@@ -207,6 +207,8 @@ export function ActivityView({
         rating: result.rating ?? null,
         user_ratings_total: result.userRatingsTotal,
         created_by: currentUserId,
+        time_of_day: null,
+        order_index: 0,
       } satisfies Omit<Activity, 'id' | 'created_at' | 'day_number' | 'scheduled_at' |
         'duration_mins' | 'notes' | 'estimated_cost' | 'is_completed' | 'user_ratings_total'> & {
         user_ratings_total?: number

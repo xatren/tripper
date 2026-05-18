@@ -361,6 +361,8 @@ export interface Activity {
   user_ratings_total: number | null
   day_number: number | null
   scheduled_at: string | null
+  time_of_day: string | null   // "HH:MM" — local time display
+  order_index: number
   duration_mins: number | null
   notes: string | null
   estimated_cost: number | null

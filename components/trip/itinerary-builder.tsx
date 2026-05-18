@@ -59,6 +59,7 @@ import { segmentKey } from '@/types'
 import { LodgingDialog, type LodgingFormData } from '@/components/trip/lodging-dialog'
 import { SleepView } from '@/components/trip/sleep-view'
 import { ActivityView } from '@/components/trip/activity-view'
+import { StopActivityPlanner } from '@/components/trip/stop-activity-planner'
 import { createClient } from '@/lib/supabase/client'
 
 interface ItineraryBuilderProps {
@@ -481,13 +482,11 @@ export function ItineraryBuilder({
                       onChangeNights={onChangeNights}
                       onDeleteStop={onDeleteStop}
                       onOpenMenu={setOpenMenuId}
+                      tripId={tripId}
+                      currentUserId={currentUserId}
                       onOpenLodging={(stopId) => {
                         setSleepInitialStopId(stopId)
                         setActiveView('sleep')
-                      }}
-                      onOpenActivity={(stopId) => {
-                        setActivityInitialStopId(stopId)
-                        setActiveView('activity')
                       }}
                     />
                   ))}
@@ -690,16 +689,19 @@ interface SortableStopRowProps {
   onSelectStop: (id: string | null) => void
   onChangeNights: (stopId: string, nights: number) => void
   onDeleteStop?: (stopId: string) => void
+  tripId: string
+  currentUserId: string
   onOpenMenu: (id: string | null) => void
   onOpenLodging: (stopId: string) => void
-  onOpenActivity: (stopId: string) => void
 }
 
 function SortableStopRow({
   stop, idx, stops, stopDates, nightsByStop, selectedStopId,
   openMenuId, showNotes, routeSegments,
-  onSelectStop, onChangeNights, onDeleteStop, onOpenMenu, onOpenLodging, onOpenActivity,
+  tripId, currentUserId,
+  onSelectStop, onChangeNights, onDeleteStop, onOpenMenu, onOpenLodging,
 }: SortableStopRowProps) {
+  const [isActivityExpanded, setIsActivityExpanded] = useState(false)
   const {
     attributes,
     listeners,
@@ -809,9 +811,9 @@ function SortableStopRow({
           {/* Activities */}
           <div onClick={(e) => e.stopPropagation()}>
             <IconAddButton
-              variant="accent"
-              title="Explore activities"
-              onClick={() => onOpenActivity(stop.id)}
+              variant={isActivityExpanded ? 'primary' : 'accent'}
+              title={isActivityExpanded ? 'Collapse activities' : 'Plan activities'}
+              onClick={() => setIsActivityExpanded((v) => !v)}
             />
           </div>
 
@@ -855,6 +857,14 @@ function SortableStopRow({
           </div>
         </div>
       </div>
+
+      {/* ── Inline activity planner ── */}
+      <StopActivityPlanner
+        stop={stop}
+        tripId={tripId}
+        currentUserId={currentUserId}
+        isExpanded={isActivityExpanded}
+      />
 
       {/* ── Transport connector ── */}
       {fallbackKm !== null && (
