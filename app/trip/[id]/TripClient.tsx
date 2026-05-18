@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { APIProvider, useMapsLibrary } from '@vis.gl/react-google-maps'
 import { createClient } from '@/lib/supabase/client'
-import type { Trip, Stop, Expense, Photo, Profile, NewStopPayload, RouteSegment } from '@/types'
+import type { Trip, Stop, Expense, Photo, Profile, NewStopPayload, RouteSegment, HotelResult, ActivityResult } from '@/types'
 import { segmentKey } from '@/types'
 import { TripMap } from '@/components/trip/trip-map'
 import { TripSettings } from '@/components/trip/trip-settings'
@@ -69,6 +69,11 @@ function TripClientContent({
   // Route segments cache: segmentKey → RouteSegment
   const [routeSegments, setRouteSegments] = useState<Map<string, RouteSegment>>(new Map())
   const fetchedKeysRef = useRef<Set<string>>(new Set())
+
+  // Hotel markers from Sleep view
+  const [hotelMarkers, setHotelMarkers] = useState<HotelResult[]>([])
+  // Activity markers from Explore view
+  const [activityMarkers, setActivityMarkers] = useState<ActivityResult[]>([])
 
   const geocodingLib = useMapsLibrary('geocoding')
   const routesLib = useMapsLibrary('routes')
@@ -323,6 +328,10 @@ function TripClientContent({
         onOpenCollaborators={handleCopyInvite}
         isOwner={isOwner}
         routeSegments={routeSegments}
+        tripId={trip.id}
+        currentUserId={currentUserId}
+        onHotelsChanged={setHotelMarkers}
+        onActivitiesChanged={setActivityMarkers}
         mapSlot={
           <TripMap
             stops={stops}
@@ -340,6 +349,8 @@ function TripClientContent({
             onConfirmPin={handleConfirmPin}
             onCancelPin={handleCancelPin}
             routeSegments={routeSegments}
+            hotelMarkers={hotelMarkers}
+            activityMarkers={activityMarkers}
           />
         }
       />

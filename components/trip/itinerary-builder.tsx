@@ -28,7 +28,6 @@ import {
   Compass,
   BedDouble,
   Map as MapIcon,
-  CalendarRange,
   PlayCircle,
   Search,
   Moon,
@@ -55,8 +54,12 @@ import {
   GripVertical,
 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
-import type { Stop, Trip, RouteSegment } from '@/types'
+import type { Stop, Trip, RouteSegment, HotelResult, ActivityResult } from '@/types'
 import { segmentKey } from '@/types'
+import { LodgingDialog, type LodgingFormData } from '@/components/trip/lodging-dialog'
+import { SleepView } from '@/components/trip/sleep-view'
+import { ActivityView } from '@/components/trip/activity-view'
+import { createClient } from '@/lib/supabase/client'
 
 interface ItineraryBuilderProps {
   trip: Trip
@@ -73,10 +76,14 @@ interface ItineraryBuilderProps {
   isOwner: boolean
   mapSlot: React.ReactNode
   routeSegments?: Map<string, RouteSegment>
+  tripId: string
+  currentUserId: string
+  onHotelsChanged: (hotels: HotelResult[]) => void
+  onActivitiesChanged: (activities: ActivityResult[]) => void
 }
 
 type MainTab = 'itinerary' | 'lists'
-type SubTab = 'route' | 'day' | 'calendar' | 'summary'
+type SubTab = 'route' | 'day' | 'summary'
 
 /** Straight-line km fallback while directions API loads */
 function haversineKm(a: Stop, b: Stop): number {
@@ -137,10 +144,18 @@ export function ItineraryBuilder({
   isOwner,
   mapSlot,
   routeSegments,
+  tripId,
+  currentUserId,
+  onHotelsChanged,
+  onActivitiesChanged,
 }: ItineraryBuilderProps) {
   const router = useRouter()
+  const [activeView, setActiveView] = useState<'itinerary' | 'sleep' | 'activity'>('itinerary')
+  const [sleepInitialStopId, setSleepInitialStopId] = useState<string | null>(null)
+  const [activityInitialStopId, setActivityInitialStopId] = useState<string | null>(null)
   const [mainTab, setMainTab] = useState<MainTab>('itinerary')
   const [subTab, setSubTab] = useState<SubTab>('route')
+  const [lodgingStopId, setLodgingStopId] = useState<string | null>(null)
   const [showNotes, setShowNotes] = useState(false)
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
   const [activeDragId, setActiveDragId] = useState<string | null>(null)
@@ -195,6 +210,20 @@ export function ItineraryBuilder({
     window.addEventListener('mouseup', onMouseUp)
   }, [panelWidth])
 
+  const handleSaveLodging = useCallback(async (data: LodgingFormData) => {
+    const supabase = createClient()
+    const description = `${data.hotelName}${data.location ? ` — ${data.location}` : ''} · ${data.nights} night${data.nights !== 1 ? 's' : ''}`
+    const { error } = await supabase.from('expenses').insert({
+      trip_id: tripId,
+      stop_id: lodgingStopId,
+      category: 'lodging',
+      amount: data.totalCost,
+      description,
+      paid_by: currentUserId,
+    })
+    if (error) throw error
+  }, [lodgingStopId, tripId, currentUserId])
+
   const totalNights = totalNightsAvailable(trip)
   const plannedNights = useMemo(
     () => stops.reduce((s, st) => s + (nightsByStop[st.id] ?? 1), 0),
@@ -231,11 +260,31 @@ export function ItineraryBuilder({
             <ArrowLeft className="h-4 w-4" />
           </button>
 
-          {/* Active */}
-          <SidebarIcon icon={<LayoutList className="h-4 w-4" />} active label="Itinerary" />
+          {/* Itinerary */}
+          <SidebarIcon
+            icon={<LayoutList className="h-4 w-4" />}
+            active={activeView === 'itinerary'}
+            label="Itinerary"
+            onClick={() => setActiveView('itinerary')}
+          />
 
-          {/* Inactive — dimmed to signal "coming soon" */}
-          <SidebarIcon icon={<CalendarDays className="h-4 w-4" />} label="Calendar" disabled />
+          {/* Sleep / Hotel search */}
+          <SidebarIcon
+            icon={<BedDouble className="h-4 w-4" />}
+            active={activeView === 'sleep'}
+            label="Sleep"
+            onClick={() => setActiveView(activeView === 'sleep' ? 'itinerary' : 'sleep')}
+          />
+
+          {/* Explore / Activities */}
+          <SidebarIcon
+            icon={<Compass className="h-4 w-4" />}
+            active={activeView === 'activity'}
+            label="Explore"
+            onClick={() => setActiveView(activeView === 'activity' ? 'itinerary' : 'activity')}
+          />
+
+          {/* Coming soon */}
           <SidebarIcon icon={<DollarSign className="h-4 w-4" />} label="Budget" disabled />
           <SidebarIcon icon={<CheckSquare className="h-4 w-4" />} label="Lists" disabled />
           <SidebarIcon icon={<FileText className="h-4 w-4" />} label="Notes" disabled />
@@ -261,11 +310,36 @@ export function ItineraryBuilder({
         </div>
       </aside>
 
-      {/* ── Planning pane ──────────────────────────────────── */}
+      {/* ── Planning pane / Sleep view ─────────────────────── */}
       <section
         className="flex flex-shrink-0 flex-col overflow-hidden bg-card/50"
         style={{ width: panelWidth }}
       >
+        {activeView === 'sleep' && (
+          <SleepView
+            key={sleepInitialStopId ?? 'sleep-view'}
+            trip={trip}
+            stops={stops}
+            initialStopId={sleepInitialStopId ?? selectedStopId}
+            tripId={tripId}
+            currentUserId={currentUserId}
+            onBack={() => setActiveView('itinerary')}
+            onHotelsChanged={onHotelsChanged}
+          />
+        )}
+        {activeView === 'activity' && (
+          <ActivityView
+            key={activityInitialStopId ?? 'activity-view'}
+            trip={trip}
+            stops={stops}
+            initialStopId={activityInitialStopId ?? selectedStopId}
+            tripId={tripId}
+            currentUserId={currentUserId}
+            onBack={() => setActiveView('itinerary')}
+            onActivitiesChanged={onActivitiesChanged}
+          />
+        )}
+        {activeView === 'itinerary' && (<>
         {/* Header */}
         <div className="border-b border-border/40 bg-card/90 px-5 pb-3.5 pt-4 backdrop-blur-sm">
           <div className="flex items-start justify-between gap-4">
@@ -325,9 +399,6 @@ export function ItineraryBuilder({
             </SubTabButton>
             <SubTabButton active={subTab === 'day'} onClick={() => setSubTab('day')} icon={<CheckSquare className="h-3.5 w-3.5" />}>
               Day by day
-            </SubTabButton>
-            <SubTabButton active={subTab === 'calendar'} onClick={() => setSubTab('calendar')} icon={<CalendarRange className="h-3.5 w-3.5" />}>
-              Calendar
             </SubTabButton>
             <SubTabButton active={subTab === 'summary'} onClick={() => setSubTab('summary')} icon={<PlayCircle className="h-3.5 w-3.5" />}>
               Summary
@@ -410,6 +481,14 @@ export function ItineraryBuilder({
                       onChangeNights={onChangeNights}
                       onDeleteStop={onDeleteStop}
                       onOpenMenu={setOpenMenuId}
+                      onOpenLodging={(stopId) => {
+                        setSleepInitialStopId(stopId)
+                        setActiveView('sleep')
+                      }}
+                      onOpenActivity={(stopId) => {
+                        setActivityInitialStopId(stopId)
+                        setActiveView('activity')
+                      }}
                     />
                   ))}
                 </div>
@@ -451,6 +530,7 @@ export function ItineraryBuilder({
         <div className="border-t border-border/40 bg-card/95 backdrop-blur-md">
           <SidebarSearch onPlaceSelected={onPlaceSelected} />
         </div>
+        </>)}
       </section>
 
       {/* ── Resize handle ─────────────────────────────────── */}
@@ -466,6 +546,13 @@ export function ItineraryBuilder({
         {mapSlot}
         <MapOverlayControls />
       </section>
+
+      <LodgingDialog
+        open={lodgingStopId !== null}
+        stopName={stops.find((s) => s.id === lodgingStopId)?.name}
+        onClose={() => setLodgingStopId(null)}
+        onSave={handleSaveLodging}
+      />
     </div>
   )
 }
@@ -475,13 +562,15 @@ export function ItineraryBuilder({
 ──────────────────────────────────────────────────────────── */
 
 function SidebarIcon({
-  icon, label, active, disabled,
+  icon, label, active, disabled, onClick,
 }: {
-  icon: React.ReactNode; label: string; active?: boolean; disabled?: boolean
+  icon: React.ReactNode; label: string; active?: boolean; disabled?: boolean; onClick?: () => void
 }) {
   return (
     <button
       title={label}
+      onClick={onClick}
+      disabled={disabled}
       className={`flex h-9 w-9 items-center justify-center rounded-lg transition-colors ${
         active
           ? 'bg-primary/20 text-primary'
@@ -529,7 +618,13 @@ function SubTabButton({
   )
 }
 
-function IconAddButton({ variant, title }: { variant: 'primary' | 'accent' | 'green'; title: string }) {
+function IconAddButton({
+  variant, title, onClick,
+}: {
+  variant: 'primary' | 'accent' | 'green'
+  title: string
+  onClick?: () => void
+}) {
   const cls =
     variant === 'green'
       ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 ring-emerald-500/30'
@@ -538,7 +633,9 @@ function IconAddButton({ variant, title }: { variant: 'primary' | 'accent' | 'gr
       : 'bg-accent/20 text-accent hover:bg-accent/30 ring-accent/30'
   return (
     <button
+      type="button"
       title={title}
+      onClick={onClick}
       className={`flex h-7 w-7 items-center justify-center rounded-full ring-1 transition-colors ${cls}`}
     >
       <Plus className="h-3.5 w-3.5" />
@@ -594,12 +691,14 @@ interface SortableStopRowProps {
   onChangeNights: (stopId: string, nights: number) => void
   onDeleteStop?: (stopId: string) => void
   onOpenMenu: (id: string | null) => void
+  onOpenLodging: (stopId: string) => void
+  onOpenActivity: (stopId: string) => void
 }
 
 function SortableStopRow({
   stop, idx, stops, stopDates, nightsByStop, selectedStopId,
   openMenuId, showNotes, routeSegments,
-  onSelectStop, onChangeNights, onDeleteStop, onOpenMenu,
+  onSelectStop, onChangeNights, onDeleteStop, onOpenMenu, onOpenLodging, onOpenActivity,
 }: SortableStopRowProps) {
   const {
     attributes,
@@ -700,12 +799,20 @@ function SortableStopRow({
 
           {/* Sleeping — green */}
           <div onClick={(e) => e.stopPropagation()}>
-            <IconAddButton variant="green" title="Add lodging" />
+            <IconAddButton
+              variant="green"
+              title="Add lodging"
+              onClick={() => onOpenLodging(stop.id)}
+            />
           </div>
 
           {/* Activities */}
           <div onClick={(e) => e.stopPropagation()}>
-            <IconAddButton variant="accent" title="Add activity" />
+            <IconAddButton
+              variant="accent"
+              title="Explore activities"
+              onClick={() => onOpenActivity(stop.id)}
+            />
           </div>
 
           {/* ⋯ menu */}

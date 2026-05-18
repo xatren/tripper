@@ -4,8 +4,8 @@ import { useCallback, useEffect } from 'react'
 import { Map, AdvancedMarker, useMap } from '@vis.gl/react-google-maps'
 import { Button } from '@/components/ui/button'
 import { MapPin, Navigation } from 'lucide-react'
-import type { Stop, NewStopPayload, RouteSegment } from '@/types'
-import { segmentKey } from '@/types'
+import type { Stop, NewStopPayload, RouteSegment, HotelResult, ActivityResult } from '@/types'
+import { segmentKey, ACTIVITY_CATEGORY_CONFIG } from '@/types'
 import { AddLocationDialog } from '@/components/trip/add-location-dialog'
 
 interface PendingPin {
@@ -29,6 +29,10 @@ interface TripMapProps {
   onCancelPin: () => void
   // Route segments (road paths + durations)
   routeSegments?: Map<string, RouteSegment>
+  // Hotel markers (sleep view)
+  hotelMarkers?: HotelResult[]
+  // Activity markers (explore view)
+  activityMarkers?: ActivityResult[]
 }
 
 const DEFAULT_CENTER = { lat: 39.8283, lng: -98.5795 }
@@ -47,6 +51,8 @@ export function TripMap({
   onConfirmPin,
   onCancelPin,
   routeSegments,
+  hotelMarkers,
+  activityMarkers,
 }: TripMapProps) {
   const map = useMap()
 
@@ -120,6 +126,30 @@ export function TripMap({
               index={index}
               name={stop.name}
               isSelected={stop.id === selectedStopId}
+            />
+          </AdvancedMarker>
+        ))}
+
+        {/* Hotel markers (sleep view) */}
+        {hotelMarkers?.map((hotel) => (
+          <AdvancedMarker
+            key={hotel.placeId}
+            position={{ lat: hotel.lat, lng: hotel.lng }}
+          >
+            <HotelMarker name={hotel.name} rating={hotel.rating} />
+          </AdvancedMarker>
+        ))}
+
+        {/* Activity markers (explore view) */}
+        {activityMarkers?.map((activity) => (
+          <AdvancedMarker
+            key={activity.placeId}
+            position={{ lat: activity.lat, lng: activity.lng }}
+          >
+            <ActivityMarker
+              name={activity.name}
+              category={activity.category}
+              rating={activity.rating}
             />
           </AdvancedMarker>
         ))}
@@ -215,6 +245,52 @@ function RoadSegment({
   }, [map, from, to, segment])
 
   return null
+}
+
+// ── Hotel marker ──────────────────────────────────────────────────────
+
+function HotelMarker({ name, rating }: { name: string; rating?: number }) {
+  return (
+    <div className="flex flex-col items-center">
+      <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500 shadow-lg ring-2 ring-emerald-400/40 ring-offset-1 ring-offset-background">
+        <span className="text-[11px]">🛏</span>
+      </div>
+      {rating !== undefined && (
+        <div className="mt-0.5 max-w-[80px] truncate rounded bg-card/95 px-1.5 py-0.5 text-[9px] font-semibold text-foreground shadow backdrop-blur-sm">
+          ★ {rating.toFixed(1)}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Activity marker ───────────────────────────────────────────────────
+
+function ActivityMarker({
+  name,
+  category,
+  rating,
+}: {
+  name: string
+  category: ActivityResult['category']
+  rating?: number | null
+}) {
+  const cfg = ACTIVITY_CATEGORY_CONFIG[category]
+  return (
+    <div className="flex flex-col items-center">
+      <div
+        className="flex h-7 w-7 items-center justify-center rounded-full shadow-lg ring-2 ring-white/20 ring-offset-1 ring-offset-background"
+        style={{ backgroundColor: cfg.color }}
+      >
+        <span className="text-[11px]">{cfg.icon}</span>
+      </div>
+      {rating !== undefined && rating !== null && (
+        <div className="mt-0.5 max-w-[80px] truncate rounded bg-card/95 px-1.5 py-0.5 text-[9px] font-semibold text-foreground shadow backdrop-blur-sm">
+          ★ {rating.toFixed(1)}
+        </div>
+      )}
+    </div>
+  )
 }
 
 // ── Stop marker ───────────────────────────────────────────────────────

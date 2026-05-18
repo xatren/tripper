@@ -267,6 +267,121 @@ export const EXPENSE_CATEGORIES: { value: ExpenseCategory; label: string }[] = [
   { value: 'other', label: 'Other' },
 ];
 
+/* ──────────────────────────────────────────────────────────
+   ACTIVITY / EXPLORE
+────────────────────────────────────────────────────────── */
+
+export type ActivityCategory =
+  | 'all'
+  | 'nature'
+  | 'culture'
+  | 'history'
+  | 'food'
+  | 'entertainment'
+
+export interface ActivityCategoryConfig {
+  label: string
+  icon: string
+  /** Hex color — used for map markers and UI accents */
+  color: string
+  /** Google Places types to query for this category */
+  types: string[]
+}
+
+export const ACTIVITY_CATEGORY_CONFIG: Record<ActivityCategory, ActivityCategoryConfig> = {
+  all: {
+    label: 'All',
+    icon: '⭐',
+    color: '#f59e0b',
+    types: ['tourist_attraction'],
+  },
+  nature: {
+    label: 'Nature & Parks',
+    icon: '🌲',
+    color: '#16a34a',
+    types: ['park', 'natural_feature', 'campground'],
+  },
+  culture: {
+    label: 'Culture',
+    icon: '🎨',
+    color: '#7c3aed',
+    types: ['museum', 'art_gallery', 'library'],
+  },
+  history: {
+    label: 'Historic',
+    icon: '🏛',
+    color: '#b45309',
+    types: ['tourist_attraction', 'church'],
+  },
+  food: {
+    label: 'Food & Drink',
+    icon: '🍜',
+    color: '#dc2626',
+    types: ['restaurant', 'cafe', 'bar'],
+  },
+  entertainment: {
+    label: 'Fun',
+    icon: '🎡',
+    color: '#0891b2',
+    types: ['amusement_park', 'night_club', 'movie_theater', 'bowling_alley'],
+  },
+}
+
+export interface ActivityResult {
+  placeId: string
+  name: string
+  address: string
+  lat: number
+  lng: number
+  rating?: number
+  userRatingsTotal?: number
+  priceLevel?: number
+  photoUrl?: string
+  /** Raw Google Places types */
+  types: string[]
+  /** Our category mapping */
+  category: ActivityCategory
+  /** Distance from the active stop in km */
+  distanceKm?: number
+}
+
+export interface Activity {
+  id: string
+  trip_id: string
+  stop_id: string | null
+  place_id: string | null
+  name: string
+  address: string | null
+  lat: number | null
+  lng: number | null
+  category: ActivityCategory
+  google_types: string[] | null
+  photo_url: string | null
+  rating: number | null
+  user_ratings_total: number | null
+  day_number: number | null
+  scheduled_at: string | null
+  duration_mins: number | null
+  notes: string | null
+  estimated_cost: number | null
+  is_completed: boolean
+  created_by: string | null
+  created_at: string
+}
+
+/** Hotel result from Google Places nearby search. */
+export interface HotelResult {
+  placeId: string
+  name: string
+  address: string
+  lat: number
+  lng: number
+  rating?: number
+  userRatingsTotal?: number
+  priceLevel?: number
+  photoUrl?: string
+}
+
 /** Driving route segment fetched from the Directions API. */
 export interface RouteSegment {
   durationText: string;          // e.g. "2 hours 15 mins"
