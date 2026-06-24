@@ -26,6 +26,30 @@
     --ring: 43 96% 56%;
     --radius: 0.625rem;
   }
+
+  @media (prefers-color-scheme: light) {
+    :root {
+      --background: 0 0% 98%;
+      --foreground: 240 15% 10%;
+      --card: 0 0% 100%;
+      --card-foreground: 240 15% 10%;
+      --popover: 0 0% 100%;
+      --popover-foreground: 240 15% 10%;
+      --primary: 43 96% 42%;
+      --primary-foreground: 0 0% 100%;
+      --secondary: 240 5% 93%;
+      --secondary-foreground: 240 15% 10%;
+      --muted: 240 5% 93%;
+      --muted-foreground: 240 5% 42%;
+      --accent: 43 96% 42%;
+      --accent-foreground: 0 0% 100%;
+      --destructive: 0 84% 50%;
+      --destructive-foreground: 0 0% 100%;
+      --border: 240 6% 86%;
+      --input: 240 5% 93%;
+      --ring: 43 96% 42%;
+    }
+  }
 }
 
 @layer base {
@@ -53,6 +77,11 @@
   background: hsl(240 8% 30%);
 }
 
+/* Spinner */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 /* Map marker pulse animation */
 @keyframes pulse-marker {
   0%, 100% { transform: scale(1); opacity: 1; }
@@ -67,6 +96,29 @@
   background: hsl(240 12% 9% / 0.8);
   backdrop-filter: blur(12px);
   border: 1px solid hsl(240 8% 18% / 0.5);
+}
+
+/* Auth form inputs */
+.auth-input {
+  width: 100%;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 12px;
+  color: #ffffff;
+  font-size: 15px;
+  font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -webkit-appearance: none;
+  box-sizing: border-box;
+}
+.auth-input:focus {
+  border-color: #f5a623;
+  box-shadow: 0 0 0 3px rgba(245, 140, 0, 0.14);
+}
+.auth-input::placeholder {
+  color: #363650;
 }
 
 /* Google Maps dark theme overrides */
