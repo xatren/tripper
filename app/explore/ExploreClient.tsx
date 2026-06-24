@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
+import type { GlobeCamera } from "@/components/explore/ExploreGlobe";
 import {
   Home, Briefcase, Compass, FileText, Globe2,
   MapPin, Moon, X, Clock, Ruler, Sun, ChevronRight, ArrowLeft,
@@ -11,7 +12,10 @@ import {
 import type { Profile, Trip } from "@/types";
 import { getInitials } from "@/lib/utils";
 
-const Globe = dynamic(() => import("react-globe.gl"), { ssr: false });
+const ExploreGlobe = dynamic(
+  () => import("@/components/explore/ExploreGlobe").then(m => m.ExploreGlobe),
+  { ssr: false },
+);
 
 // ── Tokens ────────────────────────────────────────────────────────────────────
 const FONT: React.CSSProperties = {
@@ -53,11 +57,17 @@ const COUNTRY_COORDS: Record<string, [number, number]> = {
   "Russia": [61.5, 105.3], "Georgia": [42.3, 43.4],
 };
 
+interface Waypoint {
+  name: string;
+  lat: number;
+  lng: number;
+}
+
 interface Destination {
   name: string; country: string; lat: number; lng: number;
   emoji: string; tag: string; distance: string; duration: string;
   bestSeason: string; description: string;
-  highlights: string[]; waypoints: string[];
+  highlights: string[]; waypoints: Waypoint[];
 }
 
 const ROUTES: Destination[] = [
@@ -66,42 +76,78 @@ const ROUTES: Destination[] = [
     distance: "50 km", duration: "2–3 days", bestSeason: "May – Oct",
     description: "A winding clifftop road above turquoise waters, connecting pastel villages and hidden sea grottos.",
     highlights: ["Positano cliffside village", "Ravello garden terraces", "Path of the Gods trail", "Grotta dello Smeraldo"],
-    waypoints: ["Sorrento", "Positano", "Amalfi", "Ravello", "Salerno"],
+    waypoints: [
+      { name: "Sorrento", lat: 40.626, lng: 14.375 },
+      { name: "Positano", lat: 40.628, lng: 14.485 },
+      { name: "Amalfi", lat: 40.634, lng: 14.603 },
+      { name: "Ravello", lat: 40.649, lng: 14.612 },
+      { name: "Salerno", lat: 40.683, lng: 14.768 },
+    ],
   },
   {
     name: "Ring Road", country: "Iceland", lat: 65.0, lng: -18.0, emoji: "🌋", tag: "Epic Route",
     distance: "1.332 km", duration: "7–14 days", bestSeason: "Jun – Aug",
     description: "Iceland's Route 1 circles the entire island, passing glaciers, volcanoes, waterfalls, and Northern Lights.",
     highlights: ["Jökulsárlón glacier lagoon", "Skaftafell ice caves", "Mývatn geothermal lakes", "Dettifoss waterfall"],
-    waypoints: ["Reykjavík", "Vík", "Höfn", "Egilsstaðir", "Akureyri", "Borgarnes"],
+    waypoints: [
+      { name: "Reykjavík", lat: 64.146, lng: -21.942 },
+      { name: "Vík", lat: 63.419, lng: -19.007 },
+      { name: "Höfn", lat: 64.253, lng: -15.212 },
+      { name: "Egilsstaðir", lat: 65.263, lng: -14.394 },
+      { name: "Akureyri", lat: 65.684, lng: -18.088 },
+      { name: "Borgarnes", lat: 64.537, lng: -21.921 },
+    ],
   },
   {
     name: "Route 66", country: "USA", lat: 35.5, lng: -96.0, emoji: "🛣️", tag: "Legendary Road",
     distance: "3.940 km", duration: "14–21 days", bestSeason: "Apr – Oct",
     description: "The Mother Road stretches from Chicago to LA through neon diners, vast deserts, and Americana.",
     highlights: ["Cadillac Ranch, Amarillo", "Petrified Forest NP", "Grand Canyon detour", "Santa Monica Pier"],
-    waypoints: ["Chicago", "St. Louis", "Oklahoma City", "Albuquerque", "Flagstaff", "Los Angeles"],
+    waypoints: [
+      { name: "Chicago", lat: 41.878, lng: -87.630 },
+      { name: "St. Louis", lat: 38.627, lng: -90.199 },
+      { name: "Oklahoma City", lat: 35.468, lng: -97.516 },
+      { name: "Albuquerque", lat: 35.085, lng: -106.651 },
+      { name: "Flagstaff", lat: 35.199, lng: -111.651 },
+      { name: "Los Angeles", lat: 34.052, lng: -118.244 },
+    ],
   },
   {
     name: "Milford Sound", country: "New Zealand", lat: -44.7, lng: 167.9, emoji: "🏔️", tag: "Scenic Wonder",
     distance: "120 km", duration: "2–3 days", bestSeason: "Nov – Mar",
     description: "A dramatic fjord carved by glaciers, surrounded by sheer peaks and thundering waterfalls.",
     highlights: ["Mitre Peak reflection", "Stirling & Lady Bowen Falls", "Milford Track hike", "Underwater Observatory"],
-    waypoints: ["Queenstown", "Te Anau", "Cascade Creek", "Milford Sound"],
+    waypoints: [
+      { name: "Queenstown", lat: -45.031, lng: 168.663 },
+      { name: "Te Anau", lat: -45.415, lng: 167.719 },
+      { name: "Cascade Creek", lat: -44.833, lng: 168.117 },
+      { name: "Milford Sound", lat: -44.617, lng: 167.897 },
+    ],
   },
   {
     name: "Trollstigen", country: "Norway", lat: 62.5, lng: 7.7, emoji: "🌊", tag: "Mountain Pass",
     distance: "106 km", duration: "1–2 days", bestSeason: "Jun – Sep",
     description: "Eleven hairpin bends climb a sheer wall with views of cascading waterfalls and deep Norwegian valleys.",
     highlights: ["11 hairpin bends", "Stigfossen 320 m waterfall", "Eagle Road viewpoint", "Geirangerfjord detour"],
-    waypoints: ["Åndalsnes", "Trollstigen Pass", "Valldal", "Geiranger"],
+    waypoints: [
+      { name: "Åndalsnes", lat: 62.567, lng: 7.687 },
+      { name: "Trollstigen Pass", lat: 62.472, lng: 7.662 },
+      { name: "Valldal", lat: 62.299, lng: 7.357 },
+      { name: "Geiranger", lat: 62.101, lng: 7.206 },
+    ],
   },
   {
     name: "Cappadocia", country: "Turkey", lat: 38.6, lng: 34.8, emoji: "🎈", tag: "Hidden Gem",
     distance: "180 km", duration: "3–4 days", bestSeason: "Apr – Jun",
     description: "Fairy chimneys, underground cities, and sunrise hot-air balloons over a surreal volcanic landscape.",
     highlights: ["Hot-air balloon at sunrise", "Göreme Open-Air Museum", "Derinkuyu underground city", "Rose Valley hike"],
-    waypoints: ["Nevşehir", "Göreme", "Ürgüp", "Avanos", "Derinkuyu"],
+    waypoints: [
+      { name: "Nevşehir", lat: 38.624, lng: 34.715 },
+      { name: "Göreme", lat: 38.644, lng: 34.829 },
+      { name: "Ürgüp", lat: 38.628, lng: 34.911 },
+      { name: "Avanos", lat: 38.716, lng: 34.847 },
+      { name: "Derinkuyu", lat: 38.374, lng: 34.734 },
+    ],
   },
 ];
 
@@ -116,6 +162,43 @@ function getTotalNights(trips: Pick<Trip, "start_date"|"end_date">[]) {
     if (!t.start_date || !t.end_date) return acc;
     return acc + Math.max(0, Math.round((new Date(t.end_date).getTime() - new Date(t.start_date).getTime()) / 86_400_000));
   }, 0);
+}
+
+function getRouteCamera(waypoints: Waypoint[]): GlobeCamera {
+  if (waypoints.length === 0) return { lat: 45, lng: 15, altitude: 1.8 };
+
+  const lats = waypoints.map(w => w.lat);
+  const lngs = waypoints.map(w => w.lng);
+  const centerLat = lats.reduce((a, b) => a + b, 0) / lats.length;
+  const centerLng = lngs.reduce((a, b) => a + b, 0) / lngs.length;
+
+  const latSpan = Math.max(...lats) - Math.min(...lats);
+  const lngSpan = Math.max(...lngs) - Math.min(...lngs);
+  // Enleme göre boylam mesafesini düzelt (kuzey/güney rotaları için)
+  const cosLat = Math.cos((centerLat * Math.PI) / 180);
+  const effectiveLngSpan = lngSpan * Math.max(cosLat, 0.25);
+  const span = Math.max(latSpan, effectiveLngSpan, 0.05);
+
+  // Logaritmik zoom: kısa rota → yakın, uzun rota → uzak
+  // globe.gl altitude: düşük = yakın zoom, yüksek = uzak zoom
+  const MIN_ALT = 0.44;   // ~50 km rotalar (Amalfi, Cappadocia)
+  const MAX_ALT = 0.88;   // ~4000 km rotalar (Route 66)
+  const SPAN_FLOOR = 0.10; // bundan küçük rotalar tam yakın zoom
+  const SPAN_CEIL  = 26;   // bundan büyük rotalar tam uzak zoom
+
+  let altitude: number;
+  if (span <= SPAN_FLOOR) {
+    altitude = MIN_ALT;
+  } else if (span >= SPAN_CEIL) {
+    altitude = MAX_ALT;
+  } else {
+    const t =
+      (Math.log(span) - Math.log(SPAN_FLOOR)) /
+      (Math.log(SPAN_CEIL) - Math.log(SPAN_FLOOR));
+    altitude = MIN_ALT + t * (MAX_ALT - MIN_ALT);
+  }
+
+  return { lat: centerLat, lng: centerLng, altitude };
 }
 
 const NAV_ITEMS = [
@@ -134,14 +217,16 @@ interface Props {
 
 export function ExploreClient({ profile, trips }: Props) {
   const router       = useRouter();
-  const globeRef     = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const [ready,     setReady]    = useState(false);
-  const [tab,       setTab]      = useState<"visited"|"discover">("visited");
-  const [preview,   setPreview]  = useState<Destination | null>(null);
-  const [globeW,    setGlobeW]   = useState(390);
-  const [globeH,    setGlobeH]   = useState(300);
+  const [ready,         setReady]        = useState(false);
+  const [tab,           setTab]          = useState<"visited"|"discover">("visited");
+  const [preview,       setPreview]      = useState<Destination | null>(null);
+  const [globeW,        setGlobeW]       = useState(390);
+  const [globeH,        setGlobeH]       = useState(300);
+  const [autoRotate,    setAutoRotate]    = useState(true);
+  const [camera,        setCamera]        = useState<GlobeCamera | null>(null);
+  const [flyToken,      setFlyToken]      = useState(0);
 
   const visitedCountries = useMemo(() => {
     const s = new Set<string>();
@@ -149,15 +234,39 @@ export function ExploreClient({ profile, trips }: Props) {
     return Array.from(s);
   }, [trips]);
 
-  const points = useMemo(() => [
-    ...visitedCountries.flatMap(c => {
-      const co = COUNTRY_COORDS[c];
-      return co ? [{ lat: co[0], lng: co[1], label: c, size: 0.65, color: "#f5a623" }] : [];
-    }),
-    ...ROUTES.map(d => ({ lat: d.lat, lng: d.lng, label: d.name, size: 0.32, color: preview?.name === d.name ? "#60a5fa" : "rgba(130,190,255,0.60)" })),
-  ], [visitedCountries, preview]);
+  const points = useMemo(() => {
+    if (preview) {
+      const last = preview.waypoints.length - 1;
+      const cam = getRouteCamera(preview.waypoints);
+      // Kısa rotalarda marker'ları biraz büyüt (zoom yakınken okunabilir kalsın)
+      const markerScale = cam.altitude < 0.55 ? 1.35 : cam.altitude < 0.7 ? 1.15 : 1;
+      return preview.waypoints.map((wp, i) => ({
+        lat: wp.lat,
+        lng: wp.lng,
+        label: wp.name,
+        size: (i === 0 || i === last ? 0.52 : 0.28) * markerScale,
+        color: i === 0 ? "#f5a623" : i === last ? "#fb923c" : "#60a5fa",
+      }));
+    }
+    return [
+      ...visitedCountries.flatMap(c => {
+        const co = COUNTRY_COORDS[c];
+        return co ? [{ lat: co[0], lng: co[1], label: c, size: 0.65, color: "#f5a623" }] : [];
+      }),
+      ...ROUTES.map(d => ({ lat: d.lat, lng: d.lng, label: d.name, size: 0.32, color: "rgba(130,190,255,0.60)" })),
+    ];
+  }, [visitedCountries, preview]);
+
+  const routePaths = useMemo(() => {
+    if (!preview || preview.waypoints.length < 2) return [];
+    return [{
+      points: preview.waypoints.map(wp => [wp.lat, wp.lng] as [number, number]),
+      color: "#60a5fa",
+    }];
+  }, [preview]);
 
   const arcs = useMemo(() => {
+    if (preview) return [];
     const coords = visitedCountries.map(c => COUNTRY_COORDS[c]).filter((c): c is [number,number] => !!c);
     if (coords.length < 2) return [];
     return Array.from({ length: Math.min(coords.length - 1, 6) }, (_, i) => ({
@@ -165,7 +274,7 @@ export function ExploreClient({ profile, trips }: Props) {
       endLat:   coords[i+1][0], endLng:   coords[i+1][1],
       color: ["rgba(245,166,35,0.7)", "rgba(245,166,35,0.0)"],
     }));
-  }, [visitedCountries]);
+  }, [visitedCountries, preview]);
 
   // Size globe to exactly half viewport
   useEffect(() => {
@@ -180,35 +289,35 @@ export function ExploreClient({ profile, trips }: Props) {
     return () => window.removeEventListener("resize", update);
   }, []);
 
-  // Auto-rotate + initial camera
+  // İlk kamera konumu
   useEffect(() => {
-    if (!ready || !globeRef.current) return;
-    const ctrl = globeRef.current.controls?.();
-    if (ctrl) { ctrl.autoRotate = true; ctrl.autoRotateSpeed = 0.55; ctrl.enableZoom = false; }
+    if (!ready || preview) return;
     const first = visitedCountries[0] ? COUNTRY_COORDS[visitedCountries[0]] : null;
-    globeRef.current.pointOfView({ lat: first?.[0] ?? 45, lng: first?.[1] ?? 15, altitude: 1.8 }, 1200);
-  }, [ready, visitedCountries]);
-
-  const zoomTo = (d: Destination) => {
-    const ctrl = globeRef.current?.controls?.();
-    if (ctrl) ctrl.autoRotate = false;
-    globeRef.current?.pointOfView({ lat: d.lat, lng: d.lng, altitude: 1.35 }, 900);
-  };
+    setAutoRotate(true);
+    setCamera({ lat: first?.[0] ?? 45, lng: first?.[1] ?? 15, altitude: 1.8 });
+    setFlyToken(t => t + 1);
+  }, [ready, visitedCountries, preview]);
 
   const openPreview = (d: Destination) => {
-    zoomTo(d);
+    setAutoRotate(false);
     setPreview(d);
+    setCamera(getRouteCamera(d.waypoints));
+    setFlyToken(t => t + 1);
   };
 
   const closePreview = () => {
     setPreview(null);
-    const ctrl = globeRef.current?.controls?.();
-    if (ctrl) { ctrl.autoRotate = true; }
-    globeRef.current?.pointOfView({ lat: 45, lng: 15, altitude: 1.8 }, 800);
+    setAutoRotate(true);
+    const first = visitedCountries[0] ? COUNTRY_COORDS[visitedCountries[0]] : null;
+    setCamera({ lat: first?.[0] ?? 45, lng: first?.[1] ?? 15, altitude: 1.8 });
+    setFlyToken(t => t + 1);
   };
 
   const totalNights = getTotalNights(trips);
   const idx = preview ? ROUTES.indexOf(preview) : 0;
+  const pathStroke = preview
+    ? (getRouteCamera(preview.waypoints).altitude < 0.55 ? 0.75 : 0.55)
+    : 0.55;
 
   return (
     <div
@@ -247,26 +356,17 @@ export function ExploreClient({ profile, trips }: Props) {
 
         {/* Globe */}
         <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <Globe
-            ref={globeRef}
+          <ExploreGlobe
             width={globeW}
             height={globeH}
-            globeImageUrl="//unpkg.com/three-globe/example/img/earth-night.jpg"
-            backgroundColor="rgba(0,0,0,0)"
-            atmosphereColor="rgba(100,140,255,0.22)"
-            atmosphereAltitude={0.16}
-            pointsData={points}
-            pointLat="lat" pointLng="lng" pointColor="color"
-            pointRadius="size" pointAltitude={0.01} pointResolution={16}
-            pointLabel={(p: any) =>
-              `<div style="background:rgba(8,8,28,0.92);border:1px solid rgba(245,166,35,0.4);border-radius:8px;padding:4px 10px;font-family:Inter,sans-serif;font-size:11px;color:#fff;white-space:nowrap">${p.label}</div>`
-            }
-            arcsData={arcs}
-            arcStartLat="startLat" arcStartLng="startLng"
-            arcEndLat="endLat"   arcEndLng="endLng"
-            arcColor="color" arcAltitude={0.28} arcStroke={0.55}
-            arcDashLength={0.4} arcDashGap={0.2} arcDashAnimateTime={3200}
-            onGlobeReady={() => setReady(true)}
+            points={points}
+            arcs={arcs}
+            routePaths={routePaths}
+            autoRotate={autoRotate}
+            camera={camera}
+            flyToken={flyToken}
+            pathStroke={pathStroke}
+            onReady={() => setReady(true)}
           />
         </div>
 
@@ -418,12 +518,12 @@ export function ExploreClient({ profile, trips }: Props) {
                 <p style={{ fontSize:10, fontWeight:600, color:"rgba(200,210,255,0.35)", letterSpacing:"0.08em", margin:"0 0 10px" }}>ROUTE</p>
                 <div style={{ display:"flex", alignItems:"flex-start", gap:0, marginBottom:16, overflowX:"auto", paddingBottom:4, scrollbarWidth:"none" }}>
                   {preview.waypoints.map((wp, i) => (
-                    <div key={wp} style={{ display:"flex", alignItems:"center", flexShrink:0 }}>
+                    <div key={wp.name} style={{ display:"flex", alignItems:"center", flexShrink:0 }}>
                       <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:3 }}>
                         <div style={{ width:26, height:26, borderRadius:"50%", background: i===0||i===preview.waypoints.length-1 ? AMBER_GRAD : "rgba(255,255,255,0.10)", border: i===0||i===preview.waypoints.length-1 ? "none" : "1px solid rgba(255,255,255,0.18)", display:"flex", alignItems:"center", justifyContent:"center", boxShadow: i===0||i===preview.waypoints.length-1 ? AMBER_GLOW : "none", flexShrink:0 }}>
                           <MapPin style={{ width:11, height:11, color: i===0||i===preview.waypoints.length-1 ? "#1a0800" : "rgba(200,210,255,0.55)" }} />
                         </div>
-                        <p style={{ fontSize:9, fontWeight:600, color: i===0||i===preview.waypoints.length-1 ? "#f5a623" : "rgba(200,210,255,0.50)", margin:0, whiteSpace:"nowrap", maxWidth:56, textAlign:"center", overflow:"hidden", textOverflow:"ellipsis" }}>{wp}</p>
+                        <p style={{ fontSize:9, fontWeight:600, color: i===0||i===preview.waypoints.length-1 ? "#f5a623" : "rgba(200,210,255,0.50)", margin:0, whiteSpace:"nowrap", maxWidth:56, textAlign:"center", overflow:"hidden", textOverflow:"ellipsis" }}>{wp.name}</p>
                       </div>
                       {i < preview.waypoints.length-1 && (
                         <div style={{ width:20, height:1, background:"rgba(255,255,255,0.14)", margin:"0 1px", marginBottom:18, flexShrink:0 }} />
