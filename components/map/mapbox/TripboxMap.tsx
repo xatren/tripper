@@ -1,7 +1,7 @@
 'use client'
 
-import { useMemo } from 'react'
-import Map, { Marker, Source, Layer } from 'react-map-gl/mapbox'
+import { useMemo, useRef, useEffect, useCallback } from 'react'
+import Map, { Marker, Source, Layer, type MapRef } from 'react-map-gl/mapbox'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { MAPBOX_TOKEN, MAPBOX_DARK_STYLE, DEFAULT_PITCH, DEFAULT_BEARING, BUILDING_EXTRUSION_LAYER } from '@/lib/mapbox/client'
 
@@ -23,6 +23,8 @@ interface TripboxMapProps {
 const DEFAULT_CENTER = { lat: 41.0082, lng: 28.9784 }
 
 export function TripboxMap({ points, routePath = [], interactive = true, className }: TripboxMapProps) {
+  const mapRef = useRef<MapRef | null>(null)
+
   const center = useMemo(() => {
     if (points.length === 0) return DEFAULT_CENTER
     return {
@@ -30,6 +32,31 @@ export function TripboxMap({ points, routePath = [], interactive = true, classNa
       lng: points.reduce((s, p) => s + p.lng, 0) / points.length,
     }
   }, [points])
+
+  const pointsKey = points.map((p) => `${p.lat.toFixed(5)},${p.lng.toFixed(5)}`).join('|')
+
+  const fitToPoints = useCallback(() => {
+    const map = mapRef.current
+    if (!map || points.length === 0) return
+    if (points.length === 1) {
+      map.flyTo({ center: [points[0].lng, points[0].lat], zoom: 9, pitch: DEFAULT_PITCH, bearing: DEFAULT_BEARING, duration: 800 })
+      return
+    }
+    const lats = points.map((p) => p.lat)
+    const lngs = points.map((p) => p.lng)
+    map.fitBounds(
+      [
+        [Math.min(...lngs), Math.min(...lats)],
+        [Math.max(...lngs), Math.max(...lats)],
+      ],
+      { padding: 60, maxZoom: 13, duration: 800, pitch: DEFAULT_PITCH, bearing: DEFAULT_BEARING }
+    )
+  }, [pointsKey, points])
+
+  useEffect(() => {
+    fitToPoints()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pointsKey])
 
   const routeGeoJson = useMemo(
     () => ({
@@ -56,6 +83,7 @@ export function TripboxMap({ points, routePath = [], interactive = true, classNa
 
   return (
     <Map
+      ref={mapRef}
       mapboxAccessToken={MAPBOX_TOKEN}
       initialViewState={{
         latitude: center.lat,
@@ -64,6 +92,7 @@ export function TripboxMap({ points, routePath = [], interactive = true, classNa
         pitch: DEFAULT_PITCH,
         bearing: DEFAULT_BEARING,
       }}
+      onLoad={fitToPoints}
       mapStyle={MAPBOX_DARK_STYLE}
       style={{ width: '100%', height: '100%' }}
       interactive={interactive}
