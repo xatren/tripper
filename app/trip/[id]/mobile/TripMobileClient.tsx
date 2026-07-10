@@ -2,8 +2,10 @@
 
 import { useState, useCallback, useEffect, useRef, type CSSProperties } from 'react'
 import { useRouter } from 'next/navigation'
-import { APIProvider, useMapsLibrary } from '@vis.gl/react-google-maps'
 import { createClient } from '@/lib/supabase/client'
+import { TripboxMap } from '@/components/map/mapbox/TripboxMap'
+import { getDrivingRoute } from '@/lib/mapbox/directions'
+import { forwardSearch, type GeocodeResult } from '@/lib/mapbox/geocoding'
 import type { Trip, Stop } from '@/types'
 
 const ACCENT = '#f5a623'
@@ -15,33 +17,7 @@ interface TripMobileClientProps {
 }
 
 export function TripMobileClient(props: TripMobileClientProps) {
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
-
-  if (!apiKey) {
-    return (
-      <div
-        style={{
-          minHeight: '100svh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: '#0a0a14',
-          color: 'rgba(255,255,255,.6)',
-          fontFamily: "var(--font-inter),'Inter',system-ui,sans-serif",
-          padding: 24,
-          textAlign: 'center',
-        }}
-      >
-        Google Maps API key not configured
-      </div>
-    )
-  }
-
-  return (
-    <APIProvider apiKey={apiKey} libraries={['places']}>
-      <TripMobileContent {...props} />
-    </APIProvider>
-  )
+  return <TripMobileContent {...props} />
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -90,6 +66,21 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
   const [activeTab, setActiveTab] = useState<'route' | 'days' | 'bookings'>('route')
   const [isAddOpen, setIsAddOpen] = useState(false)
   const [aiHint, setAiHint] = useState(false)
+  const [routePath, setRoutePath] = useState<{ lat: number; lng: number }[]>([])
+
+  useEffect(() => {
+    if (stops.length < 2) {
+      setRoutePath([])
+      return
+    }
+    let cancelled = false
+    getDrivingRoute(stops.map((s) => ({ lat: s.lat, lng: s.lng }))).then((route) => {
+      if (!cancelled) setRoutePath(route?.polylinePath ?? [])
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [stops])
 
   const handleAddStop = useCallback(
     async (lat: number, lng: number, name: string, address: string) => {
@@ -168,7 +159,7 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
         </div>
 
         {/* map hero */}
-        <RouteHero />
+        <RouteHero stops={stops} routePath={routePath} />
 
         {/* bottom sheet */}
         <div style={{ flex: 1, marginTop: -24, position: 'relative', zIndex: 2, background: 'rgba(255,255,255,.055)', border: '1px solid rgba(255,255,255,.13)', borderBottom: 'none', backdropFilter: 'blur(20px)', borderRadius: '24px 24px 0 0', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
@@ -260,42 +251,14 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
 
 // ─── Sub-components ────────────────────────────────────────────────────────
 
-function RouteHero() {
-  const waypoints = [
-    { cx: 70, cy: 200, delay: 0 },
-    { cx: 140, cy: 96, delay: 0.3 },
-    { cx: 260, cy: 87, delay: 0.6 },
-    { cx: 330, cy: 35, delay: 0.9 },
-  ]
+function RouteHero({ stops, routePath }: { stops: Stop[]; routePath: { lat: number; lng: number }[] }) {
   return (
     <div style={{ position: 'relative', flex: 'none', height: 260, marginTop: 2 }}>
-      <svg width="100%" height="100%" viewBox="0 0 393 260" preserveAspectRatio="none" style={{ position: 'absolute', inset: 0 }}>
-        <defs>
-          <radialGradient id="routeglow" cx="50%" cy="45%" r="60%">
-            <stop offset="0%" stopColor="rgba(245,140,0,.20)" />
-            <stop offset="100%" stopColor="rgba(245,140,0,0)" />
-          </radialGradient>
-        </defs>
-        <rect x="0" y="0" width="393" height="260" fill="url(#routeglow)" />
-        <g stroke="rgba(255,255,255,.05)" strokeWidth="1" fill="none">
-          <path d="M-20 50 Q 100 15, 200 45 T 420 32" />
-          <path d="M-20 105 Q 120 78, 220 112 T 420 96" />
-          <path d="M-20 165 Q 140 138, 260 172 T 420 160" />
-          <path d="M-20 218 Q 160 200, 280 224 T 420 212" />
-        </g>
-        <path
-          d="M70 200 C 110 165, 90 122, 140 96 C 190 70, 210 112, 260 87 C 300 67, 300 47, 330 35"
-          stroke="#8888e4" strokeWidth="2.5" fill="none" strokeDasharray="7 6"
-          style={{ animation: 'dashmove 2.2s linear infinite', opacity: 0.85 }}
-        />
-        {waypoints.map((p, i) => (
-          <g key={i}>
-            <circle cx={p.cx} cy={p.cy} r="10" fill="rgba(245,140,0,.18)" style={{ animation: `pulseglow 2.4s ease-in-out infinite ${p.delay}s` }} />
-            <circle cx={p.cx} cy={p.cy} r="6" fill="#f5a623" stroke="#0a1020" strokeWidth="2" />
-          </g>
-        ))}
-      </svg>
-      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, transparent 55%, #06061c 100%)' }} />
+      <TripboxMap
+        points={stops.map((s, idx) => ({ id: s.id, lat: s.lat, lng: s.lng, label: idx + 1 }))}
+        routePath={routePath}
+      />
+      <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(to bottom, transparent 55%, #06061c 100%)' }} />
     </div>
   )
 }
@@ -360,33 +323,24 @@ function AddDestinationSheet({
   onClose: () => void
   onAdd: (lat: number, lng: number, name: string, address: string) => Promise<void>
 }) {
-  const placesLib = useMapsLibrary('places')
   const [query, setQuery] = useState('')
-  const [predictions, setPredictions] = useState<google.maps.places.AutocompletePrediction[]>([])
+  const [results, setResults] = useState<GeocodeResult[]>([])
   const [isSearching, setIsSearching] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
-  const autocompleteRef = useRef<google.maps.places.AutocompleteService | null>(null)
-  const placesServiceRef = useRef<google.maps.places.PlacesService | null>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  useEffect(() => {
-    if (!placesLib) return
-    autocompleteRef.current = new placesLib.AutocompleteService()
-    placesServiceRef.current = new placesLib.PlacesService(document.createElement('div'))
-  }, [placesLib])
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current)
     const q = query.trim()
-    if (!q || !autocompleteRef.current) {
-      setPredictions([])
+    if (!q) {
+      setResults([])
       setIsSearching(false)
       return
     }
     setIsSearching(true)
     debounceRef.current = setTimeout(() => {
-      autocompleteRef.current!.getPlacePredictions({ input: q, types: ['establishment', 'geocode'] }, (results) => {
-        setPredictions(results ?? [])
+      forwardSearch(q).then((found) => {
+        setResults(found)
         setIsSearching(false)
       })
     }, 220)
@@ -394,24 +348,11 @@ function AddDestinationSheet({
   }, [query])
 
   const handleSelect = useCallback(
-    (prediction: google.maps.places.AutocompletePrediction) => {
-      if (!placesServiceRef.current) return
+    async (result: GeocodeResult) => {
       setIsSaving(true)
-      placesServiceRef.current.getDetails(
-        { placeId: prediction.place_id, fields: ['name', 'geometry', 'formatted_address'] },
-        async (result) => {
-          if (!result?.geometry?.location) { setIsSaving(false); return }
-          const lat = result.geometry.location.lat()
-          const lng = result.geometry.location.lng()
-          await onAdd(
-            lat, lng,
-            result.name || prediction.structured_formatting?.main_text || '',
-            result.formatted_address || prediction.description
-          )
-          setIsSaving(false)
-          onClose()
-        }
-      )
+      await onAdd(result.lat, result.lng, result.name, result.address)
+      setIsSaving(false)
+      onClose()
     },
     [onAdd, onClose]
   )
@@ -442,18 +383,18 @@ function AddDestinationSheet({
           )}
         </div>
         <div style={{ overflowY: 'auto', flex: 1 }}>
-          {predictions.map((p) => (
+          {results.map((r) => (
             <button
-              key={p.place_id}
-              onClick={() => handleSelect(p)}
+              key={r.id}
+              onClick={() => handleSelect(r)}
               disabled={isSaving}
               style={{ width: '100%', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 2, padding: '10px 8px', background: 'none', border: 'none', borderBottom: '1px solid rgba(255,255,255,.06)', cursor: isSaving ? 'default' : 'pointer', fontFamily: 'inherit' }}
             >
-              <span style={{ color: '#ffffff', fontSize: 14, fontWeight: 600 }}>{p.structured_formatting?.main_text ?? p.description}</span>
-              <span style={{ color: '#4a4a68', fontSize: 12 }}>{p.structured_formatting?.secondary_text ?? ''}</span>
+              <span style={{ color: '#ffffff', fontSize: 14, fontWeight: 600 }}>{r.name}</span>
+              <span style={{ color: '#4a4a68', fontSize: 12 }}>{r.address}</span>
             </button>
           ))}
-          {query && !isSearching && predictions.length === 0 && (
+          {query && !isSearching && results.length === 0 && (
             <div style={{ color: '#4a4a68', fontSize: 13, padding: '16px 8px', textAlign: 'center' }}>No results</div>
           )}
         </div>
