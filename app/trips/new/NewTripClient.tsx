@@ -568,7 +568,7 @@ function Step5({ name, vibe, startDate, endDate, destinations, budget, currency,
       const supabase = createClient();
       const countries = destinations.map(d => d.name).join(', ');
       const description = `Countries: ${countries || 'Not specified'}\nVibe: ${vibe ?? 'Road'}\n\nWho can view: Everyone`;
-      const { error } = await supabase.from('trips').insert({
+      const { data, error } = await supabase.from('trips').insert({
         title: name || 'Untitled Trip',
         description,
         start_date: startDate || null,
@@ -576,10 +576,10 @@ function Step5({ name, vibe, startDate, endDate, destinations, budget, currency,
         total_budget: raw,
         owner_id: userId,
         invite_code: inviteCode,
-      });
-      if (!error) {
+      }).select('id').single();
+      if (!error && data) {
         setDone(true);
-        setTimeout(() => router.push('/trips'), 1600);
+        setTimeout(() => router.push(`/trip/${data.id}/mobile`), 1600);
       }
     } finally {
       setLoading(false);
