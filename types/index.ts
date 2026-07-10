@@ -59,6 +59,9 @@ export interface Trip {
   updated_at: string;
   members?: TripMember[];
   pins?: Pin[];
+  /** Default map focus point (e.g. the first destination country picked during creation). */
+  focus_lat?: number | null;
+  focus_lng?: number | null;
 }
 
 export interface TripMember {

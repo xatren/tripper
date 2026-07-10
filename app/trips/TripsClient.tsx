@@ -269,7 +269,7 @@ export function TripsClient({ profile, trips: initialTrips, userId }: Props) {
                       trip={trip}
                       index={initialTrips.indexOf(trip)}
                       isOwner={trip.owner_id === userId}
-                      onOpen={() => router.push(`/trip/${trip.id}`)}
+                      onOpen={() => router.push(`/trip/${trip.id}/mobile`)}
                       onDelete={() => handleDelete(trip.id)}
                       onCopyCode={() => navigator.clipboard.writeText(trip.invite_code ?? "")}
                     />

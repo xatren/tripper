@@ -576,6 +576,8 @@ function Step5({ name, vibe, startDate, endDate, destinations, budget, currency,
         total_budget: raw,
         owner_id: userId,
         invite_code: inviteCode,
+        focus_lat: destinations[0]?.lat ?? null,
+        focus_lng: destinations[0]?.lng ?? null,
       }).select('id').single();
       if (!error && data) {
         setDone(true);

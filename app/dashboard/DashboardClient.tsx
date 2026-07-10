@@ -131,7 +131,7 @@ export function DashboardClient({ profile, trips: initialTrips }: DashboardClien
     if (err || !trip) { setError(err?.message ?? "Failed to create trip"); setLoading(false); return; }
     setTrips((t) => [trip as Trip, ...t]);
     setCreate(false);
-    router.push(`/trip/${trip.id}`);
+    router.push(`/trip/${trip.id}/mobile`);
     setLoading(false);
   };
 
@@ -146,7 +146,7 @@ export function DashboardClient({ profile, trips: initialTrips }: DashboardClien
     const { error: joinErr } = await supabase.from("trips").update({ collaborator_id: user.id }).eq("id", trip.id);
     if (joinErr) { setError(joinErr.message); setLoading(false); return; }
     setJoin(false);
-    router.push(`/trip/${trip.id}`);
+    router.push(`/trip/${trip.id}/mobile`);
   };
 
   const handleDelete = async (tripId: string) => {
@@ -272,7 +272,7 @@ export function DashboardClient({ profile, trips: initialTrips }: DashboardClien
                       trip={trip}
                       index={i}
                       isOwner={trip.owner_id === profile?.id}
-                      onOpen={() => router.push(`/trip/${trip.id}`)}
+                      onOpen={() => router.push(`/trip/${trip.id}/mobile`)}
                       onDelete={() => handleDelete(trip.id)}
                       onCopyCode={() => navigator.clipboard.writeText(trip.invite_code ?? "")}
                     />

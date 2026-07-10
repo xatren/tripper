@@ -152,14 +152,11 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
               <span style={{ fontSize: 14, lineHeight: 1 }}>📍</span>
               <span style={{ color: ACCENT, fontWeight: 700, fontSize: 12.5 }}>{stops.length}</span>
             </div>
-            <button onClick={() => router.push(`/trip/${trip.id}`)} title="Open full planner" style={topBtnStyle}>
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
-            </button>
           </div>
         </div>
 
         {/* map hero */}
-        <RouteHero stops={stops} routePath={routePath} />
+        <RouteHero stops={stops} routePath={routePath} trip={trip} />
 
         {/* bottom sheet */}
         <div style={{ flex: 1, marginTop: -24, position: 'relative', zIndex: 2, background: 'rgba(255,255,255,.055)', border: '1px solid rgba(255,255,255,.13)', borderBottom: 'none', backdropFilter: 'blur(20px)', borderRadius: '24px 24px 0 0', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
@@ -251,12 +248,17 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
 
 // ─── Sub-components ────────────────────────────────────────────────────────
 
-function RouteHero({ stops, routePath }: { stops: Stop[]; routePath: { lat: number; lng: number }[] }) {
+function RouteHero({ stops, routePath, trip }: { stops: Stop[]; routePath: { lat: number; lng: number }[]; trip: Trip }) {
+  const defaultCenter =
+    trip.focus_lat != null && trip.focus_lng != null ? { lat: trip.focus_lat, lng: trip.focus_lng } : undefined
+
   return (
     <div style={{ position: 'relative', flex: 'none', height: 260, marginTop: 2 }}>
       <TripboxMap
         points={stops.map((s, idx) => ({ id: s.id, lat: s.lat, lng: s.lng, label: idx + 1 }))}
         routePath={routePath}
+        defaultCenter={defaultCenter}
+        defaultZoom={5}
       />
       <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(to bottom, transparent 55%, #06061c 100%)' }} />
     </div>

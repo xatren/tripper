@@ -17,21 +17,25 @@ interface TripboxMapProps {
   routePath?: { lat: number; lng: number }[]
   interactive?: boolean
   className?: string
+  /** Center to use while there are no points yet — e.g. the trip's selected country. */
+  defaultCenter?: { lat: number; lng: number }
+  /** Zoom to use with `defaultCenter` — a country-wide view is much wider than a single-stop view. */
+  defaultZoom?: number
 }
 
-/** Fallback center (Istanbul) shown when a trip has no stops yet. */
-const DEFAULT_CENTER = { lat: 41.0082, lng: 28.9784 }
+/** Last-resort fallback center (Istanbul) when a trip has neither stops nor a selected country. */
+const FALLBACK_CENTER = { lat: 41.0082, lng: 28.9784 }
 
-export function TripboxMap({ points, routePath = [], interactive = true, className }: TripboxMapProps) {
+export function TripboxMap({ points, routePath = [], interactive = true, className, defaultCenter, defaultZoom = 9 }: TripboxMapProps) {
   const mapRef = useRef<MapRef | null>(null)
 
   const center = useMemo(() => {
-    if (points.length === 0) return DEFAULT_CENTER
+    if (points.length === 0) return defaultCenter ?? FALLBACK_CENTER
     return {
       lat: points.reduce((s, p) => s + p.lat, 0) / points.length,
       lng: points.reduce((s, p) => s + p.lng, 0) / points.length,
     }
-  }, [points])
+  }, [points, defaultCenter])
 
   const pointsKey = points.map((p) => `${p.lat.toFixed(5)},${p.lng.toFixed(5)}`).join('|')
 
@@ -88,7 +92,7 @@ export function TripboxMap({ points, routePath = [], interactive = true, classNa
       initialViewState={{
         latitude: center.lat,
         longitude: center.lng,
-        zoom: points.length > 1 ? 10 : 9,
+        zoom: points.length > 1 ? 10 : points.length === 1 ? 9 : defaultZoom,
         pitch: DEFAULT_PITCH,
         bearing: DEFAULT_BEARING,
       }}

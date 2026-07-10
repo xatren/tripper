@@ -42,5 +42,5 @@ export default async function JoinPage({ params }: JoinPageProps) {
     });
   }
 
-  redirect(`/trip/${trip.id}`);
+  redirect(`/trip/${trip.id}/mobile`);
 }
