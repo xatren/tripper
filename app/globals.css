@@ -56,6 +56,12 @@
   * {
     @apply border-border;
   }
+  html, body {
+    /* Prevent iOS/Android rubber-band overscroll from revealing the page
+       background behind fixed-position full-screen views (e.g. the mobile
+       trip map) during fast swipes/drags. */
+    overscroll-behavior: none;
+  }
   body {
     @apply bg-background text-foreground;
   }

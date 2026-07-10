@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef, type CSSProperties } from 'react'
 import { useRouter } from 'next/navigation'
+import { motion, useMotionValue, animate } from 'framer-motion'
 import { createClient } from '@/lib/supabase/client'
 import { TripboxMap } from '@/components/map/mapbox/TripboxMap'
 import { getDrivingRoute } from '@/lib/mapbox/directions'
@@ -9,6 +10,15 @@ import { forwardSearch, type GeocodeResult } from '@/lib/mapbox/geocoding'
 import type { Trip, Stop } from '@/types'
 
 const ACCENT = '#f5a623'
+const ACCENT_LIGHT = '#f8c04a'
+const ACCENT_DARK = '#e8821a'
+const GLASS_FILL = 'rgba(255,255,255,.055)'
+const GLASS_BORDER = 'rgba(255,255,255,.13)'
+
+/** Bottom-sheet snap heights, in px, resolved against the live viewport height. */
+const SHEET_MIN_PX = 190
+const SHEET_DEFAULT_RATIO = 0.54
+const SHEET_MAX_RATIO = 0.88
 
 interface TripMobileClientProps {
   trip: Trip
@@ -48,14 +58,15 @@ const topBtnStyle: CSSProperties = {
   width: 40,
   height: 40,
   borderRadius: 14,
-  background: 'rgba(255,255,255,.055)',
-  border: '1px solid rgba(255,255,255,.13)',
+  background: GLASS_FILL,
+  border: `1px solid ${GLASS_BORDER}`,
   backdropFilter: 'blur(20px)',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   flex: 'none',
   cursor: 'pointer',
+  boxShadow: '0 4px 16px rgba(0,0,0,.3)',
 }
 
 // ─── Main content ────────────────────────────────────────────────────────────
@@ -67,6 +78,63 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
   const [isAddOpen, setIsAddOpen] = useState(false)
   const [aiHint, setAiHint] = useState(false)
   const [routePath, setRoutePath] = useState<{ lat: number; lng: number }[]>([])
+  const [isDragging, setIsDragging] = useState(false)
+
+  const stageRef = useRef<HTMLDivElement>(null)
+  const sheetHeight = useMotionValue(420)
+
+  useEffect(() => {
+    const h = stageRef.current?.clientHeight ?? window.innerHeight
+    sheetHeight.set(Math.round(h * SHEET_DEFAULT_RATIO))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const snapPoints = useCallback(() => {
+    const h = stageRef.current?.clientHeight ?? window.innerHeight
+    return {
+      min: SHEET_MIN_PX,
+      mid: Math.round(h * SHEET_DEFAULT_RATIO),
+      max: Math.round(h * SHEET_MAX_RATIO),
+    }
+  }, [])
+
+  // Native Pointer Events (not Framer's onPan) so dragging works reliably with
+  // mouse, touch, and pen alike, and pointer capture keeps tracking even if the
+  // finger/cursor drifts outside the handle's small hit area mid-drag.
+  const dragStart = useRef<{ pointerId: number; clientY: number; height: number } | null>(null)
+
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      e.currentTarget.setPointerCapture(e.pointerId)
+      dragStart.current = { pointerId: e.pointerId, clientY: e.clientY, height: sheetHeight.get() }
+      setIsDragging(true)
+    },
+    [sheetHeight]
+  )
+
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      const drag = dragStart.current
+      if (!drag || e.pointerId !== drag.pointerId) return
+      const { min, max } = snapPoints()
+      const next = drag.height - (e.clientY - drag.clientY)
+      sheetHeight.set(Math.min(max, Math.max(min, next)))
+    },
+    [sheetHeight, snapPoints]
+  )
+
+  const handlePointerUp = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (!dragStart.current || e.pointerId !== dragStart.current.pointerId) return
+      dragStart.current = null
+      setIsDragging(false)
+      const { min, mid, max } = snapPoints()
+      const current = sheetHeight.get()
+      const nearest = [min, mid, max].reduce((a, b) => (Math.abs(b - current) < Math.abs(a - current) ? b : a))
+      animate(sheetHeight, nearest, { type: 'spring', stiffness: 320, damping: 34 })
+    },
+    [sheetHeight, snapPoints]
+  )
 
   useEffect(() => {
     if (stops.length < 2) {
@@ -106,6 +174,8 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
 
   const nightsTotal = totalNights(trip)
   const nightsPlanned = Math.min(stops.length, nightsTotal || stops.length)
+  const defaultCenter =
+    trip.focus_lat != null && trip.focus_lng != null ? { lat: trip.focus_lat, lng: trip.focus_lng } : undefined
 
   return (
     <div
@@ -130,54 +200,86 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
       <div style={{ position: 'absolute', top: 160, left: -100, width: 340, height: 340, borderRadius: '50%', background: 'rgba(90,0,210,.20)', filter: 'blur(70px)', pointerEvents: 'none' }} />
       <div style={{ position: 'absolute', top: 220, right: -120, width: 320, height: 320, borderRadius: '50%', background: 'rgba(0,100,160,.14)', filter: 'blur(70px)', pointerEvents: 'none' }} />
 
-      <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', minHeight: '100svh', maxWidth: 480, margin: '0 auto' }}>
+      <div ref={stageRef} style={{ position: 'relative', zIndex: 1, height: '100svh', maxWidth: 480, margin: '0 auto', overflow: 'hidden' }}>
 
-        {/* top bar */}
-        <div style={{ padding: '20px 18px 14px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-          <button onClick={() => router.push('/trips')} title="Back to trips" style={topBtnStyle}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
-          </button>
+        {/* map layer — full-bleed, its bottom edge tracks the sheet so the visible map literally grows/shrinks as you drag */}
+        <motion.div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: sheetHeight, zIndex: 0, background: '#06061c' }}>
+          <TripboxMap
+            points={stops.map((s, idx) => ({ id: s.id, lat: s.lat, lng: s.lng, label: idx + 1, title: s.name, subtitle: s.address ?? undefined }))}
+            routePath={routePath}
+            defaultCenter={defaultCenter}
+            defaultZoom={5}
+          />
+          <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(to bottom, transparent 78%, rgba(6,6,28,.6) 100%)' }} />
+        </motion.div>
 
-          <div style={{ flex: 1, textAlign: 'center', padding: '0 8px', minWidth: 0 }}>
-            <div style={{ color: '#ffffff', fontWeight: 800, fontSize: 17, letterSpacing: '-0.2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {tripTitle(trip, stops)}
+        {/* floating header — sits over the map, not a separate opaque block */}
+        <div
+          style={{
+            position: 'absolute', top: 0, left: 0, right: 0, zIndex: 2,
+            padding: '20px 18px 14px', paddingTop: 'max(20px, env(safe-area-inset-top))',
+            background: 'linear-gradient(to bottom, rgba(6,6,20,.8) 0%, rgba(6,6,20,.45) 55%, transparent 100%)',
+            pointerEvents: 'none',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', pointerEvents: 'auto' }}>
+            <button onClick={() => router.push('/trips')} title="Back to trips" style={topBtnStyle}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
+            </button>
+
+            <div style={{ flex: 1, textAlign: 'center', padding: '0 8px', minWidth: 0 }}>
+              <div style={{ color: '#ffffff', fontWeight: 800, fontSize: 17, letterSpacing: '-0.2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textShadow: '0 2px 12px rgba(0,0,0,.6)' }}>
+                {tripTitle(trip, stops)}
+              </div>
+              <div style={{ color: 'rgba(215,215,255,.7)', fontWeight: 500, fontSize: 12.5, marginTop: 3, textShadow: '0 2px 10px rgba(0,0,0,.6)' }}>
+                {formatDateRange(trip.start_date, trip.end_date) || 'No dates set'}
+              </div>
             </div>
-            <div style={{ color: '#4a4a68', fontWeight: 500, fontSize: 12.5, marginTop: 3 }}>
-              {formatDateRange(trip.start_date, trip.end_date) || 'No dates set'}
-            </div>
-          </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 'none' }}>
-            <div style={{ height: 40, padding: '0 10px', borderRadius: 14, background: 'rgba(255,255,255,.055)', border: '1px solid rgba(255,255,255,.13)', backdropFilter: 'blur(20px)', display: 'flex', alignItems: 'center', gap: 5 }}>
-              <span style={{ fontSize: 14, lineHeight: 1 }}>📍</span>
-              <span style={{ color: ACCENT, fontWeight: 700, fontSize: 12.5 }}>{stops.length}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 'none' }}>
+              <div style={{ height: 40, padding: '0 10px', borderRadius: 14, background: GLASS_FILL, border: `1px solid ${GLASS_BORDER}`, backdropFilter: 'blur(20px)', display: 'flex', alignItems: 'center', gap: 5, boxShadow: '0 4px 16px rgba(0,0,0,.3)' }}>
+                <span style={{ fontSize: 14, lineHeight: 1 }}>📍</span>
+                <span style={{ color: ACCENT, fontWeight: 700, fontSize: 12.5 }}>{stops.length}</span>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* map hero */}
-        <RouteHero stops={stops} routePath={routePath} trip={trip} />
-
-        {/* bottom sheet */}
-        <div style={{ flex: 1, marginTop: -24, position: 'relative', zIndex: 2, background: 'rgba(255,255,255,.055)', border: '1px solid rgba(255,255,255,.13)', borderBottom: 'none', backdropFilter: 'blur(20px)', borderRadius: '24px 24px 0 0', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-
-          <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 10 }}>
-            <div style={{ width: 36, height: 5, borderRadius: 3, background: 'rgba(255,255,255,.18)' }} />
+        {/* draggable bottom sheet */}
+        <motion.div
+          style={{
+            position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 3,
+            height: sheetHeight,
+            background: 'rgba(10,10,26,.82)', border: `1px solid ${GLASS_BORDER}`, borderBottom: 'none',
+            backdropFilter: 'blur(24px)', borderRadius: '24px 24px 0 0',
+            boxShadow: '0 -12px 40px rgba(0,0,0,.35)',
+            display: 'flex', flexDirection: 'column', overflow: 'hidden',
+          }}
+          transition={isDragging ? { duration: 0 } : { type: 'spring', stiffness: 320, damping: 34 }}
+        >
+          <div
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerUp}
+            style={{ display: 'flex', justifyContent: 'center', padding: '14px 0 12px', cursor: isDragging ? 'grabbing' : 'grab', touchAction: 'none', userSelect: 'none', flex: 'none' }}
+          >
+            <div style={{ width: 36, height: 5, borderRadius: 3, background: 'rgba(255,255,255,.22)' }} />
           </div>
 
-          {/* tabs */}
-          <div style={{ display: 'flex', gap: 22, padding: '16px 20px 0', borderBottom: '1px solid rgba(255,255,255,.08)' }}>
+          {/* tabs — segmented pill control */}
+          <div style={{ display: 'flex', gap: 6, padding: '0 16px 12px', flex: 'none' }}>
             <SheetTab label="Route" active={activeTab === 'route'} onClick={() => setActiveTab('route')} />
             <SheetTab label="Days" active={activeTab === 'days'} onClick={() => setActiveTab('days')} />
             <SheetTab label="Bookings" active={activeTab === 'bookings'} onClick={() => setActiveTab('bookings')} />
           </div>
 
           {/* content */}
-          <div style={{ flex: 1, padding: '18px 20px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, overflowY: 'auto' }}>
+          <div style={{ flex: 1, padding: '4px 20px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, overflowY: 'auto' }}>
 
             {activeTab === 'route' && (
               <>
-                <div style={{ alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: 8, padding: '9px 14px', borderRadius: 999, background: 'rgba(255,255,255,.055)', border: '1px solid rgba(255,255,255,.13)' }}>
+                <div style={{ alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: 8, padding: '9px 14px', borderRadius: 999, background: GLASS_FILL, border: `1px solid ${GLASS_BORDER}` }}>
                   <span style={{ color: '#ffffff', fontWeight: 700, fontSize: 14 }}>{nightsPlanned}/{nightsTotal || stops.length || '–'}</span>
                   <span style={{ color: 'rgba(215,215,255,.88)', fontWeight: 500, fontSize: 12.5 }}>Nights planned</span>
                 </div>
@@ -216,7 +318,7 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
 
                 <button
                   onClick={() => setAiHint(true)}
-                  style={{ width: '100%', padding: '13px 16px', borderRadius: 14, background: 'rgba(255,255,255,.055)', border: '1px solid rgba(245,166,35,.35)', boxShadow: '0 0 20px rgba(245,140,0,.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, cursor: 'pointer', fontFamily: 'inherit' }}
+                  style={{ width: '100%', padding: '13px 16px', borderRadius: 14, background: GLASS_FILL, border: '1px solid rgba(245,166,35,.35)', boxShadow: '0 0 20px rgba(245,140,0,.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, cursor: 'pointer', fontFamily: 'inherit' }}
                 >
                   <span style={{ fontSize: 14 }}>✨</span>
                   <span style={{ color: '#f5c268', fontWeight: 700, fontSize: 14 }}>{aiHint ? 'Coming soon' : 'Generate trip with AI'}</span>
@@ -229,14 +331,14 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
           </div>
 
           <BottomNav />
-        </div>
+        </motion.div>
       </div>
 
       {/* FAB */}
       <button
         onClick={() => setIsAddOpen(true)}
         title="Add destination"
-        style={{ position: 'fixed', right: 18, bottom: 96, width: 56, height: 56, borderRadius: '50%', background: 'linear-gradient(145deg, #f8c04a, #e8821a)', boxShadow: '0 0 32px rgba(245,140,0,.45), 0 8px 20px rgba(0,0,0,.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 5, border: 'none', cursor: 'pointer' }}
+        style={{ position: 'fixed', right: 18, bottom: 96, width: 56, height: 56, borderRadius: '50%', background: `linear-gradient(145deg, ${ACCENT_LIGHT}, ${ACCENT_DARK})`, boxShadow: '0 0 32px rgba(245,140,0,.45), 0 8px 20px rgba(0,0,0,.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 5, border: 'none', cursor: 'pointer' }}
       >
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.6" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
       </button>
@@ -248,28 +350,18 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
 
 // ─── Sub-components ────────────────────────────────────────────────────────
 
-function RouteHero({ stops, routePath, trip }: { stops: Stop[]; routePath: { lat: number; lng: number }[]; trip: Trip }) {
-  const defaultCenter =
-    trip.focus_lat != null && trip.focus_lng != null ? { lat: trip.focus_lat, lng: trip.focus_lng } : undefined
-
-  return (
-    <div style={{ position: 'relative', flex: 'none', height: 260, marginTop: 2 }}>
-      <TripboxMap
-        points={stops.map((s, idx) => ({ id: s.id, lat: s.lat, lng: s.lng, label: idx + 1, title: s.name, subtitle: s.address ?? undefined }))}
-        routePath={routePath}
-        defaultCenter={defaultCenter}
-        defaultZoom={5}
-      />
-      <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(to bottom, transparent 55%, #06061c 100%)' }} />
-    </div>
-  )
-}
-
 function SheetTab({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      style={{ background: 'none', border: 'none', cursor: 'pointer', paddingBottom: 12, borderBottom: `2px solid ${active ? ACCENT : 'transparent'}`, color: active ? ACCENT : '#4a4a68', fontWeight: 700, fontSize: 14, fontFamily: 'inherit' }}
+      style={{
+        flex: 1, padding: '9px 0', borderRadius: 12,
+        background: active ? 'rgba(245,166,35,.14)' : 'transparent',
+        border: `1px solid ${active ? 'rgba(245,166,35,.35)' : 'transparent'}`,
+        color: active ? ACCENT : '#5a5a7a',
+        fontWeight: 700, fontSize: 13, cursor: 'pointer', fontFamily: 'inherit',
+        transition: 'background .18s, border-color .18s, color .18s',
+      }}
     >
       {label}
     </button>
@@ -305,11 +397,18 @@ function BottomNav() {
     },
   ]
   return (
-    <div style={{ display: 'flex', borderTop: '1px solid rgba(255,255,255,.08)', background: 'rgba(255,255,255,.04)', padding: '10px 8px 12px' }}>
+    <div style={{ display: 'flex', gap: 4, borderTop: `1px solid ${GLASS_BORDER}`, background: 'rgba(255,255,255,.03)', padding: '10px 10px 12px', flex: 'none' }}>
       {items.map((item) => {
         const color = item.active ? ACCENT : '#363650'
         return (
-          <div key={item.label} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+          <div
+            key={item.label}
+            style={{
+              flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+              padding: '7px 0 6px', borderRadius: 14,
+              background: item.active ? 'rgba(245,166,35,.12)' : 'transparent',
+            }}
+          >
             {item.icon(color)}
             <span style={{ color, fontWeight: 600, fontSize: 11 }}>{item.label}</span>
           </div>

@@ -52,6 +52,7 @@ const zoomBtnStyle: CSSProperties = {
 
 export function TripboxMap({ points, routePath = [], interactive = true, className, defaultCenter, defaultZoom = 9 }: TripboxMapProps) {
   const mapRef = useRef<MapRef | null>(null)
+  const containerRef = useRef<HTMLDivElement | null>(null)
   const [selectedId, setSelectedId] = useState<string | null>(null)
 
   const center = useMemo(() => {
@@ -64,23 +65,26 @@ export function TripboxMap({ points, routePath = [], interactive = true, classNa
 
   const pointsKey = points.map((p) => `${p.lat.toFixed(5)},${p.lng.toFixed(5)}`).join('|')
 
-  const fitToPoints = useCallback(() => {
-    const map = mapRef.current
-    if (!map || points.length === 0) return
-    if (points.length === 1) {
-      map.flyTo({ center: [points[0].lng, points[0].lat], zoom: 9, pitch: DEFAULT_PITCH, bearing: DEFAULT_BEARING, duration: 800 })
-      return
-    }
-    const lats = points.map((p) => p.lat)
-    const lngs = points.map((p) => p.lng)
-    map.fitBounds(
-      [
-        [Math.min(...lngs), Math.min(...lats)],
-        [Math.max(...lngs), Math.max(...lats)],
-      ],
-      { padding: 60, maxZoom: 13, duration: 800, pitch: DEFAULT_PITCH, bearing: DEFAULT_BEARING }
-    )
-  }, [pointsKey, points])
+  const fitToPoints = useCallback(
+    (duration = 800) => {
+      const map = mapRef.current
+      if (!map || points.length === 0) return
+      if (points.length === 1) {
+        map.flyTo({ center: [points[0].lng, points[0].lat], zoom: 9, pitch: DEFAULT_PITCH, bearing: DEFAULT_BEARING, duration })
+        return
+      }
+      const lats = points.map((p) => p.lat)
+      const lngs = points.map((p) => p.lng)
+      map.fitBounds(
+        [
+          [Math.min(...lngs), Math.min(...lats)],
+          [Math.max(...lngs), Math.max(...lats)],
+        ],
+        { padding: 60, maxZoom: 13, duration, pitch: DEFAULT_PITCH, bearing: DEFAULT_BEARING }
+      )
+    },
+    [pointsKey, points]
+  )
 
   useEffect(() => {
     fitToPoints()
@@ -91,6 +95,20 @@ export function TripboxMap({ points, routePath = [], interactive = true, classNa
   useEffect(() => {
     if (selectedId && !points.some((p) => p.id === selectedId)) setSelectedId(null)
   }, [points, selectedId])
+
+  // Keep the WebGL canvas's pixel size following the container in real time
+  // when it's resized (e.g. by a draggable sheet growing/shrinking the map).
+  // Deliberately does NOT touch center/zoom/pitch — the camera must stay
+  // exactly where the user left it; only the visible viewport changes.
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    const observer = new ResizeObserver(() => {
+      mapRef.current?.resize()
+    })
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
 
   const handleLoad = useCallback(() => {
     const map = mapRef.current?.getMap()
@@ -136,7 +154,7 @@ export function TripboxMap({ points, routePath = [], interactive = true, classNa
   }
 
   return (
-    <div className={className} style={{ position: 'relative', width: '100%', height: '100%' }}>
+    <div ref={containerRef} className={className} style={{ position: 'relative', width: '100%', height: '100%', background: '#06061c' }}>
       <style>{`
         .mapboxgl-ctrl-logo {
           transform: scale(.72);
