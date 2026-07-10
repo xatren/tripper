@@ -37,3 +37,30 @@ export async function getDrivingRoute(points: LatLng[]): Promise<RouteSegment | 
     polylinePath: (route.geometry?.coordinates ?? []).map(([lng, lat]: [number, number]) => ({ lat, lng })),
   }
 }
+
+export interface RouteLeg {
+  durationText: string
+  durationSeconds: number
+  distanceText: string
+  distanceMeters: number
+}
+
+/** Per-leg driving distance/duration between each consecutive pair of waypoints, in one Directions API call. */
+export async function getRouteLegs(points: LatLng[]): Promise<RouteLeg[]> {
+  if (points.length < 2 || !MAPBOX_TOKEN) return []
+  const coords = points.map((p) => `${p.lng},${p.lat}`).join(';')
+  const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${coords}?overview=false&access_token=${MAPBOX_TOKEN}`
+
+  const res = await fetch(url)
+  if (!res.ok) return []
+  const data = await res.json()
+  const legs = data.routes?.[0]?.legs
+  if (!Array.isArray(legs)) return []
+
+  return legs.map((leg: { duration: number; distance: number }) => ({
+    durationText: formatDuration(leg.duration),
+    durationSeconds: Math.round(leg.duration),
+    distanceText: formatDistance(leg.distance),
+    distanceMeters: Math.round(leg.distance),
+  }))
+}

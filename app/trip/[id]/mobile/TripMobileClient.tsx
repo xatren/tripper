@@ -3,9 +3,10 @@
 import { useState, useCallback, useEffect, useRef, type CSSProperties } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, useMotionValue, animate } from 'framer-motion'
+import { SegmentedTabs } from '@/components/ui/segmented-tabs'
 import { createClient } from '@/lib/supabase/client'
 import { TripboxMap } from '@/components/map/mapbox/TripboxMap'
-import { getDrivingRoute } from '@/lib/mapbox/directions'
+import { getDrivingRoute, getRouteLegs, type RouteLeg } from '@/lib/mapbox/directions'
 import { forwardSearch, type GeocodeResult } from '@/lib/mapbox/geocoding'
 import type { Trip, Stop } from '@/types'
 
@@ -48,6 +49,31 @@ function tripTitle(trip: Trip, stops: Stop[]) {
   return trip.title
 }
 
+function formatWeekday(d?: string | null) {
+  if (!d) return null
+  return new Date(d + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long' })
+}
+
+const BOOKING_PARTNERS = ['Booking.com', 'Expedia', 'Airbnb', 'Hostelworld', 'Agoda'] as const
+
+function bookingUrl(partner: (typeof BOOKING_PARTNERS)[number], stop: Stop) {
+  const city = encodeURIComponent(stop.name)
+  const checkin = stop.arrival_date ?? ''
+  const checkout = stop.departure_date ?? ''
+  switch (partner) {
+    case 'Booking.com':
+      return `https://www.booking.com/searchresults.html?ss=${city}${checkin ? `&checkin=${checkin}` : ''}${checkout ? `&checkout=${checkout}` : ''}`
+    case 'Expedia':
+      return `https://www.expedia.com/Hotel-Search?destination=${city}`
+    case 'Airbnb':
+      return `https://www.airbnb.com/s/${city}/homes${checkin && checkout ? `?checkin=${checkin}&checkout=${checkout}` : ''}`
+    case 'Hostelworld':
+      return `https://www.hostelworld.com/search?search_keywords=${city}`
+    case 'Agoda':
+      return `https://www.agoda.com/search?city=${city}${checkin ? `&checkIn=${checkin}` : ''}${checkout ? `&checkOut=${checkout}` : ''}`
+  }
+}
+
 function totalNights(trip: Trip) {
   if (!trip.start_date || !trip.end_date) return 0
   const ms = new Date(trip.end_date).getTime() - new Date(trip.start_date).getTime()
@@ -78,7 +104,10 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
   const [isAddOpen, setIsAddOpen] = useState(false)
   const [aiHint, setAiHint] = useState(false)
   const [routePath, setRoutePath] = useState<{ lat: number; lng: number }[]>([])
+  const [routeLegs, setRouteLegs] = useState<RouteLeg[]>([])
   const [isDragging, setIsDragging] = useState(false)
+  const [nights, setNights] = useState<Record<string, number>>({})
+  const [optimizeHint, setOptimizeHint] = useState(false)
 
   const stageRef = useRef<HTMLDivElement>(null)
   const sheetHeight = useMotionValue(420)
@@ -139,16 +168,29 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
   useEffect(() => {
     if (stops.length < 2) {
       setRoutePath([])
+      setRouteLegs([])
       return
     }
     let cancelled = false
-    getDrivingRoute(stops.map((s) => ({ lat: s.lat, lng: s.lng }))).then((route) => {
+    const points = stops.map((s) => ({ lat: s.lat, lng: s.lng }))
+    getDrivingRoute(points).then((route) => {
       if (!cancelled) setRoutePath(route?.polylinePath ?? [])
+    })
+    getRouteLegs(points).then((legs) => {
+      if (!cancelled) setRouteLegs(legs)
     })
     return () => {
       cancelled = true
     }
   }, [stops])
+
+  const incNights = useCallback((id: string) => {
+    setNights((prev) => ({ ...prev, [id]: (prev[id] ?? 1) + 1 }))
+  }, [])
+
+  const decNights = useCallback((id: string) => {
+    setNights((prev) => ({ ...prev, [id]: Math.max(1, (prev[id] ?? 1) - 1) }))
+  }, [])
 
   const handleAddStop = useCallback(
     async (lat: number, lng: number, name: string, address: string) => {
@@ -173,7 +215,11 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
   )
 
   const nightsTotal = totalNights(trip)
-  const nightsPlanned = Math.min(stops.length, nightsTotal || stops.length)
+  const nightsPlanned = stops.reduce((sum, s) => sum + (nights[s.id] ?? 1), 0)
+  const nightsTarget = nightsTotal || nightsPlanned || 1
+  const ringCircumference = 150.8
+  const ringPct = Math.min(1, nightsPlanned / nightsTarget)
+  const ringOffset = ringCircumference * (1 - ringPct)
   const defaultCenter =
     trip.focus_lat != null && trip.focus_lng != null ? { lat: trip.focus_lat, lng: trip.focus_lng } : undefined
 
@@ -202,8 +248,10 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
 
       <div ref={stageRef} style={{ position: 'relative', zIndex: 1, height: '100svh', maxWidth: 480, margin: '0 auto', overflow: 'hidden' }}>
 
-        {/* map layer — full-bleed, its bottom edge tracks the sheet so the visible map literally grows/shrinks as you drag */}
-        <motion.div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: sheetHeight, zIndex: 0, background: '#06061c' }}>
+        {/* map layer — fixed, full-bleed, never resized or re-rendered by the sheet drag.
+            The sheet is a pure overlay on top; it covers more/less of this static map as it moves,
+            but the map's own DOM container size (and therefore its camera) never changes. */}
+        <div style={{ position: 'absolute', inset: 0, zIndex: 0, background: '#06061c' }}>
           <TripboxMap
             points={stops.map((s, idx) => ({ id: s.id, lat: s.lat, lng: s.lng, label: idx + 1, title: s.name, subtitle: s.address ?? undefined }))}
             routePath={routePath}
@@ -211,7 +259,7 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
             defaultZoom={5}
           />
           <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(to bottom, transparent 78%, rgba(6,6,28,.6) 100%)' }} />
-        </motion.div>
+        </div>
 
         {/* floating header — sits over the map, not a separate opaque block */}
         <div
@@ -267,11 +315,17 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
             <div style={{ width: 36, height: 5, borderRadius: 3, background: 'rgba(255,255,255,.22)' }} />
           </div>
 
-          {/* tabs — segmented pill control */}
-          <div style={{ display: 'flex', gap: 6, padding: '0 16px 12px', flex: 'none' }}>
-            <SheetTab label="Route" active={activeTab === 'route'} onClick={() => setActiveTab('route')} />
-            <SheetTab label="Days" active={activeTab === 'days'} onClick={() => setActiveTab('days')} />
-            <SheetTab label="Bookings" active={activeTab === 'bookings'} onClick={() => setActiveTab('bookings')} />
+          {/* tabs — inline segmented pill control (Route/Days/Bookings) */}
+          <div style={{ padding: '0 16px 12px', flex: 'none' }}>
+            <SegmentedTabs
+              options={[
+                { value: 'route', label: 'Route' },
+                { value: 'days', label: 'Days' },
+                { value: 'bookings', label: 'Bookings' },
+              ]}
+              value={activeTab}
+              onValueChange={setActiveTab}
+            />
           </div>
 
           {/* content */}
@@ -279,10 +333,33 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
 
             {activeTab === 'route' && (
               <>
-                <div style={{ alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: 8, padding: '9px 14px', borderRadius: 999, background: GLASS_FILL, border: `1px solid ${GLASS_BORDER}` }}>
-                  <span style={{ color: '#ffffff', fontWeight: 700, fontSize: 14 }}>{nightsPlanned}/{nightsTotal || stops.length || '–'}</span>
-                  <span style={{ color: 'rgba(215,215,255,.88)', fontWeight: 500, fontSize: 12.5 }}>Nights planned</span>
-                </div>
+                {stops.length > 0 && (
+                  <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, background: GLASS_FILL, border: `1px solid ${GLASS_BORDER}`, borderRadius: 22, padding: '18px 20px', backdropFilter: 'blur(20px)', boxShadow: '0 8px 30px rgba(0,0,0,.25)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                      <svg width="56" height="56" viewBox="0 0 56 56" style={{ flex: 'none', transform: 'rotate(-90deg)' }}>
+                        <circle cx="28" cy="28" r="24" fill="none" stroke="rgba(255,255,255,.1)" strokeWidth="5" />
+                        <circle cx="28" cy="28" r="24" fill="none" stroke="url(#tripper-ring-grad)" strokeWidth="5" strokeLinecap="round" strokeDasharray={ringCircumference} strokeDashoffset={ringOffset} />
+                        <defs>
+                          <linearGradient id="tripper-ring-grad" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0%" stopColor={ACCENT_LIGHT} />
+                            <stop offset="100%" stopColor={ACCENT} />
+                          </linearGradient>
+                        </defs>
+                      </svg>
+                      <div>
+                        <div style={{ fontSize: 20, fontWeight: 800, letterSpacing: '-0.01em' }}>{nightsPlanned} / {nightsTarget}</div>
+                        <div style={{ fontSize: 12, color: 'rgba(215,215,255,.7)', fontWeight: 500, marginTop: 2 }}>Nights Planned</div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setOptimizeHint(true)}
+                      style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,.07)', border: '1px solid rgba(255,255,255,.15)', borderRadius: 999, padding: '10px 14px', flex: 'none', cursor: 'pointer', fontFamily: 'inherit' }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 1L9.3 5.6L14 7L9.3 8.4L8 13L6.7 8.4L2 7L6.7 5.6L8 1Z" fill={ACCENT_LIGHT} /></svg>
+                      <span style={{ fontSize: 12.5, fontWeight: 600, color: '#fff' }}>{optimizeHint ? 'Coming soon' : 'Optimize'}</span>
+                    </button>
+                  </div>
+                )}
 
                 {stops.length === 0 ? (
                   <div style={{ width: '100%', flex: 1, minHeight: 160, border: '1.5px dashed rgba(255,255,255,.15)', borderRadius: 16, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, padding: 18 }}>
@@ -293,18 +370,46 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
                     <div style={{ color: '#4a4a68', fontWeight: 400, fontSize: 13, textAlign: 'center' }}>Press + to build your route</div>
                   </div>
                 ) : (
-                  <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
                     {stops.map((stop, idx) => (
-                      <div key={stop.id} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', borderRadius: 14, background: 'rgba(255,255,255,.045)', border: '1px solid rgba(255,255,255,.09)' }}>
-                        <span style={{ flexShrink: 0, width: 24, height: 24, borderRadius: '50%', background: `${ACCENT}22`, border: `1.5px solid ${ACCENT}66`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: ACCENT }}>
-                          {idx + 1}
-                        </span>
-                        <div style={{ minWidth: 0, flex: 1 }}>
-                          <div style={{ color: '#ffffff', fontWeight: 600, fontSize: 14, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{stop.name}</div>
-                          {stop.address && (
-                            <div style={{ color: '#4a4a68', fontSize: 11.5, marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{stop.address}</div>
-                          )}
+                      <div key={stop.id}>
+                        <div style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', borderRadius: 14, background: 'rgba(255,255,255,.045)', border: '1px solid rgba(255,255,255,.09)' }}>
+                          <span style={{ flexShrink: 0, width: 24, height: 24, borderRadius: '50%', background: `${ACCENT}22`, border: `1.5px solid ${ACCENT}66`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: ACCENT }}>
+                            {idx + 1}
+                          </span>
+                          <div style={{ minWidth: 0, flex: 1 }}>
+                            <div style={{ color: '#ffffff', fontWeight: 600, fontSize: 14, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{stop.name}</div>
+                            {stop.address && (
+                              <div style={{ color: '#4a4a68', fontSize: 11.5, marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{stop.address}</div>
+                            )}
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 2, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 999, padding: 4, flex: 'none' }}>
+                            <button
+                              onClick={() => decNights(stop.id)}
+                              style={{ width: 26, height: 26, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'rgba(215,215,255,.8)', background: 'none', border: 'none' }}
+                            >
+                              <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M2.5 8H13.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>
+                            </button>
+                            <span style={{ fontSize: 13, fontWeight: 700, width: 20, textAlign: 'center' }}>{nights[stop.id] ?? 1}</span>
+                            <button
+                              onClick={() => incNights(stop.id)}
+                              style={{ width: 26, height: 26, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: ACCENT_LIGHT, background: 'none', border: 'none' }}
+                            >
+                              <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M8 2.5V13.5M2.5 8H13.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>
+                            </button>
+                          </div>
                         </div>
+
+                        {idx < stops.length - 1 && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0 10px 32px' }}>
+                            <div style={{ position: 'relative', width: 2, height: 28, background: 'repeating-linear-gradient(to bottom, rgba(245,140,0,.5) 0 4px, transparent 4px 8px)' }}>
+                              <div style={{ position: 'absolute', top: '50%', left: '50%', width: 8, height: 8, margin: -4, borderRadius: '50%', background: ACCENT_LIGHT, boxShadow: '0 0 14px 3px rgba(245,140,0,.6)', animation: 'pulseglow 2.2s ease-in-out infinite' }} />
+                            </div>
+                            <span style={{ fontSize: 12, color: 'rgba(215,215,255,.55)', fontWeight: 500 }}>
+                              {routeLegs[idx] ? `${routeLegs[idx].distanceText} drive` : '…'}
+                            </span>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -326,8 +431,8 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
               </>
             )}
 
-            {activeTab === 'days' && <ComingSoon label="Day-by-day planning" />}
-            {activeTab === 'bookings' && <ComingSoon label="Bookings" />}
+            {activeTab === 'days' && <DaysTab stops={stops} routeLegs={routeLegs} />}
+            {activeTab === 'bookings' && <BookingsTab stops={stops} />}
           </div>
 
           <BottomNav />
@@ -350,21 +455,154 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
 
 // ─── Sub-components ────────────────────────────────────────────────────────
 
-function SheetTab({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
+function DaysTab({ stops, routeLegs }: { stops: Stop[]; routeLegs: RouteLeg[] }) {
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({})
+
+  if (stops.length === 0) return <ComingSoon label="Day-by-day planning" />
+
   return (
-    <button
-      onClick={onClick}
-      style={{
-        flex: 1, padding: '9px 0', borderRadius: 12,
-        background: active ? 'rgba(245,166,35,.14)' : 'transparent',
-        border: `1px solid ${active ? 'rgba(245,166,35,.35)' : 'transparent'}`,
-        color: active ? ACCENT : '#5a5a7a',
-        fontWeight: 700, fontSize: 13, cursor: 'pointer', fontFamily: 'inherit',
-        transition: 'background .18s, border-color .18s, color .18s',
-      }}
-    >
-      {label}
-    </button>
+    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 12 }}>
+      {stops.map((stop, idx) => {
+        const isOpen = !!expanded[stop.id]
+        const weekday = formatWeekday(stop.arrival_date)
+        const hasDetail = !!(stop.notes || stop.address)
+        const prevStop = idx > 0 ? stops[idx - 1] : null
+        const leg = idx > 0 ? routeLegs[idx - 1] : null
+        return (
+          <div key={stop.id}>
+            {prevStop && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '0 0 12px', padding: 12, background: 'rgba(0,0,0,.18)', borderRadius: 14 }}>
+                <div style={{ flex: 1, textAlign: 'center' }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: 'rgba(215,215,255,.85)' }}>{prevStop.name}</div>
+                </div>
+                <div style={{ flex: 1.2, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                  <div style={{ width: '100%', height: 2, background: 'linear-gradient(to right, transparent, #8888e4, transparent)' }} />
+                  <div style={{ fontSize: 10.5, color: 'rgba(215,215,255,.6)', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                    {leg ? `${leg.durationText} · ${leg.distanceText}` : '…'}
+                  </div>
+                </div>
+                <div style={{ flex: 1, textAlign: 'center' }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: 'rgba(215,215,255,.85)' }}>{stop.name}</div>
+                </div>
+              </div>
+            )}
+            <div
+              onClick={() => hasDetail && setExpanded((e) => ({ ...e, [stop.id]: !e[stop.id] }))}
+              style={{
+                background: GLASS_FILL, border: `1px solid ${GLASS_BORDER}`, borderRadius: 20,
+                padding: 16, cursor: hasDetail ? 'pointer' : 'default', backdropFilter: 'blur(20px)',
+                boxShadow: '0 6px 20px rgba(0,0,0,.2)',
+              }}
+            >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: 11.5, fontWeight: 700, color: 'rgba(215,215,255,.55)', textTransform: 'uppercase', letterSpacing: '.06em' }}>
+                  Day {idx + 1}{weekday ? ` · ${weekday}` : ''}
+                </div>
+                <div style={{ fontSize: 17, fontWeight: 800, letterSpacing: '-0.01em', marginTop: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {stop.name}
+                </div>
+                {prevStop && <div style={{ fontSize: 12, fontWeight: 700, color: ACCENT_LIGHT, marginTop: 3 }}>Travel Day</div>}
+              </div>
+              {hasDetail && (
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style={{ flex: 'none', transition: 'transform .25s ease', transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                  <path d="M4 6L8 10L12 6" stroke="rgba(215,215,255,.6)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              )}
+            </div>
+
+            {isOpen && (
+              <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid rgba(255,255,255,.1)', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {stop.address && (
+                  <div>
+                    <div style={{ fontSize: 10.5, fontWeight: 700, color: 'rgba(215,215,255,.5)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 4 }}>Address</div>
+                    <div style={{ fontSize: 13, color: 'rgba(215,215,255,.88)', lineHeight: 1.5 }}>{stop.address}</div>
+                  </div>
+                )}
+                {stop.notes && (
+                  <div>
+                    <div style={{ fontSize: 10.5, fontWeight: 700, color: 'rgba(215,215,255,.5)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 4 }}>Notes</div>
+                    <div style={{ fontSize: 13, color: 'rgba(215,215,255,.88)', lineHeight: 1.5 }}>{stop.notes}</div>
+                  </div>
+                )}
+              </div>
+            )}
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+function BookingsTab({ stops }: { stops: Stop[] }) {
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({})
+
+  if (stops.length === 0) return <ComingSoon label="Bookings" />
+
+  return (
+    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 14 }}>
+      {stops.map((stop) => {
+        const moreOpen = !!expanded[stop.id]
+        const shown = moreOpen ? BOOKING_PARTNERS : BOOKING_PARTNERS.slice(0, 3)
+        const dateRange = formatDateRange(stop.arrival_date, stop.departure_date)
+        return (
+          <div
+            key={stop.id}
+            style={{ background: GLASS_FILL, border: `1px solid ${GLASS_BORDER}`, borderRadius: 20, padding: 16, backdropFilter: 'blur(20px)', boxShadow: '0 6px 20px rgba(0,0,0,.2)' }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+              <div>
+                <div style={{ fontSize: 15.5, fontWeight: 700, letterSpacing: '-0.01em' }}>Stay in {stop.name}</div>
+                {dateRange && <div style={{ fontSize: 12, color: 'rgba(215,215,255,.65)', marginTop: 3, fontWeight: 500 }}>{dateRange}</div>}
+              </div>
+              <a
+                href={bookingUrl('Booking.com', stop)}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ display: 'flex', alignItems: 'center', gap: 5, border: '1px solid rgba(245,140,0,.5)', color: ACCENT_LIGHT, borderRadius: 999, padding: '8px 13px', flex: 'none', textDecoration: 'none', whiteSpace: 'nowrap' }}
+              >
+                <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M8 2.5V13.5M2.5 8H13.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>
+                <span style={{ fontSize: 12, fontWeight: 700 }}>Add Stay</span>
+              </a>
+            </div>
+
+            <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column' }}>
+              {shown.map((partner) => (
+                <a
+                  key={partner}
+                  href={bookingUrl(partner, stop)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,.06)', textDecoration: 'none', color: 'inherit' }}
+                >
+                  <span style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, color: 'rgba(215,215,255,.88)', flex: 'none' }}>
+                    {partner[0]}
+                  </span>
+                  <span style={{ flex: 1, minWidth: 0, fontSize: 13.5, fontWeight: 600, color: '#fff' }}>{partner}</span>
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style={{ flex: 'none', opacity: 0.5 }}>
+                    <path d="M6 3L11 8L6 13" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </a>
+              ))}
+            </div>
+
+            {BOOKING_PARTNERS.length > 3 && (
+              <div onClick={() => setExpanded((e) => ({ ...e, [stop.id]: !e[stop.id] }))} style={{ textAlign: 'center', padding: '12px 0 2px', cursor: 'pointer' }}>
+                <span style={{ fontSize: 12.5, fontWeight: 600, color: 'rgba(215,215,255,.6)' }}>
+                  {moreOpen ? 'Show Fewer Partners' : `Show ${BOOKING_PARTNERS.length - 3} More Partners`}
+                </span>
+              </div>
+            )}
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10, padding: '10px 14px', background: 'rgba(30,140,90,.12)', border: '1px solid rgba(30,180,110,.3)', borderRadius: 12 }}>
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M13.5 4.5L6 12L2.5 8.5" stroke="#4ade80" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+              <span style={{ fontSize: 11.5, fontWeight: 600, color: '#86efac' }}>Destination and dates are automatically pre-filled</span>
+            </div>
+          </div>
+        )
+      })}
+    </div>
   )
 }
 
