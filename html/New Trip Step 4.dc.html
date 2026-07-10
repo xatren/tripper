@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; background: #000010; }
+    @keyframes nbFloat {
+      0%, 100% { transform: translate(0,0) scale(1); opacity: .7; }
+      50% { transform: translate(8px,-10px) scale(1.08); opacity: 1; }
+    }
+    @keyframes cursorBlink {
+      0%, 100% { opacity: 1; } 50% { opacity: 0; }
+    }
+    .curr-chip { transition: background 0.18s, border-color 0.18s, box-shadow 0.18s, transform 0.18s cubic-bezier(.34,1.4,.64,1); }
+    .curr-chip:hover { transform: translateY(-2px) scale(1.05); }
+    .curr-chip:active { transform: scale(0.95) !important; }
+    .cbtn { transition: transform 0.2s cubic-bezier(.34,1.4,.64,1); }
+    .cbtn:hover { transform: translateY(-2px); }
+    .cbtn:active { transform: scale(0.98) !important; }
+    .ghost-btn { transition: opacity 0.18s; }
+    .ghost-btn:hover { opacity: 0.6; }
+    .budget-input { caret-color: transparent; }
+    .budget-input:focus { outline: none; }
+    .cursor { display: inline-block; width: 3px; height: 52px; background: #F59E0B; border-radius: 2px; margin-left: 4px; vertical-align: middle; animation: cursorBlink 1s ease-in-out infinite; }
+  </style>
+</helmet>
+
+<div style="height:100vh; background:#000010; display:flex; align-items:center; justify-content:center; font-family:'Inter',system-ui,sans-serif; overflow:hidden;">
+
+  <canvas id="sc4" style="position:fixed; inset:0; width:100vw; height:100vh; pointer-events:none; z-index:0;"></canvas>
+
+  <div id="phone-wrapper4">
+  <div style="width:390px; height:844px; background:linear-gradient(175deg,rgba(12,4,35,.97) 0%,rgba(0,0,20,.99) 100%); border-radius:52px; border:1px solid rgba(130,80,240,.14); position:relative; overflow:hidden; display:flex; flex-direction:column; z-index:1; box-shadow:0 0 0 1px rgba(0,0,0,.9),0 40px 120px rgba(0,0,50,.85),inset 0 1px 0 rgba(255,255,255,.05);">
+
+    <div style="position:absolute; top:-110px; left:-80px; width:350px; height:350px; background:radial-gradient(circle,rgba(70,20,175,.28) 0%,transparent 65%); animation:nbFloat 10s ease-in-out infinite; pointer-events:none; z-index:0;"></div>
+    <div style="position:absolute; bottom:60px; right:-100px; width:310px; height:310px; background:radial-gradient(circle,rgba(20,55,195,.2) 0%,transparent 60%); animation:nbFloat 15s ease-in-out infinite reverse; pointer-events:none; z-index:0;"></div>
+    <div style="position:absolute; top:45%; left:50%; transform:translate(-50%,-50%); width:340px; height:340px; background:radial-gradient(ellipse,rgba(245,158,11,.045) 0%,transparent 65%); pointer-events:none; z-index:0;"></div>
+
+    <div style="position:relative; z-index:1; display:flex; flex-direction:column; height:100%; padding:0 24px 36px;">
+
+      <div style="height:54px; flex-shrink:0;"></div>
+
+      <!-- Header -->
+      <div style="display:flex; align-items:center; justify-content:space-between; flex-shrink:0; margin-bottom:26px;">
+        <button class="ghost-btn" style="width:42px; height:42px; border-radius:14px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); display:flex; align-items:center; justify-content:center; cursor:pointer; outline:none; padding:0; flex-shrink:0;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 19L8 12L15 5" stroke="rgba(255,255,255,.9)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        </button>
+        <h2 style="margin:0; font-size:17px; font-weight:600; color:rgba(255,255,255,.95); letter-spacing:-.3px;">New Trip</h2>
+        <div style="background:rgba(255,255,255,.05); border:1px solid rgba(180,160,255,.13); border-radius:20px; padding:7px 14px;">
+          <span style="font-size:12px; font-weight:500; color:rgba(200,185,255,.7);">4 of 5</span>
+        </div>
+      </div>
+
+      <!-- Progress dots -->
+      <div style="display:flex; gap:8px; justify-content:center; flex-shrink:0; margin-bottom:10px;">
+        <sc-for list="{{ dots }}" as="dot" hint-placeholder-count="5">
+          <div style="{{ dot.style }}"></div>
+        </sc-for>
+      </div>
+
+      <!-- Budget input area — centrepiece -->
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0; padding-bottom:8px;">
+
+        <!-- Label -->
+        <p style="margin:0 0 4px; font-size:11px; font-weight:700; letter-spacing:1.3px; text-transform:uppercase; color:rgba(200,185,240,.4);">Total budget</p>
+
+        <!-- Symbol -->
+        <div style="font-size:28px; font-weight:800; color:#F59E0B; line-height:1; margin-bottom:2px; letter-spacing:-0.5px; opacity:0.85; margin-top:16px;">{{ currencySymbol }}</div>
+
+        <!-- Number display + invisible input overlay -->
+        <div style="position:relative; display:flex; align-items:center; justify-content:center; height:88px; cursor:text;" onClick="{{ onFocusInput }}">
+          <div style="{{ numberDisplayStyle }}">{{ budgetFormatted }}</div>
+          <sc-if value="{{ inputFocused }}" hint-placeholder-val="{{ false }}">
+            <span class="cursor"></span>
+          </sc-if>
+          <input
+            id="budget-input"
+            class="budget-input"
+            type="text"
+            inputMode="numeric"
+            value="{{ budgetInput }}"
+            onInput="{{ onBudgetChange }}"
+            onFocus="{{ onInputFocus }}"
+            onBlur="{{ onInputBlur }}"
+            style="position:absolute; inset:0; width:100%; opacity:0; cursor:text; font-size:64px; border:none; background:transparent;"
+          />
+        </div>
+
+        <!-- Currency chips -->
+        <div style="display:flex; gap:10px; margin-top:22px; flex-wrap:nowrap;">
+          <sc-for list="{{ currencyChips }}" as="chip" hint-placeholder-count="4">
+            <div class="curr-chip" onClick="{{ chip.onClick }}" style="{{ chip.style }}">{{ chip.label }}</div>
+          </sc-for>
+        </div>
+
+      </div>
+
+      <!-- Per-day card -->
+      <div style="flex-shrink:0; margin-bottom:14px;">
+        <div style="background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius:20px; padding:18px 22px; backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); box-shadow:inset 0 1px 0 rgba(255,255,255,.05);">
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div style="width:38px; height:38px; border-radius:12px; background:rgba(245,158,11,.1); border:1px solid rgba(245,158,11,.2); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+                  <rect x="3" y="4" width="18" height="17" rx="3" stroke="rgba(245,158,11,.8)" stroke-width="1.8"></rect>
+                  <line x1="3" y1="9" x2="21" y2="9" stroke="rgba(245,158,11,.8)" stroke-width="1.8"></line>
+                  <line x1="12" y1="13" x2="12" y2="18" stroke="rgba(245,158,11,.8)" stroke-width="1.8" stroke-linecap="round"></line>
+                  <line x1="9.5" y1="15.5" x2="14.5" y2="15.5" stroke="rgba(245,158,11,.8)" stroke-width="1.8" stroke-linecap="round"></line>
+                </svg>
+              </div>
+              <div>
+                <div style="font-size:12px; font-weight:500; color:rgba(200,185,255,.45); margin-bottom:2px;">Per day · {{ nightsLabel }}</div>
+                <div style="font-size:14px; font-weight:700; color:rgba(255,255,255,.85);">{{ perDayLabel }}</div>
+              </div>
+            </div>
+            <div style="{{ perDayBadgeStyle }}">{{ perDayShort }}</div>
+          </div>
+
+          <!-- Budget bar -->
+          <div style="margin-top:16px; height:4px; border-radius:2px; background:rgba(255,255,255,.07); overflow:hidden;">
+            <div style="{{ budgetBarStyle }}"></div>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-top:6px;">
+            <span style="font-size:10px; color:rgba(200,185,255,.25); font-weight:500;">Budget</span>
+            <span style="font-size:10px; color:rgba(200,185,255,.25); font-weight:500;">{{ budgetBarMax }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Muted note -->
+      <div style="display:flex; align-items:center; justify-content:center; gap:7px; flex-shrink:0; margin-bottom:22px;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="9" stroke="rgba(200,185,255,.25)" stroke-width="1.5"></circle>
+          <line x1="12" y1="11" x2="12" y2="17" stroke="rgba(200,185,255,.25)" stroke-width="1.5" stroke-linecap="round"></line>
+          <circle cx="12" cy="8" r="1" fill="rgba(200,185,255,.25)"></circle>
+        </svg>
+        <span style="font-size:12px; color:rgba(200,185,255,.3); font-weight:400; letter-spacing:.1px;">You can always update this later</span>
+      </div>
+
+      <!-- Buttons -->
+      <button class="cbtn" style="{{ continueStyle }}">Continue →</button>
+      <div style="height:12px; flex-shrink:0;"></div>
+      <button class="ghost-btn" style="width:100%; height:50px; border-radius:16px; background:transparent; border:1px solid rgba(255,255,255,.1); cursor:pointer; font-family:inherit; font-size:15px; font-weight:500; color:rgba(255,255,255,.4); outline:none; flex-shrink:0;">Back</button>
+
+    </div>
+  </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;$preview&quot;: { &quot;width&quot;: 430, &quot;height&quot;: 930 },
+  &quot;accentColor&quot;: {
+    &quot;editor&quot;: &quot;color&quot;,
+    &quot;default&quot;: &quot;#F59E0B&quot;,
+    &quot;options&quot;: [&quot;#F59E0B&quot;, &quot;#F97316&quot;, &quot;#EC4899&quot;, &quot;#6366F1&quot;]
+  },
+  &quot;nights&quot;: {
+    &quot;editor&quot;: &quot;int&quot;,
+    &quot;default&quot;: 7,
+    &quot;min&quot;: 1,
+    &quot;max&quot;: 60,
+    &quot;tsType&quot;: &quot;number&quot;
+  }
+}">
+class Component extends DCLogic {
+  state = {
+    budgetInput: '1000',
+    currency: 'EUR',
+    inputFocused: false,
+  };
+
+  _CURRENCIES = [
+    { code: 'USD', symbol: '$',  label: 'USD' },
+    { code: 'EUR', symbol: '€',  label: 'EUR' },
+    { code: 'GBP', symbol: '£',  label: 'GBP' },
+    { code: 'TRY', symbol: '₺',  label: 'TRY' },
+  ];
+
+  _applyScale() {
+    let st = document.getElementById('__pscale4');
+    if (!st) { st = document.createElement('style'); st.id = '__pscale4'; document.head.appendChild(st); }
+    const s = Math.min(1, (window.innerHeight - 40) / 844, (window.innerWidth - 40) / 390);
+    st.textContent = `#phone-wrapper4 { zoom: ${s.toFixed(4)}; }`;
+  }
+
+  componentDidMount() {
+    this._applyScale();
+    window.addEventListener('resize', () => this._applyScale());
+
+    const c = document.getElementById('sc4');
+    if (c) {
+      const ctx = c.getContext('2d');
+      c.width = window.innerWidth; c.height = window.innerHeight;
+      const r = () => Math.random();
+      for (let i = 0; i < 200; i++) {
+        ctx.beginPath(); ctx.arc(r()*c.width, r()*c.height, r()*1.3+0.15, 0, Math.PI*2);
+        ctx.fillStyle = `rgba(255,255,255,${(r()*.5+.15).toFixed(2)})`; ctx.fill();
+      }
+      const tints = ['200,175,255','175,215,255','255,238,185','210,235,255'];
+      for (let i = 0; i < 70; i++) {
+        ctx.beginPath(); ctx.arc(r()*c.width, r()*c.height, r()*.85+.15, 0, Math.PI*2);
+        ctx.fillStyle = `rgba(${tints[Math.floor(r()*tints.length)]},${(r()*.55+.2).toFixed(2)})`; ctx.fill();
+      }
+    }
+  }
+
+  renderVals() {
+    const accent = this.props.accentColor ?? '#F59E0B';
+    const { budgetInput, currency, inputFocused } = this.state;
+    const nights = this.props.nights ?? 7;
+
+    // Progress dots
+    const dots = Array.from({ length: 5 }, (_, i) => ({
+      style: {
+        width: '10px', height: '10px', borderRadius: '50%', flexShrink: 0,
+        background: i < 4 ? accent : 'rgba(255,255,255,0.1)',
+        border: i < 4 ? 'none' : '1.5px solid rgba(255,255,255,0.18)',
+        boxShadow: i === 3
+          ? `0 0 10px ${accent}dd, 0 0 20px ${accent}77`
+          : i < 3 ? `0 0 6px ${accent}88` : 'none',
+      }
+    }));
+
+    // Currency
+    const currData = this._CURRENCIES.find(c => c.code === currency) || this._CURRENCIES[1];
+    const symbol = currData.symbol;
+
+    const currencyChips = this._CURRENCIES.map(c => {
+      const active = c.code === currency;
+      return {
+        label: c.label,
+        style: {
+          padding: '9px 18px',
+          borderRadius: '999px',
+          fontSize: '13px',
+          fontWeight: 700,
+          letterSpacing: '0.3px',
+          cursor: 'pointer',
+          userSelect: 'none',
+          background: active ? `${accent}22` : 'rgba(255,255,255,0.05)',
+          border: active ? `1.5px solid ${accent}` : '1.5px solid rgba(255,255,255,0.1)',
+          color: active ? accent : 'rgba(255,255,255,0.5)',
+          boxShadow: active ? `0 0 14px ${accent}44` : 'none',
+        },
+        onClick: () => this.setState({ currency: c.code }),
+      };
+    });
+
+    // Budget value
+    const raw = parseFloat(budgetInput.replace(/,/g, '')) || 0;
+    const budgetFormatted = raw === 0 ? '0' : raw.toLocaleString('en-US');
+
+    // Number display style
+    const numberDisplayStyle = {
+      fontSize: '64px',
+      fontWeight: 900,
+      lineHeight: 1,
+      letterSpacing: '-3px',
+      color: raw === 0 ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.97)',
+      fontVariantNumeric: 'tabular-nums',
+      transition: 'color 0.3s ease',
+      whiteSpace: 'nowrap',
+    };
+
+    // Per-day
+    const perDay = raw > 0 && nights > 0 ? Math.round(raw / nights) : 0;
+    const perDayFormatted = perDay > 0 ? `~${symbol}${perDay.toLocaleString('en-US')}` : `${symbol}0`;
+    const perDayShort = perDay > 0 ? `${symbol}${perDay.toLocaleString('en-US')}` : '—';
+    const perDayLabel = perDay > 0 ? `${perDayFormatted} per day` : 'Enter a budget above';
+    const nightsLabel = `${nights} nights`;
+
+    const perDayBadgeStyle = {
+      background: raw > 0 ? '#1f1500' : 'rgba(255,255,255,0.04)',
+      border: `1.5px solid ${raw > 0 ? '#c27802' : 'rgba(255,255,255,0.08)'}`,
+      borderRadius: '12px',
+      padding: '8px 14px',
+      fontSize: '15px',
+      fontWeight: 800,
+      color: raw > 0 ? accent : 'rgba(255,255,255,0.2)',
+      letterSpacing: '-0.3px',
+      transition: 'all 0.35s ease',
+    };
+
+    // Budget bar
+    const maxBudget = raw > 0 ? Math.max(raw * 2, 5000) : 5000;
+    const barPct = Math.min(100, (raw / maxBudget) * 100);
+    const budgetBarStyle = {
+      width: `${barPct}%`,
+      height: '100%',
+      borderRadius: '2px',
+      background: raw > 0 ? `linear-gradient(90deg, ${accent}aa, ${accent})` : 'transparent',
+      boxShadow: raw > 0 ? `0 0 8px ${accent}88` : 'none',
+      transition: 'width 0.4s cubic-bezier(.34,1,.64,1), background 0.3s',
+    };
+    const budgetBarMax = raw > 0
+      ? `${symbol}${Math.round(maxBudget).toLocaleString('en-US')}`
+      : `${symbol}5,000`;
+
+    const continueStyle = {
+      width: '100%', height: '62px', borderRadius: '20px',
+      background: `linear-gradient(130deg, #c27802 0%, ${accent} 48%, #fde47a 100%)`,
+      border: 'none', cursor: 'pointer', fontFamily: 'inherit',
+      fontSize: '17px', fontWeight: 700, color: '#1a0e00', letterSpacing: '-.2px',
+      outline: 'none', flexShrink: 0,
+      boxShadow: `0 8px 32px ${accent}55, 0 2px 8px ${accent}33, inset 0 1px 0 rgba(255,255,255,.35)`,
+    };
+
+    return {
+      dots, currencyChips, currencySymbol: symbol,
+      budgetInput, budgetFormatted, numberDisplayStyle,
+      perDayLabel, perDayShort, perDayBadgeStyle,
+      nightsLabel, budgetBarStyle, budgetBarMax,
+      continueStyle, inputFocused,
+      onFocusInput: () => { const el = document.getElementById('budget-input'); if (el) el.focus(); },
+      onBudgetChange: (e) => {
+        const digits = e.target.value.replace(/\D/g, '');
+        this.setState({ budgetInput: digits });
+      },
+      onInputFocus: () => this.setState({ inputFocused: true }),
+      onInputBlur:  () => this.setState({ inputFocused: false }),
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -285,26 +285,19 @@ export function DashboardClient({ profile, trips: initialTrips }: DashboardClien
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 + trips.length * 0.06, duration: 0.35, ease: "easeOut" }}
                 >
-                  <CreateTripDialog
-                    open={isCreateOpen}
-                    onOpenChange={(o) => { setCreate(o); if (o) setError(null); }}
-                    loading={loading}
-                    error={error}
-                    onSubmit={handleCreateTrip}
+                  <motion.button
+                    onClick={() => router.push("/trips/new")}
+                    style={{ width: "100%", display: "flex", alignItems: "center", gap: 14, background: "rgba(255,255,255,0.035)", border: "1px solid rgba(255,255,255,0.11)", borderRadius: 20, backdropFilter: "blur(16px)", padding: "14px 16px", cursor: "pointer", textAlign: "left" }}
+                    whileTap={{ scale: 0.97 }}
+                    whileHover={{ background: "rgba(255,255,255,0.065)", borderColor: "rgba(255,255,255,0.18)" }}
+                    transition={TAP_SPRING}
                   >
-                    <motion.button
-                      style={{ width: "100%", display: "flex", alignItems: "center", gap: 14, background: "rgba(255,255,255,0.035)", border: "1px solid rgba(255,255,255,0.11)", borderRadius: 20, backdropFilter: "blur(16px)", padding: "14px 16px", cursor: "pointer", textAlign: "left" }}
-                      whileTap={{ scale: 0.97 }}
-                      whileHover={{ background: "rgba(255,255,255,0.065)", borderColor: "rgba(255,255,255,0.18)" }}
-                      transition={TAP_SPRING}
-                    >
-                      <div style={{ width: 54, height: 54, borderRadius: 16, flexShrink: 0, background: AMBER_GRAD, boxShadow: "0 0 22px rgba(245,140,0,0.22)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        <Plus style={{ width: 24, height: 24, color: "#1a0800" }} />
-                      </div>
-                      <span style={{ fontSize: 16, fontWeight: 500, color: "rgba(215,215,255,0.88)" }}>Create new trip</span>
-                      <span style={{ marginLeft: "auto", color: "rgba(215,215,255,0.42)", fontSize: 20 }}>›</span>
-                    </motion.button>
-                  </CreateTripDialog>
+                    <div style={{ width: 54, height: 54, borderRadius: 16, flexShrink: 0, background: AMBER_GRAD, boxShadow: "0 0 22px rgba(245,140,0,0.22)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <Plus style={{ width: 24, height: 24, color: "#1a0800" }} />
+                    </div>
+                    <span style={{ fontSize: 16, fontWeight: 500, color: "rgba(215,215,255,0.88)" }}>Create new trip</span>
+                    <span style={{ marginLeft: "auto", color: "rgba(215,215,255,0.42)", fontSize: 20 }}>›</span>
+                  </motion.button>
                 </motion.div>
               </div>
             </AnimatePresence>

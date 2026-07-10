@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; background: #000010; }
+    @keyframes nbFloat {
+      0%, 100% { transform: translate(0,0) scale(1); opacity: 0.7; }
+      50% { transform: translate(8px,-10px) scale(1.08); opacity: 1; }
+    }
+    @keyframes dotPulse {
+      0%, 100% { box-shadow: 0 0 8px rgba(245,158,11,0.8), 0 0 16px rgba(245,158,11,0.4); }
+      50% { box-shadow: 0 0 14px rgba(245,158,11,1), 0 0 28px rgba(245,158,11,0.6); }
+    }
+    .trip-input::placeholder { color: rgba(255,255,255,0.2); font-weight: 800; }
+    .vscroll::-webkit-scrollbar { display: none; }
+    .vscroll { scrollbar-width: none; }
+    .vcard { transition: transform 0.22s cubic-bezier(.34,1.4,.64,1); }
+    .vcard:hover { transform: scale(1.07) translateY(-2px); }
+    .vcard:active { transform: scale(0.96) !important; }
+    .cbtn:hover { transform: translateY(-2px); }
+    .cbtn:active { transform: scale(0.98) !important; }
+    .bkbtn:hover { opacity: 0.6; }
+  </style>
+</helmet>
+
+<div style="height:100vh; background:#000010; display:flex; align-items:center; justify-content:center; font-family:'Inter',system-ui,sans-serif; overflow:hidden;">
+
+  <canvas id="sc" style="position:fixed; inset:0; width:100vw; height:100vh; pointer-events:none; z-index:0;"></canvas>
+
+  <div id="phone-wrapper">
+  <div style="width:390px; height:844px; background:linear-gradient(175deg, rgba(12,4,35,.97) 0%, rgba(0,0,20,.99) 100%); border-radius:52px; border:1px solid rgba(130,80,240,.14); position:relative; overflow:hidden; display:flex; flex-direction:column; z-index:1; box-shadow:0 0 0 1px rgba(0,0,0,.9), 0 40px 120px rgba(0,0,50,.85), inset 0 1px 0 rgba(255,255,255,.05);">
+
+    <div style="position:absolute; top:-110px; left:-80px; width:350px; height:350px; background:radial-gradient(circle, rgba(70,20,175,.28) 0%, transparent 65%); animation:nbFloat 10s ease-in-out infinite; pointer-events:none; z-index:0;"></div>
+    <div style="position:absolute; bottom:60px; right:-100px; width:310px; height:310px; background:radial-gradient(circle, rgba(20,55,195,.2) 0%, transparent 60%); animation:nbFloat 15s ease-in-out infinite reverse; pointer-events:none; z-index:0;"></div>
+    <div style="position:absolute; top:55%; left:50%; transform:translate(-50%,-50%); width:380px; height:180px; background:radial-gradient(ellipse, rgba(245,158,11,.04) 0%, transparent 70%); pointer-events:none; z-index:0;"></div>
+
+    <div style="position:relative; z-index:1; display:flex; flex-direction:column; height:100%; padding:0 24px 36px;">
+
+      <div style="height:54px; flex-shrink:0;"></div>
+
+      <div style="display:flex; align-items:center; justify-content:space-between; flex-shrink:0; margin-bottom:26px;">
+        <button class="bkbtn" onClick="{{ onBack }}" style="width:42px; height:42px; border-radius:14px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); display:flex; align-items:center; justify-content:center; cursor:pointer; backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); outline:none; padding:0; flex-shrink:0; transition:opacity .2s;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M15 19L8 12L15 5" stroke="rgba(255,255,255,.9)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </button>
+        <h2 style="margin:0; font-size:17px; font-weight:600; color:rgba(255,255,255,.95); letter-spacing:-.3px;">New Trip</h2>
+        <div style="background:rgba(255,255,255,.05); border:1px solid rgba(180,160,255,.13); border-radius:20px; padding:7px 14px; backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);">
+          <span style="font-size:12px; font-weight:500; color:rgba(200,185,255,.7);">{{ stepLabel }}</span>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:8px; justify-content:center; flex-shrink:0; margin-bottom:52px;">
+        <sc-for list="{{ dots }}" as="dot" hint-placeholder-count="5">
+          <div style="{{ dot.style }}"></div>
+        </sc-for>
+      </div>
+
+      <div style="flex-shrink:0; margin-bottom:44px;">
+        <p style="margin:0 0 10px; font-size:11px; font-weight:600; letter-spacing:1.2px; text-transform:uppercase; color:rgba(200,185,255,.38);">What's the trip called?</p>
+        <div style="position:relative; padding-bottom:14px;">
+          <input type="text" class="trip-input" placeholder="Trip name..."
+            onFocus="{{ onInputFocus }}" onBlur="{{ onInputBlur }}"
+            style="width:100%; background:transparent; border:none; outline:none; font-family:inherit; font-size:34px; font-weight:800; color:rgba(255,255,255,.95); caret-color:#F59E0B; padding:0; display:block; line-height:1.25;" />
+          <div style="{{ underlineStyle }}"></div>
+        </div>
+      </div>
+
+      <div style="flex-shrink:0; margin-bottom:32px;">
+        <p style="margin:0 0 16px; font-size:11px; font-weight:700; letter-spacing:1.3px; text-transform:uppercase; color:rgba(200,185,240,.5);">Pick a vibe</p>
+        <div class="vscroll" style="display:flex; gap:12px; overflow-x:auto; margin:0 -24px; padding:4px 24px 10px;">
+          <sc-for list="{{ vibes }}" as="item" hint-placeholder-count="6">
+            <div class="vcard" style="{{ item.style }}" onClick="{{ item.onClick }}">
+              <span style="font-size:26px; line-height:1; display:block; margin-bottom:5px; pointer-events:none;">{{ item.emoji }}</span>
+              <span style="font-size:10px; font-weight:600; color:rgba(255,255,255,.88); letter-spacing:.3px; display:block; pointer-events:none;">{{ item.name }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="flex:1; min-height:0;"></div>
+
+      <button class="cbtn" style="{{ continueStyle }}" onClick="{{ onContinue }}">Continue →</button>
+
+    </div>
+  </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;$preview&quot;: { &quot;width&quot;: 430, &quot;height&quot;: 930 },
+  &quot;accentColor&quot;: {
+    &quot;editor&quot;: &quot;color&quot;,
+    &quot;default&quot;: &quot;#F59E0B&quot;,
+    &quot;options&quot;: [&quot;#F59E0B&quot;, &quot;#F97316&quot;, &quot;#EC4899&quot;, &quot;#6366F1&quot;]
+  },
+  &quot;currentStep&quot;: {
+    &quot;editor&quot;: &quot;int&quot;,
+    &quot;default&quot;: 1,
+    &quot;min&quot;: 1,
+    &quot;max&quot;: 5,
+    &quot;tsType&quot;: &quot;number&quot;
+  }
+}">
+class Component extends DCLogic {
+  state = { selectedVibe: null, inputFocused: false };
+
+  _applyScale() {
+    const s = Math.min(1, (window.innerHeight - 40) / 844, (window.innerWidth - 40) / 390);
+    let st = document.getElementById('__pscale');
+    if (!st) { st = document.createElement('style'); st.id = '__pscale'; document.head.appendChild(st); }
+    st.textContent = `#phone-wrapper { zoom: ${s.toFixed(4)}; }`;
+  }
+
+  componentDidMount() {
+    this._applyScale();
+    window.addEventListener('resize', () => this._applyScale());
+    const c = document.getElementById('sc');
+    if (!c) return;
+    const ctx = c.getContext('2d');
+    c.width = window.innerWidth;
+    c.height = window.innerHeight;
+    const r = () => Math.random();
+    // White base stars
+    for (let i = 0; i < 200; i++) {
+      const x = r() * c.width, y = r() * c.height;
+      const rad = r() * 1.3 + 0.15;
+      const a = r() * 0.5 + 0.15;
+      ctx.beginPath();
+      ctx.arc(x, y, rad, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${a.toFixed(2)})`;
+      ctx.fill();
+    }
+    // Tinted stars
+    const tints = ['200,175,255', '175,215,255', '255,238,185', '210,235,255'];
+    for (let i = 0; i < 70; i++) {
+      const x = r() * c.width, y = r() * c.height;
+      const rad = r() * 0.85 + 0.15;
+      const a = r() * 0.55 + 0.2;
+      ctx.beginPath();
+      ctx.arc(x, y, rad, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${tints[Math.floor(r() * tints.length)]},${a.toFixed(2)})`;
+      ctx.fill();
+    }
+    // A few slightly brighter sparkle stars
+    for (let i = 0; i < 12; i++) {
+      const x = r() * c.width, y = r() * c.height;
+      ctx.beginPath();
+      ctx.arc(x, y, r() * 1.8 + 0.8, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,0.9)`;
+      ctx.fill();
+      // tiny glow
+      const g = ctx.createRadialGradient(x, y, 0, x, y, 6);
+      g.addColorStop(0, 'rgba(220,210,255,0.25)');
+      g.addColorStop(1, 'transparent');
+      ctx.beginPath();
+      ctx.arc(x, y, 6, 0, Math.PI * 2);
+      ctx.fillStyle = g;
+      ctx.fill();
+    }
+  }
+
+  renderVals() {
+    const { selectedVibe, inputFocused } = this.state;
+    const accent = this.props.accentColor ?? '#F59E0B';
+    const step = Math.min(Math.max(this.props.currentStep ?? 1, 1), 5);
+
+    // Progress dots
+    const dots = Array.from({ length: 5 }, (_, i) => ({
+      style: {
+        width: '10px',
+        height: '10px',
+        borderRadius: '50%',
+        flexShrink: 0,
+        background: i < step ? accent : 'rgba(255,255,255,0.1)',
+        border: i < step ? 'none' : '1.5px solid rgba(255,255,255,0.18)',
+        boxShadow: i === step - 1
+          ? `0 0 10px ${accent}dd, 0 0 20px ${accent}77`
+          : i < step - 1
+            ? `0 0 6px ${accent}88`
+            : 'none',
+        transition: 'all 0.4s ease',
+      },
+    }));
+
+    const vibeData = [
+      { name: 'Road',     emoji: '🚗', from: '#1a2332', to: '#3d5166' },
+      { name: 'Fly',      emoji: '✈️', from: '#0f2560', to: '#2563eb' },
+      { name: 'Camp',     emoji: '⛺', from: '#0a3320', to: '#16a34a' },
+      { name: 'Beach',    emoji: '🏖️', from: '#093345', to: '#0891b2' },
+      { name: 'Mountain', emoji: '🏔️', from: '#1e1260', to: '#7c3aed' },
+      { name: 'Backpack', emoji: '🎒', from: '#5c1a07', to: '#ea580c' },
+    ];
+
+    const vibes = vibeData.map(v => {
+      const sel = v.name === selectedVibe;
+      return {
+        name: v.name,
+        emoji: v.emoji,
+        style: {
+          background: `linear-gradient(145deg, ${v.from} 0%, ${v.to} 100%)`,
+          borderRadius: '18px',
+          width: '72px',
+          height: '72px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+          flexShrink: 0,
+          userSelect: 'none',
+          transition: 'border 0.2s ease, box-shadow 0.2s ease',
+          border: sel ? `2px solid ${accent}` : '2px solid rgba(255,255,255,0.07)',
+          boxShadow: sel
+            ? `0 0 0 3px ${accent}2e, 0 0 20px ${accent}55, inset 0 1px 0 rgba(255,255,255,0.15)`
+            : '0 2px 12px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.07)',
+        },
+        onClick: () => this.setState({ selectedVibe: v.name }),
+      };
+    });
+
+    const underlineStyle = {
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      height: '2px',
+      borderRadius: '1px',
+      background: inputFocused ? accent : 'rgba(255,255,255,0.13)',
+      transition: 'background 0.3s ease, box-shadow 0.3s ease',
+      boxShadow: inputFocused
+        ? `0 0 14px ${accent}cc, 0 0 32px ${accent}66, 0 0 60px ${accent}33`
+        : 'none',
+    };
+
+    const btnGradients = {
+      '#F59E0B': 'linear-gradient(130deg, #c27802 0%, #F59E0B 48%, #fde47a 100%)',
+      '#F97316': 'linear-gradient(130deg, #b93d0d 0%, #F97316 48%, #fdba74 100%)',
+      '#EC4899': 'linear-gradient(130deg, #9d1357 0%, #EC4899 48%, #fbcfe8 100%)',
+      '#6366F1': 'linear-gradient(130deg, #3730a3 0%, #6366F1 48%, #c7d2fe 100%)',
+    };
+    const lightBtn = accent !== '#6366F1';
+    const continueStyle = {
+      width: '100%',
+      height: '62px',
+      borderRadius: '20px',
+      background: btnGradients[accent] || `linear-gradient(130deg, ${accent}, ${accent}99)`,
+      border: 'none',
+      cursor: 'pointer',
+      fontFamily: 'inherit',
+      fontSize: '17px',
+      fontWeight: 700,
+      color: lightBtn ? '#1a0e00' : 'rgba(255,255,255,0.97)',
+      letterSpacing: '-0.2px',
+      outline: 'none',
+      flexShrink: 0,
+      transition: 'transform 0.2s cubic-bezier(.34,1.4,.64,1)',
+      boxShadow: `0 8px 32px ${accent}55, 0 2px 8px ${accent}33, inset 0 1px 0 rgba(255,255,255,0.35)`,
+    };
+
+    return {
+      dots,
+      stepLabel: `${step} of 5`,
+      vibes,
+      underlineStyle,
+      continueStyle,
+      onInputFocus: () => this.setState({ inputFocused: true }),
+      onInputBlur: () => this.setState({ inputFocused: false }),
+      onBack: () => {},
+      onContinue: () => {},
+    };
+  }
+}
+</script>
+</body>
+</html>

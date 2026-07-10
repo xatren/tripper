@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; background: #000010; }
+    @keyframes nbFloat {
+      0%, 100% { transform: translate(0,0) scale(1); opacity: .7; }
+      50% { transform: translate(8px,-10px) scale(1.08); opacity: 1; }
+    }
+    @keyframes rocketPop {
+      0% { transform: scale(1); }
+      40% { transform: scale(1.18) translateY(-3px); }
+      100% { transform: scale(1); }
+    }
+    @keyframes successPulse {
+      0% { box-shadow: 0 8px 32px rgba(245,158,11,.55), 0 0 0 0 rgba(245,158,11,.45); }
+      70% { box-shadow: 0 8px 32px rgba(245,158,11,.55), 0 0 0 18px rgba(245,158,11,0); }
+      100% { box-shadow: 0 8px 32px rgba(245,158,11,.55), 0 0 0 0 rgba(245,158,11,0); }
+    }
+    .ghost-btn { transition: opacity 0.18s; }
+    .ghost-btn:hover { opacity: 0.6; }
+    .code-chip { transition: background 0.18s, border-color 0.18s, transform 0.15s; }
+    .code-chip:hover { transform: scale(1.03); }
+    .code-chip:active { transform: scale(0.97); }
+    .create-btn { transition: transform 0.22s cubic-bezier(.34,1.4,.64,1), box-shadow 0.22s; }
+    .create-btn:hover { transform: translateY(-3px); }
+    .create-btn:active { transform: scale(0.97) !important; }
+    .meta-pill { white-space: nowrap; flex-shrink: 0; }
+    .chip-row::-webkit-scrollbar { display: none; }
+    .chip-row { scrollbar-width: none; }
+  </style>
+</helmet>
+
+<div style="height:100vh; background:#000010; display:flex; align-items:center; justify-content:center; font-family:'Inter',system-ui,sans-serif; overflow:hidden;">
+
+  <canvas id="sc5" style="position:fixed; inset:0; width:100vw; height:100vh; pointer-events:none; z-index:0;"></canvas>
+
+  <div id="phone-wrapper5">
+  <div style="width:390px; height:844px; background:linear-gradient(175deg,rgba(12,4,35,.97) 0%,rgba(0,0,20,.99) 100%); border-radius:52px; border:1px solid rgba(130,80,240,.14); position:relative; overflow:hidden; display:flex; flex-direction:column; z-index:1; box-shadow:0 0 0 1px rgba(0,0,0,.9),0 40px 120px rgba(0,0,50,.85),inset 0 1px 0 rgba(255,255,255,.05);">
+
+    <div style="position:absolute; top:-90px; left:-80px; width:320px; height:320px; background:radial-gradient(circle,rgba(70,20,175,.25) 0%,transparent 65%); animation:nbFloat 10s ease-in-out infinite; pointer-events:none; z-index:0;"></div>
+    <div style="position:absolute; bottom:80px; right:-90px; width:280px; height:280px; background:radial-gradient(circle,rgba(20,55,195,.18) 0%,transparent 60%); animation:nbFloat 15s ease-in-out infinite reverse; pointer-events:none; z-index:0;"></div>
+    <div style="position:absolute; top:38%; left:50%; transform:translate(-50%,-50%); width:360px; height:240px; background:radial-gradient(ellipse,rgba(245,158,11,.05) 0%,transparent 65%); pointer-events:none; z-index:0;"></div>
+
+    <div style="position:relative; z-index:1; display:flex; flex-direction:column; height:100%; padding:0 24px 36px;">
+
+      <div style="height:54px; flex-shrink:0;"></div>
+
+      <!-- Header -->
+      <div style="display:flex; align-items:center; justify-content:space-between; flex-shrink:0; margin-bottom:22px;">
+        <button class="ghost-btn" style="width:42px; height:42px; border-radius:14px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); display:flex; align-items:center; justify-content:center; cursor:pointer; outline:none; padding:0; flex-shrink:0;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 19L8 12L15 5" stroke="rgba(255,255,255,.9)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        </button>
+        <h2 style="margin:0; font-size:17px; font-weight:600; color:rgba(255,255,255,.95); letter-spacing:-.3px;">New Trip</h2>
+        <div style="background:rgba(255,255,255,.05); border:1px solid rgba(180,160,255,.13); border-radius:20px; padding:7px 14px;">
+          <span style="font-size:12px; font-weight:500; color:rgba(200,185,255,.7);">5 of 5</span>
+        </div>
+      </div>
+
+      <!-- Progress dots — all filled -->
+      <div style="display:flex; gap:8px; justify-content:center; flex-shrink:0; margin-bottom:22px;">
+        <sc-for list="{{ dots }}" as="dot" hint-placeholder-count="5">
+          <div style="{{ dot.style }}"></div>
+        </sc-for>
+      </div>
+
+      <!-- Trip summary card -->
+      <div style="flex-shrink:0; margin-bottom:18px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.09); border-radius:24px; overflow:hidden; box-shadow:0 4px 32px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.06); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);">
+
+        <!-- Coloured top bar -->
+        <div style="height:4px; background:linear-gradient(90deg,#c27802,#F59E0B,#fde47a);"></div>
+
+        <div style="padding:18px 20px 20px;">
+
+          <!-- Emoji + Name -->
+          <div style="display:flex; align-items:center; gap:14px; margin-bottom:16px;">
+            <div style="width:52px; height:52px; border-radius:16px; background:rgba(245,158,11,.1); border:1px solid rgba(245,158,11,.2); display:flex; align-items:center; justify-content:center; font-size:26px; flex-shrink:0;">{{ tripEmoji }}</div>
+            <div style="min-width:0;">
+              <div style="font-size:20px; font-weight:800; color:rgba(255,255,255,.97); letter-spacing:-.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ tripName }}</div>
+              <div style="font-size:11px; font-weight:500; color:rgba(200,185,255,.4); margin-top:2px; letter-spacing:.2px;">{{ tripTagline }}</div>
+            </div>
+          </div>
+
+          <!-- Divider -->
+          <div style="height:1px; background:rgba(255,255,255,.06); margin-bottom:14px;"></div>
+
+          <!-- Dates row -->
+          <div style="display:flex; align-items:center; gap:9px; margin-bottom:10px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><rect x="3" y="4" width="18" height="17" rx="3" stroke="rgba(200,185,255,.4)" stroke-width="1.7"></rect><line x1="3" y1="9" x2="21" y2="9" stroke="rgba(200,185,255,.4)" stroke-width="1.7"></line></svg>
+            <span style="font-size:13px; font-weight:500; color:rgba(255,255,255,.7);">Aug 15 — Aug 22</span>
+            <div style="width:3px; height:3px; border-radius:50%; background:rgba(255,255,255,.2); flex-shrink:0;"></div>
+            <span style="font-size:12px; font-weight:500; color:rgba(200,185,255,.4);">7 nights</span>
+          </div>
+
+          <!-- Destinations row -->
+          <div class="chip-row" style="display:flex; align-items:center; gap:7px; overflow-x:auto; margin-bottom:12px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="rgba(245,158,11,.6)"></path></svg>
+            <sc-for list="{{ destChips }}" as="c" hint-placeholder-count="2">
+              <span class="meta-pill" style="font-size:12px; font-weight:600; color:rgba(255,255,255,.65); background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.09); border-radius:20px; padding:4px 10px;">{{ c.label }}</span>
+            </sc-for>
+          </div>
+
+          <!-- Budget row -->
+          <div style="display:flex; align-items:center; gap:9px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><circle cx="12" cy="12" r="9" stroke="rgba(200,185,255,.4)" stroke-width="1.7"></circle><path d="M12 7v1m0 8v1M9.5 9.5a2.5 2 0 0 1 5 0c0 1.5-2.5 2-2.5 3.5m0 1h.01" stroke="rgba(200,185,255,.4)" stroke-width="1.5" stroke-linecap="round"></path></svg>
+            <span style="font-size:13px; font-weight:600; color:rgba(255,255,255,.7);">€1,000</span>
+            <div style="width:3px; height:3px; border-radius:50%; background:rgba(255,255,255,.2); flex-shrink:0;"></div>
+            <span style="font-size:12px; font-weight:500; color:rgba(200,185,255,.4);">~€143 / day</span>
+            <div style="margin-left:auto; background:rgba(245,158,11,.12); border:1px solid rgba(245,158,11,.3); border-radius:8px; padding:3px 9px;">
+              <span style="font-size:11px; font-weight:700; color:#F59E0B;">EUR</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Invite co-pilot section -->
+      <div style="flex-shrink:0; margin-bottom:14px;">
+        <div style="display:flex; align-items:center; gap:7px; margin-bottom:10px;">
+          <p style="margin:0; font-size:11px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:rgba(200,185,240,.45);">Invite a co-pilot</p>
+          <span style="font-size:10px; color:rgba(200,185,255,.25); font-weight:500;">— optional</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; background:rgba(255,255,255,.05); border:{{ emailBorderStyle }}; border-radius:18px; padding:0 18px; height:54px; backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;">
+            <circle cx="10" cy="8" r="3.5" stroke="rgba(245,158,11,.65)" stroke-width="1.8"></circle>
+            <path d="M4 19c0-3.314 2.686-6 6-6" stroke="rgba(245,158,11,.65)" stroke-width="1.8" stroke-linecap="round"></path>
+            <path d="M18 13v6m-3-3h6" stroke="rgba(245,158,11,.65)" stroke-width="1.8" stroke-linecap="round"></path>
+          </svg>
+          <input
+            type="email"
+            placeholder="friend@email.com"
+            value="{{ emailInput }}"
+            onInput="{{ onEmailChange }}"
+            onFocus="{{ onEmailFocus }}"
+            onBlur="{{ onEmailBlur }}"
+            style="flex:1; background:transparent; border:none; outline:none; font-family:inherit; font-size:15px; font-weight:500; color:rgba(255,255,255,.9); caret-color:#F59E0B;"
+          />
+          <sc-if value="{{ emailValid }}" hint-placeholder-val="{{ false }}">
+            <div style="background:rgba(245,158,11,.15); border:1px solid rgba(245,158,11,.4); border-radius:10px; padding:5px 11px; cursor:pointer;">
+              <span style="font-size:12px; font-weight:700; color:#F59E0B;">Invite</span>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+
+      <!-- Share later / invite code -->
+      <div style="flex-shrink:0; display:flex; align-items:center; gap:10px; margin-bottom:auto;">
+        <span style="font-size:12px; color:rgba(200,185,255,.28); font-weight:500; white-space:nowrap;">Or share later</span>
+        <div style="flex:1; height:1px; background:rgba(255,255,255,.05);"></div>
+        <div class="code-chip" onClick="{{ onCopyCode }}" style="{{ codeChipStyle }}">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;">
+            <rect x="9" y="9" width="12" height="12" rx="2" stroke="rgba(245,158,11,.7)" stroke-width="1.7"></rect>
+            <path d="M15 9V7a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" stroke="rgba(245,158,11,.7)" stroke-width="1.7" stroke-linecap="round"></path>
+          </svg>
+          <span style="font-family:'SF Mono','Fira Mono','Consolas',monospace; font-size:12px; font-weight:700; color:#F59E0B; letter-spacing:0.8px;">{{ codeLabel }}</span>
+        </div>
+      </div>
+
+      <div style="height:20px; flex-shrink:0;"></div>
+
+      <!-- Back button above create -->
+      <button class="ghost-btn" style="width:100%; height:50px; border-radius:16px; background:transparent; border:1px solid rgba(255,255,255,.1); cursor:pointer; font-family:inherit; font-size:15px; font-weight:500; color:rgba(255,255,255,.4); outline:none; flex-shrink:0; margin-bottom:12px;">Back</button>
+
+      <!-- Create Trip — prominent CTA -->
+      <button class="create-btn" onClick="{{ onCreateTrip }}" style="{{ createBtnStyle }}">
+        <span style="font-size:19px; font-weight:800; letter-spacing:-.3px;">{{ createBtnLabel }}</span>
+      </button>
+
+    </div>
+  </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;$preview&quot;: { &quot;width&quot;: 430, &quot;height&quot;: 930 },
+  &quot;accentColor&quot;: {
+    &quot;editor&quot;: &quot;color&quot;,
+    &quot;default&quot;: &quot;#F59E0B&quot;,
+    &quot;options&quot;: [&quot;#F59E0B&quot;, &quot;#F97316&quot;, &quot;#EC4899&quot;, &quot;#6366F1&quot;]
+  },
+  &quot;tripName&quot;: {
+    &quot;editor&quot;: &quot;text&quot;,
+    &quot;default&quot;: &quot;Summer Euro Trip&quot;,
+    &quot;tsType&quot;: &quot;string&quot;
+  },
+  &quot;tripEmoji&quot;: {
+    &quot;editor&quot;: &quot;text&quot;,
+    &quot;default&quot;: &quot;✈️&quot;,
+    &quot;tsType&quot;: &quot;string&quot;
+  }
+}">
+class Component extends DCLogic {
+  state = {
+    emailInput: '',
+    emailFocused: false,
+    inviteCode: 'TRIP-X7K2',
+    copied: false,
+    created: false,
+  };
+
+  _applyScale() {
+    let st = document.getElementById('__pscale5');
+    if (!st) { st = document.createElement('style'); st.id = '__pscale5'; document.head.appendChild(st); }
+    const s = Math.min(1, (window.innerHeight - 40) / 844, (window.innerWidth - 40) / 390);
+    st.textContent = `#phone-wrapper5 { zoom: ${s.toFixed(4)}; }`;
+  }
+
+  _genCode() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    const part = (n) => Array.from({ length: n }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    return `TRIP-${part(4)}`;
+  }
+
+  componentDidMount() {
+    this._applyScale();
+    window.addEventListener('resize', () => this._applyScale());
+    this.setState({ inviteCode: this._genCode() });
+
+    const c = document.getElementById('sc5');
+    if (c) {
+      const ctx = c.getContext('2d');
+      c.width = window.innerWidth; c.height = window.innerHeight;
+      const r = () => Math.random();
+      for (let i = 0; i < 200; i++) {
+        ctx.beginPath(); ctx.arc(r()*c.width, r()*c.height, r()*1.3+0.15, 0, Math.PI*2);
+        ctx.fillStyle = `rgba(255,255,255,${(r()*.5+.15).toFixed(2)})`; ctx.fill();
+      }
+      const tints = ['200,175,255','175,215,255','255,238,185','210,235,255'];
+      for (let i = 0; i < 70; i++) {
+        ctx.beginPath(); ctx.arc(r()*c.width, r()*c.height, r()*.85+.15, 0, Math.PI*2);
+        ctx.fillStyle = `rgba(${tints[Math.floor(r()*tints.length)]},${(r()*.55+.2).toFixed(2)})`; ctx.fill();
+      }
+      for (let i = 0; i < 10; i++) {
+        ctx.beginPath(); ctx.arc(r()*c.width, r()*c.height, r()*1.8+0.8, 0, Math.PI*2);
+        ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.fill();
+      }
+    }
+  }
+
+  renderVals() {
+    const accent = this.props.accentColor ?? '#F59E0B';
+    const { emailInput, emailFocused, inviteCode, copied, created } = this.state;
+    const tripName = this.props.tripName ?? 'Summer Euro Trip';
+    const tripEmoji = this.props.tripEmoji ?? '✈️';
+
+    // All 5 dots filled
+    const dots = Array.from({ length: 5 }, (_, i) => ({
+      style: {
+        width: '10px', height: '10px', borderRadius: '50%', flexShrink: 0,
+        background: accent,
+        border: 'none',
+        boxShadow: i === 4
+          ? `0 0 10px ${accent}ee, 0 0 22px ${accent}88`
+          : `0 0 6px ${accent}88`,
+        transition: 'all 0.4s ease',
+      }
+    }));
+
+    // Destinations
+    const destChips = [
+      { label: '🇮🇹 Italy' },
+      { label: '🇫🇷 France' },
+    ];
+
+    // Trip tagline
+    const tripTagline = 'Aug 15 — Aug 22 · Italy & France';
+
+    // Email validation
+    const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput);
+    const emailBorderStyle = emailFocused
+      ? `1.5px solid ${accent}`
+      : emailValid
+        ? `1.5px solid rgba(245,158,11,0.4)`
+        : '1px solid rgba(255,255,255,0.1)';
+
+    // Code chip
+    const codeLabel = copied ? `✓  COPIED!` : inviteCode;
+    const codeChipStyle = {
+      display: 'inline-flex', alignItems: 'center', gap: '7px',
+      background: copied ? 'rgba(245,158,11,0.18)' : 'rgba(245,158,11,0.08)',
+      border: `1.5px solid ${copied ? accent : 'rgba(245,158,11,0.3)'}`,
+      borderRadius: '12px', padding: '9px 14px', cursor: 'pointer',
+      transition: 'all 0.25s ease',
+      boxShadow: copied ? `0 0 16px rgba(245,158,11,0.35)` : 'none',
+    };
+
+    // Create button
+    const createBtnStyle = {
+      width: '100%', height: '70px', borderRadius: '22px',
+      background: created
+        ? `linear-gradient(130deg, #15803d, #22c55e, #86efac)`
+        : `linear-gradient(130deg, #b45309 0%, ${accent} 45%, #fde047 100%)`,
+      border: 'none', cursor: 'pointer', fontFamily: 'inherit',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
+      outline: 'none', flexShrink: 0,
+      boxShadow: created
+        ? `0 8px 32px rgba(34,197,94,.5), inset 0 1px 0 rgba(255,255,255,.3)`
+        : `0 8px 40px ${accent}66, 0 2px 12px ${accent}44, inset 0 1px 0 rgba(255,255,255,.35)`,
+      transition: 'background 0.5s ease, box-shadow 0.4s ease',
+    };
+    const createBtnLabel = created ? '✓  Trip Created!' : 'Create Trip  🚀';
+
+    return {
+      dots, destChips, tripName, tripEmoji, tripTagline,
+      emailInput, emailValid, emailBorderStyle,
+      codeLabel, codeChipStyle,
+      createBtnStyle, createBtnLabel,
+      onEmailChange: (e) => this.setState({ emailInput: e.target.value }),
+      onEmailFocus:  () => this.setState({ emailFocused: true }),
+      onEmailBlur:   () => this.setState({ emailFocused: false }),
+      onCopyCode: () => {
+        try { navigator.clipboard.writeText(inviteCode); } catch(e) {}
+        this.setState({ copied: true });
+        setTimeout(() => this.setState({ copied: false }), 2200);
+      },
+      onCreateTrip: () => {
+        if (created) return;
+        this.setState({ created: true });
+      },
+    };
+  }
+}
+</script>
+</body>
+</html>

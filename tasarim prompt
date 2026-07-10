@@ -1,0 +1,38 @@
+Step 2 — Dates
+
+Same dark background, glass UI. Step 2 of 5, progress bar 2 filled.
+Top half: Two date cards side by side — "Departure" and "Return", 
+each glass card with calendar icon, date text large (Aug 15), year/month small below.
+Selected card has amber border glow.
+Middle: Pill badge auto-calculated "7 nights · 8 days" in amber.
+Below: "Dates flexible?" toggle row with moon icon, glass card style.
+Bottom: amber "Continue" button + ghost "Back" button.
+Step 3 — Destinations
+
+Same dark background. Step 3 of 5.
+Top: "Where are you going?" heading.
+Search input bar with MapPin icon, glass style, "Add a country or city..." placeholder.
+Below input: horizontal chip row showing added destinations 
+(e.g. 🇮🇹 Italy  ✕, 🇫🇷 France  ✕) — amber outlined chips.
+Below chips: Small dark globe preview (mini 3D globe or flat map) 
+showing added countries as glowing amber dots.
+Suggestion row: "Popular" label + 4 small country chips to quick-add.
+Bottom: amber "Continue" + ghost "Back".
+Step 4 — Budget
+
+Same dark background. Step 4 of 5.
+Center: Large "€" or "$" currency symbol, huge number input underneath 
+(font-size ~56px, white, bold) — "0" as placeholder.
+Below number: currency chip selector row: USD · EUR · GBP · TRY — amber active chip.
+Below: glass card showing "~€142 / day" auto-calculated from budget ÷ nights.
+Small note: "You can always update this later" in muted text.
+Bottom: amber "Continue" + ghost "Back".
+Step 5 — Invite & Review
+
+Same dark background. Step 5 of 5, all dots filled amber.
+Top section: glass card showing trip summary — 
+  trip emoji + name (bold large), dates row, destination chips, budget badge.
+Below: "Invite a co-pilot" label + email input with user-plus icon, glass style.
+Below: "Or share later" muted text + invite code chip (e.g. "TRIP-X7K2") with copy icon.
+Bottom: full-width amber gradient "Create Trip 🚀" button (larger, prominent).
+Ghost "Back" button above it.
