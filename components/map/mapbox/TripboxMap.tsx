@@ -1,15 +1,23 @@
 'use client'
 
-import { useMemo, useRef, useEffect, useCallback } from 'react'
-import Map, { Marker, Source, Layer, type MapRef } from 'react-map-gl/mapbox'
+import { useMemo, useRef, useEffect, useCallback, useState, type CSSProperties } from 'react'
+import Map, { Marker, Popup, Source, Layer, type MapRef } from 'react-map-gl/mapbox'
+import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { MAPBOX_TOKEN, MAPBOX_DARK_STYLE, DEFAULT_PITCH, DEFAULT_BEARING, BUILDING_EXTRUSION_LAYER } from '@/lib/mapbox/client'
+import { applyAppTheme } from '@/lib/mapbox/theme'
+
+const ACCENT = '#f5a623'
 
 export interface TripboxMapPoint {
   id: string
   lat: number
   lng: number
   label?: React.ReactNode
+  /** Shown as the popup heading when the pin is tapped. Falls back to the pin's label/number. */
+  title?: string
+  /** Shown as a secondary line under the popup title. */
+  subtitle?: string
 }
 
 interface TripboxMapProps {
@@ -26,8 +34,25 @@ interface TripboxMapProps {
 /** Last-resort fallback center (Istanbul) when a trip has neither stops nor a selected country. */
 const FALLBACK_CENTER = { lat: 41.0082, lng: 28.9784 }
 
+const zoomBtnStyle: CSSProperties = {
+  width: 36,
+  height: 36,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  background: 'none',
+  border: 'none',
+  color: '#ffffff',
+  fontSize: 18,
+  fontWeight: 600,
+  cursor: 'pointer',
+  fontFamily: 'inherit',
+  lineHeight: 1,
+}
+
 export function TripboxMap({ points, routePath = [], interactive = true, className, defaultCenter, defaultZoom = 9 }: TripboxMapProps) {
   const mapRef = useRef<MapRef | null>(null)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
 
   const center = useMemo(() => {
     if (points.length === 0) return defaultCenter ?? FALLBACK_CENTER
@@ -62,6 +87,29 @@ export function TripboxMap({ points, routePath = [], interactive = true, classNa
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pointsKey])
 
+  // Clear any open popup if its point disappears (e.g. stop removed).
+  useEffect(() => {
+    if (selectedId && !points.some((p) => p.id === selectedId)) setSelectedId(null)
+  }, [points, selectedId])
+
+  const handleLoad = useCallback(() => {
+    const map = mapRef.current?.getMap()
+    if (map) {
+      applyAppTheme(map)
+      map.on('style.load', () => applyAppTheme(map))
+      map.addControl(new mapboxgl.AttributionControl({ compact: true }), 'bottom-right')
+    }
+    fitToPoints()
+  }, [fitToPoints])
+
+  const handleZoomIn = useCallback(() => {
+    mapRef.current?.zoomIn({ duration: 200 })
+  }, [])
+
+  const handleZoomOut = useCallback(() => {
+    mapRef.current?.zoomOut({ duration: 200 })
+  }, [])
+
   const routeGeoJson = useMemo(
     () => ({
       type: 'Feature' as const,
@@ -73,6 +121,8 @@ export function TripboxMap({ points, routePath = [], interactive = true, classNa
     }),
     [routePath]
   )
+
+  const selectedPoint = points.find((p) => p.id === selectedId) ?? null
 
   if (!MAPBOX_TOKEN) {
     return (
@@ -86,51 +136,153 @@ export function TripboxMap({ points, routePath = [], interactive = true, classNa
   }
 
   return (
-    <Map
-      ref={mapRef}
-      mapboxAccessToken={MAPBOX_TOKEN}
-      initialViewState={{
-        latitude: center.lat,
-        longitude: center.lng,
-        zoom: points.length > 1 ? 10 : points.length === 1 ? 9 : defaultZoom,
-        pitch: DEFAULT_PITCH,
-        bearing: DEFAULT_BEARING,
-      }}
-      onLoad={fitToPoints}
-      mapStyle={MAPBOX_DARK_STYLE}
-      style={{ width: '100%', height: '100%' }}
-      interactive={interactive}
-      dragRotate={interactive}
-      touchZoomRotate={interactive}
-      attributionControl={false}
-    >
-      <Layer {...BUILDING_EXTRUSION_LAYER} />
+    <div className={className} style={{ position: 'relative', width: '100%', height: '100%' }}>
+      <style>{`
+        .mapboxgl-ctrl-logo {
+          transform: scale(.72);
+          transform-origin: bottom left;
+          opacity: .8;
+        }
+        .mapboxgl-ctrl-bottom-right .mapboxgl-ctrl-attrib {
+          background: rgba(10,10,26,.55);
+          backdrop-filter: blur(6px);
+          border-radius: 8px;
+          font-size: 10px;
+          padding: 0 6px;
+        }
+        .mapboxgl-ctrl-attrib a { color: rgba(255,255,255,.55) !important; }
+        .mapboxgl-ctrl-attrib-button { filter: invert(1) brightness(1.6); }
+        .mapboxgl-ctrl-bottom-right { display: flex; align-items: center; gap: 4px; }
+        .tripbox-popup .mapboxgl-popup-content {
+          background: #12122a;
+          border: 1px solid rgba(255,255,255,.13);
+          border-radius: 12px;
+          padding: 10px 12px;
+          box-shadow: 0 8px 24px rgba(0,0,0,.4);
+        }
+        .tripbox-popup .mapboxgl-popup-close-button {
+          color: rgba(255,255,255,.55);
+          font-size: 16px;
+          padding: 2px 6px;
+        }
+        .tripbox-popup.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip { border-top-color: #12122a; }
+        .tripbox-popup.mapboxgl-popup-anchor-top .mapboxgl-popup-tip { border-bottom-color: #12122a; }
+        .tripbox-popup.mapboxgl-popup-anchor-left .mapboxgl-popup-tip { border-right-color: #12122a; }
+        .tripbox-popup.mapboxgl-popup-anchor-right .mapboxgl-popup-tip { border-left-color: #12122a; }
+      `}</style>
 
-      {routePath.length > 1 && (
-        <Source id="trip-route" type="geojson" data={routeGeoJson}>
-          <Layer
-            id="trip-route-line"
-            type="line"
-            layout={{ 'line-join': 'round', 'line-cap': 'round' }}
-            paint={{ 'line-color': '#8888e4', 'line-width': 3, 'line-opacity': 0.85, 'line-dasharray': [2, 1.5] }}
-          />
-        </Source>
-      )}
+      <Map
+        ref={mapRef}
+        mapboxAccessToken={MAPBOX_TOKEN}
+        initialViewState={{
+          latitude: center.lat,
+          longitude: center.lng,
+          zoom: points.length > 1 ? 10 : points.length === 1 ? 9 : defaultZoom,
+          pitch: DEFAULT_PITCH,
+          bearing: DEFAULT_BEARING,
+        }}
+        onLoad={handleLoad}
+        onClick={() => setSelectedId(null)}
+        mapStyle={MAPBOX_DARK_STYLE}
+        style={{ width: '100%', height: '100%' }}
+        interactive={interactive}
+        dragRotate={interactive}
+        touchZoomRotate={interactive}
+        attributionControl={false}
+        logoPosition="bottom-right"
+      >
+        <Layer {...BUILDING_EXTRUSION_LAYER} />
 
-      {points.map((p) => (
-        <Marker key={p.id} latitude={p.lat} longitude={p.lng} anchor="center">
-          <div
-            style={{
-              width: 16,
-              height: 16,
-              borderRadius: '50%',
-              background: '#f5a623',
-              border: '2px solid #0a1020',
-              boxShadow: '0 0 12px rgba(245,140,0,.6)',
+        {routePath.length > 1 && (
+          <Source id="trip-route" type="geojson" data={routeGeoJson}>
+            <Layer
+              id="trip-route-line"
+              type="line"
+              layout={{ 'line-join': 'round', 'line-cap': 'round' }}
+              paint={{ 'line-color': '#8888e4', 'line-width': 3, 'line-opacity': 0.85, 'line-dasharray': [2, 1.5] }}
+            />
+          </Source>
+        )}
+
+        {points.map((p, idx) => (
+          <Marker
+            key={p.id}
+            latitude={p.lat}
+            longitude={p.lng}
+            anchor="center"
+            onClick={(e) => {
+              e.originalEvent.stopPropagation()
+              setSelectedId(p.id)
             }}
-          />
-        </Marker>
-      ))}
-    </Map>
+          >
+            <div
+              style={{
+                width: 24,
+                height: 24,
+                borderRadius: '50%',
+                background: ACCENT,
+                border: '2px solid #0a1020',
+                boxShadow: '0 0 12px rgba(245,140,0,.6)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 11,
+                fontWeight: 700,
+                color: '#0a1020',
+                cursor: interactive ? 'pointer' : 'default',
+              }}
+            >
+              {p.label ?? idx + 1}
+            </div>
+          </Marker>
+        ))}
+
+        {selectedPoint && (
+          <Popup
+            latitude={selectedPoint.lat}
+            longitude={selectedPoint.lng}
+            anchor="bottom"
+            offset={18}
+            closeButton
+            closeOnClick={false}
+            onClose={() => setSelectedId(null)}
+            className="tripbox-popup"
+          >
+            <div style={{ color: '#ffffff', fontWeight: 700, fontSize: 13, paddingRight: 12 }}>
+              {selectedPoint.title ?? `Stop ${selectedPoint.label ?? ''}`}
+            </div>
+            {selectedPoint.subtitle && (
+              <div style={{ color: 'rgba(255,255,255,.55)', fontSize: 11.5, marginTop: 2, paddingRight: 12 }}>{selectedPoint.subtitle}</div>
+            )}
+          </Popup>
+        )}
+      </Map>
+
+      {interactive && (
+        <div
+          style={{
+            position: 'absolute',
+            right: 12,
+            bottom: 44,
+            zIndex: 5,
+            display: 'flex',
+            flexDirection: 'column',
+            borderRadius: 12,
+            overflow: 'hidden',
+            background: 'rgba(255,255,255,.055)',
+            border: '1px solid rgba(255,255,255,.13)',
+            backdropFilter: 'blur(20px)',
+          }}
+        >
+          <button onClick={handleZoomIn} title="Zoom in" style={zoomBtnStyle}>
+            +
+          </button>
+          <div style={{ height: 1, background: 'rgba(255,255,255,.13)' }} />
+          <button onClick={handleZoomOut} title="Zoom out" style={zoomBtnStyle}>
+            −
+          </button>
+        </div>
+      )}
+    </div>
   )
 }

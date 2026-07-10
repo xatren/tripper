@@ -255,7 +255,7 @@ function RouteHero({ stops, routePath, trip }: { stops: Stop[]; routePath: { lat
   return (
     <div style={{ position: 'relative', flex: 'none', height: 260, marginTop: 2 }}>
       <TripboxMap
-        points={stops.map((s, idx) => ({ id: s.id, lat: s.lat, lng: s.lng, label: idx + 1 }))}
+        points={stops.map((s, idx) => ({ id: s.id, lat: s.lat, lng: s.lng, label: idx + 1, title: s.name, subtitle: s.address ?? undefined }))}
         routePath={routePath}
         defaultCenter={defaultCenter}
         defaultZoom={5}
