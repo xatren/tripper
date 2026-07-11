@@ -4,6 +4,8 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
+import { CURRENCY_SYMBOLS, type TripCurrency } from '@/types';
+import { showToast, Toaster } from '@/components/ui/toast';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -46,8 +48,7 @@ const COUNTRIES: Country[] = [
   { name: 'Australia', flag: '🇦🇺', lat: -25, lng: 133  },
 ];
 
-const CURRENCIES = ['USD', 'EUR', 'GBP', 'TRY'];
-const CURRENCY_SYM: Record<string, string> = { USD: '$', EUR: '€', GBP: '£', TRY: '₺' };
+const CURRENCIES = Object.keys(CURRENCY_SYMBOLS) as TripCurrency[];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -472,7 +473,7 @@ function Step4({ budget, setBudget, currency, setCurrency, nights, onNext, onBac
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [focused, setFocused] = useState(false);
-  const sym = CURRENCY_SYM[currency] ?? currency;
+  const sym = CURRENCY_SYMBOLS[currency as TripCurrency] ?? currency;
   const raw = parseFloat(budget) || 0;
   const perDay = nights > 0 && raw > 0 ? Math.round(raw / (nights + 1)) : 0;
   const maxBudget = currency === 'TRY' ? 100000 : 10000;
@@ -543,17 +544,16 @@ function Step4({ budget, setBudget, currency, setCurrency, nights, onNext, onBac
 
 // ─── Step 5 — Review & Create ─────────────────────────────────────────────────
 
-function Step5({ name, vibe, startDate, endDate, destinations, budget, currency, inviteEmail, setInviteEmail, inviteCode, userId, onBack }: {
+function Step5({ name, vibe, startDate, endDate, destinations, budget, currency, inviteCode, userId, onBack }: {
   name: string; vibe: string | null; startDate: string; endDate: string;
   destinations: Country[]; budget: string; currency: string;
-  inviteEmail: string; setInviteEmail: (v: string) => void;
   inviteCode: string; userId: string; onBack: () => void;
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [copied, setCopied] = useState(false);
-  const sym = CURRENCY_SYM[currency] ?? currency;
+  const sym = CURRENCY_SYMBOLS[currency as TripCurrency] ?? currency;
   const raw = parseFloat(budget) || 0;
   const nights = nightsBetween(startDate, endDate);
   const perDay = nights > 0 && raw > 0 ? Math.round(raw / (nights + 1)) : 0;
@@ -566,14 +566,15 @@ function Step5({ name, vibe, startDate, endDate, destinations, budget, currency,
     setLoading(true);
     try {
       const supabase = createClient();
-      const countries = destinations.map(d => d.name).join(', ');
-      const description = `Countries: ${countries || 'Not specified'}\nVibe: ${vibe ?? 'Road'}\n\nWho can view: Everyone`;
       const { data, error } = await supabase.from('trips').insert({
         title: name || 'Untitled Trip',
-        description,
+        description: null,
         start_date: startDate || null,
         end_date: endDate || null,
         total_budget: raw,
+        currency,
+        vibe: vibe ?? 'Road',
+        countries: destinations,
         owner_id: userId,
         invite_code: inviteCode,
         focus_lat: destinations[0]?.lat ?? null,
@@ -582,6 +583,8 @@ function Step5({ name, vibe, startDate, endDate, destinations, budget, currency,
       if (!error && data) {
         setDone(true);
         setTimeout(() => router.push(`/trip/${data.id}/mobile`), 1600);
+      } else {
+        showToast(error?.message ?? 'Failed to create trip. Please try again.', 'error');
       }
     } finally {
       setLoading(false);
@@ -649,27 +652,7 @@ function Step5({ name, vibe, startDate, endDate, destinations, budget, currency,
         </div>
       </div>
 
-      <Label>Invite a co-pilot</Label>
-      <div style={{ height: 54, borderRadius: 18, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.09)', display: 'flex', alignItems: 'center', gap: 12, padding: '0 16px', marginBottom: 14 }}>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-          <path d="M16 11c1.657 0 3-1.343 3-3s-1.343-3-3-3M19.946 20C19.722 17.147 17.613 15 15 15H9c-2.613 0-4.722 2.147-4.946 5M12 11c1.657 0 3-1.343 3-3S13.657 5 12 5s-3 1.343-3 3 1.343 3 3 3z" stroke="rgba(255,255,255,.4)" strokeWidth="2" strokeLinecap="round" />
-          <path d="M19 8l2 2m0 0l2-2m-2 2V5" stroke={ACCENT} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-        <input
-          value={inviteEmail}
-          onChange={e => setInviteEmail(e.target.value)}
-          placeholder="Email address (optional)"
-          type="email"
-          style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', fontFamily: 'inherit', fontSize: 15, color: 'rgba(255,255,255,.85)', caretColor: ACCENT }}
-        />
-      </div>
-
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
-        <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,.07)' }} />
-        <span style={{ fontSize: 12, color: 'rgba(255,255,255,.25)', flexShrink: 0 }}>Or share later</span>
-        <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,.07)' }} />
-      </div>
-
+      <Label>Invite a co-pilot — share this code</Label>
       <div onClick={copy} style={{ height: 48, borderRadius: 14, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.1)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px', cursor: 'pointer', marginBottom: 24 }}>
         <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,.7)', letterSpacing: '2px' }}>{inviteCode}</span>
         <span style={{ fontSize: 12, fontWeight: 600, color: copied ? '#22c55e' : ACCENT, transition: 'color .3s' }}>{copied ? '✓ Copied' : 'Copy'}</span>
@@ -703,7 +686,6 @@ export function NewTripClient({ userId }: { userId: string }) {
   const [destinations,setDestinations]= useState<Country[]>([]);
   const [budget,      setBudget]      = useState('');
   const [currency,    setCurrency]    = useState('EUR');
-  const [inviteEmail, setInviteEmail] = useState('');
   const [inviteCode]                  = useState(genCode);
 
   const nights = nightsBetween(startDate, endDate);
@@ -748,9 +730,10 @@ export function NewTripClient({ userId }: { userId: string }) {
           {step === 2 && <Step2 startDate={startDate} setStartDate={setStartDate} endDate={endDate} setEndDate={setEndDate} flexible={flexible} setFlexible={setFlexible} {...common} />}
           {step === 3 && <Step3 destinations={destinations} setDestinations={setDestinations} {...common} />}
           {step === 4 && <Step4 budget={budget} setBudget={setBudget} currency={currency} setCurrency={setCurrency} nights={nights} {...common} />}
-          {step === 5 && <Step5 name={name} vibe={vibe} startDate={startDate} endDate={endDate} destinations={destinations} budget={budget} currency={currency} inviteEmail={inviteEmail} setInviteEmail={setInviteEmail} inviteCode={inviteCode} userId={userId} onBack={back} />}
+          {step === 5 && <Step5 name={name} vibe={vibe} startDate={startDate} endDate={endDate} destinations={destinations} budget={budget} currency={currency} inviteCode={inviteCode} userId={userId} onBack={back} />}
         </motion.div>
       </AnimatePresence>
+      <Toaster />
     </div>
   );
 }

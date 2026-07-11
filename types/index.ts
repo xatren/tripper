@@ -62,7 +62,33 @@ export interface Trip {
   /** Default map focus point (e.g. the first destination country picked during creation). */
   focus_lat?: number | null;
   focus_lng?: number | null;
+  /** Present after migration `008_trip_persistence`. */
+  currency?: TripCurrency;
+  vibe?: TripVibe | null;
+  /** Present after migration `009_trip_countries`. */
+  countries?: TripCountry[];
 }
+
+/** Destination country picked in the New Trip wizard (migration `009_trip_countries`). */
+export interface TripCountry {
+  name: string;
+  flag: string;
+  lat: number;
+  lng: number;
+}
+
+/** Currencies offered in the New Trip wizard (migration `008_trip_persistence`). */
+export type TripCurrency = 'USD' | 'EUR' | 'GBP' | 'TRY';
+
+export const CURRENCY_SYMBOLS: Record<TripCurrency, string> = {
+  USD: '$',
+  EUR: '€',
+  GBP: '£',
+  TRY: '₺',
+};
+
+/** Trip vibes offered in the New Trip wizard (migration `008_trip_persistence`). */
+export type TripVibe = 'Road' | 'Fly' | 'Camp' | 'Beach' | 'Mountain' | 'Backpack';
 
 export interface TripMember {
   trip_id: string;
@@ -231,6 +257,8 @@ export interface Stop {
   estimated_cost?: number | null;
   day_number?: number | null;
   is_favorite?: boolean | null;
+  /** Present after migration `008_trip_persistence`. */
+  nights?: number;
 }
 
 export interface Photo {

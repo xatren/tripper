@@ -14,6 +14,8 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { showToast, Toaster } from "@/components/ui/toast";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
 const BG          = "linear-gradient(145deg, #06061c 0%, #0a1020 55%, #071216 100%)";
@@ -33,6 +35,10 @@ const CARD_GRADIENTS = [
   "linear-gradient(135deg, #065f46, #0d9488, #0369a1)",
 ];
 const CARD_EMOJIS = ["🗺️", "🌊", "🏰", "🏔️", "🏝️", "🎭", "🌄", "🏛️"];
+// Vibe picked in the New Trip wizard (trips.vibe, migration 008).
+const VIBE_EMOJIS: Record<string, string> = {
+  Road: "🚗", Fly: "✈️", Camp: "⛺", Beach: "🏖️", Mountain: "🏔️", Backpack: "🎒",
+};
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type FilterTab  = "all" | "upcoming" | "ongoing" | "completed";
@@ -138,8 +144,11 @@ export function TripsClient({ profile, trips: initialTrips, userId }: Props) {
     return list;
   }, [trips, tab, query]);
 
+  const [deleteTarget, setDeleteTarget] = useState<Trip | null>(null);
+
   const handleDelete = async (tripId: string) => {
-    await supabase.from("trips").delete().eq("id", tripId);
+    const { error } = await supabase.from("trips").delete().eq("id", tripId);
+    if (error) { showToast("Couldn't delete the trip. Please try again.", "error"); return; }
     setTrips(t => t.filter(tr => tr.id !== tripId));
   };
 
@@ -270,7 +279,7 @@ export function TripsClient({ profile, trips: initialTrips, userId }: Props) {
                       index={initialTrips.indexOf(trip)}
                       isOwner={trip.owner_id === userId}
                       onOpen={() => router.push(`/trip/${trip.id}/mobile`)}
-                      onDelete={() => handleDelete(trip.id)}
+                      onDelete={() => setDeleteTarget(trip)}
                       onCopyCode={() => navigator.clipboard.writeText(trip.invite_code ?? "")}
                     />
                   </motion.div>
@@ -313,6 +322,18 @@ export function TripsClient({ profile, trips: initialTrips, userId }: Props) {
           })}
         </nav>
       </div>
+
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        title="Delete this trip?"
+        message={deleteTarget ? `"${deleteTarget.title}" and all its stops and expenses will be permanently deleted. This can't be undone.` : ""}
+        onConfirm={() => {
+          if (deleteTarget) handleDelete(deleteTarget.id);
+          setDeleteTarget(null);
+        }}
+        onCancel={() => setDeleteTarget(null)}
+      />
+      <Toaster />
     </div>
   );
 }
@@ -347,7 +368,7 @@ function TripCard({ trip, index, isOwner, onOpen, onDelete, onCopyCode }: {
       {/* Icon with role badge */}
       <div style={{ position: "relative", flexShrink: 0 }}>
         <div style={{ width: 56, height: 56, borderRadius: 16, background: muted ? "linear-gradient(135deg,#2a2a3a,#1e1e2e)" : CARD_GRADIENTS[idx], display: "flex", alignItems: "center", justifyContent: "center", fontSize: muted ? 22 : 26, filter: muted ? "grayscale(0.5)" : "none" }}>
-          {muted ? "✓" : CARD_EMOJIS[idx]}
+          {muted ? "✓" : (trip.vibe && VIBE_EMOJIS[trip.vibe]) || CARD_EMOJIS[idx]}
         </div>
         <span style={{ position: "absolute", bottom: -4, right: -4, fontSize: 9, fontWeight: 700, letterSpacing: "0.04em", background: isOwner ? "rgba(245,166,35,0.90)" : "rgba(124,58,237,0.85)", color: "#fff", borderRadius: 6, padding: "2px 5px", border: "1.5px solid #0a1020" }}>
           {isOwner ? "OWNER" : "COLLAB"}
