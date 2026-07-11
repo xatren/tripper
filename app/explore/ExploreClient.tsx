@@ -6,9 +6,10 @@ import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
 import type { GlobeCamera } from "@/components/explore/ExploreGlobe";
 import {
-  Home, Briefcase, Compass, FileText, Globe2,
+  Compass, Globe2,
   MapPin, Moon, X, Clock, Ruler, Sun, ChevronRight, ArrowLeft,
 } from "lucide-react";
+import { AppBottomNav } from "@/components/ui/AppBottomNav";
 import type { Profile, Trip } from "@/types";
 import { getInitials } from "@/lib/utils";
 
@@ -200,14 +201,6 @@ function getRouteCamera(waypoints: Waypoint[]): GlobeCamera {
 
   return { lat: centerLat, lng: centerLng, altitude };
 }
-
-const NAV_ITEMS = [
-  { id: "home",      Icon: Home,      label: "Home"      },
-  { id: "trips",     Icon: Briefcase, label: "Trips"     },
-  { id: "explore",   Icon: Compass,   label: "Explore"   },
-  { id: "itinerary", Icon: FileText,  label: "Itinerary" },
-  { id: "profile",   Icon: null,      label: "Profile"   },
-] as const;
 
 // ── Component ─────────────────────────────────────────────────────────────────
 interface Props {
@@ -563,34 +556,7 @@ export function ExploreClient({ profile, trips }: Props) {
       </div>
 
       {/* Bottom Nav */}
-      <nav style={{ position:"fixed", bottom:0, left:"50%", transform:"translateX(-50%)", width:"100%", maxWidth:430, background:"rgba(0,0,16,0.94)", borderTop:"1px solid rgba(255,255,255,0.07)", backdropFilter:"blur(24px)", display:"flex", alignItems:"stretch", paddingBottom:"env(safe-area-inset-bottom, 16px)", zIndex:50 }}>
-        {NAV_ITEMS.map(({ id, Icon, label }) => {
-          const isActive = id === "explore";
-          return (
-            <motion.button key={id}
-              onClick={() => {
-                if (id === "home")    router.push("/dashboard");
-                if (id === "trips")   router.push("/trips");
-                if (id === "profile") router.push("/profile");
-              }}
-              style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:3, padding:"12px 4px 8px", background:"none", border:"none", cursor:"pointer", position:"relative" }}
-              whileTap={{ scale:0.88 }} transition={TAP}
-            >
-              {id === "profile" ? (
-                <div style={{ width:26, height:26, borderRadius:"50%", background:AVATAR_GRAD, display:"flex", alignItems:"center", justifyContent:"center", fontSize:10, fontWeight:700, color:"#fff" }}>
-                  {getInitials(profile?.display_name ?? profile?.email)}
-                </div>
-              ) : Icon ? (
-                <Icon style={{ width:22, height:22, color: isActive ? "#f5a623" : "rgba(200,210,255,0.35)" }} />
-              ) : null}
-              <span style={{ fontSize:10, fontWeight:500, color: isActive ? "#f5a623" : "rgba(200,210,255,0.35)", ...FONT }}>
-                {label}
-              </span>
-              {isActive && <span style={{ position:"absolute", bottom:5, left:"50%", transform:"translateX(-50%)", width:4, height:4, borderRadius:"50%", background:"#f5a623" }} />}
-            </motion.button>
-          );
-        })}
-      </nav>
+      <AppBottomNav active="explore" profile={profile} />
     </div>
   );
 }

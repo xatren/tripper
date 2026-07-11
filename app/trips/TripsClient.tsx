@@ -3,10 +3,7 @@
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Search, MoreVertical, Ticket, Trash2, Home,
-  Briefcase, Compass, FileText, Plus, X,
-} from "lucide-react";
+import { Search, MoreVertical, Ticket, Trash2, Briefcase, Plus, X } from "lucide-react";
 import type { Profile, Trip } from "@/types";
 import { createClient } from "@/lib/supabase/client";
 import { formatDate, getInitials } from "@/lib/utils";
@@ -16,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { showToast, Toaster } from "@/components/ui/toast";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { AppBottomNav } from "@/components/ui/AppBottomNav";
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
 const BG          = "linear-gradient(145deg, #06061c 0%, #0a1020 55%, #071216 100%)";
@@ -94,14 +92,6 @@ function orb(p: { top?: string; bottom?: string; left?: string; right?: string; 
 }
 
 // ── Config ────────────────────────────────────────────────────────────────────
-const NAV_ITEMS = [
-  { id: "home",      Icon: Home,      label: "Home"      },
-  { id: "trips",     Icon: Briefcase, label: "Trips"     },
-  { id: "explore",   Icon: Compass,   label: "Explore"   },
-  { id: "itinerary", Icon: FileText,  label: "Itinerary" },
-  { id: "profile",   Icon: null,      label: "Profile"   },
-] as const;
-
 const TABS: { id: FilterTab; label: string }[] = [
   { id: "all",       label: "All"       },
   { id: "upcoming",  label: "Upcoming"  },
@@ -290,37 +280,7 @@ export function TripsClient({ profile, trips: initialTrips, userId }: Props) {
         </div>
 
         {/* Bottom Nav */}
-        <nav style={{ position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 430, background: "rgba(5,5,20,0.90)", borderTop: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(24px)", display: "flex", alignItems: "stretch", paddingBottom: "env(safe-area-inset-bottom, 16px)", zIndex: 50 }}>
-          {NAV_ITEMS.map(({ id, Icon, label }) => {
-            const isActive = id === "trips";
-            return (
-              <motion.button
-                key={id}
-                onClick={() => {
-                  if (id === "home")    router.push("/dashboard");
-                  if (id === "profile") router.push("/profile");
-                  if (id === "explore") router.push("/explore");
-                }}
-                style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "12px 4px 8px", background: "none", border: "none", cursor: "pointer", position: "relative" }}
-                whileTap={{ scale: 0.88 }} transition={TAP}
-              >
-                {id === "profile" ? (
-                  <div style={{ width: 26, height: 26, borderRadius: "50%", background: AVATAR_GRAD, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, color: "#fff" }}>
-                    {getInitials(profile?.display_name ?? profile?.email)}
-                  </div>
-                ) : Icon ? (
-                  <Icon style={{ width: 22, height: 22, color: isActive ? "#f5a623" : "rgba(215,215,255,0.40)" }} />
-                ) : null}
-                <span style={{ fontSize: 10, fontWeight: 500, color: isActive ? "#f5a623" : "rgba(215,215,255,0.40)", ...FONT }}>
-                  {label}
-                </span>
-                {isActive && (
-                  <span style={{ position: "absolute", bottom: 5, left: "50%", transform: "translateX(-50%)", width: 4, height: 4, borderRadius: "50%", background: "#f5a623" }} />
-                )}
-              </motion.button>
-            );
-          })}
-        </nav>
+        <AppBottomNav active="trips" profile={profile} />
       </div>
 
       <ConfirmDialog

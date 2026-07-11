@@ -4,10 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import {
-  MapPin, Plus, MoreVertical, Ticket, Trash2,
-  Bell, Home, Briefcase, Compass, FileText,
-} from "lucide-react";
+import { MapPin, Plus, MoreVertical, Ticket, Trash2 } from "lucide-react";
 import type { Profile, Trip } from "@/types";
 import { createClient } from "@/lib/supabase/client";
 import { formatDate, getInitials } from "@/lib/utils";
@@ -17,14 +14,12 @@ import {
   Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  CreateTripDialog, type CreateTripFormValues,
-} from "@/components/dashboard/CreateTripDialog";
-import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { showToast, Toaster } from "@/components/ui/toast";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { AppBottomNav } from "@/components/ui/AppBottomNav";
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
 const BG         = "linear-gradient(145deg, #06061c 0%, #0a1020 55%, #071216 100%)";
@@ -90,21 +85,11 @@ function orb(p: {
   };
 }
 
-// ── Nav config ────────────────────────────────────────────────────────────────
-const NAV_ITEMS = [
-  { id: "home",      Icon: Home,      label: "Home"      },
-  { id: "trips",     Icon: Briefcase, label: "Trips"     },
-  { id: "explore",   Icon: Compass,   label: "Explore"   },
-  { id: "itinerary", Icon: FileText,  label: "Itinerary" },
-  { id: "profile",   Icon: null,      label: "Profile"   },
-] as const;
-
 // ── Main component ────────────────────────────────────────────────────────────
 interface DashboardClientProps { profile: Profile | null; trips: Trip[] }
 
 export function DashboardClient({ profile, trips: initialTrips }: DashboardClientProps) {
   const [trips, setTrips]         = useState<Trip[]>(initialTrips);
-  const [isCreateOpen, setCreate] = useState(false);
   const [isJoinOpen,   setJoin]   = useState(false);
   const [joinCode, setJoinCode]   = useState("");
   const [loading, setLoading]     = useState(false);
@@ -116,31 +101,6 @@ export function DashboardClient({ profile, trips: initialTrips }: DashboardClien
   const upcomingCount = trips.filter((t) => { const d = getDaysUntil(t.start_date); return d !== null && d >= 0; }).length;
 
   // ── handlers ─────────────────────────────────────────────────────────────
-  const buildDescription = (v: CreateTripFormValues, emails: string[]) => {
-    const audience = v.visibility === "members" ? "Trip members only" : v.visibility === "followers" ? "My followers" : "Everyone";
-    const parts = [
-      v.countries.length ? `Countries: ${v.countries.join(", ")}` : null,
-      `Who can view: ${audience}`,
-      emails.length ? `Invite emails: ${emails.join(", ")}` : null,
-    ].filter(Boolean) as string[];
-    return parts.length ? parts.join("\n\n") : null;
-  };
-
-  const handleCreateTrip = async (values: CreateTripFormValues, inviteEmails: string[]) => {
-    setLoading(true); setError(null);
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { setError("Not authenticated"); setLoading(false); return; }
-    const inviteCode = Math.random().toString(36).substring(2, 10).toUpperCase();
-    const { data: trip, error: err } = await supabase.from("trips")
-      .insert({ title: values.title, description: buildDescription(values, inviteEmails), start_date: values.start_date || null, end_date: values.end_date || null, total_budget: 0, owner_id: user.id, invite_code: inviteCode })
-      .select().single();
-    if (err || !trip) { setError(err?.message ?? "Failed to create trip"); setLoading(false); return; }
-    setTrips((t) => [trip as Trip, ...t]);
-    setCreate(false);
-    router.push(`/trip/${trip.id}/mobile`);
-    setLoading(false);
-  };
-
   const handleJoin = async (e: React.FormEvent) => {
     e.preventDefault(); setLoading(true); setError(null);
     const { data: { user } } = await supabase.auth.getUser();
@@ -162,8 +122,6 @@ export function DashboardClient({ profile, trips: initialTrips }: DashboardClien
     if (error) { showToast("Couldn't delete the trip. Please try again.", "error"); return; }
     setTrips((t) => t.filter((tr) => tr.id !== tripId));
   };
-
-  const handleSignOut = async () => { await supabase.auth.signOut(); router.push("/login"); };
 
   // ── render ────────────────────────────────────────────────────────────────
   return (
@@ -197,23 +155,11 @@ export function DashboardClient({ profile, trips: initialTrips }: DashboardClien
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
           >
-            {/* Bell — join trip */}
+            {/* Avatar → profile */}
             <motion.button
-              onClick={() => setJoin(true)}
-              title="Join a trip"
-              style={{ width: 40, height: 40, borderRadius: 11, position: "relative", background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.10)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", padding: 0 }}
-              whileTap={{ scale: 0.86 }}
-              whileHover={{ scale: 1.08, background: "rgba(255,255,255,0.12)" }}
-              transition={TAP_SPRING}
-            >
-              <Bell style={{ width: 18, height: 18, color: "rgba(215,215,255,0.65)" }} />
-              <span style={{ position: "absolute", top: 8, right: 9, width: 7, height: 7, background: "#f5a623", borderRadius: "50%", border: "1.5px solid #0a1020" }} />
-            </motion.button>
-
-            {/* Avatar */}
-            <motion.button
-              onClick={handleSignOut}
-              title="Sign out"
+              onClick={() => router.push("/profile")}
+              title="Profile"
+              aria-label="Open profile"
               style={{ width: 40, height: 40, borderRadius: "50%", background: AVATAR_GRAD, border: "2px solid #f5a623", boxShadow: "0 0 16px rgba(245,140,0,0.38)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700, color: "#fff", cursor: "pointer", overflow: "hidden", padding: 0 }}
               whileTap={{ scale: 0.86 }}
               whileHover={{ scale: 1.06 }}
@@ -256,7 +202,8 @@ export function DashboardClient({ profile, trips: initialTrips }: DashboardClien
           >
             <span style={{ fontSize: 16, fontWeight: 600, color: "#fff" }}>Continue planning your trips</span>
             <motion.button
-              style={{ fontSize: 14, color: "#f5a623", fontWeight: 500, background: "none", border: "none", cursor: "pointer", padding: "2px 0" }}
+              onClick={() => router.push("/trips")}
+              style={{ fontSize: 14, color: "#f5a623", fontWeight: 500, background: "none", border: "none", cursor: "pointer", padding: "2px 0", ...FONT }}
               whileTap={{ scale: 0.92, opacity: 0.7 }}
               transition={TAP_SPRING}
             >
@@ -265,7 +212,7 @@ export function DashboardClient({ profile, trips: initialTrips }: DashboardClien
           </motion.div>
 
           {trips.length === 0 ? (
-            <EmptyState onCreateClick={() => { setError(null); setCreate(true); }} />
+            <EmptyState onCreateClick={() => router.push("/trips/new")} />
           ) : (
             <AnimatePresence>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -308,40 +255,34 @@ export function DashboardClient({ profile, trips: initialTrips }: DashboardClien
                     <span style={{ marginLeft: "auto", color: "rgba(215,215,255,0.42)", fontSize: 20 }}>›</span>
                   </motion.button>
                 </motion.div>
+
+                {/* Join with invite code row */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.26 + trips.length * 0.06, duration: 0.35, ease: "easeOut" }}
+                >
+                  <motion.button
+                    onClick={() => { setError(null); setJoin(true); }}
+                    style={{ width: "100%", display: "flex", alignItems: "center", gap: 14, background: "rgba(255,255,255,0.035)", border: "1px solid rgba(255,255,255,0.11)", borderRadius: 20, backdropFilter: "blur(16px)", padding: "14px 16px", cursor: "pointer", textAlign: "left" }}
+                    whileTap={{ scale: 0.97 }}
+                    whileHover={{ background: "rgba(255,255,255,0.065)", borderColor: "rgba(255,255,255,0.18)" }}
+                    transition={TAP_SPRING}
+                  >
+                    <div style={{ width: 54, height: 54, borderRadius: 16, flexShrink: 0, background: "rgba(124,58,237,0.18)", border: "1px solid rgba(124,58,237,0.35)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <Ticket style={{ width: 22, height: 22, color: "#a78bfa" }} />
+                    </div>
+                    <span style={{ fontSize: 16, fontWeight: 500, color: "rgba(215,215,255,0.88)" }}>Join with invite code</span>
+                    <span style={{ marginLeft: "auto", color: "rgba(215,215,255,0.42)", fontSize: 20 }}>›</span>
+                  </motion.button>
+                </motion.div>
               </div>
             </AnimatePresence>
           )}
         </div>
 
         {/* ── Bottom Nav ── */}
-        <nav style={{ position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 430, background: "rgba(5,5,20,0.90)", borderTop: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(24px)", display: "flex", alignItems: "stretch", paddingBottom: "env(safe-area-inset-bottom, 16px)", zIndex: 50 }}>
-          {NAV_ITEMS.map(({ id, Icon, label }) => {
-            const isActive = id === "home";
-            return (
-              <motion.button
-                key={id}
-                onClick={() => { if (id === "profile") router.push("/profile"); if (id === "trips") router.push("/trips"); if (id === "explore") router.push("/explore"); }}
-                style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "12px 4px 8px", background: "none", border: "none", cursor: "pointer", position: "relative" }}
-                whileTap={{ scale: 0.88 }}
-                transition={TAP_SPRING}
-              >
-                {id === "profile" ? (
-                  <div style={{ width: 26, height: 26, borderRadius: "50%", background: AVATAR_GRAD, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, color: "#fff" }}>
-                    {getInitials(profile?.display_name ?? profile?.email)}
-                  </div>
-                ) : Icon ? (
-                  <Icon style={{ width: 22, height: 22, color: isActive ? "#f5a623" : "rgba(215,215,255,0.40)" }} />
-                ) : null}
-                <span style={{ fontSize: 10, fontWeight: 500, color: isActive ? "#f5a623" : "rgba(215,215,255,0.40)" }}>
-                  {label}
-                </span>
-                {isActive && (
-                  <span style={{ position: "absolute", bottom: 5, left: "50%", transform: "translateX(-50%)", width: 4, height: 4, borderRadius: "50%", background: "#f5a623" }} />
-                )}
-              </motion.button>
-            );
-          })}
-        </nav>
+        <AppBottomNav active="home" profile={profile} />
       </div>
 
       {/* ── Join Trip dialog ── */}

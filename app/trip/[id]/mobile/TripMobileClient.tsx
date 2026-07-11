@@ -3,6 +3,9 @@
 import { useState, useCallback, useEffect, useRef, type CSSProperties } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, useMotionValue, animate } from 'framer-motion'
+import { DndContext, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
+import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from '@dnd-kit/sortable'
+import { CSS as DndCSS } from '@dnd-kit/utilities'
 import { SegmentedTabs } from '@/components/ui/segmented-tabs'
 import { createClient } from '@/lib/supabase/client'
 import { TripboxMap } from '@/components/map/mapbox/TripboxMap'
@@ -285,9 +288,11 @@ function PrepTab() {
         const isOpen = !!expanded[key]
         return (
           <div key={key} style={{ background: GLASS_FILL, border: `1px solid ${GLASS_BORDER}`, borderRadius: 20, backdropFilter: 'blur(20px)', boxShadow: '0 6px 20px rgba(0,0,0,.2)', overflow: 'hidden' }}>
-            <div
+            <button
+              type="button"
               onClick={() => setExpanded((e) => ({ ...e, [key]: !e[key] }))}
-              style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 16, cursor: 'pointer' }}
+              aria-expanded={isOpen}
+              style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: 16, cursor: 'pointer', background: 'none', border: 'none', textAlign: 'left', fontFamily: 'inherit', color: 'inherit' }}
             >
               <span style={{ width: 34, height: 34, borderRadius: 12, background: `${ACCENT}1a`, border: `1px solid ${ACCENT}40`, display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none' }}>
                 {icon(ACCENT_LIGHT)}
@@ -299,7 +304,7 @@ function PrepTab() {
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style={{ flex: 'none', transition: 'transform .25s ease', transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
                 <path d="M4 6L8 10L12 6" stroke="rgba(215,215,255,.6)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-            </div>
+            </button>
             {isOpen && (
               <div style={{ padding: '0 16px 16px', display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {list.map((item) => (
@@ -398,10 +403,11 @@ function formatMoney(n: number) {
 }
 
 function BudgetTab({
-  trip, expenses, onAdd, onDelete,
+  trip, expenses, loading, onAdd, onDelete,
 }: {
   trip: Trip
   expenses: Expense[]
+  loading: boolean
   onAdd: (category: ExpenseCategory, description: string, amount: number) => Promise<void>
   onDelete: (id: string) => void
 }) {
@@ -453,15 +459,25 @@ function BudgetTab({
         </div>
       </div>
 
-      {EXPENSE_CATEGORIES.map(({ value: cat, label }) => {
+      {loading &&
+        [0, 1, 2].map((i) => (
+          <div
+            key={i}
+            style={{ height: 66, borderRadius: 20, background: GLASS_FILL, border: `1px solid ${GLASS_BORDER}`, animation: 'pulseglow 1.6s ease-in-out infinite', animationDelay: `${i * 0.15}s` }}
+          />
+        ))}
+
+      {!loading && EXPENSE_CATEGORIES.map(({ value: cat, label }) => {
         const list = expenses.filter((e) => e.category === cat)
         const catSpent = list.reduce((sum, e) => sum + Number(e.amount), 0)
         const isOpen = !!expanded[cat]
         return (
           <div key={cat} style={{ background: GLASS_FILL, border: `1px solid ${GLASS_BORDER}`, borderRadius: 20, backdropFilter: 'blur(20px)', boxShadow: '0 6px 20px rgba(0,0,0,.2)', overflow: 'hidden' }}>
-            <div
+            <button
+              type="button"
               onClick={() => setExpanded((e) => ({ ...e, [cat]: !e[cat] }))}
-              style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 16, cursor: 'pointer' }}
+              aria-expanded={isOpen}
+              style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: 16, cursor: 'pointer', background: 'none', border: 'none', textAlign: 'left', fontFamily: 'inherit', color: 'inherit' }}
             >
               <span style={{ width: 34, height: 34, borderRadius: 12, background: `${ACCENT}1a`, border: `1px solid ${ACCENT}40`, display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none' }}>
                 {EXPENSE_CATEGORY_ICONS[cat](ACCENT_LIGHT)}
@@ -476,7 +492,7 @@ function BudgetTab({
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style={{ flex: 'none', transition: 'transform .25s ease', transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
                 <path d="M4 6L8 10L12 6" stroke="rgba(215,215,255,.6)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-            </div>
+            </button>
             {isOpen && (
               <div style={{ padding: '0 16px 16px', display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {list.map((item) => (
@@ -541,7 +557,7 @@ function JournalTab({
     return (
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '60px 16px', textAlign: 'center' }}>
         <span style={{ color: 'rgba(255,255,255,.5)', fontSize: 14, fontWeight: 600 }}>Trip Journal</span>
-        <span style={{ color: '#4a4a68', fontSize: 12.5 }}>Add at least 2 stops to see your trip recap</span>
+        <span style={{ color: 'rgba(215,215,255,.55)', fontSize: 12.5 }}>Add at least 2 stops to see your trip recap</span>
       </div>
     )
   }
@@ -754,23 +770,38 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
     else showToast("Couldn't rename the stop.", 'error')
   }, [])
 
-  const handleMoveStop = useCallback((id: string, direction: 'up' | 'down') => {
-    setStops((prev) => {
-      const idx = prev.findIndex((s) => s.id === id)
-      const swapIdx = direction === 'up' ? idx - 1 : idx + 1
-      if (idx < 0 || swapIdx < 0 || swapIdx >= prev.length) return prev
-      const next = [...prev]
-      ;[next[idx], next[swapIdx]] = [next[swapIdx], next[idx]]
-      const supabase = createClient()
-      Promise.all([
-        supabase.from('stops').update({ order_index: idx }).eq('id', next[idx].id),
-        supabase.from('stops').update({ order_index: swapIdx }).eq('id', next[swapIdx].id),
-      ]).then((results) => {
-        if (results.some((r) => r.error)) showToast("Couldn't save the new stop order.", 'error')
-      })
-      return next
+  // Drag-and-drop reordering (dnd-kit). Pointer needs a small movement and touch
+  // a long-press before a drag starts, so taps on the buttons inside each card
+  // (nights stepper, rename) keep working as plain clicks.
+  const dndSensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 220, tolerance: 8 } })
+  )
+
+  const persistStopOrder = useCallback((ordered: Stop[]) => {
+    const supabase = createClient()
+    Promise.all(
+      ordered.map((s, i) => supabase.from('stops').update({ order_index: i }).eq('id', s.id))
+    ).then((results) => {
+      if (results.some((r) => r.error)) showToast("Couldn't save the new stop order.", 'error')
     })
   }, [])
+
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event
+      if (!over || active.id === over.id) return
+      setStops((prev) => {
+        const oldIndex = prev.findIndex((s) => s.id === active.id)
+        const newIndex = prev.findIndex((s) => s.id === over.id)
+        if (oldIndex < 0 || newIndex < 0) return prev
+        const next = arrayMove(prev, oldIndex, newIndex)
+        persistStopOrder(next)
+        return next
+      })
+    },
+    [persistStopOrder]
+  )
 
   const handleAddStop = useCallback(
     async (lat: number, lng: number, name: string, address: string) => {
@@ -796,6 +827,7 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
   )
 
   const [expenses, setExpenses] = useState<Expense[]>([])
+  const [expensesLoading, setExpensesLoading] = useState(true)
 
   useEffect(() => {
     let cancelled = false
@@ -805,8 +837,11 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
       .select('*')
       .eq('trip_id', trip.id)
       .order('created_at', { ascending: false })
-      .then(({ data }) => {
-        if (!cancelled && data) setExpenses(data as Expense[])
+      .then(({ data, error }) => {
+        if (cancelled) return
+        if (data) setExpenses(data as Expense[])
+        else if (error) showToast("Couldn't load expenses.", 'error')
+        setExpensesLoading(false)
       })
     return () => {
       cancelled = true
@@ -860,6 +895,13 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
         @keyframes pulseglow { 0%,100% { opacity: .45; } 50% { opacity: .8; } }
         * { scrollbar-width: none }
         *::-webkit-scrollbar { display: none }
+        @media (prefers-reduced-motion: reduce) {
+          *, *::before, *::after {
+            animation-duration: .01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: .01ms !important;
+          }
+        }
       `}</style>
 
       {/* luminous orbs */}
@@ -871,7 +913,7 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
         {activeSection !== 'plan' && (
           <div style={{ position: 'relative', zIndex: 1, height: '100%', display: 'flex', flexDirection: 'column' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 18px 14px', paddingTop: 'max(20px, env(safe-area-inset-top))', flex: 'none' }}>
-              <button onClick={() => setActiveSection('plan')} title="Back to plan" style={topBtnStyle}>
+              <button onClick={() => setActiveSection('plan')} title="Back to plan" aria-label="Back to plan" style={topBtnStyle}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
               </button>
               <div style={{ color: '#ffffff', fontWeight: 800, fontSize: 17, letterSpacing: '-0.2px' }}>
@@ -882,7 +924,7 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
             <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '0 16px 16px' }}>
               {activeSection === 'prep' && <PrepTab />}
               {activeSection === 'budget' && (
-                <BudgetTab trip={trip} expenses={expenses} onAdd={handleAddExpense} onDelete={handleDeleteExpense} />
+                <BudgetTab trip={trip} expenses={expenses} loading={expensesLoading} onAdd={handleAddExpense} onDelete={handleDeleteExpense} />
               )}
               {activeSection === 'journal' && (
                 <JournalTab trip={trip} stops={stops} routeLegs={routeLegs} routePath={routePath} />
@@ -917,7 +959,7 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
           }}
         >
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', pointerEvents: 'auto' }}>
-            <button onClick={() => router.push('/trips')} title="Back to trips" style={topBtnStyle}>
+            <button onClick={() => router.push('/trips')} title="Back to trips" aria-label="Back to trips" style={topBtnStyle}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
             </button>
 
@@ -1003,6 +1045,7 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
                     >
                       <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 1L9.3 5.6L14 7L9.3 8.4L8 13L6.7 8.4L2 7L6.7 5.6L8 1Z" fill={ACCENT_LIGHT} /></svg>
                       <span style={{ fontSize: 12.5, fontWeight: 600, color: '#fff' }}>{optimizeHint ? 'Coming soon' : 'Optimize'}</span>
+                      <span style={{ fontSize: 9, fontWeight: 800, padding: '2px 6px', borderRadius: 6, background: 'rgba(245,166,35,.15)', border: '1px solid rgba(245,166,35,.35)', color: ACCENT_LIGHT, letterSpacing: '.05em' }}>SOON</span>
                     </button>
                   </div>
                 )}
@@ -1013,13 +1056,22 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
                       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(136,136,228,.85)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M9 20l-5.5-2V4l5.5 2 6-2 5.5 2v14l-5.5-2-6 2z" /><path d="M9 6v14M15 4v14" /></svg>
                     </div>
                     <div style={{ color: '#ffffff', fontWeight: 500, fontSize: 16, textAlign: 'center' }}>Add your first destination</div>
-                    <div style={{ color: '#4a4a68', fontWeight: 400, fontSize: 13, textAlign: 'center' }}>Press + to build your route</div>
+                    <div style={{ color: 'rgba(215,215,255,.55)', fontWeight: 400, fontSize: 13, textAlign: 'center' }}>Press + to build your route</div>
                   </div>
                 ) : (
+                  <DndContext sensors={dndSensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                  <SortableContext items={stops.map((s) => s.id)} strategy={verticalListSortingStrategy}>
                   <div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
                     {stops.map((stop, idx) => (
-                      <div key={stop.id}>
-                        <div style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', borderRadius: 14, background: 'rgba(255,255,255,.045)', border: '1px solid rgba(255,255,255,.09)' }}>
+                      <SortableStopItem key={stop.id} id={stop.id}>
+                        {({ attributes, listeners, isDragging }) => (
+                          <>
+                        <div {...attributes} {...listeners} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', borderRadius: 14, background: isDragging ? 'rgba(255,255,255,.09)' : 'rgba(255,255,255,.045)', border: `1px solid ${isDragging ? 'rgba(245,166,35,.4)' : 'rgba(255,255,255,.09)'}`, touchAction: 'manipulation', cursor: isDragging ? 'grabbing' : 'grab' }}>
+                          <svg width="8" height="14" viewBox="0 0 8 14" fill="none" style={{ flex: 'none', opacity: 0.45 }} aria-hidden="true">
+                            <circle cx="2" cy="2" r="1.2" fill="#d7d7ff" /><circle cx="6" cy="2" r="1.2" fill="#d7d7ff" />
+                            <circle cx="2" cy="7" r="1.2" fill="#d7d7ff" /><circle cx="6" cy="7" r="1.2" fill="#d7d7ff" />
+                            <circle cx="2" cy="12" r="1.2" fill="#d7d7ff" /><circle cx="6" cy="12" r="1.2" fill="#d7d7ff" />
+                          </svg>
                           <span style={{ flexShrink: 0, width: 24, height: 24, borderRadius: '50%', background: `${ACCENT}22`, border: `1.5px solid ${ACCENT}66`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: ACCENT }}>
                             {idx + 1}
                           </span>
@@ -1047,11 +1099,12 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
                               <div style={{ color: '#ffffff', fontWeight: 600, fontSize: 14, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{stop.name}</div>
                             )}
                             {stop.address && (
-                              <div style={{ color: '#4a4a68', fontSize: 11.5, marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{stop.address}</div>
+                              <div style={{ color: 'rgba(215,215,255,.55)', fontSize: 11.5, marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{stop.address}</div>
                             )}
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 2, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 999, padding: 4, flex: 'none' }}>
                             <button
+                              aria-label={`Remove a night in ${stop.name}`}
                               onClick={() => changeNights(stop.id, -1)}
                               style={{ width: 26, height: 26, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'rgba(215,215,255,.8)', background: 'none', border: 'none' }}
                             >
@@ -1059,6 +1112,7 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
                             </button>
                             <span style={{ fontSize: 13, fontWeight: 700, width: 20, textAlign: 'center' }}>{nights[stop.id] ?? 1}</span>
                             <button
+                              aria-label={`Add a night in ${stop.name}`}
                               onClick={() => changeNights(stop.id, 1)}
                               style={{ width: 26, height: 26, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: ACCENT_LIGHT, background: 'none', border: 'none' }}
                             >
@@ -1074,32 +1128,18 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
                               setEditDraft(stop.name)
                             }}
                             title="Rename stop"
-                            style={{ width: 24, height: 24, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.08)', color: 'rgba(215,215,255,.6)' }}
+                            aria-label={`Rename ${stop.name}`}
+                            style={{ width: 30, height: 30, borderRadius: 9, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.08)', color: 'rgba(215,215,255,.6)' }}
                           >
-                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg>
-                          </button>
-                          <button
-                            onClick={() => handleMoveStop(stop.id, 'up')}
-                            disabled={idx === 0}
-                            title="Move up"
-                            style={{ width: 24, height: 24, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: idx === 0 ? 'default' : 'pointer', background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.08)', color: 'rgba(215,215,255,.6)', opacity: idx === 0 ? 0.35 : 1 }}
-                          >
-                            <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M8 12.5V3.5M3.5 7L8 3L12.5 7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                          </button>
-                          <button
-                            onClick={() => handleMoveStop(stop.id, 'down')}
-                            disabled={idx === stops.length - 1}
-                            title="Move down"
-                            style={{ width: 24, height: 24, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: idx === stops.length - 1 ? 'default' : 'pointer', background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.08)', color: 'rgba(215,215,255,.6)', opacity: idx === stops.length - 1 ? 0.35 : 1 }}
-                          >
-                            <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M8 3.5V12.5M3.5 9L8 13L12.5 9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg>
                           </button>
                           <button
                             onClick={() => setDeleteStopTarget(stop)}
                             title="Delete stop"
-                            style={{ width: 24, height: 24, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', background: 'rgba(239,68,68,.08)', border: '1px solid rgba(239,68,68,.25)', color: '#f87171' }}
+                            aria-label={`Delete ${stop.name}`}
+                            style={{ width: 30, height: 30, borderRadius: 9, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', background: 'rgba(239,68,68,.08)', border: '1px solid rgba(239,68,68,.25)', color: '#f87171' }}
                           >
-                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18" /><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6" /></svg>
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18" /><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6" /></svg>
                           </button>
                         </div>
 
@@ -1130,14 +1170,18 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
                             )}
                           </div>
                         )}
-                      </div>
+                          </>
+                        )}
+                      </SortableStopItem>
                     ))}
                   </div>
+                  </SortableContext>
+                  </DndContext>
                 )}
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%' }}>
                   <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,.08)' }} />
-                  <div style={{ color: '#4a4a68', fontSize: 12, fontWeight: 500 }}>or</div>
+                  <div style={{ color: 'rgba(215,215,255,.55)', fontSize: 12, fontWeight: 500 }}>or</div>
                   <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,.08)' }} />
                 </div>
 
@@ -1147,6 +1191,7 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
                 >
                   <span style={{ fontSize: 14 }}>✨</span>
                   <span style={{ color: '#f5c268', fontWeight: 700, fontSize: 14 }}>{aiHint ? 'Coming soon' : 'Generate trip with AI'}</span>
+                  <span style={{ fontSize: 9, fontWeight: 800, padding: '2px 6px', borderRadius: 6, background: 'rgba(245,166,35,.15)', border: '1px solid rgba(245,166,35,.35)', color: ACCENT_LIGHT, letterSpacing: '.05em' }}>SOON</span>
                 </button>
               </>
             )}
@@ -1166,6 +1211,7 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
         <button
           onClick={() => setIsAddOpen(true)}
           title="Add destination"
+          aria-label="Add destination"
           style={{ position: 'fixed', right: 18, bottom: 96, width: 56, height: 56, borderRadius: '50%', background: `linear-gradient(145deg, ${ACCENT_LIGHT}, ${ACCENT_DARK})`, boxShadow: '0 0 32px rgba(245,140,0,.45), 0 8px 20px rgba(0,0,0,.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 5, border: 'none', cursor: 'pointer' }}
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.6" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
@@ -1190,6 +1236,19 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
 }
 
 // ─── Sub-components ────────────────────────────────────────────────────────
+
+/** dnd-kit wrapper: applies the sort transform and hands drag props to the card. */
+function SortableStopItem({ id, children }: {
+  id: string
+  children: (p: { attributes: React.HTMLAttributes<HTMLDivElement>; listeners: Record<string, unknown> | undefined; isDragging: boolean }) => React.ReactNode
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id })
+  return (
+    <div ref={setNodeRef} style={{ transform: DndCSS.Transform.toString(transform), transition, position: 'relative', zIndex: isDragging ? 10 : undefined }}>
+      {children({ attributes: attributes as React.HTMLAttributes<HTMLDivElement>, listeners: listeners as Record<string, unknown> | undefined, isDragging })}
+    </div>
+  )
+}
 
 function DaysTab({ stops, routeLegs, schedule }: { stops: Stop[]; routeLegs: RouteLeg[]; schedule: StopSchedule[] }) {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({})
@@ -1231,6 +1290,15 @@ function DaysTab({ stops, routeLegs, schedule }: { stops: Stop[]; routeLegs: Rou
             )}
             <div
               onClick={() => hasDetail && setExpanded((e) => ({ ...e, [stop.id]: !e[stop.id] }))}
+              role={hasDetail ? 'button' : undefined}
+              tabIndex={hasDetail ? 0 : undefined}
+              aria-expanded={hasDetail ? isOpen : undefined}
+              onKeyDown={(e) => {
+                if (hasDetail && (e.key === 'Enter' || e.key === ' ')) {
+                  e.preventDefault()
+                  setExpanded((prev) => ({ ...prev, [stop.id]: !prev[stop.id] }))
+                }
+              }}
               style={{
                 background: GLASS_FILL, border: `1px solid ${GLASS_BORDER}`, borderRadius: 20,
                 padding: 16, cursor: hasDetail ? 'pointer' : 'default', backdropFilter: 'blur(20px)',
@@ -1342,11 +1410,16 @@ function BookingsTab({ stops, schedule }: { stops: Stop[]; schedule: StopSchedul
             </div>
 
             {BOOKING_PARTNERS.length > 3 && (
-              <div onClick={() => setExpanded((e) => ({ ...e, [stop.id]: !e[stop.id] }))} style={{ textAlign: 'center', padding: '12px 0 2px', cursor: 'pointer' }}>
+              <button
+                type="button"
+                onClick={() => setExpanded((e) => ({ ...e, [stop.id]: !e[stop.id] }))}
+                aria-expanded={moreOpen}
+                style={{ width: '100%', textAlign: 'center', padding: '12px 0 2px', cursor: 'pointer', background: 'none', border: 'none', fontFamily: 'inherit' }}
+              >
                 <span style={{ fontSize: 12.5, fontWeight: 600, color: 'rgba(215,215,255,.6)' }}>
                   {moreOpen ? 'Show Fewer Partners' : `Show ${BOOKING_PARTNERS.length - 3} More Partners`}
                 </span>
-              </div>
+              </button>
             )}
 
             {hasDates ? (
@@ -1371,7 +1444,7 @@ function ComingSoon({ label }: { label: string }) {
   return (
     <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '40px 16px', textAlign: 'center' }}>
       <span style={{ color: 'rgba(255,255,255,.5)', fontSize: 14, fontWeight: 600 }}>{label}</span>
-      <span style={{ color: '#4a4a68', fontSize: 12.5 }}>Coming soon</span>
+      <span style={{ color: 'rgba(215,215,255,.55)', fontSize: 12.5 }}>Coming soon</span>
     </div>
   )
 }
@@ -1399,7 +1472,7 @@ function BottomNav({ active, onSelect }: { active: Section; onSelect: (s: Sectio
     <div style={{ display: 'flex', gap: 4, borderTop: `1px solid ${GLASS_BORDER}`, background: 'rgba(255,255,255,.03)', padding: '10px 10px 12px', flex: 'none' }}>
       {items.map((item) => {
         const isActive = item.key === active
-        const color = isActive ? ACCENT : '#363650'
+        const color = isActive ? ACCENT : 'rgba(215,215,255,.45)'
         return (
           <button
             key={item.key}
@@ -1493,11 +1566,11 @@ function AddDestinationSheet({
               style={{ width: '100%', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 2, padding: '10px 8px', background: 'none', border: 'none', borderBottom: '1px solid rgba(255,255,255,.06)', cursor: isSaving ? 'default' : 'pointer', fontFamily: 'inherit' }}
             >
               <span style={{ color: '#ffffff', fontSize: 14, fontWeight: 600 }}>{r.name}</span>
-              <span style={{ color: '#4a4a68', fontSize: 12 }}>{r.address}</span>
+              <span style={{ color: 'rgba(215,215,255,.55)', fontSize: 12 }}>{r.address}</span>
             </button>
           ))}
           {query && !isSearching && results.length === 0 && (
-            <div style={{ color: '#4a4a68', fontSize: 13, padding: '16px 8px', textAlign: 'center' }}>No results</div>
+            <div style={{ color: 'rgba(215,215,255,.55)', fontSize: 13, padding: '16px 8px', textAlign: 'center' }}>No results</div>
           )}
         </div>
       </div>
