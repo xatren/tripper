@@ -209,7 +209,7 @@ export function ExploreMapbox({
   const initial = camera ?? { lat: 20, lng: 0, altitude: 1.8 };
 
   return (
-    <div style={{ width, height, position: "relative", background: "#000010" }}>
+    <div className="explore-map" style={{ width, height, position: "relative", background: "#000010" }}>
       <style>{`
         .explore-map .mapboxgl-ctrl-logo {
           transform: scale(.68);
@@ -229,7 +229,6 @@ export function ExploreMapbox({
 
       <Map
         ref={mapRef}
-        className="explore-map"
         mapboxAccessToken={MAPBOX_TOKEN}
         projection="globe"
         initialViewState={{

@@ -83,7 +83,7 @@ export function TripboxMap({ points, routePath = [], interactive = true, classNa
         { padding: 60, maxZoom: 13, duration, pitch: DEFAULT_PITCH, bearing: DEFAULT_BEARING }
       )
     },
-    [pointsKey, points]
+    [points]
   )
 
   useEffect(() => {

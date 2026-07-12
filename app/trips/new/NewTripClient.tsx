@@ -179,7 +179,7 @@ function Step1({ name, setName, vibe, setVibe, onNext, onBack }: {
       <Dots step={1} />
 
       <div style={{ flexShrink: 0, marginBottom: 44 }}>
-        <Label>What's the trip called?</Label>
+        <Label>What&apos;s the trip called?</Label>
         <div style={{ position: 'relative', paddingBottom: 14 }}>
           <input
             type="text"
@@ -229,7 +229,13 @@ function DateCard({ label, fmt, dateVal, onChange }: {
   const open = () => {
     const el = inputRef.current;
     if (!el) return;
-    try { (el as any).showPicker(); } catch { el.click(); }
+    const picker = (el as HTMLInputElement & { showPicker?: () => void }).showPicker;
+    try {
+      if (picker) picker.call(el);
+      else el.click();
+    } catch {
+      el.click();
+    }
   };
 
   return (
@@ -344,7 +350,13 @@ function MiniGlobe({ destinations }: { destinations: Country[] }) {
       ctx.beginPath(); let first = true;
       for (let l = -180; l <= 180; l += 4) {
         const p = proj(lat, l);
-        if (p.vis) { first ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y); first = false; } else first = true;
+        if (p.vis) {
+          if (first) ctx.moveTo(p.x, p.y);
+          else ctx.lineTo(p.x, p.y);
+          first = false;
+        } else {
+          first = true;
+        }
       }
       ctx.stroke();
     }
@@ -352,7 +364,13 @@ function MiniGlobe({ destinations }: { destinations: Country[] }) {
       ctx.beginPath(); let first = true;
       for (let a = -80; a <= 80; a += 4) {
         const p = proj(a, lng);
-        if (p.vis) { first ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y); first = false; } else first = true;
+        if (p.vis) {
+          if (first) ctx.moveTo(p.x, p.y);
+          else ctx.lineTo(p.x, p.y);
+          first = false;
+        } else {
+          first = true;
+        }
       }
       ctx.stroke();
     }
