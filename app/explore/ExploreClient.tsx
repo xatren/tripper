@@ -4,19 +4,20 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
-import type { GlobeCamera } from "@/components/explore/ExploreGlobe";
+import type { ExploreCamera } from "@/components/explore/ExploreMapbox";
 import {
   Compass, Globe2,
-  MapPin, Moon, X, Clock, Ruler, Sun, ChevronRight, ArrowLeft,
+  MapPin, Moon, Clock, Ruler, Sun, ChevronRight, ArrowLeft,
 } from "lucide-react";
 import { AppBottomNav } from "@/components/ui/AppBottomNav";
 import { createClient } from "@/lib/supabase/client";
 import { showToast, Toaster } from "@/components/ui/toast";
-import type { Profile, Trip } from "@/types";
+import type { Profile, Trip, TripCountry } from "@/types";
 import { getInitials } from "@/lib/utils";
+import { getDrivingRoute } from "@/lib/mapbox/directions";
 
-const ExploreGlobe = dynamic(
-  () => import("@/components/explore/ExploreGlobe").then(m => m.ExploreGlobe),
+const ExploreMapbox = dynamic(
+  () => import("@/components/explore/ExploreMapbox").then(m => m.ExploreMapbox),
   { ssr: false },
 );
 
@@ -167,7 +168,7 @@ function getTotalNights(trips: Pick<Trip, "start_date"|"end_date">[]) {
   }, 0);
 }
 
-function getRouteCamera(waypoints: Waypoint[]): GlobeCamera {
+function getRouteCamera(waypoints: Waypoint[]): ExploreCamera {
   if (waypoints.length === 0) return { lat: 45, lng: 15, altitude: 1.8 };
 
   const lats = waypoints.map(w => w.lat);
@@ -207,7 +208,39 @@ function getRouteCamera(waypoints: Waypoint[]): GlobeCamera {
 // ── Component ─────────────────────────────────────────────────────────────────
 interface Props {
   profile: Profile | null;
-  trips: Pick<Trip, "id"|"title"|"description"|"start_date"|"end_date"|"owner_id">[];
+  trips: Pick<Trip, "id"|"title"|"description"|"start_date"|"end_date"|"owner_id"|"countries">[];
+}
+
+interface VisitedPlace {
+  name: string;
+  lat: number;
+  lng: number;
+}
+
+function collectVisitedPlaces(
+  trips: Pick<Trip, "description"|"countries">[],
+): VisitedPlace[] {
+  const seen = new Set<string>();
+  const out: VisitedPlace[] = [];
+  for (const t of trips) {
+    if (t.countries?.length) {
+      for (const c of t.countries as TripCountry[]) {
+        if (!seen.has(c.name)) {
+          seen.add(c.name);
+          out.push({ name: c.name, lat: c.lat, lng: c.lng });
+        }
+      }
+    } else {
+      for (const c of parseCountries(t.description)) {
+        const co = COUNTRY_COORDS[c];
+        if (co && !seen.has(c)) {
+          seen.add(c);
+          out.push({ name: c, lat: co[0], lng: co[1] });
+        }
+      }
+    }
+  }
+  return out;
 }
 
 export function ExploreClient({ profile, trips }: Props) {
@@ -220,20 +253,16 @@ export function ExploreClient({ profile, trips }: Props) {
   const [globeW,        setGlobeW]       = useState(390);
   const [globeH,        setGlobeH]       = useState(300);
   const [autoRotate,    setAutoRotate]    = useState(true);
-  const [camera,        setCamera]        = useState<GlobeCamera | null>(null);
+  const [camera,        setCamera]        = useState<ExploreCamera | null>(null);
   const [flyToken,      setFlyToken]      = useState(0);
+  const [drivingPath,   setDrivingPath]   = useState<{ lat: number; lng: number }[]>([]);
 
-  const visitedCountries = useMemo(() => {
-    const s = new Set<string>();
-    trips.forEach(t => parseCountries(t.description).forEach(c => s.add(c)));
-    return Array.from(s);
-  }, [trips]);
+  const visitedPlaces = useMemo(() => collectVisitedPlaces(trips), [trips]);
 
   const points = useMemo(() => {
     if (preview) {
       const last = preview.waypoints.length - 1;
       const cam = getRouteCamera(preview.waypoints);
-      // Kısa rotalarda marker'ları biraz büyüt (zoom yakınken okunabilir kalsın)
       const markerScale = cam.altitude < 0.55 ? 1.35 : cam.altitude < 0.7 ? 1.15 : 1;
       return preview.waypoints.map((wp, i) => ({
         lat: wp.lat,
@@ -244,32 +273,41 @@ export function ExploreClient({ profile, trips }: Props) {
       }));
     }
     return [
-      ...visitedCountries.flatMap(c => {
-        const co = COUNTRY_COORDS[c];
-        return co ? [{ lat: co[0], lng: co[1], label: c, size: 0.65, color: "#f5a623" }] : [];
-      }),
-      ...ROUTES.map(d => ({ lat: d.lat, lng: d.lng, label: d.name, size: 0.32, color: "rgba(130,190,255,0.60)" })),
+      ...visitedPlaces.map(p => ({
+        lat: p.lat, lng: p.lng, label: p.name, size: 0.65, color: "#f5a623",
+      })),
+      ...ROUTES.map(d => ({ lat: d.lat, lng: d.lng, label: d.name, size: 0.32, color: "rgba(130,190,255,0.85)" })),
     ];
-  }, [visitedCountries, preview]);
+  }, [visitedPlaces, preview]);
 
-  const routePaths = useMemo(() => {
-    if (!preview || preview.waypoints.length < 2) return [];
-    return [{
-      points: preview.waypoints.map(wp => [wp.lat, wp.lng] as [number, number]),
-      color: "#60a5fa",
-    }];
-  }, [preview]);
+  const routePath = useMemo(() => {
+    if (!preview) return [];
+    if (drivingPath.length > 1) return drivingPath;
+    return preview.waypoints.map(wp => ({ lat: wp.lat, lng: wp.lng }));
+  }, [preview, drivingPath]);
 
   const arcs = useMemo(() => {
     if (preview) return [];
-    const coords = visitedCountries.map(c => COUNTRY_COORDS[c]).filter((c): c is [number,number] => !!c);
-    if (coords.length < 2) return [];
-    return Array.from({ length: Math.min(coords.length - 1, 6) }, (_, i) => ({
-      startLat: coords[i][0],   startLng: coords[i][1],
-      endLat:   coords[i+1][0], endLng:   coords[i+1][1],
-      color: ["rgba(245,166,35,0.7)", "rgba(245,166,35,0.0)"],
+    if (visitedPlaces.length < 2) return [];
+    return Array.from({ length: Math.min(visitedPlaces.length - 1, 6) }, (_, i) => ({
+      startLat: visitedPlaces[i].lat,
+      startLng: visitedPlaces[i].lng,
+      endLat: visitedPlaces[i + 1].lat,
+      endLng: visitedPlaces[i + 1].lng,
     }));
-  }, [visitedCountries, preview]);
+  }, [visitedPlaces, preview]);
+
+  useEffect(() => {
+    if (!preview || preview.waypoints.length < 2) {
+      setDrivingPath([]);
+      return;
+    }
+    let cancelled = false;
+    getDrivingRoute(preview.waypoints).then(route => {
+      if (!cancelled) setDrivingPath(route?.polylinePath ?? []);
+    });
+    return () => { cancelled = true; };
+  }, [preview]);
 
   // Size globe to exactly half viewport
   useEffect(() => {
@@ -287,11 +325,11 @@ export function ExploreClient({ profile, trips }: Props) {
   // İlk kamera konumu
   useEffect(() => {
     if (!ready || preview) return;
-    const first = visitedCountries[0] ? COUNTRY_COORDS[visitedCountries[0]] : null;
+    const first = visitedPlaces[0] ?? null;
     setAutoRotate(true);
-    setCamera({ lat: first?.[0] ?? 45, lng: first?.[1] ?? 15, altitude: 1.8 });
+    setCamera({ lat: first?.lat ?? 45, lng: first?.lng ?? 15, altitude: 1.8 });
     setFlyToken(t => t + 1);
-  }, [ready, visitedCountries, preview]);
+  }, [ready, visitedPlaces, preview]);
 
   // "Use this route" — clones the template's waypoints into a real trip.
   const [cloning, setCloning] = useState(false)
@@ -346,16 +384,12 @@ export function ExploreClient({ profile, trips }: Props) {
   const closePreview = () => {
     setPreview(null);
     setAutoRotate(true);
-    const first = visitedCountries[0] ? COUNTRY_COORDS[visitedCountries[0]] : null;
-    setCamera({ lat: first?.[0] ?? 45, lng: first?.[1] ?? 15, altitude: 1.8 });
+    const first = visitedPlaces[0] ?? null;
+    setCamera({ lat: first?.lat ?? 45, lng: first?.lng ?? 15, altitude: 1.8 });
     setFlyToken(t => t + 1);
   };
 
   const totalNights = getTotalNights(trips);
-  const idx = preview ? ROUTES.indexOf(preview) : 0;
-  const pathStroke = preview
-    ? (getRouteCamera(preview.waypoints).altitude < 0.55 ? 0.75 : 0.55)
-    : 0.55;
 
   return (
     <div
@@ -366,7 +400,7 @@ export function ExploreClient({ profile, trips }: Props) {
       <div style={{ position:"absolute", top:"20%", left:"10%", width:300, height:300, borderRadius:"50%", background:"rgba(245,100,0,0.07)", filter:"blur(100px)", pointerEvents:"none" }} />
       <div style={{ position:"absolute", top:"5%",  right:"5%", width:180, height:180, borderRadius:"50%", background:"rgba(80,50,220,0.09)",  filter:"blur(80px)",  pointerEvents:"none" }} />
 
-      {/* ── TOP HALF: Globe ── */}
+      {/* ── TOP HALF: Mapbox globe ── */}
       <div style={{ width: "100%", height: globeH, flexShrink: 0, position: "relative", overflow: "hidden" }}>
         <StarField />
 
@@ -380,7 +414,7 @@ export function ExploreClient({ profile, trips }: Props) {
               {preview ? preview.name : "Explore"}
             </p>
             <p style={{ fontSize: 11, color: "rgba(200,210,255,0.45)", margin: 0 }}>
-              {preview ? preview.country : `${visitedCountries.length} countr${visitedCountries.length !== 1 ? "ies" : "y"} visited`}
+              {preview ? preview.country : `${visitedPlaces.length} countr${visitedPlaces.length !== 1 ? "ies" : "y"} visited`}
             </p>
           </div>
           <motion.button
@@ -392,19 +426,19 @@ export function ExploreClient({ profile, trips }: Props) {
           </motion.button>
         </motion.div>
 
-        {/* Globe */}
+        {/* Mapbox globe */}
         <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <ExploreGlobe
+          <ExploreMapbox
             width={globeW}
             height={globeH}
             points={points}
             arcs={arcs}
-            routePaths={routePaths}
+            routePath={routePath}
             autoRotate={autoRotate}
             camera={camera}
             flyToken={flyToken}
-            pathStroke={pathStroke}
             onReady={() => setReady(true)}
+            onUserInteract={() => setAutoRotate(false)}
           />
         </div>
 
@@ -454,7 +488,7 @@ export function ExploreClient({ profile, trips }: Props) {
               {/* Stats */}
               <div style={{ display:"flex", margin:"12px 16px 12px", background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.09)", borderRadius:16, overflow:"hidden", backdropFilter:"blur(16px)", flexShrink:0 }}>
                 {[
-                  { Icon: Globe2, value: visitedCountries.length, label: "Countries" },
+                  { Icon: Globe2, value: visitedPlaces.length, label: "Countries" },
                   { Icon: MapPin, value: trips.length,            label: "Trips"     },
                   { Icon: Moon,   value: totalNights,             label: "Nights"    },
                 ].map(({ Icon, value, label }, i) => (
@@ -483,11 +517,11 @@ export function ExploreClient({ profile, trips }: Props) {
                 <AnimatePresence mode="wait">
                   {tab === "visited" ? (
                     <motion.div key="v" initial={{ opacity:0, x:-10 }} animate={{ opacity:1, x:0 }} exit={{ opacity:0, x:10 }} transition={{ duration:0.15 }}>
-                      {visitedCountries.length === 0 ? (
+                      {visitedPlaces.length === 0 ? (
                         <EmptyCountries onDiscover={() => setTab("discover")} />
                       ) : (
                         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
-                          {visitedCountries.map((c,i) => <CountryCard key={c} name={c} index={i} />)}
+                          {visitedPlaces.map((p, i) => <CountryCard key={p.name} name={p.name} lat={p.lat} lng={p.lng} index={i} />)}
                         </div>
                       )}
                     </motion.div>
@@ -609,8 +643,7 @@ export function ExploreClient({ profile, trips }: Props) {
 }
 
 // ── Sub-components ────────────────────────────────────────────────────────────
-function CountryCard({ name, index }: { name: string; index: number }) {
-  const coords = COUNTRY_COORDS[name];
+function CountryCard({ name, lat, lng, index }: { name: string; lat: number; lng: number; index: number }) {
   return (
     <motion.div
       style={{ background:COUNTRY_COLORS[index%COUNTRY_COLORS.length], borderRadius:16, padding:"16px 12px", position:"relative", overflow:"hidden", minHeight:90, display:"flex", flexDirection:"column", justifyContent:"flex-end" }}
@@ -619,7 +652,7 @@ function CountryCard({ name, index }: { name: string; index: number }) {
       <div style={{ position:"absolute", top:8, right:8, fontSize:9, fontWeight:700, background:"rgba(0,0,0,0.32)", color:"#f5a623", borderRadius:20, padding:"2px 7px", letterSpacing:"0.06em" }}>VISITED</div>
       <MapPin style={{ width:14, height:14, color:"rgba(255,255,255,0.65)", marginBottom:5 }} />
       <p style={{ fontSize:14, fontWeight:700, color:"#fff", margin:0 }}>{name}</p>
-      {coords && <p style={{ fontSize:9, color:"rgba(255,255,255,0.40)", margin:"2px 0 0", fontFamily:"monospace" }}>{coords[0].toFixed(1)}° {coords[1].toFixed(1)}°</p>}
+      <p style={{ fontSize:9, color:"rgba(255,255,255,0.40)", margin:"2px 0 0", fontFamily:"monospace" }}>{lat.toFixed(1)}° {lng.toFixed(1)}°</p>
     </motion.div>
   );
 }
@@ -649,7 +682,7 @@ function EmptyCountries({ onDiscover }: { onDiscover: () => void }) {
     >
       <p style={{ fontSize:36, margin:"0 0 12px" }}>🌍</p>
       <p style={{ color:"#fff", fontWeight:600, fontSize:15, margin:"0 0 6px" }}>No countries yet</p>
-      <p style={{ color:"rgba(200,210,255,0.50)", fontSize:12, margin:"0 0 20px", lineHeight:1.6 }}>Add countries to your trips and they&apos;ll appear on the globe.</p>
+      <p style={{ color:"rgba(200,210,255,0.50)", fontSize:12, margin:"0 0 20px", lineHeight:1.6 }}>Add countries to your trips and they&apos;ll appear on the map.</p>
       <motion.button onClick={onDiscover}
         style={{ background:AMBER_GRAD, color:"#1a0800", fontWeight:700, fontSize:13, border:"none", borderRadius:12, padding:"10px 22px", boxShadow:AMBER_GLOW, cursor:"pointer", fontFamily:"var(--font-inter),'Inter',system-ui" }}
         whileTap={{ scale:0.94 }} transition={TAP}
