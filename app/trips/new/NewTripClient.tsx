@@ -52,13 +52,6 @@ const CURRENCIES = Object.keys(CURRENCY_SYMBOLS) as TripCurrency[];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-function genCode() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  const part = (n: number) =>
-    Array.from({ length: n }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
-  return `TRIP-${part(4)}`;
-}
-
 function nightsBetween(start: string, end: string) {
   if (!start || !end) return 0;
   const diff = new Date(end).getTime() - new Date(start).getTime();
@@ -562,15 +555,14 @@ function Step4({ budget, setBudget, currency, setCurrency, nights, onNext, onBac
 
 // ─── Step 5 — Review & Create ─────────────────────────────────────────────────
 
-function Step5({ name, vibe, startDate, endDate, destinations, budget, currency, inviteCode, userId, onBack }: {
+function Step5({ name, vibe, startDate, endDate, destinations, budget, currency, onBack }: {
   name: string; vibe: string | null; startDate: string; endDate: string;
   destinations: Country[]; budget: string; currency: string;
-  inviteCode: string; userId: string; onBack: () => void;
+  onBack: () => void;
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
-  const [copied, setCopied] = useState(false);
   const sym = CURRENCY_SYMBOLS[currency as TripCurrency] ?? currency;
   const raw = parseFloat(budget) || 0;
   const nights = nightsBetween(startDate, endDate);
@@ -584,36 +576,27 @@ function Step5({ name, vibe, startDate, endDate, destinations, budget, currency,
     setLoading(true);
     try {
       const supabase = createClient();
-      const { data, error } = await supabase.from('trips').insert({
-        title: name || 'Untitled Trip',
-        description: null,
-        start_date: startDate || null,
-        end_date: endDate || null,
-        total_budget: raw,
-        currency,
-        vibe: vibe ?? 'Road',
-        countries: destinations,
-        owner_id: userId,
-        invite_code: inviteCode,
-        focus_lat: destinations[0]?.lat ?? null,
-        focus_lng: destinations[0]?.lng ?? null,
-      }).select('id').single();
-      if (!error && data) {
+      const { data, error } = await supabase.rpc('create_trip_with_stops', {
+        p_title: name || 'Untitled Trip',
+        p_start_date: startDate || null,
+        p_end_date: endDate || null,
+        p_total_budget: raw,
+        p_currency: currency,
+        p_vibe: vibe ?? 'Road',
+        p_countries: destinations,
+        p_focus_lat: destinations[0]?.lat ?? null,
+        p_focus_lng: destinations[0]?.lng ?? null,
+      });
+      const tripId = (data as { trip_id?: string } | null)?.trip_id;
+      if (!error && tripId) {
         setDone(true);
-        setTimeout(() => router.push(`/trip/${data.id}/mobile`), 1600);
+        router.push(`/trip/${tripId}/mobile`);
       } else {
         showToast(error?.message ?? 'Failed to create trip. Please try again.', 'error');
       }
     } finally {
       setLoading(false);
     }
-  };
-
-  const copy = () => {
-    navigator.clipboard.writeText(inviteCode).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
   };
 
   return (
@@ -670,10 +653,12 @@ function Step5({ name, vibe, startDate, endDate, destinations, budget, currency,
         </div>
       </div>
 
-      <Label>Invite a co-pilot — share this code</Label>
-      <div onClick={copy} style={{ height: 48, borderRadius: 14, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.1)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px', cursor: 'pointer', marginBottom: 24 }}>
-        <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,.7)', letterSpacing: '2px' }}>{inviteCode}</span>
-        <span style={{ fontSize: 12, fontWeight: 600, color: copied ? '#22c55e' : ACCENT, transition: 'color .3s' }}>{copied ? '✓ Copied' : 'Copy'}</span>
+      <Label>Invite a co-pilot</Label>
+      <div style={{ borderRadius: 14, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.1)', display: 'flex', alignItems: 'center', gap: 10, padding: '13px 16px', marginBottom: 24 }}>
+        <span style={{ fontSize: 16 }}>🔗</span>
+        <span style={{ fontSize: 13, color: 'rgba(255,255,255,.55)', lineHeight: 1.5 }}>
+          An invite code is generated with your trip — copy it anytime from your trips list.
+        </span>
       </div>
 
       <BackBtn onClick={onBack} />
@@ -691,7 +676,7 @@ function Step5({ name, vibe, startDate, endDate, destinations, budget, currency,
 
 // ─── Root Wizard ──────────────────────────────────────────────────────────────
 
-export function NewTripClient({ userId }: { userId: string }) {
+export function NewTripClient() {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [dir,  setDir]  = useState(1);
@@ -704,7 +689,6 @@ export function NewTripClient({ userId }: { userId: string }) {
   const [destinations,setDestinations]= useState<Country[]>([]);
   const [budget,      setBudget]      = useState('');
   const [currency,    setCurrency]    = useState('EUR');
-  const [inviteCode]                  = useState(genCode);
 
   const nights = nightsBetween(startDate, endDate);
 
@@ -748,7 +732,7 @@ export function NewTripClient({ userId }: { userId: string }) {
           {step === 2 && <Step2 startDate={startDate} setStartDate={setStartDate} endDate={endDate} setEndDate={setEndDate} flexible={flexible} setFlexible={setFlexible} {...common} />}
           {step === 3 && <Step3 destinations={destinations} setDestinations={setDestinations} {...common} />}
           {step === 4 && <Step4 budget={budget} setBudget={setBudget} currency={currency} setCurrency={setCurrency} nights={nights} {...common} />}
-          {step === 5 && <Step5 name={name} vibe={vibe} startDate={startDate} endDate={endDate} destinations={destinations} budget={budget} currency={currency} inviteCode={inviteCode} userId={userId} onBack={back} />}
+          {step === 5 && <Step5 name={name} vibe={vibe} startDate={startDate} endDate={endDate} destinations={destinations} budget={budget} currency={currency} onBack={back} />}
         </motion.div>
       </AnimatePresence>
       <Toaster />

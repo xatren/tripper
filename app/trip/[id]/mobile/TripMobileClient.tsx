@@ -9,7 +9,7 @@ import { CSS as DndCSS } from '@dnd-kit/utilities'
 import { SegmentedTabs } from '@/components/ui/segmented-tabs'
 import { createClient } from '@/lib/supabase/client'
 import { TripboxMap } from '@/components/map/mapbox/TripboxMap'
-import { getDrivingRoute, getRouteLegs, type RouteLeg } from '@/lib/mapbox/directions'
+import { getFullRoute, type RouteLeg } from '@/lib/mapbox/directions'
 import { forwardSearch, type GeocodeResult } from '@/lib/mapbox/geocoding'
 import type { Trip, Stop, Expense, ExpenseCategory, Profile, JournalEntry } from '@/types'
 import { EXPENSE_CATEGORIES, CURRENCY_SYMBOLS } from '@/types'
@@ -263,15 +263,33 @@ function buildTemplateRows(vibe: string | null | undefined): { category: Packing
   return rows
 }
 
+// Session-lifetime cache so re-opening the Prep tab never refetches; every
+// mutation below writes through it.
+const packingCache = new Map<string, PackingRow[]>()
+
 function PrepTab({ tripId, vibe, userId }: { tripId: string; vibe?: string | null; userId: string }) {
-  const [items, setItems] = useState<PackingRow[]>([])
-  const [loading, setLoading] = useState(true)
+  const [items, setItemsState] = useState<PackingRow[]>(() => packingCache.get(tripId) ?? [])
+  const [loading, setLoading] = useState(() => !packingCache.has(tripId))
+  const [loadError, setLoadError] = useState(false)
+  const [reloadToken, setReloadToken] = useState(0)
   const [seeding, setSeeding] = useState(false)
   const [expanded, setExpanded] = useState<Record<string, boolean>>({ clothing: true })
   const [draft, setDraft] = useState<Record<string, string>>({})
 
+  const setItems: React.Dispatch<React.SetStateAction<PackingRow[]>> = (action) =>
+    setItemsState((prev) => {
+      const next = typeof action === 'function' ? (action as (p: PackingRow[]) => PackingRow[])(prev) : action
+      packingCache.set(tripId, next)
+      return next
+    })
+
+  const retryLoad = () => setReloadToken((t) => t + 1)
+
   useEffect(() => {
+    if (reloadToken === 0 && packingCache.has(tripId)) return
     let cancelled = false
+    setLoading(true)
+    setLoadError(false)
     const supabase = createClient()
     supabase
       .from('packing_items')
@@ -280,14 +298,19 @@ function PrepTab({ tripId, vibe, userId }: { tripId: string; vibe?: string | nul
       .order('created_at', { ascending: true })
       .then(({ data, error }) => {
         if (cancelled) return
-        if (data) setItems(data as PackingRow[])
-        else if (error) showToast("Couldn't load the packing list. Run migration 010 if you haven't yet.", 'error')
+        if (data) {
+          packingCache.set(tripId, data as PackingRow[])
+          setItemsState(data as PackingRow[])
+        } else if (error) {
+          setLoadError(true)
+          showToast("Couldn't load the packing list. Run migration 010 if you haven't yet.", 'error', { label: 'Retry', onClick: () => setReloadToken((t) => t + 1) })
+        }
         setLoading(false)
       })
     return () => {
       cancelled = true
     }
-  }, [tripId])
+  }, [tripId, reloadToken])
 
   // Optimistic writes; revert + toast on failure.
   const toggleItem = (row: PackingRow) => {
@@ -355,6 +378,18 @@ function PrepTab({ tripId, vibe, userId }: { tripId: string; vibe?: string | nul
         {[0, 1, 2, 3].map((i) => (
           <div key={i} style={{ height: i === 0 ? 92 : 66, borderRadius: 20, background: GLASS_FILL, border: `1px solid ${GLASS_BORDER}`, animation: 'pulseglow 1.6s ease-in-out infinite', animationDelay: `${i * 0.15}s` }} />
         ))}
+      </div>
+    )
+  }
+
+  if (loadError) {
+    return (
+      <div style={{ paddingTop: 14 }}>
+        <RetryCard
+          title="Couldn't load your packing list"
+          hint="Check your connection — or run migration 010 if you haven't yet."
+          onRetry={retryLoad}
+        />
       </div>
     )
   }
@@ -514,11 +549,13 @@ function formatMoney(n: number) {
 }
 
 function BudgetTab({
-  trip, expenses, loading, members, currentUserId, onAdd, onDelete,
+  trip, expenses, loading, error, onRetry, members, currentUserId, onAdd, onDelete,
 }: {
   trip: Trip
   expenses: Expense[]
   loading: boolean
+  error: boolean
+  onRetry: () => void
   members: Profile[]
   currentUserId: string
   onAdd: (category: ExpenseCategory, description: string, amount: number, paidBy: string) => Promise<void>
@@ -583,7 +620,15 @@ function BudgetTab({
         </div>
       </div>
 
-      {partner && !loading && (
+      {error && !loading && (
+        <RetryCard
+          title="Couldn't load expenses"
+          hint="Your budget summary is shown, but the expense list didn't come through."
+          onRetry={onRetry}
+        />
+      )}
+
+      {partner && !loading && !error && (
         <div style={{ background: GLASS_FILL, border: `1px solid ${net === 0 ? GLASS_BORDER : 'rgba(245,166,35,.3)'}`, borderRadius: 20, padding: 16, backdropFilter: 'blur(20px)', boxShadow: '0 6px 20px rgba(0,0,0,.2)' }}>
           <div style={{ fontSize: 11.5, fontWeight: 700, color: 'rgba(215,215,255,.55)', textTransform: 'uppercase', letterSpacing: '.06em' }}>Split 50/50</div>
           <div style={{ fontSize: 16, fontWeight: 800, marginTop: 6, color: net === 0 ? '#4ade80' : ACCENT_LIGHT }}>
@@ -609,7 +654,7 @@ function BudgetTab({
           />
         ))}
 
-      {!loading && EXPENSE_CATEGORIES.map(({ value: cat, label }) => {
+      {!loading && !error && EXPENSE_CATEGORIES.map(({ value: cat, label }) => {
         const list = expenses.filter((e) => e.category === cat)
         const catSpent = list.reduce((sum, e) => sum + Number(e.amount), 0)
         const isOpen = !!expanded[cat]
@@ -714,6 +759,9 @@ function BudgetTab({
 
 const JOURNAL_BUCKET = 'trip-photos'
 
+// Session-lifetime cache so re-opening the Journal tab never refetches.
+const journalCache = new Map<string, JournalEntry[]>()
+
 function todayIso(): string {
   const d = new Date()
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
@@ -753,7 +801,17 @@ function JournalTab({
   currentUserId: string
 }) {
   const [sharing, setSharing] = useState(false)
-  const [entries, setEntries] = useState<JournalEntry[] | null>(null)
+  const [entries, setEntriesState] = useState<JournalEntry[] | null>(() => journalCache.get(trip.id) ?? null)
+  const [entriesError, setEntriesError] = useState(false)
+  const [reloadToken, setReloadToken] = useState(0)
+
+  // Write-through wrapper: keeps the session cache in sync with every mutation.
+  const setEntries: React.Dispatch<React.SetStateAction<JournalEntry[] | null>> = (action) =>
+    setEntriesState((prev) => {
+      const next = typeof action === 'function' ? (action as (p: JournalEntry[] | null) => JournalEntry[] | null)(prev) : action
+      if (next) journalCache.set(trip.id, next)
+      return next
+    })
   const [draftNote, setDraftNote] = useState('')
   const [draftDate, setDraftDate] = useState(todayIso())
   const [draftFiles, setDraftFiles] = useState<File[]>([])
@@ -763,7 +821,10 @@ function JournalTab({
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
+    if (reloadToken === 0 && journalCache.has(trip.id)) return
     let cancelled = false
+    setEntriesState(null)
+    setEntriesError(false)
     createClient()
       .from('journal_entries')
       .select('*, journal_photos(*)')
@@ -773,14 +834,28 @@ function JournalTab({
       .then(({ data, error }) => {
         if (cancelled) return
         if (error) {
-          // Table missing until migration 011_journal runs — degrade to empty state.
-          setEntries([])
+          // Table missing until migration 011_journal runs, or the request
+          // failed — degrade without poisoning the cache.
+          setEntriesState([])
+          setEntriesError(true)
           return
         }
-        setEntries((data ?? []) as JournalEntry[])
+        const rows = (data ?? []) as JournalEntry[]
+        journalCache.set(trip.id, rows)
+        setEntriesState(rows)
       })
     return () => { cancelled = true }
-  }, [trip.id])
+  }, [trip.id, reloadToken])
+
+  // Escape closes the photo lightbox.
+  useEffect(() => {
+    if (!lightbox) return
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setLightbox(null)
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [lightbox])
 
   const submitEntry = async () => {
     const note = draftNote.trim()
@@ -794,7 +869,7 @@ function JournalTab({
       .single()
     if (error || !entry) {
       setSaving(false)
-      showToast("Couldn't save the entry. Run migration 011 first?", 'error')
+      showToast("Couldn't save the entry. Run migration 011 first?", 'error', { label: 'Retry', onClick: () => submitEntry() })
       return
     }
     const photos: JournalEntry['journal_photos'] = []
@@ -962,9 +1037,16 @@ function JournalTab({
         {/* entries */}
         <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 12 }}>
           {entries === null && (
-            <span style={{ color: 'rgba(215,215,255,.5)', fontSize: 12.5, textAlign: 'center', padding: '12px 0' }}>Loading journal…</span>
+            <div style={{ height: 76, borderRadius: 16, background: 'rgba(255,255,255,.035)', border: '1px solid rgba(255,255,255,.08)', animation: 'pulseglow 1.6s ease-in-out infinite' }} />
           )}
-          {entries?.length === 0 && (
+          {entriesError && (
+            <RetryCard
+              title="Couldn't load the journal"
+              hint="Check your connection — or run migration 011 if you haven't yet."
+              onRetry={() => setReloadToken((t) => t + 1)}
+            />
+          )}
+          {entries?.length === 0 && !entriesError && (
             <span style={{ color: 'rgba(215,215,255,.5)', fontSize: 12.5, textAlign: 'center', padding: '12px 0' }}>No entries yet — write your first note above ✍️</span>
           )}
           {entries?.map((entry) => (
@@ -987,14 +1069,19 @@ function JournalTab({
                   {entry.journal_photos!.map((p) => {
                     const url = journalPhotoUrl(p.storage_path)
                     return (
-                      /* eslint-disable-next-line @next/next/no-img-element */
-                      <img
+                      <button
                         key={p.id}
-                        src={url}
-                        alt={p.caption ?? 'Trip photo'}
                         onClick={() => setLightbox(url)}
-                        style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', borderRadius: 10, border: '1px solid rgba(255,255,255,.1)', cursor: 'pointer' }}
-                      />
+                        aria-label="View photo full-screen"
+                        style={{ padding: 0, background: 'none', border: 'none', cursor: 'pointer', display: 'block', width: '100%' }}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={url}
+                          alt={p.caption ?? 'Trip photo'}
+                          style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', borderRadius: 10, border: '1px solid rgba(255,255,255,.1)', display: 'block' }}
+                        />
+                      </button>
                     )
                   })}
                 </div>
@@ -1007,9 +1094,20 @@ function JournalTab({
       {/* lightbox */}
       {lightbox && (
         <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Trip photo"
           onClick={() => setLightbox(null)}
           style={{ position: 'fixed', inset: 0, zIndex: 130, background: 'rgba(0,0,0,.88)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
         >
+          <button
+            autoFocus
+            onClick={() => setLightbox(null)}
+            aria-label="Close photo"
+            style={{ position: 'absolute', top: 'max(16px, env(safe-area-inset-top))', right: 16, width: 38, height: 38, borderRadius: '50%', background: 'rgba(255,255,255,.1)', border: '1px solid rgba(255,255,255,.22)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+          >
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 3L13 13M13 3L3 13" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>
+          </button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={lightbox} alt="Trip photo" style={{ maxWidth: '100%', maxHeight: '90svh', borderRadius: 14, objectFit: 'contain' }} />
         </div>
@@ -1080,6 +1178,7 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId, members }
   const [activeSection, setActiveSection] = useState<Section>('plan')
   const [activeTab, setActiveTab] = useState<'route' | 'days' | 'bookings'>('route')
   const [isAddOpen, setIsAddOpen] = useState(false)
+  const [addInitialQuery, setAddInitialQuery] = useState('')
   const [aiHint, setAiHint] = useState(false)
   const [routePath, setRoutePath] = useState<{ lat: number; lng: number }[]>([])
   const [routeLegs, setRouteLegs] = useState<RouteLeg[]>([])
@@ -1145,24 +1244,32 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId, members }
     [sheetHeight, snapPoints]
   )
 
+  // One debounced Directions request per actual route change. Keying on the
+  // coordinate signature means renames, nights, and failed-reorder reverts to a
+  // cached order never refetch; rapid drag-drops collapse into the last state,
+  // and the AbortController cancels an in-flight response that became stale.
+  const routeKey = stops.map((s) => `${s.lng},${s.lat}`).join(';')
   useEffect(() => {
     if (stops.length < 2) {
       setRoutePath([])
       setRouteLegs([])
       return
     }
-    let cancelled = false
-    const points = stops.map((s) => ({ lat: s.lat, lng: s.lng }))
-    getDrivingRoute(points).then((route) => {
-      if (!cancelled) setRoutePath(route?.polylinePath ?? [])
-    })
-    getRouteLegs(points).then((legs) => {
-      if (!cancelled) setRouteLegs(legs)
-    })
+    const controller = new AbortController()
+    const timer = setTimeout(() => {
+      const points = stops.map((s) => ({ lat: s.lat, lng: s.lng }))
+      getFullRoute(points, { signal: controller.signal }).then((full) => {
+        if (controller.signal.aborted || !full) return
+        setRoutePath(full.route.polylinePath)
+        setRouteLegs(full.legs)
+      })
+    }, 300)
     return () => {
-      cancelled = true
+      clearTimeout(timer)
+      controller.abort()
     }
-  }, [stops])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [routeKey])
 
   // Optimistic update; reverts to the previous value if the write fails.
   const changeNights = (id: string, delta: number) => {
@@ -1178,7 +1285,7 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId, members }
       .then(({ error }) => {
         if (error) {
           setNights((prev) => ({ ...prev, [id]: current }))
-          showToast("Couldn't save nights. Run migration 008 if you haven't yet.", 'error')
+          showToast("Couldn't save nights. Run migration 008 if you haven't yet.", 'error', { label: 'Retry', onClick: () => changeNights(id, delta) })
         }
       })
   }
@@ -1211,14 +1318,25 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId, members }
     useSensor(TouchSensor, { activationConstraint: { delay: 220, tolerance: 8 } })
   )
 
-  const persistStopOrder = useCallback((ordered: Stop[]) => {
+  const [savingOrder, setSavingOrder] = useState(false)
+
+  // Shows the new order immediately, then persists the whole order in a single
+  // atomic RPC (migration 014). On failure the previous order comes back (so a
+  // refresh never shows a different route) and the error toast offers a retry.
+  const applyStopOrder = (next: Stop[], previous: Stop[]) => {
+    setStops(next)
+    setSavingOrder(true)
     const supabase = createClient()
-    Promise.all(
-      ordered.map((s, i) => supabase.from('stops').update({ order_index: i }).eq('id', s.id))
-    ).then((results) => {
-      if (results.some((r) => r.error)) showToast("Couldn't save the new stop order.", 'error')
-    })
-  }, [])
+    supabase
+      .rpc('reorder_trip_stops', { p_trip_id: trip.id, p_stop_ids: next.map((s) => s.id) })
+      .then(({ error }) => {
+        setSavingOrder(false)
+        if (error) {
+          setStops(previous)
+          showToast("Couldn't save the new stop order — reverted.", 'error', { label: 'Retry', onClick: () => applyStopOrder(next, previous) })
+        }
+      })
+  }
 
   // Mapbox Optimization API — keeps first/last stops fixed, reorders the middle.
   const handleOptimize = async () => {
@@ -1230,56 +1348,62 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId, members }
     setOptimizing(false)
     if (!order) { showToast("Couldn't optimize the route. Please try again.", 'error'); return }
     if (order.every((v, i) => v === i)) { showToast('Your route is already optimal! 🎉', 'success'); return }
-    const next = order.map((i) => stops[i])
-    setStops(next)
-    persistStopOrder(next)
+    applyStopOrder(order.map((i) => stops[i]), stops)
     showToast('Route optimized — stops reordered.', 'success')
   }
 
-  const handleDragEnd = useCallback(
-    (event: DragEndEvent) => {
-      const { active, over } = event
-      if (!over || active.id === over.id) return
-      setStops((prev) => {
-        const oldIndex = prev.findIndex((s) => s.id === active.id)
-        const newIndex = prev.findIndex((s) => s.id === over.id)
-        if (oldIndex < 0 || newIndex < 0) return prev
-        const next = arrayMove(prev, oldIndex, newIndex)
-        persistStopOrder(next)
-        return next
-      })
-    },
-    [persistStopOrder]
-  )
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+    const oldIndex = stops.findIndex((s) => s.id === active.id)
+    const newIndex = stops.findIndex((s) => s.id === over.id)
+    if (oldIndex < 0 || newIndex < 0) return
+    applyStopOrder(arrayMove(stops, oldIndex, newIndex), stops)
+  }
 
   const handleAddStop = useCallback(
     async (lat: number, lng: number, name: string, address: string) => {
-      const supabase = createClient()
-      const { data, error } = await supabase
-        .from('stops')
-        .insert({
-          trip_id: trip.id,
-          name,
-          lat,
-          lng,
-          address,
-          order_index: stops.length,
-          stop_type: stops.length === 0 ? 'origin' : 'destination',
-          created_by: currentUserId,
-        })
-        .select()
-        .single()
-      if (!error && data) setStops((prev) => [...prev, data as Stop])
-      else showToast("Couldn't add the destination.", 'error')
+      const attempt = async () => {
+        const supabase = createClient()
+        const { data, error } = await supabase
+          .from('stops')
+          .insert({
+            trip_id: trip.id,
+            name,
+            lat,
+            lng,
+            address,
+            order_index: stops.length,
+            stop_type: stops.length === 0 ? 'origin' : 'destination',
+            created_by: currentUserId,
+          })
+          .select()
+          .single()
+        if (!error && data) setStops((prev) => [...prev, data as Stop])
+        else showToast("Couldn't add the destination.", 'error', { label: 'Retry', onClick: () => { void attempt() } })
+      }
+      await attempt()
     },
     [trip.id, stops.length, currentUserId]
   )
 
   const [expenses, setExpenses] = useState<Expense[]>([])
   const [expensesLoading, setExpensesLoading] = useState(true)
+  const [expensesError, setExpensesError] = useState(false)
+  const [expensesReload, setExpensesReload] = useState(0)
+  // Expenses are only fetched once the Budget tab is first opened; after that
+  // the list lives in this component's state, so re-entering the tab is instant.
+  const [expensesRequested, setExpensesRequested] = useState(false)
 
   useEffect(() => {
+    if (activeSection === 'budget') setExpensesRequested(true)
+  }, [activeSection])
+
+  useEffect(() => {
+    if (!expensesRequested) return
     let cancelled = false
+    setExpensesLoading(true)
+    setExpensesError(false)
     const supabase = createClient()
     supabase
       .from('expenses')
@@ -1289,13 +1413,16 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId, members }
       .then(({ data, error }) => {
         if (cancelled) return
         if (data) setExpenses(data as Expense[])
-        else if (error) showToast("Couldn't load expenses.", 'error')
+        else if (error) {
+          setExpensesError(true)
+          showToast("Couldn't load expenses.", 'error', { label: 'Retry', onClick: () => setExpensesReload((t) => t + 1) })
+        }
         setExpensesLoading(false)
       })
     return () => {
       cancelled = true
     }
-  }, [trip.id])
+  }, [trip.id, expensesRequested, expensesReload])
 
   const handleAddExpense = useCallback(
     async (category: ExpenseCategory, description: string, amount: number, paidBy: string) => {
@@ -1319,6 +1446,10 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId, members }
   }, [])
 
   const stopSchedule = computeStopSchedule(trip.start_date, stops, nights)
+  const routeLoading = stops.length >= 2 && routeLegs.length === 0
+  const summaryKm = Math.round(routeLegs.reduce((sum, l) => sum + l.distanceMeters, 0) / 1000)
+  const summaryMin = Math.round(routeLegs.reduce((sum, l) => sum + l.durationSeconds, 0) / 60)
+  const summaryDuration = `${Math.floor(summaryMin / 60)}h ${String(summaryMin % 60).padStart(2, '0')}m`
   const nightsTotal = totalNights(trip)
   const nightsPlanned = stops.reduce((sum, s) => sum + (nights[s.id] ?? 1), 0)
   const nightsTarget = nightsTotal || nightsPlanned || 1
@@ -1327,6 +1458,9 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId, members }
   const ringOffset = ringCircumference * (1 - ringPct)
   const defaultCenter =
     trip.focus_lat != null && trip.focus_lng != null ? { lat: trip.focus_lat, lng: trip.focus_lng } : undefined
+  // Example searches for the empty state: the wizard's destination countries
+  // when available, otherwise a generic starter set.
+  const emptyStateSuggestions = (trip.countries?.length ? trip.countries.map((c) => c.name) : ['Rome', 'Barcelona', 'Tokyo']).slice(0, 3)
 
   return (
     <div
@@ -1373,7 +1507,7 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId, members }
             <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '0 16px 16px' }}>
               {activeSection === 'prep' && <PrepTab tripId={trip.id} vibe={trip.vibe} userId={currentUserId} />}
               {activeSection === 'budget' && (
-                <BudgetTab trip={trip} expenses={expenses} loading={expensesLoading} members={members} currentUserId={currentUserId} onAdd={handleAddExpense} onDelete={handleDeleteExpense} />
+                <BudgetTab trip={trip} expenses={expenses} loading={expensesLoading} error={expensesError} onRetry={() => setExpensesReload((t) => t + 1)} members={members} currentUserId={currentUserId} onAdd={handleAddExpense} onDelete={handleDeleteExpense} />
               )}
               {activeSection === 'journal' && (
                 <JournalTab trip={trip} stops={stops} routeLegs={routeLegs} routePath={routePath} currentUserId={currentUserId} />
@@ -1452,6 +1586,38 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId, members }
             <div style={{ width: 36, height: 5, borderRadius: 3, background: 'rgba(255,255,255,.22)' }} />
           </div>
 
+          {/* pinned route summary — stays visible above Route/Days/Bookings so the
+              user keeps context while scrolling the sheet or panning the map */}
+          {stops.length > 0 && (
+            <div
+              aria-live="polite"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, padding: '0 16px 10px', flex: 'none', fontSize: 12.5, fontWeight: 700, color: 'rgba(215,215,255,.85)' }}
+            >
+              <span>{stops.length} {stops.length === 1 ? 'stop' : 'stops'}</span>
+              {stops.length >= 2 && (
+                routeLoading ? (
+                  <>
+                    <span aria-hidden="true" style={{ width: 3, height: 3, borderRadius: '50%', background: 'rgba(215,215,255,.35)' }} />
+                    <span aria-hidden="true" style={{ width: 96, height: 9, borderRadius: 999, background: 'rgba(255,255,255,.12)', animation: 'pulseglow 1.6s ease-in-out infinite' }} />
+                  </>
+                ) : (
+                  <>
+                    <span aria-hidden="true" style={{ width: 3, height: 3, borderRadius: '50%', background: 'rgba(215,215,255,.35)' }} />
+                    <span>{summaryKm.toLocaleString('en-US')} km</span>
+                    <span aria-hidden="true" style={{ width: 3, height: 3, borderRadius: '50%', background: 'rgba(215,215,255,.35)' }} />
+                    <span>{summaryDuration}</span>
+                  </>
+                )
+              )}
+              {savingOrder && (
+                <span style={{ display: 'flex', alignItems: 'center', gap: 5, marginLeft: 4, padding: '3px 10px', borderRadius: 999, background: 'rgba(245,166,35,.14)', border: '1px solid rgba(245,166,35,.35)', color: ACCENT_LIGHT, fontSize: 11 }}>
+                  <span aria-hidden="true" style={{ width: 6, height: 6, borderRadius: '50%', background: ACCENT_LIGHT, animation: 'pulseglow 1s ease-in-out infinite' }} />
+                  Saving route…
+                </span>
+              )}
+            </div>
+          )}
+
           {/* tabs — inline segmented pill control (Route/Days/Bookings) */}
           <div style={{ padding: '0 16px 12px', flex: 'none' }}>
             <SegmentedTabs
@@ -1500,12 +1666,33 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId, members }
                 )}
 
                 {stops.length === 0 ? (
-                  <div style={{ width: '100%', flex: 1, minHeight: 160, border: '1.5px dashed rgba(255,255,255,.15)', borderRadius: 16, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, padding: 18 }}>
+                  <div style={{ width: '100%', flex: 1, minHeight: 200, border: '1.5px dashed rgba(255,255,255,.15)', borderRadius: 16, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, padding: 18 }}>
                     <div style={{ width: 46, height: 46, borderRadius: '50%', background: 'rgba(136,136,228,.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 2 }}>
                       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(136,136,228,.85)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M9 20l-5.5-2V4l5.5 2 6-2 5.5 2v14l-5.5-2-6 2z" /><path d="M9 6v14M15 4v14" /></svg>
                     </div>
-                    <div style={{ color: '#ffffff', fontWeight: 500, fontSize: 16, textAlign: 'center' }}>Add your first destination</div>
-                    <div style={{ color: 'rgba(215,215,255,.55)', fontWeight: 400, fontSize: 13, textAlign: 'center' }}>Press + to build your route</div>
+                    <div style={{ color: '#ffffff', fontWeight: 600, fontSize: 16, textAlign: 'center' }}>Add your first destination</div>
+                    <div style={{ color: 'rgba(215,215,255,.55)', fontWeight: 400, fontSize: 13, textAlign: 'center' }}>Search any city or place to start your route</div>
+                    <button
+                      onClick={() => { setAddInitialQuery(''); setIsAddOpen(true) }}
+                      style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 7, padding: '12px 22px', borderRadius: 13, background: `linear-gradient(145deg, ${ACCENT_LIGHT}, ${ACCENT_DARK})`, border: 'none', color: '#1a0800', fontWeight: 800, fontSize: 13.5, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 0 22px rgba(245,140,0,.3)' }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
+                      Add your first stop
+                    </button>
+                    {emptyStateSuggestions.length > 0 && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', justifyContent: 'center', marginTop: 6 }}>
+                        <span style={{ fontSize: 11.5, color: 'rgba(215,215,255,.45)', fontWeight: 600 }}>Try:</span>
+                        {emptyStateSuggestions.map((q) => (
+                          <button
+                            key={q}
+                            onClick={() => { setAddInitialQuery(q); setIsAddOpen(true) }}
+                            style={{ padding: '5px 12px', borderRadius: 999, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.12)', color: 'rgba(215,215,255,.8)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}
+                          >
+                            {q}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <DndContext sensors={dndSensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -1615,7 +1802,7 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId, members }
                                 </span>
                               </div>
                             ) : (
-                              <span style={{ fontSize: 12, color: 'rgba(215,215,255,.55)', fontWeight: 500 }}>…</span>
+                              <span aria-hidden="true" style={{ width: 92, height: 10, borderRadius: 999, background: 'rgba(255,255,255,.1)', animation: 'pulseglow 1.6s ease-in-out infinite' }} />
                             )}
                           </div>
                         )}
@@ -1658,7 +1845,7 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId, members }
       {/* FAB */}
       {activeSection === 'plan' && (
         <button
-          onClick={() => setIsAddOpen(true)}
+          onClick={() => { setAddInitialQuery(''); setIsAddOpen(true) }}
           title="Add destination"
           aria-label="Add destination"
           style={{ position: 'fixed', right: 18, bottom: 96, width: 56, height: 56, borderRadius: '50%', background: `linear-gradient(145deg, ${ACCENT_LIGHT}, ${ACCENT_DARK})`, boxShadow: '0 0 32px rgba(245,140,0,.45), 0 8px 20px rgba(0,0,0,.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 5, border: 'none', cursor: 'pointer' }}
@@ -1667,7 +1854,7 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId, members }
         </button>
       )}
 
-      {isAddOpen && <AddDestinationSheet onClose={() => setIsAddOpen(false)} onAdd={handleAddStop} />}
+      {isAddOpen && <AddDestinationSheet initialQuery={addInitialQuery} onClose={() => setIsAddOpen(false)} onAdd={handleAddStop} />}
 
       <ConfirmDialog
         open={deleteStopTarget !== null}
@@ -1770,7 +1957,9 @@ function DaysTab({ stops, routeLegs, schedule, tripName }: { stops: Stop[]; rout
                 <div style={{ flex: 1.2, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
                   <div style={{ width: '100%', height: 2, background: 'linear-gradient(to right, transparent, #8888e4, transparent)' }} />
                   <div style={{ fontSize: 10.5, color: 'rgba(215,215,255,.6)', fontWeight: 600, whiteSpace: 'nowrap' }}>
-                    {leg ? `${leg.durationText} · ${leg.distanceText}` : '…'}
+                    {leg
+                      ? `${leg.durationText} · ${leg.distanceText}`
+                      : <span aria-hidden="true" style={{ display: 'inline-block', width: 64, height: 8, borderRadius: 999, background: 'rgba(255,255,255,.12)', animation: 'pulseglow 1.6s ease-in-out infinite' }} />}
                   </div>
                 </div>
                 <div style={{ flex: 1, textAlign: 'center' }}>
@@ -1932,6 +2121,26 @@ function BookingsTab({ stops, schedule }: { stops: Stop[]; schedule: StopSchedul
   )
 }
 
+/** Shown in place of a list when its initial load fails, so the user always has a way forward. */
+function RetryCard({ title, hint, onRetry }: { title: string; hint?: string; onRetry: () => void }) {
+  return (
+    <div role="alert" style={{ width: '100%', background: GLASS_FILL, border: '1px solid rgba(239,68,68,.3)', borderRadius: 20, padding: '22px 18px', textAlign: 'center', backdropFilter: 'blur(20px)' }}>
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" style={{ marginBottom: 8 }}>
+        <path d="M12 3L22 20H2L12 3Z" stroke="#f87171" strokeWidth="1.7" strokeLinejoin="round" />
+        <path d="M12 9.5V14M12 17h.01" stroke="#f87171" strokeWidth="1.7" strokeLinecap="round" />
+      </svg>
+      <div style={{ fontSize: 14.5, fontWeight: 700, color: '#fff' }}>{title}</div>
+      {hint && <div style={{ fontSize: 12.5, color: 'rgba(215,215,255,.6)', marginTop: 4, lineHeight: 1.5 }}>{hint}</div>}
+      <button
+        onClick={onRetry}
+        style={{ marginTop: 14, padding: '10px 24px', borderRadius: 12, background: 'rgba(255,255,255,.07)', border: '1px solid rgba(255,255,255,.16)', color: '#fff', fontWeight: 700, fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}
+      >
+        Try again
+      </button>
+    </div>
+  )
+}
+
 function ComingSoon({ label }: { label: string }) {
   return (
     <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '40px 16px', textAlign: 'center' }}>
@@ -1985,16 +2194,43 @@ function BottomNav({ active, onSelect }: { active: Section; onSelect: (s: Sectio
 }
 
 function AddDestinationSheet({
-  onClose, onAdd,
+  initialQuery = '', onClose, onAdd,
 }: {
+  initialQuery?: string
   onClose: () => void
   onAdd: (lat: number, lng: number, name: string, address: string) => Promise<void>
 }) {
-  const [query, setQuery] = useState('')
+  const [query, setQuery] = useState(initialQuery)
   const [results, setResults] = useState<GeocodeResult[]>([])
   const [isSearching, setIsSearching] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const sheetRef = useRef<HTMLDivElement>(null)
+
+  // Escape closes; Tab stays trapped inside the sheet while it's open.
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        onClose()
+        return
+      }
+      if (e.key !== 'Tab' || !sheetRef.current) return
+      const focusables = sheetRef.current.querySelectorAll<HTMLElement>('button:not([disabled]), input, [tabindex]:not([tabindex="-1"])')
+      if (focusables.length === 0) return
+      const first = focusables[0]
+      const last = focusables[focusables.length - 1]
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault()
+        first.focus()
+      }
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [onClose])
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current)
@@ -2030,13 +2266,17 @@ function AddDestinationSheet({
       onClick={onClose}
     >
       <div
+        ref={sheetRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="add-destination-title"
         onClick={(e) => e.stopPropagation()}
         style={{ width: '100%', maxWidth: 480, background: '#0e0e24', border: '1px solid rgba(255,255,255,.1)', borderBottom: 'none', borderRadius: '24px 24px 0 0', padding: '20px 20px 28px', maxHeight: '70vh', display: 'flex', flexDirection: 'column' }}
       >
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
           <div style={{ width: 36, height: 5, borderRadius: 3, background: 'rgba(255,255,255,.18)' }} />
         </div>
-        <div style={{ color: '#ffffff', fontWeight: 700, fontSize: 16, marginBottom: 14 }}>Add a destination</div>
+        <div id="add-destination-title" style={{ color: '#ffffff', fontWeight: 700, fontSize: 16, marginBottom: 14 }}>Add a destination</div>
         <div style={{ position: 'relative', marginBottom: 8 }}>
           <input
             autoFocus
