@@ -10,6 +10,8 @@ import {
   MapPin, Moon, X, Clock, Ruler, Sun, ChevronRight, ArrowLeft,
 } from "lucide-react";
 import { AppBottomNav } from "@/components/ui/AppBottomNav";
+import { createClient } from "@/lib/supabase/client";
+import { showToast, Toaster } from "@/components/ui/toast";
 import type { Profile, Trip } from "@/types";
 import { getInitials } from "@/lib/utils";
 
@@ -291,6 +293,49 @@ export function ExploreClient({ profile, trips }: Props) {
     setFlyToken(t => t + 1);
   }, [ready, visitedCountries, preview]);
 
+  // "Use this route" — clones the template's waypoints into a real trip.
+  const [cloning, setCloning] = useState(false)
+  const handleUseRoute = async (d: Destination) => {
+    if (cloning) return
+    if (!profile?.id) {
+      showToast("Sign in to start this trip.", "error")
+      return
+    }
+    setCloning(true)
+    const supabase = createClient()
+    const { data: trip, error } = await supabase
+      .from("trips")
+      .insert({
+        title: d.name,
+        description: d.description,
+        total_budget: 0,
+        vibe: "Road",
+        countries: [{ name: d.country, flag: d.emoji, lat: d.lat, lng: d.lng }],
+        owner_id: profile.id,
+        focus_lat: d.waypoints[0]?.lat ?? d.lat,
+        focus_lng: d.waypoints[0]?.lng ?? d.lng,
+      })
+      .select("id")
+      .single()
+    if (error || !trip) {
+      showToast(error?.message ?? "Couldn't create the trip.", "error")
+      setCloning(false)
+      return
+    }
+    const stopRows = d.waypoints.map((wp, i) => ({
+      trip_id: trip.id,
+      name: wp.name,
+      lat: wp.lat,
+      lng: wp.lng,
+      order_index: i,
+      stop_type: i === 0 ? "origin" : "destination",
+      created_by: profile.id,
+    }))
+    const { error: stopsErr } = await supabase.from("stops").insert(stopRows)
+    if (stopsErr) showToast("Trip created, but the stops couldn't be added.", "error")
+    router.push(`/trip/${trip.id}/mobile`)
+  }
+
   const openPreview = (d: Destination) => {
     setAutoRotate(false);
     setPreview(d);
@@ -542,12 +587,13 @@ export function ExploreClient({ profile, trips }: Props) {
 
                 {/* CTA */}
                 <motion.button
-                  onClick={() => { closePreview(); router.push("/dashboard"); }}
-                  style={{ width:"100%", background:AMBER_GRAD, color:"#1a0800", fontWeight:800, fontSize:15, border:"none", borderRadius:14, padding:"14px", boxShadow:AMBER_GLOW, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:8, ...FONT }}
+                  onClick={() => handleUseRoute(preview)}
+                  disabled={cloning}
+                  style={{ width:"100%", background:AMBER_GRAD, color:"#1a0800", fontWeight:800, fontSize:15, border:"none", borderRadius:14, padding:"14px", boxShadow:AMBER_GLOW, cursor: cloning ? "default" : "pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:8, opacity: cloning ? 0.6 : 1, ...FONT }}
                   whileTap={{ scale:0.97 }} whileHover={{ scale:1.01 }} transition={TAP}
                 >
                   <MapPin style={{ width:16, height:16 }} />
-                  Plan This Trip
+                  {cloning ? "Creating your trip…" : "Use This Route"}
                 </motion.button>
               </div>
             </motion.div>
@@ -557,6 +603,7 @@ export function ExploreClient({ profile, trips }: Props) {
 
       {/* Bottom Nav */}
       <AppBottomNav active="explore" profile={profile} />
+      <Toaster />
     </div>
   );
 }

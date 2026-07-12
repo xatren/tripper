@@ -1,6 +1,7 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import localFont from 'next/font/local';
 import { Inter } from 'next/font/google';
+import { RegisterSW } from '@/components/pwa/RegisterSW';
 import './globals.css';
 
 const geistSans = localFont({
@@ -22,6 +23,15 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: 'Tripper — Road Trip Planner',
   description: 'Plan epic road trips with friends. Interactive map, realtime collaboration, and budget tracking.',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Tripper',
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: '#0a1020',
 };
 
 export default function RootLayout({
@@ -35,6 +45,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} antialiased bg-[#0A0A0F] text-white`}
       >
         {children}
+        <RegisterSW />
       </body>
     </html>
   );

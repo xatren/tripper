@@ -11,11 +11,15 @@ import { createClient } from '@/lib/supabase/client'
 import { TripboxMap } from '@/components/map/mapbox/TripboxMap'
 import { getDrivingRoute, getRouteLegs, type RouteLeg } from '@/lib/mapbox/directions'
 import { forwardSearch, type GeocodeResult } from '@/lib/mapbox/geocoding'
-import type { Trip, Stop, Expense, ExpenseCategory } from '@/types'
+import type { Trip, Stop, Expense, ExpenseCategory, Profile } from '@/types'
 import { EXPENSE_CATEGORIES, CURRENCY_SYMBOLS } from '@/types'
 import { TripSummaryHero } from '@/components/journal/TripSummaryHero'
 import { showToast, Toaster } from '@/components/ui/toast'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+import { fetchWeatherForStops, type DayWeather, type WeatherKind } from '@/lib/weather/openMeteo'
+import { getOptimizedOrder } from '@/lib/mapbox/optimize'
+import { downloadTripIcs } from '@/lib/ics'
+import { shareTripRecap } from '@/lib/recap-image'
 
 const ACCENT = '#f5a623'
 const ACCENT_LIGHT = '#f8c04a'
@@ -32,6 +36,8 @@ interface TripMobileClientProps {
   trip: Trip
   stops: Stop[]
   currentUserId: string
+  /** Owner + collaborator profiles, for the Budget split view. */
+  members: Profile[]
 }
 
 export function TripMobileClient(props: TripMobileClientProps) {
@@ -100,26 +106,9 @@ function computeStopSchedule(
   })
 }
 
-// ─── Weather (mock) ────────────────────────────────────────────────────────
-// TODO: swap for a real forecast API keyed on stop.lat/lng + arrival_date once available.
-
-const WEATHER_KINDS = ['sunny', 'partly', 'cloudy', 'rainy'] as const
-type WeatherKind = (typeof WEATHER_KINDS)[number]
-
-interface DayWeather {
-  kind: WeatherKind
-  high: number
-  low: number
-}
-
-function getMockWeather(seed: string): DayWeather {
-  let hash = 0
-  for (let i = 0; i < seed.length; i++) hash = (hash * 31 + seed.charCodeAt(i)) >>> 0
-  const kind = WEATHER_KINDS[hash % WEATHER_KINDS.length]
-  const high = 18 + (hash % 14) // 18–31°C
-  const low = high - (4 + ((hash >> 3) % 6)) // 4–9° spread below high
-  return { kind, high, low }
-}
+// ─── Weather ────────────────────────────────────────────────────────────────
+// Live Open-Meteo forecast (see lib/weather/openMeteo). Chips only appear for
+// arrival dates inside the ~16-day forecast horizon — no fake data.
 
 function WeatherIcon({ kind, size = 18 }: { kind: WeatherKind; size?: number }) {
   const cloud = 'rgba(215,215,255,.7)'
@@ -164,16 +153,28 @@ function WeatherIcon({ kind, size = 18 }: { kind: WeatherKind; size?: number }) 
           </g>
         </svg>
       )
+    case 'snowy':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+          <path d="M6.3 15H16.4C18.5 15 20.2 13.3 20.2 11.1C20.2 9.1 18.7 7.5 16.8 7.3C16.4 4.6 14.1 2.5 11.2 2.5C8 2.5 5.4 5.1 5.4 8.3C5.4 8.5 5.4 8.7 5.44 8.9C3.7 9.3 2.4 10.9 2.4 12.6C2.4 13.9 3.4 15 6.3 15Z" stroke={cloud} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+          <g stroke="#bfe3ff" strokeWidth="1.5" strokeLinecap="round">
+            <path d="M8 17.8v3M6.8 19.3h2.4" />
+            <path d="M14.5 17.8v3M13.3 19.3h2.4" />
+          </g>
+        </svg>
+      )
   }
 }
 
-// ─── Prep / packing list (mock, local-only) ────────────────────────────────
-// TODO: persist to Supabase (a `packing_items` table keyed by trip_id) once the shape settles.
+// ─── Prep / packing list ────────────────────────────────────────────────────
+// Backed by the `packing_items` table (migration 010). A vibe-aware starter
+// template seeds the list on first open.
 
 type Section = 'plan' | 'prep' | 'budget' | 'journal'
 
-interface PackingItem {
+interface PackingRow {
   id: string
+  category: PackingCategoryKey
   label: string
   checked: boolean
 }
@@ -234,38 +235,129 @@ const DEFAULT_PACKING: Record<PackingCategoryKey, string[]> = {
   other: ['Water bottle', 'Snacks', 'Spare charging cable'],
 }
 
-function makePackingItem(label: string): PackingItem {
-  return { id: `${label}-${Math.random().toString(36).slice(2, 9)}`, label, checked: false }
+/** Extra starter items layered on top of the defaults, keyed by trip vibe. */
+const VIBE_PACKING: Record<string, Partial<Record<PackingCategoryKey, string[]>>> = {
+  Road: { electronics: ['Car charger'], other: ['Car phone mount', 'Roadside emergency kit', 'Sunglasses'] },
+  Fly: { clothing: ['Compression socks'], documents: ['Boarding passes'], other: ['Neck pillow', 'Luggage tags'] },
+  Camp: { clothing: ['Thermal layers'], other: ['Tent', 'Sleeping bag', 'Headlamp', 'Multi-tool'] },
+  Beach: { clothing: ['Swimsuit', 'Flip-flops', 'Sun hat'], toiletries: ['SPF 50 sunscreen', 'After-sun lotion'], other: ['Beach towel'] },
+  Mountain: { clothing: ['Hiking boots', 'Rain shell', 'Fleece'], other: ['Trekking poles', 'Water filter'] },
+  Backpack: { clothing: ['Quick-dry clothes'], other: ['Packing cubes', 'Padlock', 'Microfiber towel', 'Daypack'] },
 }
 
-function PrepTab() {
-  const [items, setItems] = useState<Record<PackingCategoryKey, PackingItem[]>>(() => {
-    const seeded = {} as Record<PackingCategoryKey, PackingItem[]>
-    for (const key of Object.keys(DEFAULT_PACKING) as PackingCategoryKey[]) {
-      seeded[key] = DEFAULT_PACKING[key].map(makePackingItem)
+const VIBE_PACKING_EMOJI: Record<string, string> = {
+  Road: '🚗', Fly: '✈️', Camp: '⛺', Beach: '🏖️', Mountain: '🏔️', Backpack: '🎒',
+}
+
+function buildTemplateRows(vibe: string | null | undefined): { category: PackingCategoryKey; label: string }[] {
+  const rows: { category: PackingCategoryKey; label: string }[] = []
+  for (const key of Object.keys(DEFAULT_PACKING) as PackingCategoryKey[]) {
+    DEFAULT_PACKING[key].forEach((label) => rows.push({ category: key, label }))
+  }
+  const extras = vibe ? VIBE_PACKING[vibe] : undefined
+  if (extras) {
+    for (const [cat, labels] of Object.entries(extras) as [PackingCategoryKey, string[]][]) {
+      labels.forEach((label) => rows.push({ category: cat, label }))
     }
-    return seeded
-  })
+  }
+  return rows
+}
+
+function PrepTab({ tripId, vibe, userId }: { tripId: string; vibe?: string | null; userId: string }) {
+  const [items, setItems] = useState<PackingRow[]>([])
+  const [loading, setLoading] = useState(true)
+  const [seeding, setSeeding] = useState(false)
   const [expanded, setExpanded] = useState<Record<string, boolean>>({ clothing: true })
   const [draft, setDraft] = useState<Record<string, string>>({})
 
-  const toggleItem = (cat: PackingCategoryKey, id: string) => {
-    setItems((prev) => ({ ...prev, [cat]: prev[cat].map((it) => (it.id === id ? { ...it, checked: !it.checked } : it)) }))
-  }
-  const removeItem = (cat: PackingCategoryKey, id: string) => {
-    setItems((prev) => ({ ...prev, [cat]: prev[cat].filter((it) => it.id !== id) }))
-  }
-  const addItem = (cat: PackingCategoryKey) => {
-    const label = (draft[cat] ?? '').trim()
-    if (!label) return
-    setItems((prev) => ({ ...prev, [cat]: [...prev[cat], makePackingItem(label)] }))
-    setDraft((d) => ({ ...d, [cat]: '' }))
+  useEffect(() => {
+    let cancelled = false
+    const supabase = createClient()
+    supabase
+      .from('packing_items')
+      .select('*')
+      .eq('trip_id', tripId)
+      .order('created_at', { ascending: true })
+      .then(({ data, error }) => {
+        if (cancelled) return
+        if (data) setItems(data as PackingRow[])
+        else if (error) showToast("Couldn't load the packing list. Run migration 010 if you haven't yet.", 'error')
+        setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [tripId])
+
+  // Optimistic writes; revert + toast on failure.
+  const toggleItem = (row: PackingRow) => {
+    setItems((prev) => prev.map((it) => (it.id === row.id ? { ...it, checked: !it.checked } : it)))
+    const supabase = createClient()
+    supabase.from('packing_items').update({ checked: !row.checked }).eq('id', row.id).then(({ error }) => {
+      if (error) {
+        setItems((prev) => prev.map((it) => (it.id === row.id ? { ...it, checked: row.checked } : it)))
+        showToast("Couldn't update the item.", 'error')
+      }
+    })
   }
 
-  const allItems = Object.values(items).flat()
-  const totalItems = allItems.length
-  const totalChecked = allItems.filter((i) => i.checked).length
+  const removeItem = (row: PackingRow) => {
+    setItems((prev) => prev.filter((it) => it.id !== row.id))
+    const supabase = createClient()
+    supabase.from('packing_items').delete().eq('id', row.id).then(({ error }) => {
+      if (error) {
+        setItems((prev) => [...prev, row])
+        showToast("Couldn't remove the item.", 'error')
+      }
+    })
+  }
+
+  const addItem = async (cat: PackingCategoryKey) => {
+    const label = (draft[cat] ?? '').trim()
+    if (!label) return
+    setDraft((d) => ({ ...d, [cat]: '' }))
+    const supabase = createClient()
+    const { data, error } = await supabase
+      .from('packing_items')
+      .insert({ trip_id: tripId, category: cat, label, created_by: userId })
+      .select()
+      .single()
+    if (!error && data) setItems((prev) => [...prev, data as PackingRow])
+    else showToast("Couldn't add the item.", 'error')
+  }
+
+  const seedTemplate = async () => {
+    if (seeding) return
+    setSeeding(true)
+    const supabase = createClient()
+    const rows = buildTemplateRows(vibe).map((r) => ({ trip_id: tripId, category: r.category, label: r.label, created_by: userId }))
+    const { data, error } = await supabase.from('packing_items').insert(rows).select()
+    if (!error && data) {
+      setItems(data as PackingRow[])
+      setExpanded({ clothing: true })
+    } else {
+      showToast("Couldn't create the starter list.", 'error')
+    }
+    setSeeding(false)
+  }
+
+  const grouped = {} as Record<PackingCategoryKey, PackingRow[]>
+  for (const meta of PACKING_CATEGORY_META) grouped[meta.key] = []
+  for (const it of items) (grouped[it.category] ?? grouped.other).push(it)
+
+  const totalItems = items.length
+  const totalChecked = items.filter((i) => i.checked).length
   const overallPct = totalItems ? Math.round((totalChecked / totalItems) * 100) : 0
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingTop: 14 }}>
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} style={{ height: i === 0 ? 92 : 66, borderRadius: 20, background: GLASS_FILL, border: `1px solid ${GLASS_BORDER}`, animation: 'pulseglow 1.6s ease-in-out infinite', animationDelay: `${i * 0.15}s` }} />
+        ))}
+      </div>
+    )
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingTop: 14 }}>
@@ -282,8 +374,25 @@ function PrepTab() {
         </div>
       </div>
 
+      {totalItems === 0 && (
+        <div style={{ background: GLASS_FILL, border: '1px solid rgba(245,166,35,.3)', borderRadius: 20, padding: '20px 18px', textAlign: 'center', backdropFilter: 'blur(20px)' }}>
+          <div style={{ fontSize: 28, marginBottom: 8 }}>{VIBE_PACKING_EMOJI[vibe ?? 'Road'] ?? '🚗'}</div>
+          <div style={{ fontSize: 14.5, fontWeight: 700 }}>Start your packing list</div>
+          <div style={{ fontSize: 12.5, color: 'rgba(215,215,255,.6)', marginTop: 4, lineHeight: 1.5 }}>
+            Get a starter list tailored to your {vibe ?? 'Road'} trip — edit everything after.
+          </div>
+          <button
+            onClick={seedTemplate}
+            disabled={seeding}
+            style={{ marginTop: 14, padding: '11px 22px', borderRadius: 12, background: 'linear-gradient(135deg, #f5a623, #f8c04a)', border: 'none', color: '#1a0800', fontWeight: 800, fontSize: 13.5, cursor: seeding ? 'default' : 'pointer', fontFamily: 'inherit', opacity: seeding ? 0.6 : 1, boxShadow: '0 0 20px rgba(245,140,0,.25)' }}
+          >
+            {seeding ? 'Adding…' : `Add ${vibe ?? 'Road'} essentials`}
+          </button>
+        </div>
+      )}
+
       {PACKING_CATEGORY_META.map(({ key, label, icon }) => {
-        const list = items[key]
+        const list = grouped[key]
         const checkedCount = list.filter((i) => i.checked).length
         const isOpen = !!expanded[key]
         return (
@@ -310,7 +419,8 @@ function PrepTab() {
                 {list.map((item) => (
                   <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 10px', borderRadius: 12, background: item.checked ? 'rgba(74,222,128,.08)' : 'rgba(255,255,255,.035)' }}>
                     <button
-                      onClick={() => toggleItem(key, item.id)}
+                      onClick={() => toggleItem(item)}
+                      aria-label={item.checked ? `Uncheck ${item.label}` : `Check ${item.label}`}
                       style={{ width: 20, height: 20, borderRadius: '50%', border: item.checked ? 'none' : '1.5px solid rgba(215,215,255,.35)', background: item.checked ? 'linear-gradient(145deg,#4ade80,#22c55e)' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none', cursor: 'pointer' }}
                     >
                       {item.checked && (
@@ -321,7 +431,8 @@ function PrepTab() {
                       {item.label}
                     </span>
                     <button
-                      onClick={() => removeItem(key, item.id)}
+                      onClick={() => removeItem(item)}
+                      aria-label={`Remove ${item.label}`}
                       style={{ width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none', background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(215,215,255,.35)' }}
                     >
                       <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M3 3L13 13M13 3L3 13" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
@@ -403,18 +514,26 @@ function formatMoney(n: number) {
 }
 
 function BudgetTab({
-  trip, expenses, loading, onAdd, onDelete,
+  trip, expenses, loading, members, currentUserId, onAdd, onDelete,
 }: {
   trip: Trip
   expenses: Expense[]
   loading: boolean
-  onAdd: (category: ExpenseCategory, description: string, amount: number) => Promise<void>
+  members: Profile[]
+  currentUserId: string
+  onAdd: (category: ExpenseCategory, description: string, amount: number, paidBy: string) => Promise<void>
   onDelete: (id: string) => void
 }) {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({})
   const [draftDesc, setDraftDesc] = useState<Record<string, string>>({})
   const [draftAmount, setDraftAmount] = useState<Record<string, string>>({})
+  const [draftPayer, setDraftPayer] = useState<Record<string, string>>({})
   const [submitting, setSubmitting] = useState<string | null>(null)
+
+  const partner = members.find((m) => m.id !== currentUserId) ?? null
+  const partnerName = partner
+    ? partner.display_name?.split(' ')[0] ?? partner.email?.split('@')[0] ?? 'Partner'
+    : null
 
   const sym = CURRENCY_SYMBOLS[trip.currency ?? 'USD'] ?? '$'
   const spent = expenses.reduce((sum, e) => sum + Number(e.amount), 0)
@@ -423,11 +542,16 @@ function BudgetTab({
   const pct = total > 0 ? Math.min(100, Math.round((spent / total) * 100)) : 0
   const overBudget = total > 0 && remaining < 0
 
+  // Splitwise-lite: everything is split 50/50 between the two trip members.
+  const myPaid = expenses.filter((e) => e.paid_by === currentUserId).reduce((s, e) => s + Number(e.amount), 0)
+  const partnerPaid = partner ? expenses.filter((e) => e.paid_by === partner.id).reduce((s, e) => s + Number(e.amount), 0) : 0
+  const net = (myPaid - partnerPaid) / 2
+
   const submitExpense = async (cat: ExpenseCategory) => {
     const amountRaw = parseFloat(draftAmount[cat] ?? '')
     if (!amountRaw || amountRaw <= 0) return
     setSubmitting(cat)
-    await onAdd(cat, (draftDesc[cat] ?? '').trim(), amountRaw)
+    await onAdd(cat, (draftDesc[cat] ?? '').trim(), amountRaw, draftPayer[cat] ?? currentUserId)
     setDraftDesc((d) => ({ ...d, [cat]: '' }))
     setDraftAmount((d) => ({ ...d, [cat]: '' }))
     setSubmitting(null)
@@ -458,6 +582,24 @@ function BudgetTab({
               : `${sym}${formatMoney(remaining)} remaining`}
         </div>
       </div>
+
+      {partner && !loading && (
+        <div style={{ background: GLASS_FILL, border: `1px solid ${net === 0 ? GLASS_BORDER : 'rgba(245,166,35,.3)'}`, borderRadius: 20, padding: 16, backdropFilter: 'blur(20px)', boxShadow: '0 6px 20px rgba(0,0,0,.2)' }}>
+          <div style={{ fontSize: 11.5, fontWeight: 700, color: 'rgba(215,215,255,.55)', textTransform: 'uppercase', letterSpacing: '.06em' }}>Split 50/50</div>
+          <div style={{ fontSize: 16, fontWeight: 800, marginTop: 6, color: net === 0 ? '#4ade80' : ACCENT_LIGHT }}>
+            {net > 0
+              ? `${partnerName} owes you ${sym}${formatMoney(net)}`
+              : net < 0
+                ? `You owe ${partnerName} ${sym}${formatMoney(-net)}`
+                : 'All settled up 🎉'}
+          </div>
+          <div style={{ display: 'flex', gap: 10, marginTop: 8, fontSize: 12, color: 'rgba(215,215,255,.6)', fontWeight: 500 }}>
+            <span>You paid {sym}{formatMoney(myPaid)}</span>
+            <span>·</span>
+            <span>{partnerName} paid {sym}{formatMoney(partnerPaid)}</span>
+          </div>
+        </div>
+      )}
 
       {loading &&
         [0, 1, 2].map((i) => (
@@ -500,6 +642,14 @@ function BudgetTab({
                     <span style={{ flex: 1, minWidth: 0, fontSize: 13.5, fontWeight: 600, color: 'rgba(255,255,255,.92)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {item.description || label}
                     </span>
+                    {partner && item.paid_by && (
+                      <span
+                        title={item.paid_by === currentUserId ? 'Paid by you' : `Paid by ${partnerName}`}
+                        style={{ width: 20, height: 20, borderRadius: '50%', flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8.5, fontWeight: 800, color: '#fff', background: item.paid_by === currentUserId ? 'linear-gradient(135deg,#f5a623,#e8821a)' : 'linear-gradient(135deg,#7c3aed,#4f46e5)' }}
+                      >
+                        {item.paid_by === currentUserId ? 'ME' : partnerName?.[0]?.toUpperCase() ?? 'P'}
+                      </span>
+                    )}
                     <span style={{ fontSize: 13.5, fontWeight: 700, color: ACCENT_LIGHT, flex: 'none' }}>{sym}{formatMoney(Number(item.amount))}</span>
                     <button
                       onClick={() => onDelete(item.id)}
@@ -509,6 +659,23 @@ function BudgetTab({
                     </button>
                   </div>
                 ))}
+                {partner && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6 }}>
+                    <span style={{ fontSize: 11.5, color: 'rgba(215,215,255,.55)', fontWeight: 600 }}>Paid by</span>
+                    {[{ id: currentUserId, label: 'Me' }, { id: partner.id, label: partnerName ?? 'Partner' }].map((p) => {
+                      const active = (draftPayer[cat] ?? currentUserId) === p.id
+                      return (
+                        <button
+                          key={p.id}
+                          onClick={() => setDraftPayer((d) => ({ ...d, [cat]: p.id }))}
+                          style={{ padding: '5px 12px', borderRadius: 999, fontSize: 12, fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer', background: active ? 'rgba(245,166,35,.18)' : 'rgba(255,255,255,.05)', border: `1px solid ${active ? 'rgba(245,166,35,.45)' : 'rgba(255,255,255,.1)'}`, color: active ? ACCENT_LIGHT : 'rgba(215,215,255,.7)' }}
+                        >
+                          {p.label}
+                        </button>
+                      )
+                    })}
+                  </div>
+                )}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
                   <input
                     value={draftDesc[cat] ?? ''}
@@ -553,6 +720,8 @@ function JournalTab({
   routeLegs: RouteLeg[]
   routePath: { lat: number; lng: number }[]
 }) {
+  const [sharing, setSharing] = useState(false)
+
   if (stops.length < 2) {
     return (
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '60px 16px', textAlign: 'center' }}>
@@ -586,6 +755,32 @@ function JournalTab({
         durationHours={durationHours}
         days={days}
       />
+      <button
+        onClick={async () => {
+          if (sharing) return
+          setSharing(true)
+          const result = await shareTripRecap({
+            title: tripTitle(trip, stops),
+            dateRange: formatDateRange(trip.start_date, trip.end_date) || 'Dates not set',
+            routePath,
+            stops: stops.map((s) => ({ lat: s.lat, lng: s.lng, name: s.name })),
+            distanceKm,
+            durationHours,
+            days,
+          })
+          setSharing(false)
+          if (result === 'failed') showToast("Couldn't create the recap image.", 'error')
+          else if (result === 'downloaded') showToast('Recap image downloaded — story-ready! 📸', 'success')
+        }}
+        disabled={sharing}
+        style={{ width: '100%', marginTop: 12, padding: '14px 16px', borderRadius: 16, background: 'linear-gradient(135deg, #f5a623, #f8c04a)', border: 'none', color: '#1a0800', fontWeight: 800, fontSize: 14.5, cursor: sharing ? 'default' : 'pointer', fontFamily: 'inherit', boxShadow: '0 0 24px rgba(245,140,0,.3)', opacity: sharing ? 0.6 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a0800" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7" />
+          <path d="M16 6l-4-4-4 4M12 2v13" />
+        </svg>
+        {sharing ? 'Creating image…' : 'Share trip recap'}
+      </button>
       <div style={{ marginTop: 16 }}>
         <ComingSoon label="Daily notes & photos coming soon" />
       </div>
@@ -641,7 +836,7 @@ const topBtnStyle: CSSProperties = {
 
 // ─── Main content ────────────────────────────────────────────────────────────
 
-function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMobileClientProps) {
+function TripMobileContent({ trip, stops: initialStops, currentUserId, members }: TripMobileClientProps) {
   const router = useRouter()
   const [stops, setStops] = useState(initialStops)
   const [activeSection, setActiveSection] = useState<Section>('plan')
@@ -654,7 +849,7 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
   const [nights, setNights] = useState<Record<string, number>>(() =>
     Object.fromEntries(initialStops.map((s) => [s.id, s.nights ?? 1]))
   )
-  const [optimizeHint, setOptimizeHint] = useState(false)
+  const [optimizing, setOptimizing] = useState(false)
 
   const stageRef = useRef<HTMLDivElement>(null)
   const sheetHeight = useMotionValue(420)
@@ -787,6 +982,22 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
     })
   }, [])
 
+  // Mapbox Optimization API — keeps first/last stops fixed, reorders the middle.
+  const handleOptimize = async () => {
+    if (optimizing) return
+    if (stops.length < 3) { showToast('Add at least 3 stops to optimize the order.', 'info'); return }
+    if (stops.length > 12) { showToast('Optimization works with up to 12 stops.', 'info'); return }
+    setOptimizing(true)
+    const order = await getOptimizedOrder(stops.map((s) => ({ lat: s.lat, lng: s.lng })))
+    setOptimizing(false)
+    if (!order) { showToast("Couldn't optimize the route. Please try again.", 'error'); return }
+    if (order.every((v, i) => v === i)) { showToast('Your route is already optimal! 🎉', 'success'); return }
+    const next = order.map((i) => stops[i])
+    setStops(next)
+    persistStopOrder(next)
+    showToast('Route optimized — stops reordered.', 'success')
+  }
+
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
       const { active, over } = event
@@ -849,11 +1060,11 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
   }, [trip.id])
 
   const handleAddExpense = useCallback(
-    async (category: ExpenseCategory, description: string, amount: number) => {
+    async (category: ExpenseCategory, description: string, amount: number, paidBy: string) => {
       const supabase = createClient()
       const { data, error } = await supabase
         .from('expenses')
-        .insert({ trip_id: trip.id, category, amount, description: description || null, paid_by: currentUserId })
+        .insert({ trip_id: trip.id, category, amount, description: description || null, paid_by: paidBy || currentUserId })
         .select()
         .single()
       if (!error && data) setExpenses((prev) => [data as Expense, ...prev])
@@ -922,9 +1133,9 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
               <div style={{ width: 40 }} />
             </div>
             <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '0 16px 16px' }}>
-              {activeSection === 'prep' && <PrepTab />}
+              {activeSection === 'prep' && <PrepTab tripId={trip.id} vibe={trip.vibe} userId={currentUserId} />}
               {activeSection === 'budget' && (
-                <BudgetTab trip={trip} expenses={expenses} loading={expensesLoading} onAdd={handleAddExpense} onDelete={handleDeleteExpense} />
+                <BudgetTab trip={trip} expenses={expenses} loading={expensesLoading} members={members} currentUserId={currentUserId} onAdd={handleAddExpense} onDelete={handleDeleteExpense} />
               )}
               {activeSection === 'journal' && (
                 <JournalTab trip={trip} stops={stops} routeLegs={routeLegs} routePath={routePath} />
@@ -1040,12 +1251,12 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
                       </div>
                     </div>
                     <button
-                      onClick={() => setOptimizeHint(true)}
-                      style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,.07)', border: '1px solid rgba(255,255,255,.15)', borderRadius: 999, padding: '10px 14px', flex: 'none', cursor: 'pointer', fontFamily: 'inherit' }}
+                      onClick={handleOptimize}
+                      disabled={optimizing}
+                      style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,.07)', border: '1px solid rgba(255,255,255,.15)', borderRadius: 999, padding: '10px 14px', flex: 'none', cursor: optimizing ? 'default' : 'pointer', fontFamily: 'inherit', opacity: optimizing ? 0.6 : 1 }}
                     >
-                      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 1L9.3 5.6L14 7L9.3 8.4L8 13L6.7 8.4L2 7L6.7 5.6L8 1Z" fill={ACCENT_LIGHT} /></svg>
-                      <span style={{ fontSize: 12.5, fontWeight: 600, color: '#fff' }}>{optimizeHint ? 'Coming soon' : 'Optimize'}</span>
-                      <span style={{ fontSize: 9, fontWeight: 800, padding: '2px 6px', borderRadius: 6, background: 'rgba(245,166,35,.15)', border: '1px solid rgba(245,166,35,.35)', color: ACCENT_LIGHT, letterSpacing: '.05em' }}>SOON</span>
+                      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style={optimizing ? { animation: 'pulseglow 1s ease-in-out infinite' } : undefined}><path d="M8 1L9.3 5.6L14 7L9.3 8.4L8 13L6.7 8.4L2 7L6.7 5.6L8 1Z" fill={ACCENT_LIGHT} /></svg>
+                      <span style={{ fontSize: 12.5, fontWeight: 600, color: '#fff' }}>{optimizing ? 'Optimizing…' : 'Optimize'}</span>
                     </button>
                   </div>
                 )}
@@ -1196,7 +1407,7 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId }: TripMob
               </>
             )}
 
-            {activeTab === 'days' && <DaysTab stops={stops} routeLegs={routeLegs} schedule={stopSchedule} />}
+            {activeTab === 'days' && <DaysTab stops={stops} routeLegs={routeLegs} schedule={stopSchedule} tripName={tripTitle(trip, stops)} />}
             {activeTab === 'bookings' && <BookingsTab stops={stops} schedule={stopSchedule} />}
           </div>
 
@@ -1250,13 +1461,54 @@ function SortableStopItem({ id, children }: {
   )
 }
 
-function DaysTab({ stops, routeLegs, schedule }: { stops: Stop[]; routeLegs: RouteLeg[]; schedule: StopSchedule[] }) {
+function DaysTab({ stops, routeLegs, schedule, tripName }: { stops: Stop[]; routeLegs: RouteLeg[]; schedule: StopSchedule[]; tripName: string }) {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({})
+  const [weather, setWeather] = useState<Record<string, DayWeather | null>>({})
+
+  // Refetch only when a stop or its arrival date actually changes.
+  const weatherKey = stops.map((s, i) => `${s.id}:${schedule[i]?.arrival ?? ''}`).join('|')
+  useEffect(() => {
+    if (!stops.length) return
+    let cancelled = false
+    fetchWeatherForStops(
+      stops.map((s, i) => ({ id: s.id, lat: s.lat, lng: s.lng, date: schedule[i]?.arrival ?? null }))
+    ).then((w) => {
+      if (!cancelled) setWeather(w)
+    })
+    return () => {
+      cancelled = true
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [weatherKey])
 
   if (stops.length === 0) return <ComingSoon label="Day-by-day planning" />
 
+  const exportIcs = () => {
+    const events = stops
+      .map((s, i) => ({ name: s.name, address: s.address, arrival: schedule[i]?.arrival, departure: schedule[i]?.departure }))
+      .filter((e): e is { name: string; address: string | null; arrival: string; departure: string } => !!(e.arrival && e.departure))
+    if (!events.length) {
+      showToast('Set trip dates first to export the calendar.', 'info')
+      return
+    }
+    downloadTripIcs(tripName, events)
+    showToast('Calendar file downloaded.', 'success')
+  }
+
   return (
     <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 12 }}>
+      {schedule[0]?.arrival && (
+        <button
+          onClick={exportIcs}
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, width: '100%', padding: '12px 16px', borderRadius: 14, background: GLASS_FILL, border: `1px solid ${GLASS_BORDER}`, cursor: 'pointer', fontFamily: 'inherit' }}
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={ACCENT_LIGHT} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="4.5" width="18" height="17" rx="2.5" />
+            <path d="M8 2.5v4M16 2.5v4M3 9.5h18M12 13v5M9.5 15.5h5" />
+          </svg>
+          <span style={{ color: '#fff', fontWeight: 700, fontSize: 13 }}>Add to calendar (.ics)</span>
+        </button>
+      )}
       {stops.map((stop, idx) => {
         const isOpen = !!expanded[stop.id]
         const sched = schedule[idx]
@@ -1269,7 +1521,7 @@ function DaysTab({ stops, routeLegs, schedule }: { stops: Stop[]; routeLegs: Rou
         const hasDetail = !!(stop.notes || stop.address)
         const prevStop = idx > 0 ? stops[idx - 1] : null
         const leg = idx > 0 ? routeLegs[idx - 1] : null
-        const weather = getMockWeather(stop.id)
+        const w = weather[stop.id]
         return (
           <div key={stop.id}>
             {prevStop && (
@@ -1316,12 +1568,14 @@ function DaysTab({ stops, routeLegs, schedule }: { stops: Stop[]; routeLegs: Rou
                 {prevStop && <div style={{ fontSize: 12, fontWeight: 700, color: ACCENT_LIGHT, marginTop: 3 }}>Travel Day</div>}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 'none' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 10px', borderRadius: 999, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.08)' }}>
-                  <WeatherIcon kind={weather.kind} />
-                  <div style={{ fontSize: 12.5, fontWeight: 700, color: 'rgba(255,255,255,.92)', whiteSpace: 'nowrap' }}>
-                    {weather.high}° <span style={{ color: 'rgba(215,215,255,.5)', fontWeight: 600 }}>/ {weather.low}°</span>
+                {w && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 10px', borderRadius: 999, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.08)' }}>
+                    <WeatherIcon kind={w.kind} />
+                    <div style={{ fontSize: 12.5, fontWeight: 700, color: 'rgba(255,255,255,.92)', whiteSpace: 'nowrap' }}>
+                      {w.high}° <span style={{ color: 'rgba(215,215,255,.5)', fontWeight: 600 }}>/ {w.low}°</span>
+                    </div>
                   </div>
-                </div>
+                )}
                 {hasDetail && (
                   <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style={{ flex: 'none', transition: 'transform .25s ease', transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
                     <path d="M4 6L8 10L12 6" stroke="rgba(215,215,255,.6)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />

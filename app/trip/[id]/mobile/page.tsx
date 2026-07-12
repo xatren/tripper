@@ -1,7 +1,7 @@
 import { redirect, notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { TripMobileClient } from './TripMobileClient';
-import type { Trip, Stop } from '@/types';
+import type { Trip, Stop, Profile } from '@/types';
 
 interface TripMobilePageProps {
   params: Promise<{ id: string }>;
@@ -30,11 +30,18 @@ export default async function TripMobilePage({ params }: TripMobilePageProps) {
     .eq('trip_id', id)
     .order('order_index', { ascending: true });
 
+  const memberIds = [trip.owner_id, trip.collaborator_id].filter(Boolean) as string[];
+  const { data: members } = await supabase
+    .from('profiles')
+    .select('*')
+    .in('id', memberIds);
+
   return (
     <TripMobileClient
       trip={trip as Trip}
       stops={(stops as Stop[]) || []}
       currentUserId={user.id}
+      members={(members as Profile[]) || []}
     />
   );
 }
