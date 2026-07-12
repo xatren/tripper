@@ -270,6 +270,29 @@ export interface Photo {
   created_at: string;
 }
 
+/** Daily journal entry (migration `011_journal`). */
+export interface JournalEntry {
+  id: string;
+  trip_id: string;
+  /** ISO date (YYYY-MM-DD). */
+  entry_date: string;
+  note: string | null;
+  created_by: string | null;
+  created_at: string;
+  journal_photos?: JournalPhoto[];
+}
+
+/** Photo attached to a journal entry, stored in the `trip-photos` bucket (migration `011_journal`). */
+export interface JournalPhoto {
+  id: string;
+  entry_id: string;
+  /** Object path inside the `trip-photos` bucket, e.g. `{trip_id}/{uuid}.jpg`. */
+  storage_path: string;
+  caption: string | null;
+  uploaded_by: string | null;
+  created_at: string;
+}
+
 export type ExpenseCategory =
   | 'fuel'
   | 'food'

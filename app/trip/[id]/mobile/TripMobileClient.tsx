@@ -11,7 +11,7 @@ import { createClient } from '@/lib/supabase/client'
 import { TripboxMap } from '@/components/map/mapbox/TripboxMap'
 import { getDrivingRoute, getRouteLegs, type RouteLeg } from '@/lib/mapbox/directions'
 import { forwardSearch, type GeocodeResult } from '@/lib/mapbox/geocoding'
-import type { Trip, Stop, Expense, ExpenseCategory, Profile } from '@/types'
+import type { Trip, Stop, Expense, ExpenseCategory, Profile, JournalEntry } from '@/types'
 import { EXPENSE_CATEGORIES, CURRENCY_SYMBOLS } from '@/types'
 import { TripSummaryHero } from '@/components/journal/TripSummaryHero'
 import { showToast, Toaster } from '@/components/ui/toast'
@@ -712,78 +712,316 @@ function BudgetTab({
 
 // ─── Journal ────────────────────────────────────────────────────────────────
 
+const JOURNAL_BUCKET = 'trip-photos'
+
+function todayIso(): string {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+function formatJournalDate(iso: string) {
+  return new Date(iso + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })
+}
+
+/** Downscale to max 1600px and re-encode as JPEG before upload (keeps the bucket lean). */
+async function compressJournalPhoto(file: File): Promise<Blob> {
+  const bitmap = await createImageBitmap(file)
+  const scale = Math.min(1, 1600 / Math.max(bitmap.width, bitmap.height))
+  const w = Math.round(bitmap.width * scale)
+  const h = Math.round(bitmap.height * scale)
+  const canvas = document.createElement('canvas')
+  canvas.width = w
+  canvas.height = h
+  canvas.getContext('2d')!.drawImage(bitmap, 0, 0, w, h)
+  bitmap.close()
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('compress failed'))), 'image/jpeg', 0.85)
+  })
+}
+
+function journalPhotoUrl(path: string): string {
+  return createClient().storage.from(JOURNAL_BUCKET).getPublicUrl(path).data.publicUrl
+}
+
 function JournalTab({
-  trip, stops, routeLegs, routePath,
+  trip, stops, routeLegs, routePath, currentUserId,
 }: {
   trip: Trip
   stops: Stop[]
   routeLegs: RouteLeg[]
   routePath: { lat: number; lng: number }[]
+  currentUserId: string
 }) {
   const [sharing, setSharing] = useState(false)
+  const [entries, setEntries] = useState<JournalEntry[] | null>(null)
+  const [draftNote, setDraftNote] = useState('')
+  const [draftDate, setDraftDate] = useState(todayIso())
+  const [draftFiles, setDraftFiles] = useState<File[]>([])
+  const [saving, setSaving] = useState(false)
+  const [pendingDelete, setPendingDelete] = useState<JournalEntry | null>(null)
+  const [lightbox, setLightbox] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
-  if (stops.length < 2) {
-    return (
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '60px 16px', textAlign: 'center' }}>
-        <span style={{ color: 'rgba(255,255,255,.5)', fontSize: 14, fontWeight: 600 }}>Trip Journal</span>
-        <span style={{ color: 'rgba(215,215,255,.55)', fontSize: 12.5 }}>Add at least 2 stops to see your trip recap</span>
-      </div>
-    )
+  useEffect(() => {
+    let cancelled = false
+    createClient()
+      .from('journal_entries')
+      .select('*, journal_photos(*)')
+      .eq('trip_id', trip.id)
+      .order('entry_date', { ascending: false })
+      .order('created_at', { ascending: false })
+      .then(({ data, error }) => {
+        if (cancelled) return
+        if (error) {
+          // Table missing until migration 011_journal runs — degrade to empty state.
+          setEntries([])
+          return
+        }
+        setEntries((data ?? []) as JournalEntry[])
+      })
+    return () => { cancelled = true }
+  }, [trip.id])
+
+  const submitEntry = async () => {
+    const note = draftNote.trim()
+    if (saving || (!note && draftFiles.length === 0)) return
+    setSaving(true)
+    const supabase = createClient()
+    const { data: entry, error } = await supabase
+      .from('journal_entries')
+      .insert({ trip_id: trip.id, entry_date: draftDate, note: note || null, created_by: currentUserId })
+      .select('*')
+      .single()
+    if (error || !entry) {
+      setSaving(false)
+      showToast("Couldn't save the entry. Run migration 011 first?", 'error')
+      return
+    }
+    const photos: JournalEntry['journal_photos'] = []
+    for (const file of draftFiles) {
+      try {
+        const blob = await compressJournalPhoto(file)
+        const path = `${trip.id}/${crypto.randomUUID()}.jpg`
+        const { error: upErr } = await supabase.storage.from(JOURNAL_BUCKET).upload(path, blob, { contentType: 'image/jpeg' })
+        if (upErr) throw upErr
+        const { data: row, error: rowErr } = await supabase
+          .from('journal_photos')
+          .insert({ entry_id: entry.id, storage_path: path, uploaded_by: currentUserId })
+          .select('*')
+          .single()
+        if (rowErr || !row) throw rowErr ?? new Error('insert failed')
+        photos.push(row)
+      } catch {
+        showToast(`Couldn't upload ${file.name}.`, 'error')
+      }
+    }
+    setEntries((prev) => {
+      const next = [{ ...entry, journal_photos: photos } as JournalEntry, ...(prev ?? [])]
+      return next.sort((a, b) => b.entry_date.localeCompare(a.entry_date) || b.created_at.localeCompare(a.created_at))
+    })
+    setDraftNote('')
+    setDraftFiles([])
+    if (fileInputRef.current) fileInputRef.current.value = ''
+    setSaving(false)
+    showToast('Journal entry saved 📝', 'success')
   }
 
-  if (routePath.length < 2) {
-    return (
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '60px 16px', textAlign: 'center' }}>
-        <span style={{ color: 'rgba(255,255,255,.5)', fontSize: 14, fontWeight: 600 }}>Loading route recap…</span>
-      </div>
-    )
+  const deleteEntry = async (entry: JournalEntry) => {
+    setPendingDelete(null)
+    const supabase = createClient()
+    const paths = (entry.journal_photos ?? []).map((p) => p.storage_path)
+    if (paths.length > 0) await supabase.storage.from(JOURNAL_BUCKET).remove(paths)
+    const { error } = await supabase.from('journal_entries').delete().eq('id', entry.id)
+    if (error) {
+      showToast("Couldn't delete the entry.", 'error')
+      return
+    }
+    setEntries((prev) => (prev ?? []).filter((e) => e.id !== entry.id))
   }
 
   const points = stops.map((s, i) => ({ id: s.id, lat: s.lat, lng: s.lng, label: i + 1, title: s.name }))
   const distanceKm = routeLegs.reduce((sum, l) => sum + l.distanceMeters, 0) / 1000
   const durationHours = routeLegs.reduce((sum, l) => sum + l.durationSeconds, 0) / 3600
   const days = trip.start_date && trip.end_date ? totalNights(trip) + 1 : stops.length
+  const recapReady = stops.length >= 2 && routePath.length >= 2
+
+  const inputStyle: CSSProperties = { background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 10, padding: '8px 12px', fontSize: 13, color: '#fff', outline: 'none', fontFamily: 'inherit' }
 
   return (
     <div style={{ paddingTop: 14, paddingBottom: 20 }}>
-      <TripSummaryHero
-        title={tripTitle(trip, stops)}
-        dateRange={formatDateRange(trip.start_date, trip.end_date) || 'Dates not set'}
-        points={points}
-        routePath={routePath}
-        distanceKm={distanceKm}
-        durationHours={durationHours}
-        days={days}
-      />
-      <button
-        onClick={async () => {
-          if (sharing) return
-          setSharing(true)
-          const result = await shareTripRecap({
-            title: tripTitle(trip, stops),
-            dateRange: formatDateRange(trip.start_date, trip.end_date) || 'Dates not set',
-            routePath,
-            stops: stops.map((s) => ({ lat: s.lat, lng: s.lng, name: s.name })),
-            distanceKm,
-            durationHours,
-            days,
-          })
-          setSharing(false)
-          if (result === 'failed') showToast("Couldn't create the recap image.", 'error')
-          else if (result === 'downloaded') showToast('Recap image downloaded — story-ready! 📸', 'success')
-        }}
-        disabled={sharing}
-        style={{ width: '100%', marginTop: 12, padding: '14px 16px', borderRadius: 16, background: 'linear-gradient(135deg, #f5a623, #f8c04a)', border: 'none', color: '#1a0800', fontWeight: 800, fontSize: 14.5, cursor: sharing ? 'default' : 'pointer', fontFamily: 'inherit', boxShadow: '0 0 24px rgba(245,140,0,.3)', opacity: sharing ? 0.6 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a0800" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7" />
-          <path d="M16 6l-4-4-4 4M12 2v13" />
-        </svg>
-        {sharing ? 'Creating image…' : 'Share trip recap'}
-      </button>
-      <div style={{ marginTop: 16 }}>
-        <ComingSoon label="Daily notes & photos coming soon" />
+      {recapReady ? (
+        <>
+          <TripSummaryHero
+            title={tripTitle(trip, stops)}
+            dateRange={formatDateRange(trip.start_date, trip.end_date) || 'Dates not set'}
+            points={points}
+            routePath={routePath}
+            distanceKm={distanceKm}
+            durationHours={durationHours}
+            days={days}
+          />
+          <button
+            onClick={async () => {
+              if (sharing) return
+              setSharing(true)
+              const result = await shareTripRecap({
+                title: tripTitle(trip, stops),
+                dateRange: formatDateRange(trip.start_date, trip.end_date) || 'Dates not set',
+                routePath,
+                stops: stops.map((s) => ({ lat: s.lat, lng: s.lng, name: s.name })),
+                distanceKm,
+                durationHours,
+                days,
+              })
+              setSharing(false)
+              if (result === 'failed') showToast("Couldn't create the recap image.", 'error')
+              else if (result === 'downloaded') showToast('Recap image downloaded — story-ready! 📸', 'success')
+            }}
+            disabled={sharing}
+            style={{ width: '100%', marginTop: 12, padding: '14px 16px', borderRadius: 16, background: 'linear-gradient(135deg, #f5a623, #f8c04a)', border: 'none', color: '#1a0800', fontWeight: 800, fontSize: 14.5, cursor: sharing ? 'default' : 'pointer', fontFamily: 'inherit', boxShadow: '0 0 24px rgba(245,140,0,.3)', opacity: sharing ? 0.6 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a0800" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7" />
+              <path d="M16 6l-4-4-4 4M12 2v13" />
+            </svg>
+            {sharing ? 'Creating image…' : 'Share trip recap'}
+          </button>
+        </>
+      ) : (
+        <div style={{ padding: '18px 16px', borderRadius: 16, background: 'rgba(255,255,255,.035)', border: '1px solid rgba(255,255,255,.08)', textAlign: 'center' }}>
+          <span style={{ color: 'rgba(215,215,255,.55)', fontSize: 12.5 }}>
+            {stops.length < 2 ? 'Add at least 2 stops to see your trip recap' : 'Loading route recap…'}
+          </span>
+        </div>
+      )}
+
+      {/* ── Daily journal ── */}
+      <div style={{ marginTop: 20 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,.85)', letterSpacing: '.02em', marginBottom: 10 }}>Daily journal</div>
+
+        {/* composer */}
+        <div style={{ borderRadius: 16, background: 'rgba(255,255,255,.045)', border: '1px solid rgba(255,255,255,.1)', padding: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <input
+            type="date"
+            value={draftDate}
+            onChange={(e) => e.target.value && setDraftDate(e.target.value)}
+            style={{ ...inputStyle, colorScheme: 'dark', width: 'fit-content' }}
+          />
+          <textarea
+            value={draftNote}
+            onChange={(e) => setDraftNote(e.target.value)}
+            placeholder="How was the day? Notes, highlights, hidden gems…"
+            rows={3}
+            style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.5 }}
+          />
+          {draftFiles.length > 0 && (
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              {draftFiles.map((f, i) => (
+                <div key={`${f.name}-${i}`} style={{ position: 'relative' }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={URL.createObjectURL(f)} alt={f.name} style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 10, border: '1px solid rgba(255,255,255,.15)' }} />
+                  <button
+                    onClick={() => setDraftFiles((prev) => prev.filter((_, j) => j !== i))}
+                    aria-label="Remove photo"
+                    style={{ position: 'absolute', top: -6, right: -6, width: 18, height: 18, borderRadius: '50%', background: 'rgba(20,20,40,.9)', border: '1px solid rgba(255,255,255,.25)', color: '#fff', fontSize: 10, lineHeight: 1, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={(e) => setDraftFiles((prev) => [...prev, ...Array.from(e.target.files ?? [])])}
+              style={{ display: 'none' }}
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 10, background: GLASS_FILL, border: `1px solid ${GLASS_BORDER}`, color: 'rgba(255,255,255,.85)', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="5" width="18" height="14" rx="2" /><circle cx="12" cy="12" r="3.2" /><path d="M8 5l1.2-2h5.6L16 5" />
+              </svg>
+              Add photos
+            </button>
+            <button
+              onClick={submitEntry}
+              disabled={saving || (!draftNote.trim() && draftFiles.length === 0)}
+              style={{ marginLeft: 'auto', padding: '8px 18px', borderRadius: 10, background: 'linear-gradient(135deg, #f5a623, #f8c04a)', border: 'none', color: '#1a0800', fontSize: 12.5, fontWeight: 800, cursor: saving ? 'default' : 'pointer', fontFamily: 'inherit', opacity: saving || (!draftNote.trim() && draftFiles.length === 0) ? 0.5 : 1 }}
+            >
+              {saving ? 'Saving…' : 'Save entry'}
+            </button>
+          </div>
+        </div>
+
+        {/* entries */}
+        <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {entries === null && (
+            <span style={{ color: 'rgba(215,215,255,.5)', fontSize: 12.5, textAlign: 'center', padding: '12px 0' }}>Loading journal…</span>
+          )}
+          {entries?.length === 0 && (
+            <span style={{ color: 'rgba(215,215,255,.5)', fontSize: 12.5, textAlign: 'center', padding: '12px 0' }}>No entries yet — write your first note above ✍️</span>
+          )}
+          {entries?.map((entry) => (
+            <div key={entry.id} style={{ borderRadius: 16, background: 'rgba(255,255,255,.035)', border: '1px solid rgba(255,255,255,.08)', padding: '12px 14px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: 12.5, fontWeight: 700, color: ACCENT_LIGHT }}>{formatJournalDate(entry.entry_date)}</span>
+                <button
+                  onClick={() => setPendingDelete(entry)}
+                  aria-label="Delete entry"
+                  style={{ marginLeft: 'auto', width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(215,215,255,.35)' }}
+                >
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 3L13 13M13 3L3 13" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
+                </button>
+              </div>
+              {entry.note && (
+                <div style={{ marginTop: 6, fontSize: 13.5, color: 'rgba(255,255,255,.9)', lineHeight: 1.55, whiteSpace: 'pre-wrap' }}>{entry.note}</div>
+              )}
+              {(entry.journal_photos?.length ?? 0) > 0 && (
+                <div style={{ marginTop: 10, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
+                  {entry.journal_photos!.map((p) => {
+                    const url = journalPhotoUrl(p.storage_path)
+                    return (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img
+                        key={p.id}
+                        src={url}
+                        alt={p.caption ?? 'Trip photo'}
+                        onClick={() => setLightbox(url)}
+                        style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', borderRadius: 10, border: '1px solid rgba(255,255,255,.1)', cursor: 'pointer' }}
+                      />
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
+
+      {/* lightbox */}
+      {lightbox && (
+        <div
+          onClick={() => setLightbox(null)}
+          style={{ position: 'fixed', inset: 0, zIndex: 130, background: 'rgba(0,0,0,.88)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={lightbox} alt="Trip photo" style={{ maxWidth: '100%', maxHeight: '90svh', borderRadius: 14, objectFit: 'contain' }} />
+        </div>
+      )}
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        title="Delete journal entry?"
+        message="The note and its photos will be removed for everyone on this trip."
+        onConfirm={() => pendingDelete && deleteEntry(pendingDelete)}
+        onCancel={() => setPendingDelete(null)}
+      />
     </div>
   )
 }
@@ -1138,7 +1376,7 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId, members }
                 <BudgetTab trip={trip} expenses={expenses} loading={expensesLoading} members={members} currentUserId={currentUserId} onAdd={handleAddExpense} onDelete={handleDeleteExpense} />
               )}
               {activeSection === 'journal' && (
-                <JournalTab trip={trip} stops={stops} routeLegs={routeLegs} routePath={routePath} />
+                <JournalTab trip={trip} stops={stops} routeLegs={routeLegs} routePath={routePath} currentUserId={currentUserId} />
               )}
             </div>
             <BottomNav active={activeSection} onSelect={setActiveSection} />
