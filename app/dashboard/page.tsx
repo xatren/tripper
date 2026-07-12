@@ -19,7 +19,6 @@ export default async function DashboardPage() {
   const { data: trips } = await supabase
     .from('trips')
     .select('*')
-    .or(`owner_id.eq.${user.id},collaborator_id.eq.${user.id}`)
     .order('updated_at', { ascending: false });
 
   return <DashboardClient profile={profile} trips={trips ?? []} />;

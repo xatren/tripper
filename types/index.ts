@@ -47,6 +47,7 @@ export interface Pin {
 export interface Trip {
   id: string;
   owner_id: string;
+  /** @deprecated Collaboration is represented by trip_members. */
   collaborator_id?: string | null;
   title: string;
   description?: string | null;

@@ -103,16 +103,9 @@ export function DashboardClient({ profile, trips: initialTrips }: DashboardClien
   // ── handlers ─────────────────────────────────────────────────────────────
   const handleJoin = async (e: React.FormEvent) => {
     e.preventDefault(); setLoading(true); setError(null);
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { setError("Not authenticated"); setLoading(false); return; }
-    const { data: trip, error: findErr } = await supabase.from("trips").select("*").eq("invite_code", joinCode.trim().toUpperCase()).single();
-    if (findErr || !trip) { setError("Invalid invite code"); setLoading(false); return; }
-    if (trip.owner_id === user.id) { setError("You already own this trip"); setLoading(false); return; }
-    if (trip.collaborator_id)      { setError("This trip already has a collaborator"); setLoading(false); return; }
-    const { error: joinErr } = await supabase.from("trips").update({ collaborator_id: user.id }).eq("id", trip.id);
-    if (joinErr) { setError(joinErr.message); setLoading(false); return; }
-    setJoin(false);
-    router.push(`/trip/${trip.id}/mobile`);
+    const code = joinCode.trim();
+    if (!code) { setError("Enter an invite code"); setLoading(false); return; }
+    router.push(`/join/${encodeURIComponent(code)}`);
   };
 
   const [deleteTarget, setDeleteTarget] = useState<Trip | null>(null);

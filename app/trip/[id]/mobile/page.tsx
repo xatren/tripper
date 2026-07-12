@@ -22,19 +22,22 @@ export default async function TripMobilePage({ params }: TripMobilePageProps) {
 
   if (tripError || !trip) notFound();
 
-  if (trip.owner_id !== user.id && trip.collaborator_id !== user.id) notFound();
+  const { data: tripMembers } = await supabase
+    .from('trip_members')
+    .select('user_id')
+    .eq('trip_id', id);
 
-  const { data: stops } = await supabase
-    .from('stops')
-    .select('*')
-    .eq('trip_id', id)
-    .order('order_index', { ascending: true });
-
-  const memberIds = [trip.owner_id, trip.collaborator_id].filter(Boolean) as string[];
-  const { data: members } = await supabase
-    .from('profiles')
-    .select('*')
-    .in('id', memberIds);
+  const memberIds = tripMembers?.map((member) => member.user_id) ?? [];
+  const [{ data: stops }, { data: members }] = await Promise.all([
+    supabase
+      .from('stops')
+      .select('*')
+      .eq('trip_id', id)
+      .order('order_index', { ascending: true }),
+    memberIds.length > 0
+      ? supabase.from('profiles').select('*').in('id', memberIds)
+      : Promise.resolve({ data: [] }),
+  ]);
 
   return (
     <TripMobileClient

@@ -16,8 +16,7 @@ export default async function ProfilePage() {
 
   const { data: trips } = await supabase
     .from('trips')
-    .select('start_date, end_date, description')
-    .or(`owner_id.eq.${user.id},collaborator_id.eq.${user.id}`);
+    .select('start_date, end_date, description');
 
   return <ProfileClient profile={profile} trips={trips ?? []} />;
 }

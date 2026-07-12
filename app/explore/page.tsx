@@ -16,8 +16,7 @@ export default async function ExplorePage() {
 
   const { data: trips } = await supabase
     .from('trips')
-    .select('id, title, description, start_date, end_date, owner_id, countries')
-    .or(`owner_id.eq.${user.id},collaborator_id.eq.${user.id}`);
+    .select('id, title, description, start_date, end_date, owner_id, countries');
 
   return <ExploreClient profile={profile} trips={trips ?? []} />;
 }

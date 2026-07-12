@@ -14,33 +14,13 @@ export default async function JoinPage({ params }: JoinPageProps) {
     redirect(`/login?next=/join/${code}`);
   }
 
-  // Find trip by invite code
-  const { data: trip, error: tripError } = await supabase
-    .from('trips')
-    .select('id, title')
-    .eq('invite_code', code)
-    .single();
+  const { data: tripId, error: joinError } = await supabase.rpc('join_trip_by_invite', {
+    p_invite_code: code,
+  });
 
-  if (tripError || !trip) {
+  if (joinError || !tripId) {
     redirect('/dashboard?error=invalid_invite');
   }
 
-  // Check if already a member
-  const { data: existing } = await supabase
-    .from('trip_members')
-    .select('trip_id')
-    .eq('trip_id', trip.id)
-    .eq('user_id', user.id)
-    .single();
-
-  if (!existing) {
-    // Add as editor
-    await supabase.from('trip_members').insert({
-      trip_id: trip.id,
-      user_id: user.id,
-      role: 'editor',
-    });
-  }
-
-  redirect(`/trip/${trip.id}/mobile`);
+  redirect(`/trip/${tripId}/mobile`);
 }

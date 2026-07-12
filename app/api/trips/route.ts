@@ -56,12 +56,5 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  // Add owner as member
-  await supabase.from('trip_members').insert({
-    trip_id: trip.id,
-    user_id: user.id,
-    role: 'owner',
-  });
-
   return NextResponse.json(trip, { status: 201 });
 }
