@@ -2,12 +2,15 @@
 // to Instagram stories & friends. Pure client-side: draw → PNG blob →
 // navigator.share (with file support) or download fallback.
 
+import type { DistanceUnit } from './settings'
+
 interface RecapData {
   title: string
   dateRange: string
   routePath: { lat: number; lng: number }[]
   stops: { lat: number; lng: number; name: string }[]
-  distanceKm: number
+  distance: number
+  distanceUnit: DistanceUnit
   durationHours: number
   days: number
 }
@@ -124,7 +127,7 @@ export function renderRecapCanvas(data: RecapData): HTMLCanvasElement {
 
   // stats row
   const stats = [
-    { value: `${Math.round(data.distanceKm)}`, suffix: 'km', label: 'DISTANCE' },
+    { value: `${Math.round(data.distance)}`, suffix: data.distanceUnit, label: 'DISTANCE' },
     { value: `${Math.round(data.durationHours)}`, suffix: 'h', label: 'DRIVE TIME' },
     { value: `${data.days}`, suffix: '', label: 'DAYS' },
     { value: `${data.stops.length}`, suffix: '', label: 'STOPS' },

@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { MapPin, ArrowLeft, Eye, EyeOff } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { getSafeRedirectPath } from '@/lib/safe-redirect'
 
 /* ── Design tokens ─────────────────────────────────────────────────── */
 const C = {
@@ -109,15 +110,19 @@ export default function SignUpPage() {
 
   async function handleSignUp(e: React.FormEvent) {
     e.preventDefault()
-    if (password !== confirm) { setError('Şifreler eşleşmiyor'); return }
-    if (password.length < 6)  { setError('Şifre en az 6 karakter olmalı'); return }
+    if (password !== confirm) { setError('Passwords don\'t match'); return }
+    if (password.length < 6)  { setError('Password must be at least 6 characters'); return }
 
     setLoading(true); setError(null)
     const supabase = createClient()
+    const rawNext = new URLSearchParams(window.location.search).get('next')
+    const safeNext = getSafeRedirectPath(rawNext, window.location.origin)
+    const emailRedirectTo = new URL('/auth/callback', window.location.origin)
+    emailRedirectTo.searchParams.set('next', safeNext)
     const { error } = await supabase.auth.signUp({
       email, password,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: emailRedirectTo.toString(),
         data: {
           full_name:    displayName || email.split('@')[0],
           display_name: displayName || email.split('@')[0],
@@ -141,7 +146,7 @@ export default function SignUpPage() {
       <div style={{ position: 'relative', zIndex: 1, padding: '52px 20px 0' }}>
         <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: C.grayAtla, textDecoration: 'none', fontSize: 14, fontWeight: 500 }}>
           <ArrowLeft size={16} />
-          Geri
+          Back
         </Link>
       </div>
 
@@ -157,10 +162,10 @@ export default function SignUpPage() {
             <SmallIcon />
             <div>
               <h1 style={{ color: C.white, fontSize: 24, fontWeight: 800, letterSpacing: '-0.5px', margin: 0, lineHeight: 1.1 }}>
-                Hesap oluştur
+                Create account
               </h1>
               <p style={{ color: C.graySubLand, fontSize: 13, fontWeight: 400, margin: '4px 0 0' }}>
-                Macerana başlamak için kayıt ol
+                Sign up to start your adventure
               </p>
             </div>
           </div>
@@ -169,30 +174,30 @@ export default function SignUpPage() {
           <div style={{ background: C.glassFill, backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: `1px solid ${C.glassBorder}`, borderRadius: 20, padding: '24px 20px' }}>
             <form onSubmit={handleSignUp} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
 
-              <Field label="Ad Soyad">
+              <Field label="Full name">
                 <input
                   className="auth-input"
-                  type="text" placeholder="Adın Soyadın"
+                  type="text" placeholder="Your full name"
                   autoComplete="name"
                   value={displayName} onChange={e => setDisplayName(e.target.value)}
                 />
               </Field>
 
-              <Field label="E-posta">
+              <Field label="Email">
                 <input
                   className="auth-input"
-                  type="email" placeholder="sen@ornek.com"
+                  type="email" placeholder="you@example.com"
                   required autoComplete="email"
                   value={email} onChange={e => setEmail(e.target.value)}
                 />
               </Field>
 
-              <Field label="Şifre">
+              <Field label="Password">
                 <div style={{ position: 'relative' }}>
                   <input
                     className="auth-input"
                     type={showPass ? 'text' : 'password'}
-                    placeholder="En az 6 karakter"
+                    placeholder="At least 6 characters"
                     required autoComplete="new-password"
                     value={password} onChange={e => setPassword(e.target.value)}
                     style={{ paddingRight: 48 }}
@@ -204,12 +209,12 @@ export default function SignUpPage() {
                 </div>
               </Field>
 
-              <Field label="Şifre Tekrar">
+              <Field label="Confirm password">
                 <div style={{ position: 'relative' }}>
                   <input
                     className="auth-input"
                     type={showConfirm ? 'text' : 'password'}
-                    placeholder="Şifreni tekrar gir"
+                    placeholder="Re-enter your password"
                     required autoComplete="new-password"
                     value={confirm} onChange={e => setConfirm(e.target.value)}
                     style={{ paddingRight: 48 }}
@@ -246,8 +251,8 @@ export default function SignUpPage() {
                 <button type="submit" disabled={loading}
                   style={{ ...BTN_PRIMARY, marginTop: 4, opacity: loading ? 0.7 : 1 }}>
                   {loading
-                    ? <><Spinner />&nbsp;Hesap oluşturuluyor...</>
-                    : 'Kayıt Ol'}
+                    ? <><Spinner />&nbsp;Creating account...</>
+                    : 'Sign Up'}
                 </button>
               </Press>
             </form>
@@ -255,9 +260,9 @@ export default function SignUpPage() {
 
           {/* Footer link */}
           <p style={{ textAlign: 'center', color: C.grayBody, fontSize: 14, margin: 0 }}>
-            Zaten hesabın var mı?{' '}
+            Already have an account?{' '}
             <Link href="/login" style={{ color: C.amberMuted, textDecoration: 'none', fontWeight: 600 }}>
-              Giriş yap
+              Log in
             </Link>
           </p>
         </motion.div>

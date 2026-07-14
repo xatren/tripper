@@ -133,10 +133,10 @@ function HomeBar() {
 
 /* ── Onboarding screens ────────────────────────────────────────────── */
 const SCREENS = [
-  { emoji: '🗺️', title: 'Güzergahını çiz',    subtitle: 'Rotanı belirle, durakları ekle ve macerana hazırlan.' },
-  { emoji: '📍', title: 'Her durağı planla',  subtitle: 'Konaklama, aktiviteler ve fotoğraflarını stop bazında organize et.' },
-  { emoji: '👥', title: 'Arkadaşlarınla planla', subtitle: 'Davet kodu paylaş, birlikte gerçek zamanlı düzenleyin.' },
-  { emoji: '📍', title: 'Konumuna izin ver',  subtitle: 'Yakındaki yerleri bulmak ve güzergahını oluşturmak için konumuna ihtiyacımız var.', isPermission: true as const },
+  { emoji: '🗺️', title: 'Draw your route',    subtitle: 'Set your route, add stops, and get ready for your adventure.' },
+  { emoji: '📍', title: 'Plan every stop',  subtitle: 'Organize lodging, activities, and photos for each stop.' },
+  { emoji: '👥', title: 'Plan with friends', subtitle: 'Share an invite code and edit together in real time.' },
+  { emoji: '📍', title: 'Allow your location',  subtitle: 'We need your location to find nearby places and build your route.', isPermission: true as const },
 ] as const
 
 const STORAGE_KEY = 'tripper_onboarding_done'
@@ -215,7 +215,7 @@ export function MobileEntryFlow() {
           {/* Skip */}
           <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'flex-end', padding: '52px 24px 0' }}>
             <button onClick={finish} style={{ ...FONT, background: 'none', border: 'none', color: C.grayAtla, fontSize: 14, fontWeight: 500, cursor: 'pointer', letterSpacing: '-0.01em' }}>
-              Atla
+              Skip
             </button>
           </div>
 
@@ -292,15 +292,15 @@ export function MobileEntryFlow() {
 
             {isP ? (
               <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <Press><button onClick={askGeo} style={{ ...BTN_PRIMARY, width: '100%' }}>📍 Konuma İzin Ver</button></Press>
+                <Press><button onClick={askGeo} style={{ ...BTN_PRIMARY, width: '100%' }}>📍 Allow Location</button></Press>
                 <Press style={{ width: 'auto' }}>
                   <button onClick={next} style={{ ...FONT, background: 'none', border: 'none', color: C.grayAtla, fontSize: 13, cursor: 'pointer', paddingTop: 4, width: '100%' }}>
-                    Şimdi değil
+                    Not now
                   </button>
                 </Press>
               </div>
             ) : (
-              <Press><button onClick={next} style={{ ...BTN_PRIMARY, width: '100%' }}>Devam →</button></Press>
+              <Press><button onClick={next} style={{ ...BTN_PRIMARY, width: '100%' }}>Continue →</button></Press>
             )}
           </div>
           <HomeBar />
@@ -330,17 +330,17 @@ export function MobileEntryFlow() {
                 Tripper
               </h1>
               <p style={{ ...FONT, color: C.graySubLand, fontSize: 14, fontWeight: 400, margin: 0, letterSpacing: '-0.01em' }}>
-                Birlikte road trip planla
+                Plan road trips together
               </p>
             </div>
 
             {/* Badge pills */}
             <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 8, marginTop: 4 }}>
               {[
-                { icon: Map,        label: 'Harita'    },
-                { icon: Users,      label: 'İşbirliği' },
-                { icon: DollarSign, label: 'Bütçe'     },
-                { icon: MapPin,     label: 'Duraklar'  },
+                { icon: Map,        label: 'Map'        },
+                { icon: Users,      label: 'Collaborate' },
+                { icon: DollarSign, label: 'Budget'      },
+                { icon: MapPin,     label: 'Stops'       },
               ].map(({ icon: Icon, label }) => (
                 <span key={label} style={{
                   ...FONT,
@@ -365,7 +365,7 @@ export function MobileEntryFlow() {
           >
             <Press>
               <Link href="/login" style={{ textDecoration: 'none' }}>
-                <button style={{ ...BTN_PRIMARY, width: '100%' }}>Giriş Yap</button>
+                <button style={{ ...BTN_PRIMARY, width: '100%' }}>Log In</button>
               </Link>
             </Press>
 
@@ -377,7 +377,7 @@ export function MobileEntryFlow() {
                   color: C.offWhite, fontSize: 17, fontWeight: 700,
                   letterSpacing: '-0.01em', cursor: 'pointer',
                 }}>
-                  Kayıt Ol
+                  Sign Up
                 </div>
               </Link>
             </Press>
@@ -388,7 +388,7 @@ export function MobileEntryFlow() {
                 padding: '12px', color: C.amberMuted,
                 fontSize: 13, fontWeight: 500, textDecoration: 'none', letterSpacing: '-0.01em',
               }}>
-                Misafir olarak devam et →
+                Continue as guest →
               </Link>
             </Press>
           </motion.div>

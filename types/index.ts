@@ -63,52 +63,6 @@ export interface Profile {
 
 // ---- New schema types (stops / expenses / photos) ----
 
-/** Map pin / stop category (12-cell grid on Add Location). */
-export type StopPlaceCategory =
-  | 'hotel'
-  | 'restaurant'
-  | 'scenic_view'
-  | 'national_park'
-  | 'gas_station'
-  | 'hidden_spot'
-  | 'camping'
-  | 'coffee_stop'
-  | 'city'
-  | 'beach'
-  | 'museum'
-  | 'activity';
-
-export const STOP_PLACE_LABELS: Record<StopPlaceCategory, string> = {
-  hotel: 'Hotel',
-  restaurant: 'Restaurant',
-  scenic_view: 'Scenic View',
-  national_park: 'National Park',
-  gas_station: 'Gas Station',
-  hidden_spot: 'Hidden Spot',
-  camping: 'Camping',
-  coffee_stop: 'Coffee Stop',
-  city: 'City',
-  beach: 'Beach',
-  museum: 'Museum',
-  activity: 'Activity',
-};
-
-export interface NewStopPayload {
-  lat: number;
-  lng: number;
-  name: string;
-  address: string | null;
-  state: string | null;
-  description: string | null;
-  notes: string | null;
-  place_category: StopPlaceCategory;
-  rating: number | null;
-  estimated_cost: number | null;
-  day_number: number | null;
-  arrival_date: string | null;
-  is_favorite: boolean;
-}
-
 export interface Stop {
   id: string;
   trip_id: string;
@@ -123,8 +77,6 @@ export interface Stop {
   stop_type: 'origin' | 'destination' | 'waypoint' | 'overnight';
   created_by: string | null;
   created_at: string;
-  /** Present after migration `004_stops_place_fields`. */
-  place_category?: StopPlaceCategory | null;
   state?: string | null;
   notes?: string | null;
   rating?: number | null;
@@ -133,15 +85,6 @@ export interface Stop {
   is_favorite?: boolean | null;
   /** Present after migration `008_trip_persistence`. */
   nights?: number;
-}
-
-export interface Photo {
-  id: string;
-  stop_id: string;
-  blob_pathname: string;
-  caption: string | null;
-  uploaded_by: string | null;
-  created_at: string;
 }
 
 /** Daily journal entry (migration `011_journal`). */
@@ -195,136 +138,10 @@ export const EXPENSE_CATEGORIES: { value: ExpenseCategory; label: string }[] = [
   { value: 'other', label: 'Other' },
 ];
 
-/* ──────────────────────────────────────────────────────────
-   ACTIVITY / EXPLORE
-────────────────────────────────────────────────────────── */
-
-export type ActivityCategory =
-  | 'all'
-  | 'nature'
-  | 'culture'
-  | 'history'
-  | 'food'
-  | 'entertainment'
-
-export interface ActivityCategoryConfig {
-  label: string
-  icon: string
-  /** Hex color — used for map markers and UI accents */
-  color: string
-  /** Google Places types to query for this category */
-  types: string[]
-}
-
-export const ACTIVITY_CATEGORY_CONFIG: Record<ActivityCategory, ActivityCategoryConfig> = {
-  all: {
-    label: 'All',
-    icon: '⭐',
-    color: '#f59e0b',
-    types: ['tourist_attraction'],
-  },
-  nature: {
-    label: 'Nature & Parks',
-    icon: '🌲',
-    color: '#16a34a',
-    types: ['park', 'natural_feature', 'campground'],
-  },
-  culture: {
-    label: 'Culture',
-    icon: '🎨',
-    color: '#7c3aed',
-    types: ['museum', 'art_gallery', 'library'],
-  },
-  history: {
-    label: 'Historic',
-    icon: '🏛',
-    color: '#b45309',
-    types: ['tourist_attraction', 'church'],
-  },
-  food: {
-    label: 'Food & Drink',
-    icon: '🍜',
-    color: '#dc2626',
-    types: ['restaurant', 'cafe', 'bar'],
-  },
-  entertainment: {
-    label: 'Fun',
-    icon: '🎡',
-    color: '#0891b2',
-    types: ['amusement_park', 'night_club', 'movie_theater', 'bowling_alley'],
-  },
-}
-
-export interface ActivityResult {
-  placeId: string
-  name: string
-  address: string
-  lat: number
-  lng: number
-  rating?: number
-  userRatingsTotal?: number
-  priceLevel?: number
-  photoUrl?: string
-  /** Raw Google Places types */
-  types: string[]
-  /** Our category mapping */
-  category: ActivityCategory
-  /** Distance from the active stop in km */
-  distanceKm?: number
-}
-
-export interface Activity {
-  id: string
-  trip_id: string
-  stop_id: string | null
-  place_id: string | null
-  name: string
-  address: string | null
-  lat: number | null
-  lng: number | null
-  category: ActivityCategory
-  google_types: string[] | null
-  photo_url: string | null
-  rating: number | null
-  user_ratings_total: number | null
-  day_number: number | null
-  scheduled_at: string | null
-  time_of_day: string | null   // "HH:MM" — local time display
-  order_index: number
-  duration_mins: number | null
-  notes: string | null
-  estimated_cost: number | null
-  is_completed: boolean
-  created_by: string | null
-  created_at: string
-}
-
-/** Hotel result from Google Places nearby search. */
-export interface HotelResult {
-  placeId: string
-  name: string
-  address: string
-  lat: number
-  lng: number
-  rating?: number
-  userRatingsTotal?: number
-  priceLevel?: number
-  photoUrl?: string
-}
-
 /** Driving route segment fetched from the Directions API. */
 export interface RouteSegment {
   durationText: string;          // e.g. "2 hours 15 mins"
   durationSeconds: number;
-  distanceText: string;          // e.g. "234 km"
   distanceMeters: number;
   polylinePath: { lat: number; lng: number }[];
-}
-
-/** Stable cache key for a segment between two positions. */
-export function segmentKey(
-  aLat: number, aLng: number,
-  bLat: number, bLng: number,
-): string {
-  return `${aLat.toFixed(5)},${aLng.toFixed(5)}-${bLat.toFixed(5)},${bLng.toFixed(5)}`
 }

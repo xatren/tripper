@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { animate } from 'framer-motion'
 import { RouteReplayMap, type RouteReplayPoint } from './RouteReplayMap'
+import type { DistanceUnit } from '@/lib/settings'
 
 const ACCENT = '#f5a623'
 const GLASS_BORDER = 'rgba(255,255,255,.13)'
@@ -12,7 +13,8 @@ export interface TripSummaryHeroProps {
   dateRange: string
   points: RouteReplayPoint[]
   routePath: { lat: number; lng: number }[]
-  distanceKm: number
+  distance: number
+  distanceUnit: DistanceUnit
   durationHours: number
   days: number
 }
@@ -31,8 +33,8 @@ function useCountUp(target: number, durationMs = 1400, delayMs = 300) {
   return value
 }
 
-export function TripSummaryHero({ title, dateRange, points, routePath, distanceKm, durationHours, days }: TripSummaryHeroProps) {
-  const distance = useCountUp(distanceKm)
+export function TripSummaryHero({ title, dateRange, points, routePath, distance: distanceValue, distanceUnit, durationHours, days }: TripSummaryHeroProps) {
+  const distance = useCountUp(distanceValue)
   const duration = useCountUp(durationHours, 1400, 500)
   const dayCount = useCountUp(days, 1000, 700)
 
@@ -59,7 +61,7 @@ export function TripSummaryHero({ title, dateRange, points, routePath, distanceK
 
       {/* stat row */}
       <div style={{ display: 'flex', padding: '16px 20px 20px', gap: 8 }}>
-        <StatCell label="DISTANCE" value={`${Math.round(distance)}`} suffix="km" />
+        <StatCell label="DISTANCE" value={`${Math.round(distance)}`} suffix={distanceUnit} />
         <StatCell label="DRIVE TIME" value={`${Math.round(duration)}`} suffix="h" />
         <StatCell label="DAYS" value={`${Math.round(dayCount)}`} suffix="" />
         <StatCell label="STOPS" value={`${points.length}`} suffix="" />

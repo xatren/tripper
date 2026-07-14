@@ -12,15 +12,9 @@ function formatDuration(seconds: number): string {
   return h > 0 ? `${h}h ${m}min` : `${m}min`
 }
 
-function formatDistance(meters: number): string {
-  const km = meters / 1000
-  return km >= 10 ? `${Math.round(km)} km` : `${km.toFixed(1)} km`
-}
-
 export interface RouteLeg {
   durationText: string
   durationSeconds: number
-  distanceText: string
   distanceMeters: number
 }
 
@@ -60,7 +54,6 @@ export async function getFullRoute(points: LatLng[], opts?: { signal?: AbortSign
       route: {
         durationText: formatDuration(route.duration),
         durationSeconds: Math.round(route.duration),
-        distanceText: formatDistance(route.distance),
         distanceMeters: Math.round(route.distance),
         polylinePath: (route.geometry?.coordinates ?? []).map(([lng, lat]: [number, number]) => ({ lat, lng })),
       },
@@ -68,7 +61,6 @@ export async function getFullRoute(points: LatLng[], opts?: { signal?: AbortSign
         ? route.legs.map((leg: { duration: number; distance: number }) => ({
             durationText: formatDuration(leg.duration),
             durationSeconds: Math.round(leg.duration),
-            distanceText: formatDistance(leg.distance),
             distanceMeters: Math.round(leg.distance),
           }))
         : [],

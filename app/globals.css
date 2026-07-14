@@ -126,13 +126,3 @@
 .auth-input::placeholder {
   color: #363650;
 }
-
-/* Google Maps dark theme overrides */
-.gm-style .gm-style-iw-c {
-  background: hsl(240 12% 9%) !important;
-  border: 1px solid hsl(240 8% 18%) !important;
-  border-radius: 12px !important;
-}
-.gm-style-iw-tc::after {
-  background: hsl(240 12% 9%) !important;
-}

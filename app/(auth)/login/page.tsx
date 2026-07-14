@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { MapPin, ArrowLeft, Eye, EyeOff } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { getSafeRedirectPath } from '@/lib/safe-redirect'
 
 /* ── Design tokens ─────────────────────────────────────────────────── */
 const C = {
@@ -110,14 +111,21 @@ export default function LoginPage() {
     setLoading(true); setError(null)
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) { setError(error.message); setLoading(false) }
-    else router.push('/dashboard')
+    else {
+      const rawNext = new URLSearchParams(window.location.search).get('next')
+      router.push(getSafeRedirectPath(rawNext, window.location.origin))
+    }
   }
 
   async function handleGoogle() {
     setGoogleLoading(true); setError(null)
+    const rawNext = new URLSearchParams(window.location.search).get('next')
+    const safeNext = getSafeRedirectPath(rawNext, window.location.origin)
+    const callbackUrl = new URL('/auth/callback', window.location.origin)
+    callbackUrl.searchParams.set('next', safeNext)
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      options: { redirectTo: callbackUrl.toString() },
     })
     if (error) { setError(error.message); setGoogleLoading(false) }
   }
@@ -134,7 +142,7 @@ export default function LoginPage() {
       <div style={{ position: 'relative', zIndex: 1, padding: '52px 20px 0' }}>
         <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: C.grayAtla, textDecoration: 'none', fontSize: 14, fontWeight: 500 }}>
           <ArrowLeft size={16} />
-          Geri
+          Back
         </Link>
       </div>
 
@@ -150,10 +158,10 @@ export default function LoginPage() {
             <SmallIcon />
             <div>
               <h1 style={{ color: C.white, fontSize: 24, fontWeight: 800, letterSpacing: '-0.5px', margin: 0, lineHeight: 1.1 }}>
-                Tekrar hoş geldin
+                Welcome back
               </h1>
               <p style={{ color: C.graySubLand, fontSize: 13, fontWeight: 400, margin: '4px 0 0' }}>
-                Macerana devam etmek için giriş yap
+                Sign in to continue your adventure
               </p>
             </div>
           </div>
@@ -167,14 +175,14 @@ export default function LoginPage() {
                 {googleLoading
                   ? <Spinner />
                   : <GoogleIcon />}
-                {googleLoading ? 'Giriş yapılıyor...' : 'Google ile devam et'}
+                {googleLoading ? 'Signing in...' : 'Continue with Google'}
               </button>
             </Press>
 
             {/* Divider */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <div style={{ flex: 1, height: 1, background: C.glassBorder }} />
-              <span style={{ color: C.grayAtla, fontSize: 12, fontWeight: 500 }}>veya</span>
+              <span style={{ color: C.grayAtla, fontSize: 12, fontWeight: 500 }}>or</span>
               <div style={{ flex: 1, height: 1, background: C.glassBorder }} />
             </div>
 
@@ -182,11 +190,11 @@ export default function LoginPage() {
             <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 <label style={{ color: C.offWhite, fontSize: 13, fontWeight: 500, letterSpacing: '-0.01em' }}>
-                  E-posta
+                  Email
                 </label>
                 <input
                   className="auth-input"
-                  type="email" placeholder="sen@ornek.com"
+                  type="email" placeholder="you@example.com"
                   required autoComplete="email"
                   value={email} onChange={e => setEmail(e.target.value)}
                 />
@@ -194,13 +202,13 @@ export default function LoginPage() {
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 <label style={{ color: C.offWhite, fontSize: 13, fontWeight: 500, letterSpacing: '-0.01em' }}>
-                  Şifre
+                  Password
                 </label>
                 <div style={{ position: 'relative' }}>
                   <input
                     className="auth-input"
                     type={showPass ? 'text' : 'password'}
-                    placeholder="En az 6 karakter"
+                    placeholder="At least 6 characters"
                     required autoComplete="current-password"
                     value={password} onChange={e => setPassword(e.target.value)}
                     style={{ paddingRight: 48 }}
@@ -220,7 +228,7 @@ export default function LoginPage() {
 
               <Press>
                 <button type="submit" disabled={loading} style={{ ...BTN_PRIMARY, marginTop: 4, opacity: loading ? 0.7 : 1 }}>
-                  {loading ? <><Spinner />&nbsp;Giriş yapılıyor...</> : 'Giriş Yap'}
+                  {loading ? <><Spinner />&nbsp;Signing in...</> : 'Log In'}
                 </button>
               </Press>
             </form>
@@ -228,9 +236,9 @@ export default function LoginPage() {
 
           {/* Footer link */}
           <p style={{ textAlign: 'center', color: C.grayBody, fontSize: 14, margin: 0 }}>
-            Hesabın yok mu?{' '}
+            Don&apos;t have an account?{' '}
             <Link href="/sign-up" style={{ color: C.amberMuted, textDecoration: 'none', fontWeight: 600 }}>
-              Kayıt ol
+              Sign up
             </Link>
           </p>
         </motion.div>

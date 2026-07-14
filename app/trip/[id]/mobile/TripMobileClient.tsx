@@ -37,6 +37,7 @@ import { fetchWeatherForStops, type DayWeather, type WeatherKind } from '@/lib/w
 import { getOptimizedOrder } from '@/lib/mapbox/optimize'
 import { downloadTripIcs } from '@/lib/ics'
 import { shareTripRecap } from '@/lib/recap-image'
+import { useDistanceUnit, formatDistanceValue, convertKm } from '@/lib/settings'
 
 const ACCENT = '#f5a623'
 const ACCENT_LIGHT = '#f8c04a'
@@ -909,6 +910,7 @@ function JournalTab({
   routePath: { lat: number; lng: number }[]
   currentUserId: string
 }) {
+  const distanceUnit = useDistanceUnit()
   const [sharing, setSharing] = useState(false)
   const [entries, setEntriesState] = useState<JournalEntry[] | null>(() => journalCache.get(trip.id) ?? null)
   const [entriesError, setEntriesError] = useState(false)
@@ -1069,6 +1071,7 @@ function JournalTab({
 
   const points = stops.map((s, i) => ({ id: s.id, lat: s.lat, lng: s.lng, label: i + 1, title: s.name }))
   const distanceKm = routeLegs.reduce((sum, l) => sum + l.distanceMeters, 0) / 1000
+  const distanceValue = convertKm(distanceKm, distanceUnit)
   const durationHours = routeLegs.reduce((sum, l) => sum + l.durationSeconds, 0) / 3600
   const days = trip.start_date && trip.end_date ? totalNights(trip) + 1 : stops.length
   const recapReady = stops.length >= 2 && routePath.length >= 2
@@ -1084,7 +1087,8 @@ function JournalTab({
             dateRange={formatDateRange(trip.start_date, trip.end_date) || 'Dates not set'}
             points={points}
             routePath={routePath}
-            distanceKm={distanceKm}
+            distance={distanceValue}
+            distanceUnit={distanceUnit}
             durationHours={durationHours}
             days={days}
           />
@@ -1097,7 +1101,8 @@ function JournalTab({
                 dateRange: formatDateRange(trip.start_date, trip.end_date) || 'Dates not set',
                 routePath,
                 stops: stops.map((s) => ({ lat: s.lat, lng: s.lng, name: s.name })),
-                distanceKm,
+                distance: distanceValue,
+                distanceUnit,
                 durationHours,
                 days,
               })
@@ -1208,7 +1213,7 @@ function JournalTab({
             </div>
           )}
           {draftPhotos.some((p) => p.status === 'offline') && (
-            <div style={{ fontSize: 11.5, color: '#fbbf24', fontWeight: 600 }}>Offline — photos will upload once you're back online.</div>
+            <div style={{ fontSize: 11.5, color: '#fbbf24', fontWeight: 600 }}>Offline — photos will upload once you&apos;re back online.</div>
           )}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <input
@@ -1391,6 +1396,7 @@ const topBtnStyle: CSSProperties = {
 
 function TripMobileContent({ trip, stops: initialStops, currentUserId, members }: TripMobileClientProps) {
   const router = useRouter()
+  const distanceUnit = useDistanceUnit()
   const [stops, setStops] = useState(initialStops)
   const [activeSection, setActiveSection] = useState<Section>('plan')
   const [activeTab, setActiveTab] = useState<'route' | 'days' | 'bookings'>('route')
@@ -1716,7 +1722,7 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId, members }
 
   const stopSchedule = computeStopSchedule(trip.start_date, stops, nights)
   const routeLoading = stops.length >= 2 && routeLegs.length === 0
-  const summaryKm = Math.round(routeLegs.reduce((sum, l) => sum + l.distanceMeters, 0) / 1000)
+  const summaryDistanceText = formatDistanceValue(routeLegs.reduce((sum, l) => sum + l.distanceMeters, 0), distanceUnit)
   const summaryMin = Math.round(routeLegs.reduce((sum, l) => sum + l.durationSeconds, 0) / 60)
   const summaryDuration = `${Math.floor(summaryMin / 60)}h ${String(summaryMin % 60).padStart(2, '0')}m`
   const nightsTotal = totalNights(trip)
@@ -1873,7 +1879,7 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId, members }
                 ) : (
                   <>
                     <span aria-hidden="true" style={{ width: 3, height: 3, borderRadius: '50%', background: 'rgba(215,215,255,.35)' }} />
-                    <span>{summaryKm.toLocaleString('en-US')} km</span>
+                    <span>{summaryDistanceText}</span>
                     <span aria-hidden="true" style={{ width: 3, height: 3, borderRadius: '50%', background: 'rgba(215,215,255,.35)' }} />
                     <span>{summaryDuration}</span>
                   </>
@@ -2060,7 +2066,7 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId, members }
                                   <svg width="11" height="11" viewBox="0 0 16 16" fill="none" style={{ flex: 'none' }}>
                                     <path d="M2 12L6 4L9 9L11 6L14 12" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
                                   </svg>
-                                  {routeLegs[idx].distanceText}
+                                  {formatDistanceValue(routeLegs[idx].distanceMeters, distanceUnit)}
                                 </span>
                                 <span style={{ width: 3, height: 3, borderRadius: '50%', background: 'rgba(215,215,255,.35)', flex: 'none' }} />
                                 <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: 'rgba(215,215,255,.55)', fontWeight: 500, whiteSpace: 'nowrap' }}>
@@ -2152,7 +2158,8 @@ function OptimizePreviewSheet({
   onApply: () => void
   onDismiss: () => void
 }) {
-  const km = preview ? Math.abs(preview.savedDistanceMeters) / 1000 : 0
+  const distanceUnit = useDistanceUnit()
+  const distanceText = preview ? formatDistanceValue(Math.abs(preview.savedDistanceMeters), distanceUnit) : ''
   const min = preview ? Math.round(Math.abs(preview.savedDurationSeconds) / 60) : 0
   const improved = (preview?.savedDistanceMeters ?? 0) > 0 || (preview?.savedDurationSeconds ?? 0) > 0
 
@@ -2197,7 +2204,7 @@ function OptimizePreviewSheet({
             <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
               <div style={{ flex: 1, borderRadius: 14, padding: '12px 14px', background: 'rgba(245,166,35,.1)', border: '1px solid rgba(245,166,35,.3)' }}>
                 <div style={{ fontSize: 20, fontWeight: 800, color: ACCENT_LIGHT }}>
-                  {improved ? '−' : ''}{km.toFixed(km >= 10 ? 0 : 1)} km
+                  {improved ? '−' : ''}{distanceText}
                 </div>
                 <div style={{ fontSize: 11, color: 'rgba(215,215,255,.55)', marginTop: 2 }}>distance</div>
               </div>
@@ -2253,6 +2260,7 @@ function SortableStopItem({ id, children }: {
 }
 
 function DaysTab({ stops, routeLegs, schedule, tripName }: { stops: Stop[]; routeLegs: RouteLeg[]; schedule: StopSchedule[]; tripName: string }) {
+  const distanceUnit = useDistanceUnit()
   const [expanded, setExpanded] = useState<Record<string, boolean>>({})
   const [weather, setWeather] = useState<Record<string, DayWeather | null>>({})
 
@@ -2324,7 +2332,7 @@ function DaysTab({ stops, routeLegs, schedule, tripName }: { stops: Stop[]; rout
                   <div style={{ width: '100%', height: 2, background: 'linear-gradient(to right, transparent, #8888e4, transparent)' }} />
                   <div style={{ fontSize: 10.5, color: 'rgba(215,215,255,.6)', fontWeight: 600, whiteSpace: 'nowrap' }}>
                     {leg
-                      ? `${leg.durationText} · ${leg.distanceText}`
+                      ? `${leg.durationText} · ${formatDistanceValue(leg.distanceMeters, distanceUnit)}`
                       : <span aria-hidden="true" style={{ display: 'inline-block', width: 64, height: 8, borderRadius: 999, background: 'rgba(255,255,255,.12)', animation: 'pulseglow 1.6s ease-in-out infinite' }} />}
                   </div>
                 </div>
