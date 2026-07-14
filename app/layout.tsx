@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import localFont from 'next/font/local';
 import { Inter } from 'next/font/google';
 import { RegisterSW } from '@/components/pwa/RegisterSW';
+import { Toaster } from '@/components/ui/toast';
 import './globals.css';
 
 const geistSans = localFont({
@@ -45,6 +46,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} antialiased bg-[#0A0A0F] text-white`}
       >
         {children}
+        <Toaster />
         <RegisterSW />
       </body>
     </html>

@@ -10,16 +10,10 @@ export default async function DashboardPage() {
     redirect('/login');
   }
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single();
-
-  const { data: trips } = await supabase
-    .from('trips')
-    .select('*')
-    .order('updated_at', { ascending: false });
+  const [{ data: profile }, { data: trips }] = await Promise.all([
+    supabase.from('profiles').select('*').eq('id', user.id).single(),
+    supabase.from('trips').select('*').order('updated_at', { ascending: false }),
+  ]);
 
   return <DashboardClient profile={profile} trips={trips ?? []} />;
 }

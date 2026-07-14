@@ -17,7 +17,7 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { showToast, Toaster } from "@/components/ui/toast";
+import { showToast } from "@/components/ui/toast";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { AppBottomNav } from "@/components/ui/AppBottomNav";
 
@@ -314,7 +314,6 @@ export function DashboardClient({ profile, trips: initialTrips }: DashboardClien
         }}
         onCancel={() => setDeleteTarget(null)}
       />
-      <Toaster />
     </div>
   );
 }

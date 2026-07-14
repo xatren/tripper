@@ -2,19 +2,36 @@
 
 import { useState, useCallback, useEffect, useRef, type CSSProperties } from 'react'
 import { useRouter } from 'next/navigation'
-import { motion, useMotionValue, animate } from 'framer-motion'
+import dynamic from 'next/dynamic'
+import { motion, AnimatePresence, useMotionValue, animate } from 'framer-motion'
 import { DndContext, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from '@dnd-kit/sortable'
 import { CSS as DndCSS } from '@dnd-kit/utilities'
 import { SegmentedTabs } from '@/components/ui/segmented-tabs'
 import { createClient } from '@/lib/supabase/client'
-import { TripboxMap } from '@/components/map/mapbox/TripboxMap'
+const TripboxMap = dynamic(
+  () => import('@/components/map/mapbox/TripboxMap').then((m) => m.TripboxMap),
+  {
+    ssr: false,
+    // Static gradient placeholder while the mapbox-gl chunk downloads —
+    // matches the map layer's dark backdrop so there's no flash.
+    loading: () => (
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'radial-gradient(120% 90% at 50% 10%, #12123a 0%, #0a0a28 55%, #06061c 100%)',
+        }}
+      />
+    ),
+  },
+)
 import { getFullRoute, type RouteLeg } from '@/lib/mapbox/directions'
 import { forwardSearch, type GeocodeResult } from '@/lib/mapbox/geocoding'
 import type { Trip, Stop, Expense, ExpenseCategory, Profile, JournalEntry } from '@/types'
 import { EXPENSE_CATEGORIES, CURRENCY_SYMBOLS } from '@/types'
 import { TripSummaryHero } from '@/components/journal/TripSummaryHero'
-import { showToast, Toaster } from '@/components/ui/toast'
+import { showToast } from '@/components/ui/toast'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { fetchWeatherForStops, type DayWeather, type WeatherKind } from '@/lib/weather/openMeteo'
 import { getOptimizedOrder } from '@/lib/mapbox/optimize'
@@ -567,6 +584,22 @@ function BudgetTab({
   const [draftPayer, setDraftPayer] = useState<Record<string, string>>({})
   const [submitting, setSubmitting] = useState<string | null>(null)
 
+  // Detects which category a newly-added expense belongs to (by diffing ids,
+  // not by hooking submitExpense) so the ring pulses no matter where the
+  // expense came from. Cleared after the pulse has had time to play.
+  const [justUpdatedCat, setJustUpdatedCat] = useState<string | null>(null)
+  const prevExpenseIdsRef = useRef<Set<string>>(new Set(expenses.map((e) => e.id)))
+  useEffect(() => {
+    const prevIds = prevExpenseIdsRef.current
+    const added = expenses.find((e) => !prevIds.has(e.id))
+    prevExpenseIdsRef.current = new Set(expenses.map((e) => e.id))
+    if (added) {
+      setJustUpdatedCat(added.category)
+      const t = setTimeout(() => setJustUpdatedCat(null), 900)
+      return () => clearTimeout(t)
+    }
+  }, [expenses])
+
   const partner = members.find((m) => m.id !== currentUserId) ?? null
   const partnerName = partner
     ? partner.display_name?.split(' ')[0] ?? partner.email?.split('@')[0] ?? 'Partner'
@@ -604,20 +637,35 @@ function BudgetTab({
               {sym}{formatMoney(spent)} of {sym}{formatMoney(total)} spent
             </div>
           </div>
-          <div style={{ fontSize: 20, fontWeight: 800, color: overBudget ? '#f87171' : ACCENT_LIGHT }}>
+          <div style={{ fontSize: 20, fontWeight: 800, color: ACCENT_LIGHT }}>
             {total > 0 ? `${pct}%` : '—'}
           </div>
         </div>
         <div style={{ height: 6, borderRadius: 999, background: 'rgba(255,255,255,.08)', overflow: 'hidden' }}>
-          <div style={{ height: '100%', width: `${pct}%`, borderRadius: 999, background: overBudget ? 'linear-gradient(90deg, #dc2626, #f87171)' : `linear-gradient(90deg, ${ACCENT_DARK}, ${ACCENT_LIGHT})`, transition: 'width .3s ease' }} />
+          <div style={{ height: '100%', width: `${pct}%`, borderRadius: 999, background: `linear-gradient(90deg, ${ACCENT_DARK}, ${ACCENT_LIGHT})`, transition: 'width .3s ease' }} />
         </div>
-        <div style={{ marginTop: 10, fontSize: 12.5, fontWeight: 600, color: overBudget ? '#f87171' : 'rgba(215,215,255,.6)' }}>
-          {total <= 0
-            ? 'No budget set for this trip'
-            : overBudget
-              ? `${sym}${formatMoney(Math.abs(remaining))} over budget`
-              : `${sym}${formatMoney(remaining)} remaining`}
-        </div>
+        {total > 0 && overBudget ? (
+          <button
+            type="button"
+            onClick={() => setExpanded(Object.fromEntries(EXPENSE_CATEGORIES.map((c) => [c.value, true])))}
+            style={{
+              marginTop: 10, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '10px 14px', borderRadius: 12, background: 'rgba(245,166,35,.14)', border: '1px solid rgba(245,166,35,.4)',
+              cursor: 'pointer', fontFamily: 'inherit',
+            }}
+          >
+            <span style={{ fontSize: 12.5, fontWeight: 700, color: ACCENT_LIGHT }}>
+              Budget needs attention · {sym}{formatMoney(Math.abs(remaining))} over
+            </span>
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style={{ flex: 'none' }}>
+              <path d="M6 4L10 8L6 12" stroke={ACCENT_LIGHT} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        ) : (
+          <div style={{ marginTop: 10, fontSize: 12.5, fontWeight: 600, color: 'rgba(215,215,255,.6)' }}>
+            {total <= 0 ? 'No budget set for this trip' : `${sym}${formatMoney(remaining)} remaining`}
+          </div>
+        )}
       </div>
 
       {error && !loading && (
@@ -658,6 +706,12 @@ function BudgetTab({
         const list = expenses.filter((e) => e.category === cat)
         const catSpent = list.reduce((sum, e) => sum + Number(e.amount), 0)
         const isOpen = !!expanded[cat]
+        // Ring shows this category's share of the trip's total budget; pulses
+        // briefly whenever a new expense in this category lands.
+        const catPct = total > 0 ? Math.min(100, (catSpent / total) * 100) : 0
+        const CAT_RING_R = 14
+        const catRingCircumference = 2 * Math.PI * CAT_RING_R
+        const justUpdated = cat === justUpdatedCat
         return (
           <div key={cat} style={{ background: GLASS_FILL, border: `1px solid ${GLASS_BORDER}`, borderRadius: 20, backdropFilter: 'blur(20px)', boxShadow: '0 6px 20px rgba(0,0,0,.2)', overflow: 'hidden' }}>
             <button
@@ -666,8 +720,26 @@ function BudgetTab({
               aria-expanded={isOpen}
               style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: 16, cursor: 'pointer', background: 'none', border: 'none', textAlign: 'left', fontFamily: 'inherit', color: 'inherit' }}
             >
-              <span style={{ width: 34, height: 34, borderRadius: 12, background: `${ACCENT}1a`, border: `1px solid ${ACCENT}40`, display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none' }}>
-                {EXPENSE_CATEGORY_ICONS[cat](ACCENT_LIGHT)}
+              <span style={{ width: 34, height: 34, borderRadius: 12, position: 'relative', flex: 'none' }}>
+                <svg width="34" height="34" viewBox="0 0 34 34" style={{ position: 'absolute', inset: 0, transform: 'rotate(-90deg)' }} aria-hidden="true">
+                  <circle cx="17" cy="17" r={CAT_RING_R} fill="none" stroke={`${ACCENT}1a`} strokeWidth="3" />
+                  {total > 0 && (
+                    <circle
+                      cx="17" cy="17" r={CAT_RING_R} fill="none"
+                      stroke={ACCENT_LIGHT} strokeWidth="3" strokeLinecap="round"
+                      strokeDasharray={catRingCircumference}
+                      strokeDashoffset={catRingCircumference * (1 - catPct / 100)}
+                      style={{
+                        transformOrigin: '17px 17px',
+                        transform: justUpdated ? 'scale(1.18)' : 'scale(1)',
+                        transition: 'stroke-dashoffset .6s cubic-bezier(.22,.9,.32,1.2), transform .45s cubic-bezier(.34,1.56,.64,1)',
+                      }}
+                    />
+                  )}
+                </svg>
+                <span style={{ position: 'absolute', inset: 5, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', background: `${ACCENT}1a`, border: `1px solid ${ACCENT}40` }}>
+                  {EXPENSE_CATEGORY_ICONS[cat](ACCENT_LIGHT)}
+                </span>
               </span>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 14.5, fontWeight: 700 }}>{label}</div>
@@ -791,6 +863,43 @@ function journalPhotoUrl(path: string): string {
   return createClient().storage.from(JOURNAL_BUCKET).getPublicUrl(path).data.publicUrl
 }
 
+interface DraftPhoto {
+  id: string
+  file: File
+  /** Local object URL — the thumbnail shown while the real upload is still in flight. */
+  previewUrl: string
+  status: 'queued' | 'uploading' | 'done' | 'error' | 'offline'
+  progress: number
+  storagePath?: string
+}
+
+/**
+ * Uploads straight to the Storage REST endpoint via XHR (bypassing supabase-js's
+ * fetch-based client) so we get real `upload.onprogress` byte counts — the
+ * supabase-js storage client doesn't expose progress at all.
+ */
+function uploadPhotoWithProgress(accessToken: string, path: string, blob: Blob, onProgress: (pct: number) => void): Promise<void> {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const apiKey = (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)!
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest()
+    xhr.open('POST', `${supabaseUrl}/storage/v1/object/${JOURNAL_BUCKET}/${path}`)
+    xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`)
+    xhr.setRequestHeader('apikey', apiKey)
+    xhr.setRequestHeader('Content-Type', 'image/jpeg')
+    xhr.setRequestHeader('x-upsert', 'false')
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100))
+    }
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) resolve()
+      else reject(new Error(`Upload failed (${xhr.status})`))
+    }
+    xhr.onerror = () => reject(new Error('Network error'))
+    xhr.send(blob)
+  })
+}
+
 function JournalTab({
   trip, stops, routeLegs, routePath, currentUserId,
 }: {
@@ -814,7 +923,7 @@ function JournalTab({
     })
   const [draftNote, setDraftNote] = useState('')
   const [draftDate, setDraftDate] = useState(todayIso())
-  const [draftFiles, setDraftFiles] = useState<File[]>([])
+  const [draftPhotos, setDraftPhotos] = useState<DraftPhoto[]>([])
   const [saving, setSaving] = useState(false)
   const [pendingDelete, setPendingDelete] = useState<JournalEntry | null>(null)
   const [lightbox, setLightbox] = useState<string | null>(null)
@@ -857,9 +966,58 @@ function JournalTab({
     return () => document.removeEventListener('keydown', onKeyDown)
   }, [lightbox])
 
+  // Connection comes back → anything parked as 'offline' re-joins the queue.
+  useEffect(() => {
+    const onOnline = () => setDraftPhotos((prev) => prev.map((p) => (p.status === 'offline' ? { ...p, status: 'queued' } : p)))
+    window.addEventListener('online', onOnline)
+    return () => window.removeEventListener('online', onOnline)
+  }, [])
+
+  // Upload queue: one photo in flight at a time. Each photo uploads to Storage
+  // as soon as it's added (independent of "Save entry"), with real byte
+  // progress; a lost connection parks it as 'offline' instead of erroring, and
+  // it resumes automatically via the listener above once the browser reconnects.
+  useEffect(() => {
+    if (draftPhotos.some((p) => p.status === 'uploading')) return
+    const next = draftPhotos.find((p) => p.status === 'queued')
+    if (!next) return
+
+    if (!navigator.onLine) {
+      setDraftPhotos((prev) => prev.map((p) => (p.id === next.id ? { ...p, status: 'offline' } : p)))
+      return
+    }
+
+    let cancelled = false
+    setDraftPhotos((prev) => prev.map((p) => (p.id === next.id ? { ...p, status: 'uploading', progress: 0 } : p)))
+    ;(async () => {
+      try {
+        const supabase = createClient()
+        const { data: { session } } = await supabase.auth.getSession()
+        if (!session) throw new Error('Not signed in')
+        const blob = await compressJournalPhoto(next.file)
+        const path = `${trip.id}/${crypto.randomUUID()}.jpg`
+        await uploadPhotoWithProgress(session.access_token, path, blob, (pct) => {
+          if (!cancelled) setDraftPhotos((prev) => prev.map((p) => (p.id === next.id ? { ...p, progress: pct } : p)))
+        })
+        if (cancelled) return
+        setDraftPhotos((prev) => prev.map((p) => (p.id === next.id ? { ...p, status: 'done', progress: 100, storagePath: path } : p)))
+      } catch {
+        if (cancelled) return
+        setDraftPhotos((prev) => prev.map((p) => (p.id === next.id ? { ...p, status: navigator.onLine ? 'error' : 'offline' } : p)))
+      }
+    })()
+    return () => { cancelled = true }
+  }, [draftPhotos, trip.id])
+
+  // Photos upload independently as soon as they're added (see the queue effect
+  // above); Save just waits for that queue to settle, then links whichever
+  // photos made it to Storage to the new entry.
+  const photosSettled = draftPhotos.every((p) => p.status === 'done' || p.status === 'error')
+  const hasContent = draftNote.trim().length > 0 || draftPhotos.some((p) => p.status === 'done')
+
   const submitEntry = async () => {
     const note = draftNote.trim()
-    if (saving || (!note && draftFiles.length === 0)) return
+    if (saving || !photosSettled || !hasContent) return
     setSaving(true)
     const supabase = createClient()
     const { data: entry, error } = await supabase
@@ -872,30 +1030,25 @@ function JournalTab({
       showToast("Couldn't save the entry. Run migration 011 first?", 'error', { label: 'Retry', onClick: () => submitEntry() })
       return
     }
+    const uploaded = draftPhotos.filter((p) => p.status === 'done' && p.storagePath)
+    const failed = draftPhotos.filter((p) => p.status === 'error')
     const photos: JournalEntry['journal_photos'] = []
-    for (const file of draftFiles) {
-      try {
-        const blob = await compressJournalPhoto(file)
-        const path = `${trip.id}/${crypto.randomUUID()}.jpg`
-        const { error: upErr } = await supabase.storage.from(JOURNAL_BUCKET).upload(path, blob, { contentType: 'image/jpeg' })
-        if (upErr) throw upErr
-        const { data: row, error: rowErr } = await supabase
-          .from('journal_photos')
-          .insert({ entry_id: entry.id, storage_path: path, uploaded_by: currentUserId })
-          .select('*')
-          .single()
-        if (rowErr || !row) throw rowErr ?? new Error('insert failed')
-        photos.push(row)
-      } catch {
-        showToast(`Couldn't upload ${file.name}.`, 'error')
-      }
+    for (const p of uploaded) {
+      const { data: row, error: rowErr } = await supabase
+        .from('journal_photos')
+        .insert({ entry_id: entry.id, storage_path: p.storagePath!, uploaded_by: currentUserId })
+        .select('*')
+        .single()
+      if (!rowErr && row) photos.push(row)
     }
+    if (failed.length > 0) showToast(`${failed.length} photo${failed.length > 1 ? 's' : ''} couldn't be uploaded and were skipped.`, 'error')
     setEntries((prev) => {
       const next = [{ ...entry, journal_photos: photos } as JournalEntry, ...(prev ?? [])]
       return next.sort((a, b) => b.entry_date.localeCompare(a.entry_date) || b.created_at.localeCompare(a.created_at))
     })
     setDraftNote('')
-    setDraftFiles([])
+    draftPhotos.forEach((p) => URL.revokeObjectURL(p.previewUrl))
+    setDraftPhotos([])
     if (fileInputRef.current) fileInputRef.current.value = ''
     setSaving(false)
     showToast('Journal entry saved 📝', 'success')
@@ -989,22 +1142,73 @@ function JournalTab({
             rows={3}
             style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.5 }}
           />
-          {draftFiles.length > 0 && (
+          {draftPhotos.length > 0 && (
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              {draftFiles.map((f, i) => (
-                <div key={`${f.name}-${i}`} style={{ position: 'relative' }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={URL.createObjectURL(f)} alt={f.name} style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 10, border: '1px solid rgba(255,255,255,.15)' }} />
-                  <button
-                    onClick={() => setDraftFiles((prev) => prev.filter((_, j) => j !== i))}
-                    aria-label="Remove photo"
-                    style={{ position: 'absolute', top: -6, right: -6, width: 18, height: 18, borderRadius: '50%', background: 'rgba(20,20,40,.9)', border: '1px solid rgba(255,255,255,.25)', color: '#fff', fontSize: 10, lineHeight: 1, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}
-                  >
-                    ✕
-                  </button>
-                </div>
-              ))}
+              {draftPhotos.map((p) => {
+                const ringR = 15
+                const ringC = 2 * Math.PI * ringR
+                const dimmed = p.status !== 'done'
+                return (
+                  <div key={p.id} style={{ position: 'relative', width: 64, height: 64 }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={p.previewUrl}
+                      alt={p.file.name}
+                      style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 10, border: '1px solid rgba(255,255,255,.15)', opacity: dimmed ? 0.45 : 1, filter: dimmed ? 'saturate(.6)' : 'none', transition: 'opacity .3s ease' }}
+                    />
+                    {(p.status === 'uploading' || p.status === 'queued') && (
+                      <svg width="64" height="64" viewBox="0 0 34 34" style={{ position: 'absolute', inset: 0, transform: 'rotate(-90deg)' }} aria-hidden="true">
+                        <circle cx="17" cy="17" r={ringR} fill="none" stroke="rgba(255,255,255,.18)" strokeWidth="2.5" />
+                        <circle
+                          cx="17" cy="17" r={ringR} fill="none" stroke={ACCENT_LIGHT} strokeWidth="2.5" strokeLinecap="round"
+                          strokeDasharray={ringC} strokeDashoffset={ringC * (1 - p.progress / 100)}
+                          style={{ transition: 'stroke-dashoffset .2s linear' }}
+                        />
+                      </svg>
+                    )}
+                    {(p.status === 'uploading' || p.status === 'queued') && (
+                      <span style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10.5, fontWeight: 800, color: '#fff', textShadow: '0 1px 3px rgba(0,0,0,.6)' }}>
+                        {p.progress}%
+                      </span>
+                    )}
+                    {p.status === 'offline' && (
+                      <span title="Waiting for connection" style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M2 8.82a15 15 0 0 1 20 0M5 12.86a10 10 0 0 1 14 0M8.5 16.43a5 5 0 0 1 7 0" />
+                          <path d="M2 2l20 20" stroke="#f87171" />
+                          <circle cx="12" cy="20" r="1" fill="#fbbf24" stroke="none" />
+                        </svg>
+                      </span>
+                    )}
+                    {p.status === 'error' && (
+                      <button
+                        onClick={() => setDraftPhotos((prev) => prev.map((x) => (x.id === p.id ? { ...x, status: 'queued', progress: 0 } : x)))}
+                        aria-label={`Retry uploading ${p.file.name}`}
+                        title="Upload failed — tap to retry"
+                        style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer' }}
+                      >
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M1 4v6h6M23 20v-6h-6" /><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+                        </svg>
+                      </button>
+                    )}
+                    <button
+                      onClick={() => {
+                        URL.revokeObjectURL(p.previewUrl)
+                        setDraftPhotos((prev) => prev.filter((x) => x.id !== p.id))
+                      }}
+                      aria-label="Remove photo"
+                      style={{ position: 'absolute', top: -6, right: -6, width: 18, height: 18, borderRadius: '50%', background: 'rgba(20,20,40,.9)', border: '1px solid rgba(255,255,255,.25)', color: '#fff', fontSize: 10, lineHeight: 1, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )
+              })}
             </div>
+          )}
+          {draftPhotos.some((p) => p.status === 'offline') && (
+            <div style={{ fontSize: 11.5, color: '#fbbf24', fontWeight: 600 }}>Offline — photos will upload once you're back online.</div>
           )}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <input
@@ -1012,7 +1216,19 @@ function JournalTab({
               type="file"
               accept="image/*"
               multiple
-              onChange={(e) => setDraftFiles((prev) => [...prev, ...Array.from(e.target.files ?? [])])}
+              onChange={(e) => {
+                const files = Array.from(e.target.files ?? [])
+                setDraftPhotos((prev) => [
+                  ...prev,
+                  ...files.map((file) => ({
+                    id: crypto.randomUUID(),
+                    file,
+                    previewUrl: URL.createObjectURL(file),
+                    status: 'queued' as const,
+                    progress: 0,
+                  })),
+                ])
+              }}
               style={{ display: 'none' }}
             />
             <button
@@ -1026,10 +1242,11 @@ function JournalTab({
             </button>
             <button
               onClick={submitEntry}
-              disabled={saving || (!draftNote.trim() && draftFiles.length === 0)}
-              style={{ marginLeft: 'auto', padding: '8px 18px', borderRadius: 10, background: 'linear-gradient(135deg, #f5a623, #f8c04a)', border: 'none', color: '#1a0800', fontSize: 12.5, fontWeight: 800, cursor: saving ? 'default' : 'pointer', fontFamily: 'inherit', opacity: saving || (!draftNote.trim() && draftFiles.length === 0) ? 0.5 : 1 }}
+              disabled={saving || !photosSettled || !hasContent}
+              title={!photosSettled ? 'Wait for photos to finish uploading' : undefined}
+              style={{ marginLeft: 'auto', padding: '8px 18px', borderRadius: 10, background: 'linear-gradient(135deg, #f5a623, #f8c04a)', border: 'none', color: '#1a0800', fontSize: 12.5, fontWeight: 800, cursor: saving ? 'default' : 'pointer', fontFamily: 'inherit', opacity: saving || !photosSettled || !hasContent ? 0.5 : 1 }}
             >
-              {saving ? 'Saving…' : 'Save entry'}
+              {saving ? 'Saving…' : !photosSettled ? 'Uploading…' : 'Save entry'}
             </button>
           </div>
         </div>
@@ -1187,6 +1404,11 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId, members }
     Object.fromEntries(initialStops.map((s) => [s.id, s.nights ?? 1]))
   )
   const [optimizing, setOptimizing] = useState(false)
+  const [optimizePreview, setOptimizePreview] = useState<{
+    order: number[]
+    savedDistanceMeters: number
+    savedDurationSeconds: number
+  } | null>(null)
 
   const stageRef = useRef<HTMLDivElement>(null)
   const sheetHeight = useMotionValue(420)
@@ -1271,6 +1493,35 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId, members }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [routeKey])
 
+  // Just-added stop: its marker drops in on the map and its list card glows
+  // briefly; cleared after the highlight has had time to register.
+  const [lastAddedStopId, setLastAddedStopId] = useState<string | null>(null)
+  useEffect(() => {
+    if (!lastAddedStopId) return
+    const t = setTimeout(() => setLastAddedStopId(null), 2600)
+    return () => clearTimeout(t)
+  }, [lastAddedStopId])
+
+  // Route duration total before an add, so the post-add toast can report the
+  // delta ("Route updated · 18 min added") once Directions responds.
+  const routeTotalRef = useRef(0)
+  const pendingAddTotalRef = useRef<number | null>(null)
+  useEffect(() => {
+    const total = routeLegs.reduce((s, l) => s + l.durationSeconds, 0)
+    const prev = pendingAddTotalRef.current
+    if (prev != null && routeLegs.length > 0) {
+      pendingAddTotalRef.current = null
+      const deltaMin = Math.round((total - prev) / 60)
+      if (deltaMin >= 1) {
+        const text = deltaMin >= 60 ? `${Math.floor(deltaMin / 60)}h ${deltaMin % 60}m` : `${deltaMin} min`
+        showToast(`Route updated · ${text} added`, 'success')
+      } else {
+        showToast('Route updated', 'success')
+      }
+    }
+    routeTotalRef.current = total
+  }, [routeLegs])
+
   // Optimistic update; reverts to the previous value if the write fails.
   const changeNights = (id: string, delta: number) => {
     const current = nights[id] ?? 1
@@ -1339,17 +1590,32 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId, members }
   }
 
   // Mapbox Optimization API — keeps first/last stops fixed, reorders the middle.
+  // Fetches the candidate order + its totals first and shows a before/after
+  // comparison sheet; stops only actually move once the user taps Apply.
   const handleOptimize = async () => {
     if (optimizing) return
     if (stops.length < 3) { showToast('Add at least 3 stops to optimize the order.', 'info'); return }
     if (stops.length > 12) { showToast('Optimization works with up to 12 stops.', 'info'); return }
     setOptimizing(true)
-    const order = await getOptimizedOrder(stops.map((s) => ({ lat: s.lat, lng: s.lng })))
+    const result = await getOptimizedOrder(stops.map((s) => ({ lat: s.lat, lng: s.lng })))
     setOptimizing(false)
-    if (!order) { showToast("Couldn't optimize the route. Please try again.", 'error'); return }
+    if (!result) { showToast("Couldn't optimize the route. Please try again.", 'error'); return }
+    const { order, distanceMeters: optimizedDistance, durationSeconds: optimizedDuration } = result
     if (order.every((v, i) => v === i)) { showToast('Your route is already optimal! 🎉', 'success'); return }
-    applyStopOrder(order.map((i) => stops[i]), stops)
+    const currentDistance = routeLegs.reduce((s, l) => s + l.distanceMeters, 0)
+    const currentDuration = routeLegs.reduce((s, l) => s + l.durationSeconds, 0)
+    setOptimizePreview({
+      order,
+      savedDistanceMeters: currentDistance - optimizedDistance,
+      savedDurationSeconds: currentDuration - optimizedDuration,
+    })
+  }
+
+  const applyOptimizePreview = () => {
+    if (!optimizePreview) return
+    applyStopOrder(optimizePreview.order.map((i) => stops[i]), stops)
     showToast('Route optimized — stops reordered.', 'success')
+    setOptimizePreview(null)
   }
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -1379,8 +1645,11 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId, members }
           })
           .select()
           .single()
-        if (!error && data) setStops((prev) => [...prev, data as Stop])
-        else showToast("Couldn't add the destination.", 'error', { label: 'Retry', onClick: () => { void attempt() } })
+        if (!error && data) {
+          pendingAddTotalRef.current = routeTotalRef.current
+          setStops((prev) => [...prev, data as Stop])
+          setLastAddedStopId((data as Stop).id)
+        } else showToast("Couldn't add the destination.", 'error', { label: 'Retry', onClick: () => { void attempt() } })
       }
       await attempt()
     },
@@ -1528,6 +1797,7 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId, members }
             routePath={routePath}
             defaultCenter={defaultCenter}
             defaultZoom={5}
+            dropInId={lastAddedStopId}
           />
           <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(to bottom, transparent 78%, rgba(6,6,28,.6) 100%)' }} />
         </div>
@@ -1702,7 +1972,7 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId, members }
                       <SortableStopItem key={stop.id} id={stop.id}>
                         {({ attributes, listeners, isDragging }) => (
                           <>
-                        <div {...attributes} {...listeners} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', borderRadius: 14, background: isDragging ? 'rgba(255,255,255,.09)' : 'rgba(255,255,255,.045)', border: `1px solid ${isDragging ? 'rgba(245,166,35,.4)' : 'rgba(255,255,255,.09)'}`, touchAction: 'manipulation', cursor: isDragging ? 'grabbing' : 'grab' }}>
+                        <div {...attributes} {...listeners} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', borderRadius: 14, background: isDragging ? 'rgba(255,255,255,.09)' : stop.id === lastAddedStopId ? 'rgba(245,166,35,.14)' : 'rgba(255,255,255,.045)', border: `1px solid ${isDragging ? 'rgba(245,166,35,.4)' : stop.id === lastAddedStopId ? 'rgba(245,166,35,.55)' : 'rgba(255,255,255,.09)'}`, transition: 'background .7s ease, border-color .7s ease', touchAction: 'manipulation', cursor: isDragging ? 'grabbing' : 'grab' }}>
                           <svg width="8" height="14" viewBox="0 0 8 14" fill="none" style={{ flex: 'none', opacity: 0.45 }} aria-hidden="true">
                             <circle cx="2" cy="2" r="1.2" fill="#d7d7ff" /><circle cx="6" cy="2" r="1.2" fill="#d7d7ff" />
                             <circle cx="2" cy="7" r="1.2" fill="#d7d7ff" /><circle cx="6" cy="7" r="1.2" fill="#d7d7ff" />
@@ -1856,6 +2126,8 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId, members }
 
       {isAddOpen && <AddDestinationSheet initialQuery={addInitialQuery} onClose={() => setIsAddOpen(false)} onAdd={handleAddStop} />}
 
+      <OptimizePreviewSheet preview={optimizePreview} onApply={applyOptimizePreview} onDismiss={() => setOptimizePreview(null)} />
+
       <ConfirmDialog
         open={deleteStopTarget !== null}
         title="Delete this stop?"
@@ -1866,12 +2138,106 @@ function TripMobileContent({ trip, stops: initialStops, currentUserId, members }
         }}
         onCancel={() => setDeleteStopTarget(null)}
       />
-      <Toaster />
     </div>
   )
 }
 
 // ─── Sub-components ────────────────────────────────────────────────────────
+
+/** Before/after comparison shown after "Optimize" — stops only reorder once the user taps Apply. */
+function OptimizePreviewSheet({
+  preview, onApply, onDismiss,
+}: {
+  preview: { savedDistanceMeters: number; savedDurationSeconds: number } | null
+  onApply: () => void
+  onDismiss: () => void
+}) {
+  const km = preview ? Math.abs(preview.savedDistanceMeters) / 1000 : 0
+  const min = preview ? Math.round(Math.abs(preview.savedDurationSeconds) / 60) : 0
+  const improved = (preview?.savedDistanceMeters ?? 0) > 0 || (preview?.savedDurationSeconds ?? 0) > 0
+
+  return (
+    <AnimatePresence>
+      {preview && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onDismiss}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 120, display: 'flex', alignItems: 'center',
+            justifyContent: 'center', background: 'rgba(0,0,0,.6)', padding: 24,
+            fontFamily: "var(--font-inter),'Inter',system-ui,-apple-system,sans-serif",
+          }}
+        >
+          <motion.div
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="optimize-preview-title"
+            initial={{ opacity: 0, scale: 0.94, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.94, y: 10 }}
+            transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: '100%', maxWidth: 340, borderRadius: 20, padding: 20,
+              background: 'rgba(14,14,34,.97)', border: '1px solid rgba(255,255,255,.12)',
+              boxShadow: '0 16px 48px rgba(0,0,0,.5)', backdropFilter: 'blur(24px)',
+            }}
+          >
+            <div id="optimize-preview-title" style={{ fontSize: 16, fontWeight: 800, color: '#fff', letterSpacing: '-0.01em' }}>
+              Optimized route
+            </div>
+            <div style={{ fontSize: 13, color: 'rgba(215,215,255,.65)', marginTop: 6, lineHeight: 1.5 }}>
+              {improved
+                ? "Reordering your middle stops shortens the drive. Apply to update your route."
+                : "This order doesn't save distance or time, but you can still apply it if you prefer the sequence."}
+            </div>
+
+            <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
+              <div style={{ flex: 1, borderRadius: 14, padding: '12px 14px', background: 'rgba(245,166,35,.1)', border: '1px solid rgba(245,166,35,.3)' }}>
+                <div style={{ fontSize: 20, fontWeight: 800, color: ACCENT_LIGHT }}>
+                  {improved ? '−' : ''}{km.toFixed(km >= 10 ? 0 : 1)} km
+                </div>
+                <div style={{ fontSize: 11, color: 'rgba(215,215,255,.55)', marginTop: 2 }}>distance</div>
+              </div>
+              <div style={{ flex: 1, borderRadius: 14, padding: '12px 14px', background: 'rgba(245,166,35,.1)', border: '1px solid rgba(245,166,35,.3)' }}>
+                <div style={{ fontSize: 20, fontWeight: 800, color: ACCENT_LIGHT }}>
+                  {improved ? '−' : ''}{min} min
+                </div>
+                <div style={{ fontSize: 11, color: 'rgba(215,215,255,.55)', marginTop: 2 }}>drive time</div>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: 10, marginTop: 18 }}>
+              <button
+                onClick={onDismiss}
+                style={{
+                  flex: 1, height: 44, borderRadius: 12, background: 'rgba(255,255,255,.06)',
+                  border: '1px solid rgba(255,255,255,.12)', color: 'rgba(255,255,255,.85)',
+                  fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+                }}
+              >
+                Keep current
+              </button>
+              <button
+                onClick={onApply}
+                style={{
+                  flex: 1, height: 44, borderRadius: 12,
+                  background: `linear-gradient(145deg, ${ACCENT_LIGHT}, ${ACCENT_DARK})`,
+                  border: 'none', color: '#1a1004', fontSize: 14, fontWeight: 700,
+                  cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 6px 20px rgba(245,166,35,.3)',
+                }}
+              >
+                Apply
+              </button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  )
+}
 
 /** dnd-kit wrapper: applies the sort transform and hands drag props to the card. */
 function SortableStopItem({ id, children }: {

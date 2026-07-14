@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Map, { Marker, Source, Layer, type MapRef } from "react-map-gl/mapbox";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -89,6 +89,10 @@ export function ExploreMapbox({
   const mapRef = useRef<MapRef | null>(null);
   const readyRef = useRef(false);
   const rotateRef = useRef<number | null>(null);
+  // The rotate effect must re-run once the map exists: on mount mapRef.current
+  // is still null (react-map-gl assigns it after the map instance is created),
+  // so keying the effect on autoRotate alone would leave it dead forever.
+  const [mapLoaded, setMapLoaded] = useState(false);
 
   const arcGeoJson = useMemo(
     () => ({
@@ -143,10 +147,14 @@ export function ExploreMapbox({
         map.setFog(EXPLORE_FOG);
       });
       map.addControl(new mapboxgl.AttributionControl({ compact: true }), "bottom-right");
-      map.on("dragstart", () => onUserInteract?.());
-      map.on("zoomstart", () => onUserInteract?.());
+      // Only genuine user gestures carry an originalEvent; programmatic
+      // camera flights (flyTo) also emit these events and must not count
+      // as interaction, or they'd cancel auto-rotate on every flight.
+      map.on("dragstart", (e) => { if (e.originalEvent) onUserInteract?.(); });
+      map.on("zoomstart", (e) => { if ((e as { originalEvent?: Event }).originalEvent) onUserInteract?.(); });
     }
     if (camera) flyTo(camera, 0);
+    setMapLoaded(true);
     if (!readyRef.current) {
       readyRef.current = true;
       onReady();
@@ -159,10 +167,7 @@ export function ExploreMapbox({
   }, [flyToken, camera, flyTo]);
 
   useEffect(() => {
-    const map = mapRef.current;
-    if (!map) return;
-
-    if (!autoRotate) {
+    if (!mapLoaded || !autoRotate) {
       if (rotateRef.current != null) {
         cancelAnimationFrame(rotateRef.current);
         rotateRef.current = null;
@@ -186,7 +191,7 @@ export function ExploreMapbox({
       if (rotateRef.current != null) cancelAnimationFrame(rotateRef.current);
       rotateRef.current = null;
     };
-  }, [autoRotate]);
+  }, [autoRotate, mapLoaded]);
 
   if (!MAPBOX_TOKEN) {
     return (

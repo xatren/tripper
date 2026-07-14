@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
 import { CURRENCY_SYMBOLS, type TripCurrency } from '@/types';
-import { showToast, Toaster } from '@/components/ui/toast';
+import { showToast } from '@/components/ui/toast';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -735,7 +735,6 @@ export function NewTripClient() {
           {step === 5 && <Step5 name={name} vibe={vibe} startDate={startDate} endDate={endDate} destinations={destinations} budget={budget} currency={currency} onBack={back} />}
         </motion.div>
       </AnimatePresence>
-      <Toaster />
     </div>
   );
 }

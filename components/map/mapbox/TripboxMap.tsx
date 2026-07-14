@@ -29,6 +29,8 @@ interface TripboxMapProps {
   defaultCenter?: { lat: number; lng: number }
   /** Zoom to use with `defaultCenter` — a country-wide view is much wider than a single-stop view. */
   defaultZoom?: number
+  /** Point id that was just added — its marker plays a short drop-in animation. */
+  dropInId?: string | null
 }
 
 /** Last-resort fallback center (Istanbul) when a trip has neither stops nor a selected country. */
@@ -50,7 +52,7 @@ const zoomBtnStyle: CSSProperties = {
   lineHeight: 1,
 }
 
-export function TripboxMap({ points, routePath = [], interactive = true, className, defaultCenter, defaultZoom = 9 }: TripboxMapProps) {
+export function TripboxMap({ points, routePath = [], interactive = true, className, defaultCenter, defaultZoom = 9, dropInId = null }: TripboxMapProps) {
   const mapRef = useRef<MapRef | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -187,6 +189,15 @@ export function TripboxMap({ points, routePath = [], interactive = true, classNa
         .tripbox-popup.mapboxgl-popup-anchor-top .mapboxgl-popup-tip { border-bottom-color: #12122a; }
         .tripbox-popup.mapboxgl-popup-anchor-left .mapboxgl-popup-tip { border-right-color: #12122a; }
         .tripbox-popup.mapboxgl-popup-anchor-right .mapboxgl-popup-tip { border-left-color: #12122a; }
+        @keyframes tripbox-drop-in {
+          0%   { transform: translateY(-22px) scale(.5); opacity: 0; }
+          60%  { transform: translateY(3px) scale(1.12); opacity: 1; }
+          100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        .tripbox-marker-drop { animation: tripbox-drop-in .5s cubic-bezier(.22,.9,.32,1.2) both; }
+        @media (prefers-reduced-motion: reduce) {
+          .tripbox-marker-drop { animation: none; }
+        }
       `}</style>
 
       <Map
@@ -234,6 +245,7 @@ export function TripboxMap({ points, routePath = [], interactive = true, classNa
             }}
           >
             <div
+              className={p.id === dropInId ? 'tripbox-marker-drop' : undefined}
               style={{
                 width: 24,
                 height: 24,
