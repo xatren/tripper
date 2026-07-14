@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { ChevronLeft, Settings, Camera, Lock, LogOut, Trash2, Pencil, ChevronRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { getInitials } from "@/lib/utils";
+import { clearTripperCaches } from "@/components/pwa/RegisterSW";
 import type { Profile } from "@/types";
 import { Home, Briefcase, Compass, FileText } from "lucide-react";
 
@@ -106,13 +107,17 @@ export function ProfileClient({ profile, trips }: Props) {
   };
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
+    const { error } = await supabase.auth.signOut();
+    if (error) return;
+    await clearTripperCaches();
     router.push("/login");
   };
 
   const handleDeleteAccount = async () => {
     if (!confirm("Are you sure? This will permanently delete your account and all trip data.")) return;
-    await supabase.auth.signOut();
+    const { error } = await supabase.auth.signOut();
+    if (error) return;
+    await clearTripperCaches();
     router.push("/login");
   };
 
