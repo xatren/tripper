@@ -1,48 +1,4 @@
-export type PinCategory =
-  | 'hotel'
-  | 'restaurant'
-  | 'scenic_view'
-  | 'national_park'
-  | 'gas_station'
-  | 'hidden_spot'
-  | 'camping'
-  | 'coffee_stop'
-  | 'activity'
-  | 'city'
-  | 'other';
-
-export type BudgetCategory =
-  | 'gas'
-  | 'hotel'
-  | 'food'
-  | 'activities'
-  | 'emergency'
-  | 'misc';
-
 export type MemberRole = 'owner' | 'editor' | 'viewer';
-
-export interface Pin {
-  id: string;
-  trip_id: string;
-  created_by: string;
-  title: string;
-  description?: string;
-  address?: string;
-  category: PinCategory;
-  lat: number;
-  lng: number;
-  day_number?: number;
-  order_index: number;
-  is_favorite: boolean;
-  is_completed: boolean;
-  rating?: number;
-  estimated_cost?: number;
-  visit_date?: string;
-  stay_duration_hours?: number;
-  created_at: string;
-  updated_at: string;
-  photos?: PinPhoto[];
-}
 
 export interface Trip {
   id: string;
@@ -59,7 +15,6 @@ export interface Trip {
   created_at: string;
   updated_at: string;
   members?: TripMember[];
-  pins?: Pin[];
   /** Default map focus point (e.g. the first destination country picked during creation). */
   focus_lat?: number | null;
   focus_lng?: number | null;
@@ -105,88 +60,6 @@ export interface Profile {
   display_name?: string;
   avatar_url?: string;
 }
-
-export interface PinPhoto {
-  id: string;
-  pin_id: string;
-  storage_path: string;
-  url: string;
-  caption?: string;
-  uploaded_by?: string;
-  created_at: string;
-}
-
-export interface BudgetItem {
-  id: string;
-  trip_id: string;
-  pin_id?: string;
-  category: BudgetCategory;
-  label: string;
-  amount: number;
-  date?: string;
-  created_by?: string;
-  created_at: string;
-}
-
-export const CATEGORY_COLORS: Record<PinCategory, string> = {
-  hotel: '#6366F1',
-  restaurant: '#EF4444',
-  scenic_view: '#10B981',
-  national_park: '#059669',
-  gas_station: '#64748B',
-  hidden_spot: '#8B5CF6',
-  camping: '#F97316',
-  coffee_stop: '#92400E',
-  activity: '#3B82F6',
-  city: '#F59E0B',
-  other: '#6B7280',
-};
-
-export const CATEGORY_ICONS: Record<PinCategory, string> = {
-  hotel: '🏨',
-  restaurant: '🍽️',
-  scenic_view: '🏔️',
-  national_park: '🌲',
-  gas_station: '⛽',
-  hidden_spot: '💎',
-  camping: '⛺',
-  coffee_stop: '☕',
-  activity: '🎯',
-  city: '🏙️',
-  other: '📍',
-};
-
-export const CATEGORY_LABELS: Record<PinCategory, string> = {
-  hotel: 'Hotel',
-  restaurant: 'Restaurant',
-  scenic_view: 'Scenic View',
-  national_park: 'National Park',
-  gas_station: 'Gas Station',
-  hidden_spot: 'Hidden Spot',
-  camping: 'Camping',
-  coffee_stop: 'Coffee Stop',
-  activity: 'Activity',
-  city: 'City',
-  other: 'Other',
-};
-
-export const BUDGET_CATEGORY_LABELS: Record<BudgetCategory, string> = {
-  gas: 'Gas',
-  hotel: 'Hotel',
-  food: 'Food',
-  activities: 'Activities',
-  emergency: 'Emergency',
-  misc: 'Miscellaneous',
-};
-
-export const BUDGET_CATEGORY_ICONS: Record<BudgetCategory, string> = {
-  gas: '⛽',
-  hotel: '🏨',
-  food: '🍔',
-  activities: '🎯',
-  emergency: '🚨',
-  misc: '💳',
-};
 
 // ---- New schema types (stops / expenses / photos) ----
 
