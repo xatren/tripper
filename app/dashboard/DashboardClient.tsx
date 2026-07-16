@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { MapPin, Plus, MoreVertical, Ticket, Trash2 } from "lucide-react";
-import type { Profile, Trip } from "@/types";
+import type { Profile, Trip, TripCapabilities } from "@/types";
 import { createClient } from "@/lib/supabase/client";
 import { formatDate, getInitials } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
@@ -86,9 +86,9 @@ function orb(p: {
 }
 
 // ── Main component ────────────────────────────────────────────────────────────
-interface DashboardClientProps { profile: Profile | null; trips: Trip[] }
+interface DashboardClientProps { profile: Profile | null; trips: Trip[]; capabilitiesByTripId: Record<string, TripCapabilities> }
 
-export function DashboardClient({ profile, trips: initialTrips }: DashboardClientProps) {
+export function DashboardClient({ profile, trips: initialTrips, capabilitiesByTripId }: DashboardClientProps) {
   const [trips, setTrips]         = useState<Trip[]>(initialTrips);
   const [isJoinOpen,   setJoin]   = useState(false);
   const [joinCode, setJoinCode]   = useState("");
@@ -111,6 +111,7 @@ export function DashboardClient({ profile, trips: initialTrips }: DashboardClien
   const [deleteTarget, setDeleteTarget] = useState<Trip | null>(null);
 
   const handleDelete = async (tripId: string) => {
+    if (!capabilitiesByTripId[tripId]?.canManageTrip) return;
     const { error } = await supabase.from("trips").delete().eq("id", tripId);
     if (error) { showToast("Couldn't delete the trip. Please try again.", "error"); return; }
     setTrips((t) => t.filter((tr) => tr.id !== tripId));
@@ -220,7 +221,7 @@ export function DashboardClient({ profile, trips: initialTrips }: DashboardClien
                     <TripCard
                       trip={trip}
                       index={i}
-                      isOwner={trip.owner_id === profile?.id}
+                      capabilities={capabilitiesByTripId[trip.id]}
                       onOpen={() => router.push(`/trip/${trip.id}/mobile`)}
                       onDelete={() => setDeleteTarget(trip)}
                       onCopyCode={() => navigator.clipboard.writeText(trip.invite_code ?? "")}
@@ -288,7 +289,7 @@ export function DashboardClient({ profile, trips: initialTrips }: DashboardClien
           <form onSubmit={handleJoin} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               <Label htmlFor="inviteCode">Invite Code</Label>
-              <Input id="inviteCode" placeholder="e.g. ABC12345" value={joinCode} onChange={(e) => setJoinCode(e.target.value)} required />
+              <Input id="inviteCode" placeholder="e.g. ABC12345" value={joinCode} onChange={(e) => setJoinCode(e.target.value)} required aria-invalid={Boolean(error)} aria-describedby={error ? "join-error" : undefined} />
             </div>
             <motion.button
               type="submit"
@@ -299,7 +300,7 @@ export function DashboardClient({ profile, trips: initialTrips }: DashboardClien
             >
               {loading ? "Joining…" : "Join Trip"}
             </motion.button>
-            {error && <p style={{ color: "#ef4444", fontSize: 13, textAlign: "center", margin: 0 }}>{error}</p>}
+            {error && <p id="join-error" role="alert" style={{ color: "#ef4444", fontSize: 13, textAlign: "center", margin: 0 }}>{error}</p>}
           </form>
         </DialogContent>
       </Dialog>
@@ -319,8 +320,8 @@ export function DashboardClient({ profile, trips: initialTrips }: DashboardClien
 }
 
 // ── TripCard ──────────────────────────────────────────────────────────────────
-function TripCard({ trip, index, isOwner, onOpen, onDelete, onCopyCode }: {
-  trip: Trip; index: number; isOwner: boolean;
+function TripCard({ trip, index, capabilities, onOpen, onDelete, onCopyCode }: {
+  trip: Trip; index: number; capabilities?: TripCapabilities;
   onOpen: () => void; onDelete: () => void; onCopyCode: () => void;
 }) {
   const gradient  = CARD_GRADIENTS[index % CARD_GRADIENTS.length];
@@ -337,13 +338,13 @@ function TripCard({ trip, index, isOwner, onOpen, onDelete, onCopyCode }: {
   })();
 
   return (
-    <motion.button
-      onClick={onOpen}
+    <motion.div
       style={{ width: "100%", display: "flex", alignItems: "center", gap: 14, background: elevated ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.055)", border: `1px solid ${elevated ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.11)"}`, borderRadius: 20, backdropFilter: "blur(16px)", padding: "14px 16px", cursor: "pointer", textAlign: "left" }}
       whileTap={{ scale: 0.97 }}
       whileHover={{ background: "rgba(255,255,255,0.085)", borderColor: "rgba(255,255,255,0.17)" }}
       transition={TAP_SPRING}
     >
+      <button type="button" onClick={onOpen} style={{ minWidth: 0, flex: 1, display: "flex", alignItems: "center", gap: 14, padding: 0, border: 0, background: "transparent", color: "inherit", cursor: "pointer", textAlign: "left", fontFamily: "inherit" }}>
       {/* Gradient icon */}
       <div style={{ width: 56, height: 56, borderRadius: 16, flexShrink: 0, background: gradient, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26 }}>
         {emoji}
@@ -366,26 +367,27 @@ function TripCard({ trip, index, isOwner, onOpen, onDelete, onCopyCode }: {
           {nights !== null && nights > 0 ? ` · ${nights} Night${nights > 1 ? "s" : ""}` : ""}
         </p>
       </div>
+      </button>
 
       {/* Context menu */}
-      <DropdownMenu>
+      {capabilities?.canManageTrip && <DropdownMenu>
         <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-          <motion.div
-            style={{ width: 32, height: 32, borderRadius: 8, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(215,215,255,0.42)", cursor: "pointer" }}
+          <motion.button
+            type="button"
+            aria-label={`Open actions for ${trip.title}`}
+            style={{ width: 44, height: 44, padding: 0, border: 0, background: "transparent", borderRadius: 8, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(215,215,255,0.42)", cursor: "pointer" }}
             whileTap={{ scale: 0.84 }}
             transition={TAP_SPRING}
           >
             <MoreVertical style={{ width: 18, height: 18 }} />
-          </motion.div>
+          </motion.button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
           <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onCopyCode(); }}>
             <Ticket style={{ width: 14, height: 14, marginRight: 8 }} />
             Copy Invite Code
           </DropdownMenuItem>
-          {isOwner && (
-            <>
-              <DropdownMenuSeparator />
+          <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="text-destructive focus:text-destructive"
                 onClick={(e) => { e.stopPropagation(); onDelete(); }}
@@ -393,11 +395,9 @@ function TripCard({ trip, index, isOwner, onOpen, onDelete, onCopyCode }: {
                 <Trash2 style={{ width: 14, height: 14, marginRight: 8 }} />
                 Delete Trip
               </DropdownMenuItem>
-            </>
-          )}
         </DropdownMenuContent>
-      </DropdownMenu>
-    </motion.button>
+      </DropdownMenu>}
+    </motion.div>
   );
 }
 

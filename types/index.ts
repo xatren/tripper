@@ -1,5 +1,12 @@
 export type MemberRole = 'owner' | 'editor' | 'viewer';
 
+/** Server-derived presentation permissions. RLS remains the security boundary. */
+export interface TripCapabilities {
+  role: MemberRole;
+  canEdit: boolean;
+  canManageTrip: boolean;
+}
+
 export interface Trip {
   id: string;
   owner_id: string;

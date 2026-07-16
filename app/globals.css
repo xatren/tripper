@@ -65,6 +65,13 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Inline-styled legacy screens used outline: none extensively. Keep the
+     visual system, but guarantee a high-contrast keyboard focus indicator. */
+  :where(a, button, input, textarea, select, [tabindex]):focus-visible {
+    outline: 3px solid #f5a623 !important;
+    outline-offset: 3px !important;
+  }
 }
 
 /* Custom scrollbar */
@@ -95,6 +102,27 @@
 }
 .animate-pulse-marker {
   animation: pulse-marker 2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within {
+    scroll-behavior: auto;
+  }
+
+  /* Decorative loops become stable while controls and loading copy remain. */
+  .animate-pulse-marker,
+  [style*="pulseglow"],
+  [style*="cursorBlink"] {
+    animation: none !important;
+  }
+
+  /* Radix/Tailwind overlays use a brief fade instead of zooming/sliding. */
+  [data-state="open"],
+  [data-state="closed"] {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Glassmorphism utility */

@@ -4,11 +4,9 @@ import { MobileEntryFlow } from '@/components/onboarding/mobile-entry-flow'
 
 export default async function Home() {
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { data } = await supabase.auth.getClaims()
 
-  if (user) redirect('/dashboard')
+  if (data?.claims?.sub) redirect('/dashboard')
 
   return <MobileEntryFlow />
 }

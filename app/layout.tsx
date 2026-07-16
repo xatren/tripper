@@ -3,6 +3,7 @@ import localFont from 'next/font/local';
 import { Inter } from 'next/font/google';
 import { RegisterSW } from '@/components/pwa/RegisterSW';
 import { Toaster } from '@/components/ui/toast';
+import { ReducedMotionProvider } from '@/components/motion/ReducedMotionProvider';
 import './globals.css';
 
 const geistSans = localFont({
@@ -45,9 +46,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} antialiased bg-[#0A0A0F] text-white`}
       >
-        {children}
-        <Toaster />
-        <RegisterSW />
+        <ReducedMotionProvider>
+          {children}
+          <Toaster />
+          <RegisterSW />
+        </ReducedMotionProvider>
       </body>
     </html>
   );

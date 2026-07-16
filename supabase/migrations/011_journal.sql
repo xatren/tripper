@@ -104,10 +104,10 @@ create policy "Trip members can delete journal photos"
   );
 
 -- ── Storage bucket: trip-photos ──────────────────────────────────────────────
--- Public read (photos are shown via public URLs); writes restricted to trip
--- members. Object paths follow `{trip_id}/{uuid}.jpg`.
+-- Private from creation; migration 20260715231929 adds the member-scoped read
+-- policy used by signed URLs. Object paths follow `{trip_id}/{uuid}.jpg`.
 insert into storage.buckets (id, name, public)
-values ('trip-photos', 'trip-photos', true)
+values ('trip-photos', 'trip-photos', false)
 on conflict (id) do nothing;
 
 create policy "Trip members can upload trip photos"

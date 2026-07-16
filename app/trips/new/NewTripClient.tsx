@@ -6,6 +6,14 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
 import { CURRENCY_SYMBOLS, type TripCurrency } from '@/types';
 import { showToast } from '@/components/ui/toast';
+import {
+  budgetError,
+  currencyError,
+  dateError,
+  destinationsError,
+  titleError,
+  vibeError,
+} from '@/lib/trip-validation';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -111,7 +119,7 @@ function Dots({ step }: { step: number }) {
 function Header({ step, onBack }: { step: number; onBack: () => void }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, marginBottom: 26 }}>
-      <button onClick={onBack} style={{ width: 42, height: 42, borderRadius: 14, background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', outline: 'none', padding: 0 }}>
+      <button onClick={onBack} aria-label="Go back" style={{ width: 44, height: 44, borderRadius: 14, background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', outline: 'none', padding: 0 }}>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
           <path d="M15 19L8 12L15 5" stroke="rgba(255,255,255,.9)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
@@ -124,12 +132,19 @@ function Header({ step, onBack }: { step: number; onBack: () => void }) {
   );
 }
 
-function Label({ children }: { children: string }) {
+function Label({ children, htmlFor, id }: { children: string; htmlFor?: string; id?: string }) {
+  const style = { margin: '0 0 14px', fontSize: 11, fontWeight: 600, letterSpacing: '1.2px', textTransform: 'uppercase' as const, color: 'rgba(200,185,255,.38)' };
+  if (htmlFor) return <label id={id} htmlFor={htmlFor} style={style}>{children}</label>;
   return (
-    <p style={{ margin: '0 0 14px', fontSize: 11, fontWeight: 600, letterSpacing: '1.2px', textTransform: 'uppercase' as const, color: 'rgba(200,185,255,.38)' }}>
+    <p id={id} style={style}>
       {children}
     </p>
   );
+}
+
+function FieldError({ id, message }: { id: string; message: string | null }) {
+  if (!message) return null;
+  return <p id={id} role="alert" style={{ margin: '10px 0 0', fontSize: 13, lineHeight: 1.4, color: '#fca5a5' }}>{message}</p>;
 }
 
 function ContinueBtn({ onClick, label = 'Continue →' }: { onClick: () => void; label?: string }) {
@@ -165,6 +180,16 @@ function Step1({ name, setName, vibe, setVibe, onNext, onBack }: {
   onNext: () => void; onBack: () => void;
 }) {
   const [focused, setFocused] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const nameRef = useRef<HTMLInputElement>(null);
+  const vibeRef = useRef<HTMLButtonElement>(null);
+  const validate = () => {
+    const nextError = titleError(name) ?? vibeError(vibe);
+    setError(nextError);
+    if (!nextError) return onNext();
+    if (titleError(name)) nameRef.current?.focus();
+    else vibeRef.current?.focus();
+  };
   return (
     <Shell>
       <div style={{ height: 54, flexShrink: 0 }} />
@@ -172,14 +197,19 @@ function Step1({ name, setName, vibe, setVibe, onNext, onBack }: {
       <Dots step={1} />
 
       <div style={{ flexShrink: 0, marginBottom: 44 }}>
-        <Label>What&apos;s the trip called?</Label>
+        <Label htmlFor="trip-name">What&apos;s the trip called?</Label>
         <div style={{ position: 'relative', paddingBottom: 14 }}>
           <input
+            id="trip-name"
+            ref={nameRef}
             type="text"
             value={name}
-            onChange={e => setName(e.target.value)}
+            onChange={e => { setName(e.target.value); setError(null); }}
+            onKeyDown={e => { if (e.key === 'Enter') validate(); }}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
+            aria-invalid={Boolean(error && titleError(name))}
+            aria-describedby={error ? 'identity-error' : undefined}
             placeholder="Trip name..."
             style={{ width: '100%', background: 'transparent', border: 'none', outline: 'none', fontFamily: 'inherit', fontSize: 34, fontWeight: 800, color: 'rgba(255,255,255,.95)', caretColor: ACCENT, padding: 0, display: 'block', lineHeight: 1.25 }}
           />
@@ -188,62 +218,56 @@ function Step1({ name, setName, vibe, setVibe, onNext, onBack }: {
       </div>
 
       <div style={{ flexShrink: 0, marginBottom: 32 }}>
-        <Label>Pick a vibe</Label>
-        <div style={{ display: 'flex', gap: 12, overflowX: 'auto', margin: '0 -24px', padding: '4px 24px 10px', scrollbarWidth: 'none' }}>
-          {VIBES.map(v => {
+        <Label id="vibe-label">Pick a vibe</Label>
+        <div role="group" aria-labelledby="vibe-label" aria-describedby={error ? 'identity-error' : undefined} style={{ display: 'flex', gap: 12, overflowX: 'auto', margin: '0 -24px', padding: '4px 24px 10px', scrollbarWidth: 'none', outline: 'none' }}>
+          {VIBES.map((v, index) => {
             const sel = vibe === v.name;
             return (
-              <button key={v.name} onClick={() => setVibe(v.name)} style={{ background: `linear-gradient(145deg, ${v.from} 0%, ${v.to} 100%)`, borderRadius: 18, width: 72, height: 72, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0, border: sel ? `2px solid ${ACCENT}` : '2px solid rgba(255,255,255,.07)', boxShadow: sel ? `0 0 0 3px ${ACCENT}2e, 0 0 20px ${ACCENT}55` : '0 2px 12px rgba(0,0,0,.55)', outline: 'none', padding: 0, transition: 'border .2s, box-shadow .2s' }}>
+              <button ref={index === 0 ? vibeRef : undefined} key={v.name} aria-pressed={sel} onClick={() => { setVibe(v.name); setError(null); }} style={{ background: `linear-gradient(145deg, ${v.from} 0%, ${v.to} 100%)`, borderRadius: 18, width: 72, height: 72, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0, border: sel ? `2px solid ${ACCENT}` : '2px solid rgba(255,255,255,.07)', boxShadow: sel ? `0 0 0 3px ${ACCENT}2e, 0 0 20px ${ACCENT}55` : '0 2px 12px rgba(0,0,0,.55)', outline: 'none', padding: 0, transition: 'border .2s, box-shadow .2s' }}>
                 <span style={{ fontSize: 26, lineHeight: 1, display: 'block', marginBottom: 5 }}>{v.emoji}</span>
                 <span style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,.88)', letterSpacing: '.3px' }}>{v.name}</span>
               </button>
             );
           })}
         </div>
+        <FieldError id="identity-error" message={error} />
       </div>
 
       <div style={{ flex: 1 }} />
-      <ContinueBtn onClick={() => { if (name.trim()) onNext(); }} />
+      <ContinueBtn onClick={validate} />
     </Shell>
   );
 }
 
 // ─── Step 2 — Dates ───────────────────────────────────────────────────────────
 
-function DateCard({ label, fmt, dateVal, onChange }: {
+function DateCard({ label, fmt, dateVal, onChange, inputRef, describedBy, invalid }: {
   label: string;
   fmt: { day: string; my: string };
   dateVal: string;
   onChange: (v: string) => void;
+  inputRef: React.RefObject<HTMLInputElement | null>;
+  describedBy?: string;
+  invalid?: boolean;
 }) {
-  const inputRef = useRef<HTMLInputElement>(null);
   const [focused, setFocused] = useState(false);
-
-  const open = () => {
-    const el = inputRef.current;
-    if (!el) return;
-    const picker = (el as HTMLInputElement & { showPicker?: () => void }).showPicker;
-    try {
-      if (picker) picker.call(el);
-      else el.click();
-    } catch {
-      el.click();
-    }
-  };
+  const inputId = `trip-${label.toLowerCase()}-date`;
 
   return (
     <div
-      onClick={open}
       style={{ flex: 1, borderRadius: 22, padding: '18px 16px', background: 'rgba(255,255,255,.04)', border: `1.5px solid ${focused ? ACCENT : dateVal ? `${ACCENT}66` : 'rgba(255,255,255,.08)'}`, boxShadow: focused ? `0 0 0 3px ${ACCENT}22` : 'none', position: 'relative', cursor: 'pointer', transition: 'border .2s, box-shadow .2s', backdropFilter: 'blur(12px)' }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
         <CalIcon />
-        <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(200,185,255,.5)', letterSpacing: '.8px', textTransform: 'uppercase' as const }}>{label}</span>
+        <label htmlFor={inputId} style={{ fontSize: 11, fontWeight: 600, color: 'rgba(200,185,255,.5)', letterSpacing: '.8px', textTransform: 'uppercase' as const }}>{label}</label>
       </div>
       <div style={{ fontSize: 38, fontWeight: 800, color: dateVal ? 'rgba(255,255,255,.95)' : 'rgba(255,255,255,.2)', letterSpacing: '-1.5px', lineHeight: 1 }}>{fmt.day}</div>
       <div style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,.45)', marginTop: 4 }}>{fmt.my}</div>
       <input
+        id={inputId}
         ref={inputRef}
+        aria-invalid={invalid}
+        aria-describedby={describedBy}
         type="date"
         value={dateVal}
         onChange={e => onChange(e.target.value)}
@@ -255,13 +279,24 @@ function DateCard({ label, fmt, dateVal, onChange }: {
   );
 }
 
-function Step2({ startDate, setStartDate, endDate, setEndDate, flexible, setFlexible, onNext, onBack }: {
+function Step2({ startDate, setStartDate, endDate, setEndDate, onNext, onBack }: {
   startDate: string; setStartDate: (v: string) => void;
   endDate: string; setEndDate: (v: string) => void;
-  flexible: boolean; setFlexible: (v: boolean) => void;
   onNext: () => void; onBack: () => void;
 }) {
   const nights = nightsBetween(startDate, endDate);
+  const [error, setError] = useState<string | null>(null);
+  const startRef = useRef<HTMLInputElement>(null);
+  const endRef = useRef<HTMLInputElement>(null);
+  const validate = () => {
+    const nextError = dateError(startDate, endDate);
+    setError(nextError);
+    if (!nextError) return onNext();
+    if (!startDate) startRef.current?.focus();
+    else endRef.current?.focus();
+  };
+  const updateStart = (value: string) => { setStartDate(value); setError(null); };
+  const updateEnd = (value: string) => { setEndDate(value); setError(null); };
   return (
     <Shell>
       <div style={{ height: 54, flexShrink: 0 }} />
@@ -270,9 +305,10 @@ function Step2({ startDate, setStartDate, endDate, setEndDate, flexible, setFlex
       <Label>When are you going?</Label>
 
       <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
-        <DateCard label="Departure" fmt={fmtDate(startDate)} dateVal={startDate} onChange={setStartDate} />
-        <DateCard label="Return"    fmt={fmtDate(endDate)}   dateVal={endDate}   onChange={setEndDate} />
+        <DateCard label="Departure" fmt={fmtDate(startDate)} dateVal={startDate} onChange={updateStart} inputRef={startRef} describedBy={error ? 'date-error' : undefined} invalid={Boolean(error)} />
+        <DateCard label="Return" fmt={fmtDate(endDate)} dateVal={endDate} onChange={updateEnd} inputRef={endRef} describedBy={error ? 'date-error' : undefined} invalid={Boolean(error)} />
       </div>
+      <FieldError id="date-error" message={error} />
 
       {nights > 0 && (
         <div style={{ textAlign: 'center', marginBottom: 20 }}>
@@ -282,21 +318,18 @@ function Step2({ startDate, setStartDate, endDate, setEndDate, flexible, setFlex
         </div>
       )}
 
-      <div style={{ borderRadius: 18, padding: '16px 18px', background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.07)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32 }}>
+      <div style={{ borderRadius: 18, padding: '16px 18px', background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.07)', display: 'flex', alignItems: 'center', marginTop: error ? 16 : 0, marginBottom: 32 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span style={{ fontSize: 20 }}>🌙</span>
+          <span style={{ fontSize: 20 }}>📅</span>
           <div>
-            <div style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,.85)' }}>Dates flexible?</div>
-            <div style={{ fontSize: 12, color: 'rgba(255,255,255,.35)', marginTop: 2 }}>±3 days window</div>
+            <div style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,.85)' }}>Dates are optional</div>
+            <div style={{ fontSize: 12, color: 'rgba(255,255,255,.35)', marginTop: 2 }}>Leave both blank if you haven&apos;t decided yet.</div>
           </div>
-        </div>
-        <div onClick={() => setFlexible(!flexible)} style={{ width: 48, height: 28, borderRadius: 14, background: flexible ? ACCENT : 'rgba(255,255,255,.12)', position: 'relative', cursor: 'pointer', transition: 'background .3s', flexShrink: 0 }}>
-          <div style={{ width: 22, height: 22, borderRadius: '50%', background: '#fff', position: 'absolute', top: 3, left: flexible ? 23 : 3, transition: 'left .25s cubic-bezier(.34,1.4,.64,1)', boxShadow: '0 2px 6px rgba(0,0,0,.3)' }} />
         </div>
       </div>
 
       <div style={{ flex: 1 }} />
-      <ContinueBtn onClick={onNext} />
+      <ContinueBtn onClick={validate} />
       <BackBtn onClick={onBack} />
     </Shell>
   );
@@ -391,25 +424,35 @@ function Step3({ destinations, setDestinations, onNext, onBack }: {
 }) {
   const [query, setQuery] = useState('');
   const [showDrop, setShowDrop] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
 
   const filtered = COUNTRIES.filter(c =>
     c.name.toLowerCase().includes(query.toLowerCase()) &&
     !destinations.find(d => d.name === c.name)
   );
+  const options = filtered.slice(0, 6);
   const popular = COUNTRIES.filter(c =>
     ['Japan', 'Thailand', 'Greece', 'Portugal'].includes(c.name) &&
     !destinations.find(d => d.name === c.name)
   );
 
-  const add = (c: Country) => { setDestinations(p => [...p, c]); setQuery(''); setShowDrop(false); };
+  const add = (c: Country) => { setDestinations(p => [...p, c]); setQuery(''); setShowDrop(false); setActiveIndex(0); setError(null); };
   const rem = (name: string) => setDestinations(p => p.filter(d => d.name !== name));
+  const validate = () => {
+    const nextError = destinationsError(destinations);
+    setError(nextError);
+    if (!nextError) return onNext();
+    searchRef.current?.focus();
+  };
 
   return (
     <Shell>
       <div style={{ height: 54, flexShrink: 0 }} />
       <Header step={3} onBack={onBack} />
       <Dots step={3} />
-      <Label>Where are you going?</Label>
+      <Label htmlFor="country-search">Where are you going?</Label>
 
       <div style={{ position: 'relative', marginBottom: 14 }}>
         <div style={{ height: 54, borderRadius: 18, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.09)', display: 'flex', alignItems: 'center', gap: 12, padding: '0 16px' }}>
@@ -418,18 +461,38 @@ function Step3({ destinations, setDestinations, onNext, onBack }: {
             <circle cx="12" cy="9" r="2.5" stroke={ACCENT} strokeWidth="1.5" />
           </svg>
           <input
+            id="country-search"
+            ref={searchRef}
             value={query}
-            onChange={e => { setQuery(e.target.value); setShowDrop(true); }}
+            role="combobox"
+            aria-autocomplete="list"
+            aria-controls="country-options"
+            aria-expanded={showDrop && query.length > 0 && options.length > 0}
+            aria-activedescendant={showDrop && query && options[activeIndex] ? `country-option-${activeIndex}` : undefined}
+            onChange={e => { setQuery(e.target.value); setShowDrop(true); setActiveIndex(0); }}
             onFocus={() => setShowDrop(true)}
             onBlur={() => setTimeout(() => setShowDrop(false), 150)}
+            onKeyDown={(e) => {
+              if (e.key === 'ArrowDown' && options.length) {
+                e.preventDefault(); setShowDrop(true); setActiveIndex(i => (i + 1) % options.length);
+              } else if (e.key === 'ArrowUp' && options.length) {
+                e.preventDefault(); setShowDrop(true); setActiveIndex(i => (i - 1 + options.length) % options.length);
+              } else if (e.key === 'Enter' && showDrop && options[activeIndex]) {
+                e.preventDefault(); add(options[activeIndex]);
+              } else if (e.key === 'Escape') {
+                e.preventDefault(); setShowDrop(false);
+              }
+            }}
             placeholder="Search countries..."
+            aria-invalid={Boolean(error)}
+            aria-describedby={error ? 'destinations-error' : undefined}
             style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', fontFamily: 'inherit', fontSize: 15, color: 'rgba(255,255,255,.85)', caretColor: ACCENT }}
           />
         </div>
-        {showDrop && query && filtered.length > 0 && (
-          <div style={{ position: 'absolute', top: 58, left: 0, right: 0, background: 'rgba(14,8,38,.97)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 16, overflow: 'hidden', zIndex: 20 }}>
-            {filtered.slice(0, 6).map(c => (
-              <div key={c.name} onMouseDown={() => add(c)} style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', borderBottom: '1px solid rgba(255,255,255,.05)' }}>
+        {showDrop && query && options.length > 0 && (
+          <div id="country-options" role="listbox" aria-label="Country suggestions" style={{ position: 'absolute', top: 58, left: 0, right: 0, background: 'rgba(14,8,38,.97)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 16, overflow: 'hidden', zIndex: 20 }}>
+            {options.map((c, index) => (
+              <div id={`country-option-${index}`} key={c.name} role="option" aria-selected={index === activeIndex} onMouseDown={(e) => e.preventDefault()} onClick={() => add(c)} style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', borderBottom: '1px solid rgba(255,255,255,.05)', background: index === activeIndex ? 'rgba(245,158,11,.14)' : 'transparent' }}>
                 <span style={{ fontSize: 22 }}>{c.flag}</span>
                 <span style={{ fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,.85)' }}>{c.name}</span>
               </div>
@@ -437,6 +500,7 @@ function Step3({ destinations, setDestinations, onNext, onBack }: {
           </div>
         )}
       </div>
+      <FieldError id="destinations-error" message={error} />
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, minHeight: 36, marginBottom: 16 }}>
         {destinations.length === 0
@@ -445,7 +509,7 @@ function Step3({ destinations, setDestinations, onNext, onBack }: {
             <div key={d.name} style={{ height: 36, borderRadius: 18, padding: '0 10px 0 12px', display: 'flex', alignItems: 'center', gap: 6, background: `${ACCENT}15`, border: `1.5px solid ${ACCENT}66`, fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,.85)' }}>
               <span>{d.flag}</span>
               <span>{d.name}</span>
-              <button onClick={() => rem(d.name)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 0 2px', color: 'rgba(255,255,255,.5)', fontSize: 15, lineHeight: 1, outline: 'none' }}>✕</button>
+              <button onClick={() => rem(d.name)} aria-label={`Remove ${d.name}`} style={{ width: 44, height: 44, margin: '-4px -8px -4px 0', background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'rgba(255,255,255,.5)', fontSize: 15, lineHeight: 1, outline: 'none' }}>✕</button>
             </div>
           ))
         }
@@ -460,7 +524,7 @@ function Step3({ destinations, setDestinations, onNext, onBack }: {
           <Label>Popular</Label>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
             {popular.map(c => (
-              <button key={c.name} onClick={() => add(c)} style={{ height: 34, borderRadius: 17, padding: '0 14px', display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,.7)', cursor: 'pointer', outline: 'none', fontFamily: 'inherit' }}>
+              <button key={c.name} onClick={() => add(c)} style={{ minHeight: 44, borderRadius: 22, padding: '0 14px', display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,.7)', cursor: 'pointer', outline: 'none', fontFamily: 'inherit' }}>
                 <span>{c.flag}</span><span>{c.name}</span>
               </button>
             ))}
@@ -469,7 +533,7 @@ function Step3({ destinations, setDestinations, onNext, onBack }: {
       )}
 
       <div style={{ flex: 1 }} />
-      <ContinueBtn onClick={onNext} />
+      <ContinueBtn onClick={validate} />
       <BackBtn onClick={onBack} />
     </Shell>
   );
@@ -483,23 +547,32 @@ function Step4({ budget, setBudget, currency, setCurrency, nights, onNext, onBac
   nights: number; onNext: () => void; onBack: () => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const currencyRef = useRef<HTMLButtonElement>(null);
   const [focused, setFocused] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const sym = CURRENCY_SYMBOLS[currency as TripCurrency] ?? currency;
   const raw = parseFloat(budget) || 0;
   const perDay = nights > 0 && raw > 0 ? Math.round(raw / (nights + 1)) : 0;
   const maxBudget = currency === 'TRY' ? 100000 : 10000;
   const barW = Math.min(100, (raw / maxBudget) * 100);
+  const validate = () => {
+    const nextError = budgetError(budget) ?? currencyError(currency);
+    setError(nextError);
+    if (!nextError) return onNext();
+    if (budgetError(budget)) inputRef.current?.focus();
+    else currencyRef.current?.focus();
+  };
 
   return (
     <Shell>
       <div style={{ height: 54, flexShrink: 0 }} />
       <Header step={4} onBack={onBack} />
       <Dots step={4} />
-      <Label>Total budget</Label>
+      <Label htmlFor="trip-total-budget">Total budget</Label>
 
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 32 }}>
         <span style={{ fontSize: 28, fontWeight: 800, color: ACCENT, opacity: .85, marginBottom: 4 }}>{sym}</span>
-        <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'text' }} onClick={() => inputRef.current?.focus()}>
+        <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'text' }}>
           <span style={{ fontSize: 64, fontWeight: 900, letterSpacing: '-3px', color: raw > 0 ? 'rgba(255,255,255,.95)' : 'rgba(255,255,255,.15)', lineHeight: 1 }}>
             {raw > 0 ? raw.toLocaleString() : '0'}
           </span>
@@ -507,20 +580,30 @@ function Step4({ budget, setBudget, currency, setCurrency, nights, onNext, onBac
             <span style={{ width: 3, height: 52, background: ACCENT, marginLeft: 4, borderRadius: 2, display: 'inline-block', animation: 'cursorBlink 1s step-end infinite' }} />
           )}
           <input
+            id="trip-total-budget"
             ref={inputRef}
             type="number"
             value={budget}
-            onChange={e => setBudget(e.target.value)}
+            min="0"
+            max="99999999.99"
+            step="0.01"
+            inputMode="decimal"
+            aria-label="Total budget"
+            aria-invalid={Boolean(error)}
+            aria-describedby={error ? 'budget-error' : undefined}
+            onChange={e => { setBudget(e.target.value); setError(null); }}
+            onKeyDown={e => { if (e.key === 'Enter') validate(); }}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
             style={{ position: 'absolute', inset: 0, opacity: 0, width: '100%', height: '100%', cursor: 'text' }}
           />
         </div>
+        <FieldError id="budget-error" message={error} />
       </div>
 
       <div style={{ display: 'flex', gap: 10, justifyContent: 'center', marginBottom: 32 }}>
-        {CURRENCIES.map(c => (
-          <button key={c} onClick={() => setCurrency(c)} style={{ height: 36, borderRadius: 18, padding: '0 16px', background: currency === c ? `${ACCENT}22` : 'rgba(255,255,255,.05)', border: `1.5px solid ${currency === c ? ACCENT : 'rgba(255,255,255,.1)'}`, fontSize: 13, fontWeight: 600, color: currency === c ? ACCENT : 'rgba(255,255,255,.5)', cursor: 'pointer', outline: 'none', transition: 'all .2s', fontFamily: 'inherit' }}>
+        {CURRENCIES.map((c, index) => (
+          <button ref={index === 0 ? currencyRef : undefined} key={c} aria-pressed={currency === c} onClick={() => { setCurrency(c); setError(null); }} style={{ height: 36, borderRadius: 18, padding: '0 16px', background: currency === c ? `${ACCENT}22` : 'rgba(255,255,255,.05)', border: `1.5px solid ${currency === c ? ACCENT : 'rgba(255,255,255,.1)'}`, fontSize: 13, fontWeight: 600, color: currency === c ? ACCENT : 'rgba(255,255,255,.5)', cursor: 'pointer', outline: 'none', transition: 'all .2s', fontFamily: 'inherit' }}>
             {c}
           </button>
         ))}
@@ -547,7 +630,7 @@ function Step4({ budget, setBudget, currency, setCurrency, nights, onNext, onBac
       <p style={{ textAlign: 'center', fontSize: 12, color: 'rgba(255,255,255,.25)', margin: '0 0 20px' }}>You can always update this later</p>
 
       <div style={{ flex: 1 }} />
-      <ContinueBtn onClick={onNext} />
+      <ContinueBtn onClick={validate} />
       <BackBtn onClick={onBack} />
     </Shell>
   );
@@ -563,6 +646,8 @@ function Step5({ name, vibe, startDate, endDate, destinations, budget, currency,
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
+  const [submissionError, setSubmissionError] = useState<string | null>(null);
+  const createRef = useRef<HTMLButtonElement>(null);
   const sym = CURRENCY_SYMBOLS[currency as TripCurrency] ?? currency;
   const raw = parseFloat(budget) || 0;
   const nights = nightsBetween(startDate, endDate);
@@ -573,16 +658,24 @@ function Step5({ name, vibe, startDate, endDate, destinations, budget, currency,
 
   const create = async () => {
     if (loading || done) return;
+    const invalid = titleError(name) ?? vibeError(vibe) ?? dateError(startDate, endDate) ??
+      destinationsError(destinations) ?? budgetError(budget) ?? currencyError(currency);
+    if (invalid) {
+      setSubmissionError(invalid);
+      requestAnimationFrame(() => createRef.current?.focus());
+      return;
+    }
+    setSubmissionError(null);
     setLoading(true);
     try {
       const supabase = createClient();
       const { data, error } = await supabase.rpc('create_trip_with_stops', {
-        p_title: name || 'Untitled Trip',
+        p_title: name.trim(),
         p_start_date: startDate || null,
         p_end_date: endDate || null,
         p_total_budget: raw,
         p_currency: currency,
-        p_vibe: vibe ?? 'Road',
+        p_vibe: vibe,
         p_countries: destinations,
         p_focus_lat: destinations[0]?.lat ?? null,
         p_focus_lng: destinations[0]?.lng ?? null,
@@ -662,10 +755,13 @@ function Step5({ name, vibe, startDate, endDate, destinations, budget, currency,
       </div>
 
       <BackBtn onClick={onBack} />
+      <FieldError id="create-error" message={submissionError} />
       <div style={{ height: 12 }} />
       <button
+        ref={createRef}
         onClick={create}
         disabled={loading || done}
+        aria-describedby={submissionError ? 'create-error' : undefined}
         style={{ width: '100%', height: 70, borderRadius: 22, background: done ? 'linear-gradient(130deg, #14532d, #22c55e)' : BTN_GRAD, border: 'none', cursor: loading || done ? 'default' : 'pointer', fontFamily: 'inherit', fontSize: 18, fontWeight: 700, color: done ? '#fff' : '#1a0e00', letterSpacing: '-.3px', outline: 'none', boxShadow: done ? '0 8px 32px rgba(34,197,94,.4)' : `0 8px 32px ${ACCENT}55`, transition: 'all .4s ease' }}
       >
         {done ? '✓ Trip Created!' : loading ? 'Creating...' : 'Create Trip 🚀'}
@@ -685,7 +781,6 @@ export function NewTripClient() {
   const [vibe,        setVibe]        = useState<string | null>(null);
   const [startDate,   setStartDate]   = useState('');
   const [endDate,     setEndDate]     = useState('');
-  const [flexible,    setFlexible]    = useState(false);
   const [destinations,setDestinations]= useState<Country[]>([]);
   const [budget,      setBudget]      = useState('');
   const [currency,    setCurrency]    = useState('EUR');
@@ -729,7 +824,7 @@ export function NewTripClient() {
           style={{ position: 'absolute', top: 0, left: 0, right: 0, minHeight: '100svh' }}
         >
           {step === 1 && <Step1 name={name} setName={setName} vibe={vibe} setVibe={setVibe} {...common} />}
-          {step === 2 && <Step2 startDate={startDate} setStartDate={setStartDate} endDate={endDate} setEndDate={setEndDate} flexible={flexible} setFlexible={setFlexible} {...common} />}
+          {step === 2 && <Step2 startDate={startDate} setStartDate={setStartDate} endDate={endDate} setEndDate={setEndDate} {...common} />}
           {step === 3 && <Step3 destinations={destinations} setDestinations={setDestinations} {...common} />}
           {step === 4 && <Step4 budget={budget} setBudget={setBudget} currency={currency} setCurrency={setCurrency} nights={nights} {...common} />}
           {step === 5 && <Step5 name={name} vibe={vibe} startDate={startDate} endDate={endDate} destinations={destinations} budget={budget} currency={currency} onBack={back} />}

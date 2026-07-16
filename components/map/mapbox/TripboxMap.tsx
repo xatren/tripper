@@ -2,10 +2,10 @@
 
 import { useMemo, useRef, useEffect, useCallback, useState, type CSSProperties } from 'react'
 import Map, { Marker, Popup, Source, Layer, type MapRef } from 'react-map-gl/mapbox'
-import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { MAPBOX_TOKEN, MAPBOX_DARK_STYLE, DEFAULT_PITCH, DEFAULT_BEARING, BUILDING_EXTRUSION_LAYER } from '@/lib/mapbox/client'
 import { applyAppTheme } from '@/lib/mapbox/theme'
+import { useReducedMotionPreference } from '@/components/motion/ReducedMotionProvider'
 
 const ACCENT = '#f5a623'
 
@@ -37,8 +37,8 @@ interface TripboxMapProps {
 const FALLBACK_CENTER = { lat: 41.0082, lng: 28.9784 }
 
 const zoomBtnStyle: CSSProperties = {
-  width: 36,
-  height: 36,
+  width: 44,
+  height: 44,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -53,6 +53,7 @@ const zoomBtnStyle: CSSProperties = {
 }
 
 export function TripboxMap({ points, routePath = [], interactive = true, className, defaultCenter, defaultZoom = 9, dropInId = null }: TripboxMapProps) {
+  const reducedMotion = useReducedMotionPreference()
   const mapRef = useRef<MapRef | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -72,7 +73,7 @@ export function TripboxMap({ points, routePath = [], interactive = true, classNa
       const map = mapRef.current
       if (!map || points.length === 0) return
       if (points.length === 1) {
-        map.flyTo({ center: [points[0].lng, points[0].lat], zoom: 9, pitch: DEFAULT_PITCH, bearing: DEFAULT_BEARING, duration })
+        map.flyTo({ center: [points[0].lng, points[0].lat], zoom: 9, pitch: DEFAULT_PITCH, bearing: DEFAULT_BEARING, duration: reducedMotion ? 0 : duration, essential: false })
         return
       }
       const lats = points.map((p) => p.lat)
@@ -82,10 +83,10 @@ export function TripboxMap({ points, routePath = [], interactive = true, classNa
           [Math.min(...lngs), Math.min(...lats)],
           [Math.max(...lngs), Math.max(...lats)],
         ],
-        { padding: 60, maxZoom: 13, duration, pitch: DEFAULT_PITCH, bearing: DEFAULT_BEARING }
+        { padding: 60, maxZoom: 13, duration: reducedMotion ? 0 : duration, pitch: DEFAULT_PITCH, bearing: DEFAULT_BEARING }
       )
     },
-    [points]
+    [points, reducedMotion]
   )
 
   useEffect(() => {
@@ -117,18 +118,17 @@ export function TripboxMap({ points, routePath = [], interactive = true, classNa
     if (map) {
       applyAppTheme(map)
       map.on('style.load', () => applyAppTheme(map))
-      map.addControl(new mapboxgl.AttributionControl({ compact: true }), 'bottom-right')
     }
     fitToPoints()
   }, [fitToPoints])
 
   const handleZoomIn = useCallback(() => {
-    mapRef.current?.zoomIn({ duration: 200 })
-  }, [])
+    mapRef.current?.zoomIn({ duration: reducedMotion ? 0 : 200 })
+  }, [reducedMotion])
 
   const handleZoomOut = useCallback(() => {
-    mapRef.current?.zoomOut({ duration: 200 })
-  }, [])
+    mapRef.current?.zoomOut({ duration: reducedMotion ? 0 : 200 })
+  }, [reducedMotion])
 
   const routeGeoJson = useMemo(
     () => ({
@@ -217,7 +217,7 @@ export function TripboxMap({ points, routePath = [], interactive = true, classNa
         interactive={interactive}
         dragRotate={interactive}
         touchZoomRotate={interactive}
-        attributionControl={false}
+        attributionControl
         logoPosition="bottom-right"
       >
         <Layer {...BUILDING_EXTRUSION_LAYER} />
@@ -304,11 +304,11 @@ export function TripboxMap({ points, routePath = [], interactive = true, classNa
             backdropFilter: 'blur(20px)',
           }}
         >
-          <button onClick={handleZoomIn} title="Zoom in" style={zoomBtnStyle}>
+          <button onClick={handleZoomIn} aria-label="Zoom in" title="Zoom in" style={zoomBtnStyle}>
             +
           </button>
           <div style={{ height: 1, background: 'rgba(255,255,255,.13)' }} />
-          <button onClick={handleZoomOut} title="Zoom out" style={zoomBtnStyle}>
+          <button onClick={handleZoomOut} aria-label="Zoom out" title="Zoom out" style={zoomBtnStyle}>
             −
           </button>
         </div>

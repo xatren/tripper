@@ -1,9 +1,15 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { animate } from 'framer-motion'
-import { RouteReplayMap, type RouteReplayPoint } from './RouteReplayMap'
+import type { RouteReplayPoint } from './RouteReplayMap'
 import type { DistanceUnit } from '@/lib/settings'
+import { useReducedMotionPreference } from '@/components/motion/ReducedMotionProvider'
+import { DeferredBoundary } from '@/components/ui/deferred-boundary'
+
+const RouteReplayMap = lazy(() =>
+  import('./RouteReplayMap').then((module) => ({ default: module.RouteReplayMap })),
+)
 
 const ACCENT = '#f5a623'
 const GLASS_BORDER = 'rgba(255,255,255,.13)'
@@ -21,7 +27,12 @@ export interface TripSummaryHeroProps {
 
 function useCountUp(target: number, durationMs = 1400, delayMs = 300) {
   const [value, setValue] = useState(0)
+  const reducedMotion = useReducedMotionPreference()
   useEffect(() => {
+    if (reducedMotion) {
+      setValue(target)
+      return
+    }
     const controls = animate(0, target, {
       duration: durationMs / 1000,
       delay: delayMs / 1000,
@@ -29,7 +40,7 @@ function useCountUp(target: number, durationMs = 1400, delayMs = 300) {
       onUpdate: (v) => setValue(v),
     })
     return () => controls.stop()
-  }, [target, durationMs, delayMs])
+  }, [target, durationMs, delayMs, reducedMotion])
   return value
 }
 
@@ -57,7 +68,19 @@ export function TripSummaryHero({ title, dateRange, points, routePath, distance:
         <div style={{ fontSize: 12.5, color: 'rgba(215,215,255,.6)', marginTop: 2, fontWeight: 500 }}>{dateRange}</div>
       </div>
 
-      <RouteReplayMap points={points} routePath={routePath} height={220} />
+      <DeferredBoundary label="the route replay" style={{ height: 220 }}>
+        <Suspense
+          fallback={(
+            <div
+              role="status"
+              aria-label="Loading route replay"
+              style={{ height: 220, background: 'radial-gradient(120% 90% at 50% 10%, #12123a 0%, #0a0a28 55%, #06061c 100%)' }}
+            />
+          )}
+        >
+          <RouteReplayMap points={points} routePath={routePath} height={220} />
+        </Suspense>
+      </DeferredBoundary>
 
       {/* stat row */}
       <div style={{ display: 'flex', padding: '16px 20px 20px', gap: 8 }}>

@@ -25,9 +25,11 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // getUser() always makes a request to the Auth server. That can hold the
+  // entire App Router response in its loading shell when the service or the
+  // local connection is slow. getClaims() is the recommended SSR guard: it
+  // validates the JWT locally (using cached signing keys where available).
+  const { data } = await supabase.auth.getClaims();
 
   const isAuthPage =
     request.nextUrl.pathname.startsWith('/login') ||
@@ -40,7 +42,7 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname === '/manifest.webmanifest';
 
   if (
-    !user &&
+    !data?.claims?.sub &&
     !isAuthPage &&
     !isAuthCallback &&
     !isApiRoute &&

@@ -8,6 +8,7 @@ import { ChevronLeft, Settings, Camera, Lock, LogOut, Trash2, Pencil, ChevronRig
 import { createClient } from "@/lib/supabase/client";
 import { getInitials } from "@/lib/utils";
 import { clearTripperCaches } from "@/components/pwa/RegisterSW";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import type { Profile } from "@/types";
 import { Home, Briefcase, Compass, FileText } from "lucide-react";
 
@@ -88,6 +89,9 @@ export function ProfileClient({ profile, trips }: Props) {
   const [saving, setSaving] = useState(false);
   const [saved,  setSaved]  = useState(false);
   const [saveErr, setSaveErr] = useState<string | null>(null);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [accountError, setAccountError] = useState<string | null>(null);
   const router   = useRouter();
   const supabase = createClient();
 
@@ -107,18 +111,38 @@ export function ProfileClient({ profile, trips }: Props) {
   };
 
   const handleSignOut = async () => {
+    setAccountError(null);
     const { error } = await supabase.auth.signOut();
-    if (error) return;
+    if (error) { setAccountError(error.message); return; }
     await clearTripperCaches();
-    router.push("/login");
+    router.replace("/login");
+    router.refresh();
   };
 
   const handleDeleteAccount = async () => {
-    if (!confirm("Are you sure? This will permanently delete your account and all trip data.")) return;
-    const { error } = await supabase.auth.signOut();
-    if (error) return;
-    await clearTripperCaches();
-    router.push("/login");
+    if (deleting) return;
+    setDeleteOpen(false);
+    setDeleting(true);
+    setAccountError(null);
+    try {
+      const response = await fetch('/api/account/delete', {
+        method: 'POST',
+        headers: { 'x-tripper-confirm': 'delete-account' },
+      });
+      const result = await response.json().catch(() => null) as { error?: string } | null;
+      if (!response.ok) {
+        setAccountError(result?.error ?? 'Could not delete your account. Try again.');
+        return;
+      }
+      await supabase.auth.signOut({ scope: 'local' });
+      await clearTripperCaches();
+      router.replace('/login?account_deleted=1');
+      router.refresh();
+    } catch {
+      setAccountError('Could not reach the server. Check your connection and try again.');
+    } finally {
+      setDeleting(false);
+    }
   };
 
   const statBtnBg = saved
@@ -233,9 +257,10 @@ export function ProfileClient({ profile, trips }: Props) {
             </p>
 
             <div style={{ marginBottom: 16 }}>
-              <p style={{ fontSize: 12, color: "rgba(215,215,255,0.60)", margin: "0 0 6px" }}>Display name</p>
+              <label htmlFor="profile-display-name" style={{ display: "block", fontSize: 12, color: "rgba(215,215,255,0.60)", margin: "0 0 6px" }}>Display name</label>
               <div style={{ position: "relative" }}>
                 <input
+                  id="profile-display-name"
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
                   placeholder="Your name"
@@ -248,9 +273,10 @@ export function ProfileClient({ profile, trips }: Props) {
             <div style={{ height: 1, background: "rgba(255,255,255,0.07)", margin: "0 0 16px" }} />
 
             <div style={{ marginBottom: 20 }}>
-              <p style={{ fontSize: 12, color: "rgba(215,215,255,0.60)", margin: "0 0 6px" }}>Email</p>
+              <label htmlFor="profile-email" style={{ display: "block", fontSize: 12, color: "rgba(215,215,255,0.60)", margin: "0 0 6px" }}>Email</label>
               <div style={{ position: "relative" }}>
                 <input
+                  id="profile-email"
                   value={profile?.email ?? ""}
                   readOnly
                   style={{ width: "100%", boxSizing: "border-box", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "13px 40px 13px 14px", fontSize: 15, color: "rgba(215,215,255,0.50)", outline: "none", cursor: "default", ...FONT }}
@@ -297,16 +323,18 @@ export function ProfileClient({ profile, trips }: Props) {
             <div style={{ height: 1, background: "rgba(255,255,255,0.07)", margin: "0 16px" }} />
 
             <motion.button
-              onClick={handleDeleteAccount}
-              style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", background: "none", border: "none", cursor: "pointer", textAlign: "left" }}
+              onClick={() => { setAccountError(null); setDeleteOpen(true); }}
+              disabled={deleting}
+              style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", background: "none", border: "none", cursor: deleting ? "wait" : "pointer", textAlign: "left", opacity: deleting ? 0.65 : 1 }}
               whileTap={{ scale: 0.99 }} transition={TAP}
             >
               <div style={{ width: 34, height: 34, borderRadius: 10, background: "rgba(239,68,68,0.10)", border: "1px solid rgba(239,68,68,0.20)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <Trash2 style={{ width: 16, height: 16, color: "rgba(239,68,68,0.75)" }} />
               </div>
-              <span style={{ flex: 1, fontSize: 15, color: "rgba(239,68,68,0.85)", ...FONT }}>Delete Account</span>
+              <span style={{ flex: 1, fontSize: 15, color: "rgba(239,68,68,0.85)", ...FONT }}>{deleting ? 'Deleting Account…' : 'Delete Account'}</span>
               <ChevronRight style={{ width: 16, height: 16, color: "rgba(239,68,68,0.35)" }} />
             </motion.button>
+            {accountError && <p role="alert" style={{ color: "#ff7b7b", fontSize: 13, lineHeight: 1.45, margin: "0 16px 16px" }}>{accountError}</p>}
           </motion.div>
 
         </div>
@@ -339,6 +367,14 @@ export function ProfileClient({ profile, trips }: Props) {
             );
           })}
         </nav>
+        <ConfirmDialog
+          open={deleteOpen}
+          title="Delete your account?"
+          message="This permanently removes your account, trips you own, and their private photos. Shared-trip contributions remain without your identity. This cannot be undone."
+          confirmLabel="Delete account"
+          onConfirm={handleDeleteAccount}
+          onCancel={() => setDeleteOpen(false)}
+        />
       </div>
     </div>
   );

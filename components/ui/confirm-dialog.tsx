@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useId, useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 
 // Inline-styled (not the Radix alert-dialog) so it matches the app's dark
@@ -18,6 +18,8 @@ export interface ConfirmDialogProps {
 export function ConfirmDialog({ open, title, message, confirmLabel = 'Delete', onConfirm, onCancel }: ConfirmDialogProps) {
   const cancelRef = useRef<HTMLButtonElement>(null)
   const confirmRef = useRef<HTMLButtonElement>(null)
+  const titleId = useId()
+  const messageId = useId()
 
   // Escape closes; Tab cycles between the two buttons; focus returns to the
   // previously focused element when the dialog goes away.
@@ -59,8 +61,8 @@ export function ConfirmDialog({ open, title, message, confirmLabel = 'Delete', o
           <motion.div
             role="alertdialog"
             aria-modal="true"
-            aria-labelledby="confirm-dialog-title"
-            aria-describedby="confirm-dialog-message"
+            aria-labelledby={titleId}
+            aria-describedby={messageId}
             initial={{ opacity: 0, scale: 0.94, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.94, y: 10 }}
@@ -72,8 +74,8 @@ export function ConfirmDialog({ open, title, message, confirmLabel = 'Delete', o
               boxShadow: '0 16px 48px rgba(0,0,0,.5)', backdropFilter: 'blur(24px)',
             }}
           >
-            <div id="confirm-dialog-title" style={{ fontSize: 16, fontWeight: 800, color: '#fff', letterSpacing: '-0.01em' }}>{title}</div>
-            <div id="confirm-dialog-message" style={{ fontSize: 13, color: 'rgba(215,215,255,.65)', marginTop: 6, lineHeight: 1.5 }}>{message}</div>
+            <div id={titleId} style={{ fontSize: 16, fontWeight: 800, color: '#fff', letterSpacing: '-0.01em' }}>{title}</div>
+            <div id={messageId} style={{ fontSize: 13, color: 'rgba(215,215,255,.65)', marginTop: 6, lineHeight: 1.5 }}>{message}</div>
             <div style={{ display: 'flex', gap: 10, marginTop: 18 }}>
               <button
                 ref={cancelRef}

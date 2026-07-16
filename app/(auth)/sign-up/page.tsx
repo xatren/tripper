@@ -83,10 +83,10 @@ function SmallIcon() {
 }
 
 /* ── Field component ───────────────────────────────────────────────── */
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({ id, label, children }: { id: string; label: string; children: React.ReactNode }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-      <label style={{ color: C.offWhite, fontSize: 13, fontWeight: 500, letterSpacing: '-0.01em' }}>
+      <label htmlFor={id} style={{ color: C.offWhite, fontSize: 13, fontWeight: 500, letterSpacing: '-0.01em' }}>
         {label}
       </label>
       {children}
@@ -155,7 +155,7 @@ export default function SignUpPage() {
         <motion.div
           initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: 'easeOut' }}
-          style={{ display: 'flex', flexDirection: 'column', gap: 28 }}
+          style={{ width: '100%', maxWidth: 430, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 28 }}
         >
           {/* Header */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
@@ -174,8 +174,9 @@ export default function SignUpPage() {
           <div style={{ background: C.glassFill, backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: `1px solid ${C.glassBorder}`, borderRadius: 20, padding: '24px 20px' }}>
             <form onSubmit={handleSignUp} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
 
-              <Field label="Full name">
+              <Field id="signup-name" label="Full name">
                 <input
+                  id="signup-name"
                   className="auth-input"
                   type="text" placeholder="Your full name"
                   autoComplete="name"
@@ -183,44 +184,57 @@ export default function SignUpPage() {
                 />
               </Field>
 
-              <Field label="Email">
+              <Field id="signup-email" label="Email">
                 <input
+                  id="signup-email"
                   className="auth-input"
                   type="email" placeholder="you@example.com"
                   required autoComplete="email"
+                  aria-invalid={Boolean(error)}
+                  aria-describedby={error ? 'signup-error' : undefined}
                   value={email} onChange={e => setEmail(e.target.value)}
                 />
               </Field>
 
-              <Field label="Password">
+              <Field id="signup-password" label="Password">
                 <div style={{ position: 'relative' }}>
                   <input
+                    id="signup-password"
                     className="auth-input"
                     type={showPass ? 'text' : 'password'}
                     placeholder="At least 6 characters"
                     required autoComplete="new-password"
+                    aria-invalid={Boolean(error)}
+                    aria-describedby={error ? 'signup-error' : undefined}
                     value={password} onChange={e => setPassword(e.target.value)}
                     style={{ paddingRight: 48 }}
                   />
                   <button type="button" onClick={() => setShowPass(v => !v)}
-                    style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: C.grayAtla, display: 'flex', alignItems: 'center' }}>
+                    aria-label={showPass ? 'Hide password' : 'Show password'}
+                    aria-pressed={showPass}
+                    style={{ position: 'absolute', right: 4, top: '50%', transform: 'translateY(-50%)', width: 44, height: 44, background: 'none', border: 'none', cursor: 'pointer', color: C.grayAtla, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     {showPass ? <EyeOff size={17} /> : <Eye size={17} />}
                   </button>
                 </div>
               </Field>
 
-              <Field label="Confirm password">
+              <Field id="signup-confirm-password" label="Confirm password">
                 <div style={{ position: 'relative' }}>
                   <input
+                    id="signup-confirm-password"
                     className="auth-input"
                     type={showConfirm ? 'text' : 'password'}
                     placeholder="Re-enter your password"
                     required autoComplete="new-password"
+                    aria-invalid={Boolean(error)}
+                    aria-describedby={error ? 'signup-error' : undefined}
                     value={confirm} onChange={e => setConfirm(e.target.value)}
                     style={{ paddingRight: 48 }}
                   />
                   <button type="button" onClick={() => setShowConfirm(v => !v)}
-                    style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: C.grayAtla, display: 'flex', alignItems: 'center' }}>
+                    aria-label={showConfirm ? 'Hide confirmation password' : 'Show confirmation password'}
+                    aria-pressed={showConfirm}
+                    style={{ position: 'absolute', right: 4, top: '50%', transform: 'translateY(-50%)', width: 44, height: 44, background: 'none', border: 'none', cursor: 'pointer', color: C.grayAtla, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     {showConfirm ? <EyeOff size={17} /> : <Eye size={17} />}
                   </button>
                 </div>
@@ -242,7 +256,7 @@ export default function SignUpPage() {
               )}
 
               {error && (
-                <div style={{ background: 'rgba(220,50,50,.12)', border: '1px solid rgba(220,50,50,.25)', borderRadius: 10, padding: '10px 14px' }}>
+                <div id="signup-error" role="alert" style={{ background: 'rgba(220,50,50,.12)', border: '1px solid rgba(220,50,50,.25)', borderRadius: 10, padding: '10px 14px' }}>
                   <p style={{ color: '#ff6b6b', fontSize: 13, margin: 0 }}>{error}</p>
                 </div>
               )}

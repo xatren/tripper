@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Map, { Marker, Source, Layer, type MapRef } from "react-map-gl/mapbox";
-import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import {
   MAPBOX_TOKEN,
@@ -10,6 +9,7 @@ import {
   DEFAULT_PITCH,
 } from "@/lib/mapbox/client";
 import { applyAppTheme } from "@/lib/mapbox/theme";
+import { useReducedMotionPreference } from "@/components/motion/ReducedMotionProvider";
 
 export interface ExploreCamera {
   lat: number;
@@ -86,6 +86,7 @@ export function ExploreMapbox({
   onReady,
   onUserInteract,
 }: Props) {
+  const reducedMotion = useReducedMotionPreference();
   const mapRef = useRef<MapRef | null>(null);
   const readyRef = useRef(false);
   const rotateRef = useRef<number | null>(null);
@@ -132,10 +133,10 @@ export function ExploreMapbox({
       zoom: altitudeToZoom(target.altitude),
       pitch: altitudeToPitch(target.altitude),
       bearing: map.getBearing(),
-      duration,
-      essential: true,
+      duration: reducedMotion ? 0 : duration,
+      essential: false,
     });
-  }, []);
+  }, [reducedMotion]);
 
   const handleLoad = useCallback(() => {
     const map = mapRef.current?.getMap();
@@ -146,7 +147,6 @@ export function ExploreMapbox({
         applyAppTheme(map);
         map.setFog(EXPLORE_FOG);
       });
-      map.addControl(new mapboxgl.AttributionControl({ compact: true }), "bottom-right");
       // Only genuine user gestures carry an originalEvent; programmatic
       // camera flights (flyTo) also emit these events and must not count
       // as interaction, or they'd cancel auto-rotate on every flight.
@@ -167,7 +167,7 @@ export function ExploreMapbox({
   }, [flyToken, camera, flyTo]);
 
   useEffect(() => {
-    if (!mapLoaded || !autoRotate) {
+    if (!mapLoaded || !autoRotate || reducedMotion) {
       if (rotateRef.current != null) {
         cancelAnimationFrame(rotateRef.current);
         rotateRef.current = null;
@@ -180,7 +180,7 @@ export function ExploreMapbox({
       const delta = now - last;
       last = now;
       const m = mapRef.current?.getMap();
-      if (m && autoRotate) {
+      if (m && autoRotate && !reducedMotion) {
         m.setBearing(m.getBearing() + delta * 0.004);
       }
       rotateRef.current = requestAnimationFrame(spin);
@@ -191,7 +191,7 @@ export function ExploreMapbox({
       if (rotateRef.current != null) cancelAnimationFrame(rotateRef.current);
       rotateRef.current = null;
     };
-  }, [autoRotate, mapLoaded]);
+  }, [autoRotate, mapLoaded, reducedMotion]);
 
   if (!MAPBOX_TOKEN) {
     return (
@@ -248,7 +248,7 @@ export function ExploreMapbox({
         style={{ width: "100%", height: "100%" }}
         dragRotate
         touchZoomRotate
-        attributionControl={false}
+        attributionControl
         logoPosition="bottom-right"
         maxPitch={85}
       >

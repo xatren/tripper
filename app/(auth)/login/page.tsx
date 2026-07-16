@@ -151,7 +151,7 @@ export default function LoginPage() {
         <motion.div
           initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: 'easeOut' }}
-          style={{ display: 'flex', flexDirection: 'column', gap: 28 }}
+          style={{ width: '100%', maxWidth: 430, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 28 }}
         >
           {/* Header */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
@@ -189,39 +189,47 @@ export default function LoginPage() {
             {/* Form */}
             <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <label style={{ color: C.offWhite, fontSize: 13, fontWeight: 500, letterSpacing: '-0.01em' }}>
+                <label htmlFor="login-email" style={{ color: C.offWhite, fontSize: 13, fontWeight: 500, letterSpacing: '-0.01em' }}>
                   Email
                 </label>
                 <input
+                  id="login-email"
                   className="auth-input"
                   type="email" placeholder="you@example.com"
                   required autoComplete="email"
+                  aria-invalid={Boolean(error)}
+                  aria-describedby={error ? 'login-error' : undefined}
                   value={email} onChange={e => setEmail(e.target.value)}
                 />
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <label style={{ color: C.offWhite, fontSize: 13, fontWeight: 500, letterSpacing: '-0.01em' }}>
+                <label htmlFor="login-password" style={{ color: C.offWhite, fontSize: 13, fontWeight: 500, letterSpacing: '-0.01em' }}>
                   Password
                 </label>
                 <div style={{ position: 'relative' }}>
                   <input
+                    id="login-password"
                     className="auth-input"
                     type={showPass ? 'text' : 'password'}
                     placeholder="At least 6 characters"
                     required autoComplete="current-password"
+                    aria-invalid={Boolean(error)}
+                    aria-describedby={error ? 'login-error' : undefined}
                     value={password} onChange={e => setPassword(e.target.value)}
                     style={{ paddingRight: 48 }}
                   />
                   <button type="button" onClick={() => setShowPass(v => !v)}
-                    style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: C.grayAtla, display: 'flex', alignItems: 'center' }}>
+                    aria-label={showPass ? 'Hide password' : 'Show password'}
+                    aria-pressed={showPass}
+                    style={{ position: 'absolute', right: 4, top: '50%', transform: 'translateY(-50%)', width: 44, height: 44, background: 'none', border: 'none', cursor: 'pointer', color: C.grayAtla, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     {showPass ? <EyeOff size={17} /> : <Eye size={17} />}
                   </button>
                 </div>
               </div>
 
               {error && (
-                <div style={{ background: 'rgba(220,50,50,.12)', border: '1px solid rgba(220,50,50,.25)', borderRadius: 10, padding: '10px 14px' }}>
+                <div id="login-error" role="alert" style={{ background: 'rgba(220,50,50,.12)', border: '1px solid rgba(220,50,50,.25)', borderRadius: 10, padding: '10px 14px' }}>
                   <p style={{ color: '#ff6b6b', fontSize: 13, margin: 0 }}>{error}</p>
                 </div>
               )}

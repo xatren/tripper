@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint app components lib types proxy.ts next.config.mjs eslint.config.mjs"
+    "lint": "eslint app components lib types proxy.ts next.config.mjs eslint.config.mjs",
+    "test": "node --experimental-strip-types --test tests/*.test.mts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

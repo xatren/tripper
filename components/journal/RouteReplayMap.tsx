@@ -2,11 +2,12 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Map, { Marker, Source, Layer, type MapRef } from 'react-map-gl/mapbox'
-import mapboxgl from 'mapbox-gl'
+import type mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { animate } from 'framer-motion'
 import { MAPBOX_TOKEN, MAPBOX_DARK_STYLE, DEFAULT_PITCH, DEFAULT_BEARING, BUILDING_EXTRUSION_LAYER } from '@/lib/mapbox/client'
 import { applyAppTheme } from '@/lib/mapbox/theme'
+import { useReducedMotionPreference } from '@/components/motion/ReducedMotionProvider'
 
 const ACCENT_LIGHT = '#f8c04a'
 /** How much closer (in zoom levels) the chase camera gets vs. the full-route overview. */
@@ -76,6 +77,7 @@ function sampleAtDistance(path: LatLng[], cum: number[], dist: number) {
 const emptyLine = { type: 'Feature' as const, geometry: { type: 'LineString' as const, coordinates: [] as number[][] }, properties: {} }
 
 export function RouteReplayMap({ points, routePath, duration = 7, height = 220 }: RouteReplayMapProps) {
+  const reducedMotion = useReducedMotionPreference()
   const mapRef = useRef<MapRef | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [mapReady, setMapReady] = useState(false)
@@ -121,7 +123,29 @@ export function RouteReplayMap({ points, routePath, duration = 7, height = 220 }
     timeoutsRef.current = []
     animControlsRef.current?.stop()
     animControlsRef.current = null
+    mapRef.current?.getMap().stop()
   }, [])
+
+  const showCompletedRoute = useCallback(() => {
+    const map = mapRef.current?.getMap()
+    if (!map || !bounds || routePath.length < 2) return
+
+    clearPending()
+    setCar(null)
+    setRevealed(points.map(() => true))
+    map.fitBounds([bounds.sw, bounds.ne], {
+      padding: 36,
+      duration: 0,
+      pitch: DEFAULT_PITCH,
+      bearing: DEFAULT_BEARING,
+    })
+    const traveledSource = map.getSource('journal-traveled-route') as mapboxgl.GeoJSONSource | undefined
+    traveledSource?.setData({
+      type: 'Feature',
+      geometry: { type: 'LineString', coordinates: routePath.map((p) => [p.lng, p.lat]) },
+      properties: {},
+    })
+  }, [bounds, clearPending, points, routePath])
 
   /**
    * Cinematic sequence: wide establishing shot of the whole route, zoom in on
@@ -146,7 +170,7 @@ export function RouteReplayMap({ points, routePath, duration = 7, height = 220 }
 
     const t1 = window.setTimeout(() => {
       // 2. zoom in to the starting point
-      map.flyTo({ center: [start.lng, start.lat], zoom: chaseZoom, pitch: DEFAULT_PITCH, bearing: DEFAULT_BEARING, duration: 1400, essential: true })
+      map.flyTo({ center: [start.lng, start.lat], zoom: chaseZoom, pitch: DEFAULT_PITCH, bearing: DEFAULT_BEARING, duration: 1400, essential: false })
 
       const t2 = window.setTimeout(() => {
         // 3. chase the marker along the real route geometry
@@ -190,10 +214,11 @@ export function RouteReplayMap({ points, routePath, duration = 7, height = 220 }
 
   useEffect(() => {
     if (!mapReady || !bounds) return
-    playSequence()
+    if (reducedMotion) showCompletedRoute()
+    else playSequence()
     return () => clearPending()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mapReady, bounds, playToken])
+  }, [mapReady, bounds, playToken, reducedMotion])
 
   useEffect(() => {
     const el = containerRef.current
@@ -259,7 +284,7 @@ export function RouteReplayMap({ points, routePath, duration = 7, height = 220 }
         </Source>
 
         {points.map((p, i) => (
-          <Marker key={p.id} latitude={p.lat} longitude={p.lng} anchor="center" style={{ opacity: revealed[i] ? 1 : 0, transition: 'opacity .3s ease' }}>
+          <Marker key={p.id} latitude={p.lat} longitude={p.lng} anchor="center" style={{ opacity: revealed[i] ? 1 : 0, transition: reducedMotion ? 'none' : 'opacity .3s ease' }}>
             <div
               style={{
                 width: 22, height: 22, borderRadius: '50%', background: '#0a0a1e',
@@ -286,11 +311,12 @@ export function RouteReplayMap({ points, routePath, duration = 7, height = 220 }
       </Map>
 
       <button
-        onClick={() => setPlayToken((n) => n + 1)}
-        title="Replay route"
+        onClick={() => reducedMotion ? showCompletedRoute() : setPlayToken((n) => n + 1)}
+        aria-label={reducedMotion ? 'Show full route' : 'Replay route'}
+        title={reducedMotion ? 'Show full route' : 'Replay route'}
         style={{
           position: 'absolute', right: 10, bottom: 10, zIndex: 5,
-          width: 34, height: 34, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          width: 44, height: 44, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center',
           background: 'rgba(255,255,255,.08)', border: '1px solid rgba(255,255,255,.15)', backdropFilter: 'blur(16px)',
           cursor: 'pointer',
         }}

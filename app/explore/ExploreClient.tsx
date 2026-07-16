@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
+import { useReducedMotionPreference } from "@/components/motion/ReducedMotionProvider";
+import { DeferredBoundary, DeferredFailure } from "@/components/ui/deferred-boundary";
 import type { ExploreCamera } from "@/components/explore/ExploreMapbox";
 import {
   Compass, Globe2,
@@ -16,23 +17,19 @@ import type { Profile, Trip, TripCountry } from "@/types";
 import { getInitials } from "@/lib/utils";
 import { getDrivingRoute } from "@/lib/mapbox/directions";
 
-const ExploreMapbox = dynamic(
-  () => import("@/components/explore/ExploreMapbox").then(m => m.ExploreMapbox),
-  {
-    ssr: false,
-    // Static gradient placeholder while the mapbox-gl chunk downloads;
-    // the animated loading ring overlay sits on top until the globe is ready.
-    loading: () => (
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          background: "radial-gradient(120% 90% at 50% 20%, #0a0a30 0%, #050518 60%, #000010 100%)",
-        }}
-      />
-    ),
-  },
-);
+function ExploreMapPlaceholder() {
+  return (
+    <div
+      role="status"
+      aria-label="Loading interactive globe"
+      style={{
+        width: "100%",
+        height: "100%",
+        background: "radial-gradient(120% 90% at 50% 20%, #0a0a30 0%, #050518 60%, #000010 100%)",
+      }}
+    />
+  );
+}
 
 // ── Tokens ────────────────────────────────────────────────────────────────────
 const FONT: React.CSSProperties = {
@@ -256,19 +253,6 @@ function collectVisitedPlaces(
   return out;
 }
 
-/** True when the user has requested reduced motion at the OS/browser level. */
-function usePrefersReducedMotion() {
-  const [reduced, setReduced] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduced(mq.matches);
-    const onChange = (e: MediaQueryListEvent) => setReduced(e.matches);
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, []);
-  return reduced;
-}
-
 /** True while the tab is in the foreground; flips off on visibilitychange. */
 function usePageVisible() {
   const [visible, setVisible] = useState(true);
@@ -282,6 +266,8 @@ function usePageVisible() {
 }
 
 export function ExploreClient({ profile, trips }: Props) {
+  const [MapComponent, setMapComponent] = useState<typeof import("@/components/explore/ExploreMapbox").ExploreMapbox | null>(null);
+  const [mapLoadFailed, setMapLoadFailed] = useState(false);
   const router       = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -291,10 +277,21 @@ export function ExploreClient({ profile, trips }: Props) {
   const [globeW,        setGlobeW]       = useState(390);
   const [globeH,        setGlobeH]       = useState(300);
   const [autoRotate,    setAutoRotate]    = useState(true);
-  const reducedMotion = usePrefersReducedMotion();
+  const reducedMotion = useReducedMotionPreference();
   const pageVisible   = usePageVisible();
   const [camera,        setCamera]        = useState<ExploreCamera | null>(null);
   const [flyToken,      setFlyToken]      = useState(0);
+
+  // mapbox-gl touches browser APIs; request it after hydration so it remains
+  // outside the route's initial client graph without changing the map layout.
+  useEffect(() => {
+    let current = true;
+    setMapLoadFailed(false);
+    import("@/components/explore/ExploreMapbox")
+      .then((module) => { if (current) setMapComponent(() => module.ExploreMapbox); })
+      .catch(() => { if (current) setMapLoadFailed(true); });
+    return () => { current = false; };
+  }, []);
   const [drivingPath,   setDrivingPath]   = useState<{ lat: number; lng: number }[]>([]);
 
   const visitedPlaces = useMemo(() => collectVisitedPlaces(trips), [trips]);
@@ -460,18 +457,24 @@ export function ExploreClient({ profile, trips }: Props) {
 
         {/* Mapbox globe */}
         <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <ExploreMapbox
-            width={globeW}
-            height={globeH}
-            points={points}
-            arcs={arcs}
-            routePath={routePath}
-            autoRotate={autoRotate && pageVisible && !reducedMotion}
-            camera={camera}
-            flyToken={flyToken}
-            onReady={() => setReady(true)}
-            onUserInteract={() => setAutoRotate(false)}
-          />
+          <DeferredBoundary label="the interactive globe" style={{ width: "100%", height: "100%" }}>
+            {mapLoadFailed ? (
+              <DeferredFailure label="the interactive globe" onRetry={() => window.location.reload()} style={{ width: "100%", height: "100%" }} />
+            ) : MapComponent ? (
+                <MapComponent
+                  width={globeW}
+                  height={globeH}
+                  points={points}
+                  arcs={arcs}
+                  routePath={routePath}
+                  autoRotate={autoRotate && pageVisible && !reducedMotion}
+                  camera={camera}
+                  flyToken={flyToken}
+                  onReady={() => setReady(true)}
+                  onUserInteract={() => setAutoRotate(false)}
+                />
+            ) : <ExploreMapPlaceholder />}
+          </DeferredBoundary>
         </div>
 
         {/* Loading ring */}
@@ -734,7 +737,7 @@ function StarField() {
   }, []);
   // Twinkling pauses when the tab is hidden or the user prefers reduced motion;
   // stars then hold a static mid opacity instead of running 60 infinite tweens.
-  const reducedMotion = usePrefersReducedMotion();
+  const reducedMotion = useReducedMotionPreference();
   const pageVisible   = usePageVisible();
   const twinkle = pageVisible && !reducedMotion;
   return (

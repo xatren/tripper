@@ -103,12 +103,11 @@ export function Toaster() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.96 }}
             transition={{ type: 'spring', stiffness: 380, damping: 28 }}
-            onClick={() => setToasts((prev) => prev.filter((x) => x.id !== t.id))}
             style={{
               display: 'flex', alignItems: 'center', gap: 10, padding: '11px 14px',
               borderRadius: 14, background: 'rgba(12,12,30,.92)', backdropFilter: 'blur(20px)',
               border: `1px solid ${KIND_META[t.kind].border}`,
-              boxShadow: '0 8px 28px rgba(0,0,0,.4)', pointerEvents: 'auto', cursor: 'pointer',
+              boxShadow: '0 8px 28px rgba(0,0,0,.4)', pointerEvents: 'auto',
             }}
           >
             <span style={{ flex: 'none', display: 'flex' }}>{KIND_META[t.kind].icon}</span>
@@ -133,6 +132,13 @@ export function Toaster() {
                 {t.action.label}
               </button>
             )}
+            <button
+              aria-label="Dismiss notification"
+              onClick={() => setToasts((prev) => prev.filter((x) => x.id !== t.id))}
+              style={{ width: 44, height: 44, margin: '-8px -10px -8px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none', padding: 0, border: 0, background: 'transparent', color: 'rgba(255,255,255,.65)', cursor: 'pointer', fontSize: 18 }}
+            >
+              ×
+            </button>
           </motion.div>
         ))}
       </AnimatePresence>
