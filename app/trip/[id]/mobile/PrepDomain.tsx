@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState, type Dispatch, type ReactNode, type S
 import { createClient } from '@/lib/supabase/client'
 import { useTripRealtimeTable } from '@/lib/supabase/trip-realtime'
 import { showToast } from '@/components/ui/toast'
-import { ACCENT, ACCENT_DARK, ACCENT_LIGHT, GLASS_BORDER, GLASS_FILL, RetryCard } from './domain-ui'
+import { ACCENT, ACCENT_DARK, ACCENT_GRADIENT, ACCENT_LIGHT, GLASS_BORDER, GLASS_FILL, RetryCard } from './domain-ui'
 
 interface PackingRow {
   id: string
@@ -292,7 +292,7 @@ export function PrepDomain({ tripId, vibe, userId, canEdit }: PrepDomainProps) {
           {canEdit && <button
             onClick={seedTemplate}
             disabled={seeding}
-            style={{ marginTop: 14, padding: '11px 22px', borderRadius: 12, background: 'linear-gradient(135deg, #f5a623, #f8c04a)', border: 'none', color: '#1a0800', fontWeight: 800, fontSize: 13.5, cursor: seeding ? 'default' : 'pointer', fontFamily: 'inherit', opacity: seeding ? 0.6 : 1, boxShadow: '0 0 20px rgba(245,140,0,.25)' }}
+            style={{ marginTop: 14, padding: '11px 22px', borderRadius: 12, background: ACCENT_GRADIENT, border: 'none', color: '#1a0800', fontWeight: 800, fontSize: 13.5, cursor: seeding ? 'default' : 'pointer', fontFamily: 'inherit', opacity: seeding ? 0.6 : 1, boxShadow: '0 0 20px rgba(245,140,0,.25)' }}
           >
             {seeding ? 'Adding…' : `Add ${vibe ?? 'Road'} essentials`}
           </button>}

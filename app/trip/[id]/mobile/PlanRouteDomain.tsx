@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect, useRef, type CSSProperties, type Dispatch, type SetStateAction } from 'react'
+import { useState, useCallback, useEffect, useRef, type Dispatch, type SetStateAction } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence, useMotionValue, animate } from 'framer-motion'
 import { DndContext, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
@@ -10,7 +10,7 @@ import { SegmentedTabs } from '@/components/ui/segmented-tabs'
 import { createClient } from '@/lib/supabase/client'
 import { DeferredBoundary, DeferredFailure } from '@/components/ui/deferred-boundary'
 import { getFullRoute, type RouteLeg } from '@/lib/mapbox/directions'
-import type { Trip, Stop, TripCapabilities } from '@/types'
+import type { Trip, Stop, TripCapabilities, TripMember } from '@/types'
 import { showToast } from '@/components/ui/toast'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { fetchWeatherForStops, type DayWeather, type WeatherKind } from '@/lib/weather/openMeteo'
@@ -19,7 +19,10 @@ import { downloadTripIcs } from '@/lib/ics'
 import { useDistanceUnit, formatDistanceValue } from '@/lib/settings'
 import { DestinationDialog } from './DestinationDialog'
 import { ACCENT, ACCENT_DARK, ACCENT_LIGHT, GLASS_BORDER, GLASS_FILL } from './domain-ui'
-import { BOOKING_PARTNERS, bookingUrl, computeStopSchedule, formatDateRange, formatDayChip, totalNights, tripTitle, type StopSchedule } from './trip-domain-utils'
+import { computeStopSchedule, formatDateRange, formatDayChip, totalNights, tripTitle, type StopSchedule } from './trip-domain-utils'
+import { TripMobileHeader } from './components/TripMobileHeader'
+import { TripPrimaryNav, type PrimaryNavSection } from './components/TripPrimaryNav'
+import { TripAddSheet } from './components/TripAddSheet'
 
 function TripMapPlaceholder() {
   return (
@@ -41,19 +44,19 @@ const SHEET_MIN_PX = 190
 const SHEET_DEFAULT_RATIO = 0.54
 const SHEET_MAX_RATIO = 0.88
 
-export type Section = 'plan' | 'prep' | 'budget' | 'journal'
-
 export interface PlanRouteDomainProps {
   trip: Trip
   stops: Stop[]
   setStops: Dispatch<SetStateAction<Stop[]>>
   currentUserId: string
+  members: TripMember[]
   routePath: { lat: number; lng: number }[]
   setRoutePath: Dispatch<SetStateAction<{ lat: number; lng: number }[]>>
   routeLegs: RouteLeg[]
   setRouteLegs: Dispatch<SetStateAction<RouteLeg[]>>
-  onSelectSection: (section: Section) => void
-  onPrefetchSection?: (section: Section) => void
+  onSelectSection: (section: PrimaryNavSection) => void
+  onPrefetchSection?: (section: PrimaryNavSection) => void
+  onOpenMore: () => void
   capabilities: TripCapabilities
   onStopSyncPaused: (paused: boolean) => void
 }
@@ -124,28 +127,14 @@ function WeatherIcon({ kind, size = 18 }: { kind: WeatherKind; size?: number }) 
 // Backed by the `packing_items` table (migration 010). A vibe-aware starter
 // template seeds the list on first open.
 
-const topBtnStyle: CSSProperties = {
-  width: 40,
-  height: 40,
-  borderRadius: 14,
-  background: GLASS_FILL,
-  border: `1px solid ${GLASS_BORDER}`,
-  backdropFilter: 'blur(20px)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  flex: 'none',
-  cursor: 'pointer',
-  boxShadow: '0 4px 16px rgba(0,0,0,.3)',
-}
-
 // ─── Main content ────────────────────────────────────────────────────────────
 
-export function PlanRouteDomain({ trip, stops, setStops, currentUserId, routePath, setRoutePath, routeLegs, setRouteLegs, onSelectSection, onPrefetchSection, capabilities, onStopSyncPaused }: PlanRouteDomainProps) {
+export function PlanRouteDomain({ trip, stops, setStops, currentUserId, members, routePath, setRoutePath, routeLegs, setRouteLegs, onSelectSection, onPrefetchSection, onOpenMore, capabilities, onStopSyncPaused }: PlanRouteDomainProps) {
   const { canEdit } = capabilities
   const router = useRouter()
   const distanceUnit = useDistanceUnit()
-  const [activeTab, setActiveTab] = useState<'route' | 'days' | 'bookings'>('route')
+  const [activeTab, setActiveTab] = useState<'route' | 'days'>('route')
+  const [isAddSheetOpen, setIsAddSheetOpen] = useState(false)
   const [MapComponent, setMapComponent] = useState<typeof import('@/components/map/mapbox/TripboxMap').TripboxMap | null>(null)
   const [mapLoadFailed, setMapLoadFailed] = useState(false)
   const [isAddOpen, setIsAddOpen] = useState(false)
@@ -522,38 +511,17 @@ export function PlanRouteDomain({ trip, stops, setStops, currentUserId, routePat
           <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(to bottom, transparent 78%, rgba(6,6,28,.6) 100%)' }} />
         </div>
 
-        {/* floating header — sits over the map, not a separate opaque block */}
-        <div
-          style={{
-            position: 'absolute', top: 0, left: 0, right: 0, zIndex: 2,
-            padding: '20px 18px 14px', paddingTop: 'max(20px, env(safe-area-inset-top))',
-            background: 'linear-gradient(to bottom, rgba(6,6,20,.8) 0%, rgba(6,6,20,.45) 55%, transparent 100%)',
-            pointerEvents: 'none',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', pointerEvents: 'auto' }}>
-            <button onClick={() => router.push('/trips')} title="Back to trips" aria-label="Back to trips" style={topBtnStyle}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
-            </button>
-
-            <div style={{ flex: 1, textAlign: 'center', padding: '0 8px', minWidth: 0 }}>
-              <div style={{ color: '#ffffff', fontWeight: 800, fontSize: 17, letterSpacing: '-0.2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textShadow: '0 2px 12px rgba(0,0,0,.6)' }}>
-                {tripTitle(trip, stops)}
-              </div>
-              <div style={{ color: 'rgba(215,215,255,.7)', fontWeight: 500, fontSize: 12.5, marginTop: 3, textShadow: '0 2px 10px rgba(0,0,0,.6)' }}>
-                {formatDateRange(trip.start_date, trip.end_date) || 'No dates set'}
-              </div>
-              {!canEdit && <div style={{ color: 'rgba(215,215,255,.58)', fontWeight: 700, fontSize: 10, marginTop: 3, letterSpacing: '.07em', textTransform: 'uppercase', textShadow: '0 2px 10px rgba(0,0,0,.6)' }}>Read only</div>}
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 'none' }}>
-              <div style={{ height: 40, padding: '0 10px', borderRadius: 14, background: GLASS_FILL, border: `1px solid ${GLASS_BORDER}`, backdropFilter: 'blur(20px)', display: 'flex', alignItems: 'center', gap: 5, boxShadow: '0 4px 16px rgba(0,0,0,.3)' }}>
-                <span style={{ fontSize: 14, lineHeight: 1 }}>📍</span>
-                <span style={{ color: ACCENT, fontWeight: 700, fontSize: 12.5 }}>{stops.length}</span>
-              </div>
-            </div>
-          </div>
-        </div>
+        <TripMobileHeader
+          variant="overlay"
+          title={tripTitle(trip, stops)}
+          subtitle={formatDateRange(trip.start_date, trip.end_date) || 'No dates set'}
+          readOnly={!canEdit}
+          members={members}
+          tripId={trip.id}
+          onBack={() => router.push('/trips')}
+          onOpenMore={onOpenMore}
+          backLabel="Back to trips"
+        />
 
         {/* draggable bottom sheet */}
         <motion.div
@@ -615,7 +583,6 @@ export function PlanRouteDomain({ trip, stops, setStops, currentUserId, routePat
               options={[
                 { value: 'route', label: 'Route' },
                 { value: 'days', label: 'Days' },
-                { value: 'bookings', label: 'Bookings' },
               ]}
               value={activeTab}
               onValueChange={setActiveTab}
@@ -831,23 +798,28 @@ export function PlanRouteDomain({ trip, stops, setStops, currentUserId, routePat
             )}
 
             {activeTab === 'days' && <DaysTab stops={stops} routeLegs={routeLegs} schedule={stopSchedule} tripName={tripTitle(trip, stops)} />}
-            {activeTab === 'bookings' && <BookingsTab stops={stops} schedule={stopSchedule} />}
           </div>
 
-          <TripBottomNav active="plan" onSelect={onSelectSection} onPrefetch={onPrefetchSection} />
+          <TripPrimaryNav active="plan" onSelect={onSelectSection} onOpenMore={onOpenMore} onPrefetch={onPrefetchSection} />
         </motion.div>
         </>
       </div>
 
       {/* FAB */}
       {canEdit && <button
-          onClick={() => { setAddInitialQuery(''); setIsAddOpen(true) }}
-          title="Add destination"
-          aria-label="Add destination"
+          onClick={() => setIsAddSheetOpen(true)}
+          title="Add to trip"
+          aria-label="Add to trip"
           style={{ position: 'fixed', right: 18, bottom: 96, width: 56, height: 56, borderRadius: '50%', background: `linear-gradient(145deg, ${ACCENT_LIGHT}, ${ACCENT_DARK})`, boxShadow: '0 0 32px rgba(245,140,0,.45), 0 8px 20px rgba(0,0,0,.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 5, border: 'none', cursor: 'pointer' }}
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.6" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
         </button>}
+
+      {canEdit && <TripAddSheet
+        open={isAddSheetOpen}
+        onClose={() => setIsAddSheetOpen(false)}
+        onAddPlace={() => { setAddInitialQuery(''); setIsAddOpen(true) }}
+      />}
 
       {canEdit && isAddOpen && <DestinationDialog initialQuery={addInitialQuery} onClose={() => setIsAddOpen(false)} onAdd={handleAddStop} />}
 
@@ -1149,92 +1121,6 @@ function DaysTab({ stops, routeLegs, schedule, tripName }: { stops: Stop[]; rout
   )
 }
 
-function BookingsTab({ stops, schedule }: { stops: Stop[]; schedule: StopSchedule[] }) {
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({})
-
-  if (stops.length === 0) return <ComingSoon label="Bookings" />
-
-  return (
-    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 14 }}>
-      {stops.map((stop, idx) => {
-        const moreOpen = !!expanded[stop.id]
-        const shown = moreOpen ? BOOKING_PARTNERS : BOOKING_PARTNERS.slice(0, 3)
-        const arrival = schedule[idx]?.arrival ?? stop.arrival_date
-        const departure = schedule[idx]?.departure ?? stop.departure_date
-        const hasDates = !!(arrival && departure)
-        const dateRange = formatDateRange(arrival, departure)
-        return (
-          <div
-            key={stop.id}
-            style={{ background: GLASS_FILL, border: `1px solid ${GLASS_BORDER}`, borderRadius: 20, padding: 16, backdropFilter: 'blur(20px)', boxShadow: '0 6px 20px rgba(0,0,0,.2)' }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
-              <div>
-                <div style={{ fontSize: 15.5, fontWeight: 700, letterSpacing: '-0.01em' }}>Stay in {stop.name}</div>
-                {dateRange && <div style={{ fontSize: 12, color: 'rgba(215,215,255,.65)', marginTop: 3, fontWeight: 500 }}>{dateRange}</div>}
-              </div>
-              <a
-                href={bookingUrl('Booking.com', stop, arrival, departure)}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ display: 'flex', alignItems: 'center', gap: 5, border: '1px solid rgba(245,140,0,.5)', color: ACCENT_LIGHT, borderRadius: 999, padding: '8px 13px', flex: 'none', textDecoration: 'none', whiteSpace: 'nowrap' }}
-              >
-                <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M8 2.5V13.5M2.5 8H13.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>
-                <span style={{ fontSize: 12, fontWeight: 700 }}>Add Stay</span>
-              </a>
-            </div>
-
-            <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column' }}>
-              {shown.map((partner) => (
-                <a
-                  key={partner}
-                  href={bookingUrl(partner, stop, arrival, departure)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,.06)', textDecoration: 'none', color: 'inherit' }}
-                >
-                  <span style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, color: 'rgba(215,215,255,.88)', flex: 'none' }}>
-                    {partner[0]}
-                  </span>
-                  <span style={{ flex: 1, minWidth: 0, fontSize: 13.5, fontWeight: 600, color: '#fff' }}>{partner}</span>
-                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style={{ flex: 'none', opacity: 0.5 }}>
-                    <path d="M6 3L11 8L6 13" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </a>
-              ))}
-            </div>
-
-            {BOOKING_PARTNERS.length > 3 && (
-              <button
-                type="button"
-                onClick={() => setExpanded((e) => ({ ...e, [stop.id]: !e[stop.id] }))}
-                aria-expanded={moreOpen}
-                style={{ width: '100%', textAlign: 'center', padding: '12px 0 2px', cursor: 'pointer', background: 'none', border: 'none', fontFamily: 'inherit' }}
-              >
-                <span style={{ fontSize: 12.5, fontWeight: 600, color: 'rgba(215,215,255,.6)' }}>
-                  {moreOpen ? 'Show Fewer Partners' : `Show ${BOOKING_PARTNERS.length - 3} More Partners`}
-                </span>
-              </button>
-            )}
-
-            {hasDates ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10, padding: '10px 14px', background: 'rgba(30,140,90,.12)', border: '1px solid rgba(30,180,110,.3)', borderRadius: 12 }}>
-                <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M13.5 4.5L6 12L2.5 8.5" stroke="#4ade80" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                <span style={{ fontSize: 11.5, fontWeight: 600, color: '#86efac' }}>Destination and dates are automatically pre-filled</span>
-              </div>
-            ) : (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10, padding: '10px 14px', background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 12 }}>
-                <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="rgba(215,215,255,.55)" strokeWidth="1.6" /><path d="M8 5v3.5M8 11h.01" stroke="rgba(215,215,255,.55)" strokeWidth="1.6" strokeLinecap="round" /></svg>
-                <span style={{ fontSize: 11.5, fontWeight: 600, color: 'rgba(215,215,255,.6)' }}>Set trip dates to pre-fill check-in & check-out</span>
-              </div>
-            )}
-          </div>
-        )
-      })}
-    </div>
-  )
-}
-
 function ComingSoon({ label }: { label: string }) {
   return (
     <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '40px 16px', textAlign: 'center' }}>
@@ -1244,47 +1130,3 @@ function ComingSoon({ label }: { label: string }) {
   )
 }
 
-export function TripBottomNav({ active, onSelect, onPrefetch }: { active: Section; onSelect: (s: Section) => void; onPrefetch?: (s: Section) => void }) {
-  const items: { key: Section; label: string; icon: (color: string) => React.ReactNode }[] = [
-    {
-      key: 'plan', label: 'Plan',
-      icon: (color) => (<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 20l-5.5-2V4l5.5 2 6-2 5.5 2v14l-5.5-2-6 2z" /><path d="M9 6v14M15 4v14" /></svg>),
-    },
-    {
-      key: 'prep', label: 'Prep',
-      icon: (color) => (<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2l1 4M18 2l-1 4" /><rect x="5" y="6" width="14" height="15" rx="4" /><path d="M9 10v4M15 10v4" /></svg>),
-    },
-    {
-      key: 'budget', label: 'Budget',
-      icon: (color) => (<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="7" width="18" height="13" rx="2" /><path d="M3 10h18M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>),
-    },
-    {
-      key: 'journal', label: 'Journal',
-      icon: (color) => (<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z" /></svg>),
-    },
-  ]
-  return (
-    <div style={{ display: 'flex', gap: 4, borderTop: `1px solid ${GLASS_BORDER}`, background: 'rgba(255,255,255,.03)', padding: '10px 10px 12px', flex: 'none' }}>
-      {items.map((item) => {
-        const isActive = item.key === active
-        const color = isActive ? ACCENT : 'rgba(215,215,255,.45)'
-        return (
-          <button
-            key={item.key}
-            onClick={() => onSelect(item.key)}
-            onPointerEnter={() => onPrefetch?.(item.key)}
-            onFocus={() => onPrefetch?.(item.key)}
-            style={{
-              flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-              padding: '7px 0 6px', borderRadius: 14, border: 'none', cursor: 'pointer', fontFamily: 'inherit',
-              background: isActive ? 'rgba(245,166,35,.12)' : 'transparent',
-            }}
-          >
-            {item.icon(color)}
-            <span style={{ color, fontWeight: 600, fontSize: 11 }}>{item.label}</span>
-          </button>
-        )
-      })}
-    </div>
-  )
-}

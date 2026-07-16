@@ -7,10 +7,22 @@ import { optionalQueryData, requiredQueryData, throwServerDataError } from '@/li
 
 interface TripMobilePageProps {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ section?: string }>;
 }
 
-export default async function TripMobilePage({ params }: TripMobilePageProps) {
+const VALID_DEEP_LINK_SECTIONS = ['plan', 'explore', 'bookings', 'more'] as const;
+type DeepLinkSection = (typeof VALID_DEEP_LINK_SECTIONS)[number];
+
+function resolveInitialSection(section: string | undefined): 'plan' | 'explore' | 'bookings' {
+  const valid = VALID_DEEP_LINK_SECTIONS.includes(section as DeepLinkSection) ? (section as DeepLinkSection) : 'plan';
+  // "more" is a sheet, not a persistent screen — land on Plan and let the client open it.
+  return valid === 'more' ? 'plan' : valid;
+}
+
+export default async function TripMobilePage({ params, searchParams }: TripMobilePageProps) {
   const { id } = await params;
+  const { section } = await searchParams;
+  const initialSection = resolveInitialSection(section);
   const supabase = await createClient();
 
   const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -81,6 +93,7 @@ export default async function TripMobilePage({ params }: TripMobilePageProps) {
       currentUserId={user.id}
       members={members}
       capabilities={capabilities}
+      initialSection={initialSection}
     />
   );
 }

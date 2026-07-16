@@ -28,7 +28,7 @@ export function SegmentedTabs<T extends string = string>({ options, value, onVal
       <TabsPrimitive.List
         className={cn(
           'flex gap-1.5 rounded-[14px] border p-1',
-          'border-[rgba(255,255,255,.08)] bg-[rgba(255,255,255,.04)]'
+          'border-[var(--glass-subtle-border)] bg-[var(--glass-subtle-fill)]'
         )}
       >
         {options.map((opt) => (
@@ -39,8 +39,8 @@ export function SegmentedTabs<T extends string = string>({ options, value, onVal
               'flex-1 cursor-pointer rounded-[11px] border border-transparent py-[9px] text-[13px] font-bold outline-none',
               'text-[rgba(215,215,255,.55)] [transition:all_0.25s_ease]',
               'hover:text-[rgba(215,215,255,.8)]',
-              'focus-visible:ring-2 focus-visible:ring-[#f5a623]/50',
-              'data-[state=active]:border-[rgba(245,140,0,.4)] data-[state=active]:bg-[rgba(245,140,0,.16)] data-[state=active]:text-[#f8c04a]'
+              'focus-visible:ring-2 focus-visible:ring-[rgba(245,166,35,.5)]',
+              'data-[state=active]:border-[rgba(245,140,0,.4)] data-[state=active]:bg-[rgba(245,140,0,.16)] data-[state=active]:text-[var(--color-accent-light)]'
             )}
           >
             {opt.label}

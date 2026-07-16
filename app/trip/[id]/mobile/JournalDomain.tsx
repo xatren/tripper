@@ -10,7 +10,7 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { showToast } from '@/components/ui/toast'
 import { convertKm, useDistanceUnit } from '@/lib/settings'
 import { createRandomId } from '@/lib/random-id'
-import { ACCENT_LIGHT, GLASS_BORDER, GLASS_FILL, RetryCard } from './domain-ui'
+import { ACCENT_GRADIENT, ACCENT_LIGHT, GLASS_BORDER, GLASS_FILL, RetryCard } from './domain-ui'
 import { formatDateRange, totalNights, tripTitle } from './trip-domain-utils'
 
 const JOURNAL_BUCKET = 'trip-photos'
@@ -509,7 +509,7 @@ export function JournalDomain({
             onFocus={() => { if (navigator.onLine) void loadRecapImage().catch(() => undefined) }}
             disabled={sharing}
             aria-busy={sharing}
-            style={{ width: '100%', marginTop: 12, padding: '14px 16px', borderRadius: 16, background: 'linear-gradient(135deg, #f5a623, #f8c04a)', border: 'none', color: '#1a0800', fontWeight: 800, fontSize: 14.5, cursor: sharing ? 'default' : 'pointer', fontFamily: 'inherit', boxShadow: '0 0 24px rgba(245,140,0,.3)', opacity: sharing ? 0.6 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+            style={{ width: '100%', marginTop: 12, padding: '14px 16px', borderRadius: 16, background: ACCENT_GRADIENT, border: 'none', color: '#1a0800', fontWeight: 800, fontSize: 14.5, cursor: sharing ? 'default' : 'pointer', fontFamily: 'inherit', boxShadow: '0 0 24px rgba(245,140,0,.3)', opacity: sharing ? 0.6 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a0800" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7" />
@@ -657,7 +657,7 @@ export function JournalDomain({
             <button
               onClick={submitEntry}
               disabled={saving || !hasContent}
-              style={{ marginLeft: 'auto', padding: '8px 18px', borderRadius: 10, background: 'linear-gradient(135deg, #f5a623, #f8c04a)', border: 'none', color: '#1a0800', fontSize: 12.5, fontWeight: 800, cursor: saving ? 'default' : 'pointer', fontFamily: 'inherit', opacity: saving || !hasContent ? 0.5 : 1 }}
+              style={{ marginLeft: 'auto', padding: '8px 18px', borderRadius: 10, background: ACCENT_GRADIENT, border: 'none', color: '#1a0800', fontSize: 12.5, fontWeight: 800, cursor: saving ? 'default' : 'pointer', fontFamily: 'inherit', opacity: saving || !hasContent ? 0.5 : 1 }}
             >
               {saving ? 'Saving & uploading…' : draftEntryId ? 'Retry photos' : 'Save entry'}
             </button>

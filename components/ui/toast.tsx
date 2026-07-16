@@ -105,7 +105,7 @@ export function Toaster() {
             transition={{ type: 'spring', stiffness: 380, damping: 28 }}
             style={{
               display: 'flex', alignItems: 'center', gap: 10, padding: '11px 14px',
-              borderRadius: 14, background: 'rgba(12,12,30,.92)', backdropFilter: 'blur(20px)',
+              borderRadius: 14, background: 'var(--glass-elevated-fill)', backdropFilter: 'blur(var(--glass-standard-blur))', WebkitBackdropFilter: 'blur(var(--glass-standard-blur))',
               border: `1px solid ${KIND_META[t.kind].border}`,
               boxShadow: '0 8px 28px rgba(0,0,0,.4)', pointerEvents: 'auto',
             }}
