@@ -69,7 +69,7 @@ npm run build    # Production build
 - `app/` contains Next.js App Router pages. Authenticated pages are server components that validate the Supabase user and load initial data; adjacent `*Client.tsx` and trip-domain components own interaction.
 - `components/` contains shared UI, Mapbox maps, journal presentation, onboarding, navigation, motion, and PWA registration.
 - `lib/mapbox/` calls Mapbox directly for geocoding, driving directions, route optimization, and map styling. `lib/weather/openMeteo.ts` supplies forecast data without another credential.
-- `lib/supabase/` contains browser/server clients, a server-only service-role client for account deletion, cookie refresh middleware, server-query error handling, and the trip-domain realtime subscription provider. Realtime synchronization is implemented for stops, packing items, expenses, and journal entries after migration `016`.
+- `lib/supabase/` contains browser/server clients, a server-only service-role client for account deletion, cookie refresh middleware, server-query error handling, and the trip-domain realtime subscription provider. Realtime synchronization is implemented for stops, packing items, expenses, and journal entries after migration `016`, and for itinerary items after `20260716120000_itinerary_items`.
 - `lib/trip-capabilities.ts` converts database roles into presentation capabilities; Supabase row-level security remains the security boundary.
 - `types/index.ts` defines the shared trip, member, stop, expense, journal, and route contracts.
 - `supabase/migrations/` owns the PostgreSQL schema, RPCs, RLS policies, Storage policy, and Realtime publication changes.
@@ -98,6 +98,7 @@ The migration directory contains two historical starting schemas, so do **not** 
    - `20260715231929_journal_photo_privacy.sql`
    - `20260715233000_validate_create_trip_with_stops.sql`
    - `20260716005552_active_schema_grants_and_account_deletion.sql`
+   - `20260716120000_itinerary_items.sql` (unified daily itinerary; `supabase/tests/itinerary_rls_assertions.sql` verifies its security contract)
 
 Existing projects must use their recorded migration history: `001_initial_schema.sql` is the legacy baseline and must not be applied after `000_full_schema.sql`. Migration `012` backfills `trip_members` from historical owner/collaborator columns and makes role-based RLS authoritative. Migration `011` creates the `trip-photos` bucket; the timestamped privacy migration makes it private and limits reads to trip members and writes to editors/owners. The final timestamped migration makes active-table Data API grants explicit and changes shared-content attribution foreign keys to `ON DELETE SET NULL`, which must be deployed before enabling the account-deletion endpoint.
 

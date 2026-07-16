@@ -15,6 +15,10 @@ export interface TripPrimaryNavProps {
 
 const ITEMS: { key: Section; label: string; icon: (color: string) => ReactNode }[] = [
   {
+    key: 'overview', label: 'Overview',
+    icon: (color) => (<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 10.5L12 3l9 7.5" /><path d="M5.5 9v10.5a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1V9" /><path d="M9.5 20.5v-6h5v6" /></svg>),
+  },
+  {
     key: 'plan', label: 'Plan',
     icon: (color) => (<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 20l-5.5-2V4l5.5 2 6-2 5.5 2v14l-5.5-2-6 2z" /><path d="M9 6v14M15 4v14" /></svg>),
   },

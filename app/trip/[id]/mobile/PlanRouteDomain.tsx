@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useCallback, useEffect, useRef, type Dispatch, type SetStateAction } from 'react'
-import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence, useMotionValue, animate } from 'framer-motion'
 import { DndContext, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from '@dnd-kit/sortable'
@@ -10,19 +9,18 @@ import { SegmentedTabs } from '@/components/ui/segmented-tabs'
 import { createClient } from '@/lib/supabase/client'
 import { DeferredBoundary, DeferredFailure } from '@/components/ui/deferred-boundary'
 import { getFullRoute, type RouteLeg } from '@/lib/mapbox/directions'
-import type { Trip, Stop, TripCapabilities, TripMember } from '@/types'
+import type { ItineraryItem, ItineraryItemType, Trip, Stop, TripCapabilities, TripMember } from '@/types'
 import { showToast } from '@/components/ui/toast'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
-import { fetchWeatherForStops, type DayWeather, type WeatherKind } from '@/lib/weather/openMeteo'
 import { getOptimizedOrder } from '@/lib/mapbox/optimize'
-import { downloadTripIcs } from '@/lib/ics'
 import { useDistanceUnit, formatDistanceValue } from '@/lib/settings'
 import { DestinationDialog } from './DestinationDialog'
 import { ACCENT, ACCENT_DARK, ACCENT_LIGHT, GLASS_BORDER, GLASS_FILL } from './domain-ui'
-import { computeStopSchedule, formatDateRange, formatDayChip, totalNights, tripTitle, type StopSchedule } from './trip-domain-utils'
+import { formatDateRange, totalNights, tripTitle } from './trip-domain-utils'
 import { TripMobileHeader } from './components/TripMobileHeader'
 import { TripPrimaryNav, type PrimaryNavSection } from './components/TripPrimaryNav'
 import { TripAddSheet } from './components/TripAddSheet'
+import { ItineraryTimeline, type ItineraryCreateRequest } from './itinerary/ItineraryTimeline'
 
 function TripMapPlaceholder() {
   return (
@@ -48,6 +46,10 @@ export interface PlanRouteDomainProps {
   trip: Trip
   stops: Stop[]
   setStops: Dispatch<SetStateAction<Stop[]>>
+  items: ItineraryItem[]
+  setItems: Dispatch<SetStateAction<ItineraryItem[]>>
+  itineraryEnabled: boolean
+  onItemSyncPaused: (paused: boolean) => void
   currentUserId: string
   members: TripMember[]
   routePath: { lat: number; lng: number }[]
@@ -61,80 +63,14 @@ export interface PlanRouteDomainProps {
   onStopSyncPaused: (paused: boolean) => void
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
-// ─── Weather ────────────────────────────────────────────────────────────────
-// Live Open-Meteo forecast (see lib/weather/openMeteo). Chips only appear for
-// arrival dates inside the ~16-day forecast horizon — no fake data.
-
-function WeatherIcon({ kind, size = 18 }: { kind: WeatherKind; size?: number }) {
-  const cloud = 'rgba(215,215,255,.7)'
-  switch (kind) {
-    case 'sunny':
-      return (
-        <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="4.3" stroke={ACCENT_LIGHT} strokeWidth="1.6" />
-          <g stroke={ACCENT_LIGHT} strokeWidth="1.6" strokeLinecap="round">
-            <path d="M12 2.5V5" />
-            <path d="M12 19V21.5" />
-            <path d="M4.2 4.2L6 6" />
-            <path d="M18 18L19.8 19.8" />
-            <path d="M2.5 12H5" />
-            <path d="M19 12H21.5" />
-            <path d="M4.2 19.8L6 18" />
-            <path d="M18 6L19.8 4.2" />
-          </g>
-        </svg>
-      )
-    case 'partly':
-      return (
-        <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-          <circle cx="9" cy="9" r="3.2" stroke={ACCENT_LIGHT} strokeWidth="1.6" />
-          <path d="M7 19.5H16.3C18.4 19.5 20.1 17.8 20.1 15.7C20.1 13.7 18.6 12.1 16.7 12C16.2 9.8 14.2 8.2 11.9 8.2" stroke={cloud} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      )
-    case 'cloudy':
-      return (
-        <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-          <path d="M6.3 18H16.4C18.5 18 20.2 16.3 20.2 14.1C20.2 12.1 18.7 10.5 16.8 10.3C16.4 7.6 14.1 5.5 11.2 5.5C8 5.5 5.4 8.1 5.4 11.3C5.4 11.5 5.4 11.7 5.44 11.9C3.7 12.3 2.4 13.9 2.4 15.6C2.4 16.9 3.4 18 6.3 18Z" stroke={cloud} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      )
-    case 'rainy':
-      return (
-        <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-          <path d="M6.3 15H16.4C18.5 15 20.2 13.3 20.2 11.1C20.2 9.1 18.7 7.5 16.8 7.3C16.4 4.6 14.1 2.5 11.2 2.5C8 2.5 5.4 5.1 5.4 8.3C5.4 8.5 5.4 8.7 5.44 8.9C3.7 9.3 2.4 10.9 2.4 12.6C2.4 13.9 3.4 15 6.3 15Z" stroke={cloud} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-          <g stroke="#7ec8ff" strokeWidth="1.6" strokeLinecap="round">
-            <path d="M8.2 18.3L7.2 20.8" />
-            <path d="M12.5 18.3L11.5 20.8" />
-            <path d="M16.8 18.3L15.8 20.8" />
-          </g>
-        </svg>
-      )
-    case 'snowy':
-      return (
-        <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-          <path d="M6.3 15H16.4C18.5 15 20.2 13.3 20.2 11.1C20.2 9.1 18.7 7.5 16.8 7.3C16.4 4.6 14.1 2.5 11.2 2.5C8 2.5 5.4 5.1 5.4 8.3C5.4 8.5 5.4 8.7 5.44 8.9C3.7 9.3 2.4 10.9 2.4 12.6C2.4 13.9 3.4 15 6.3 15Z" stroke={cloud} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-          <g stroke="#bfe3ff" strokeWidth="1.5" strokeLinecap="round">
-            <path d="M8 17.8v3M6.8 19.3h2.4" />
-            <path d="M14.5 17.8v3M13.3 19.3h2.4" />
-          </g>
-        </svg>
-      )
-  }
-}
-
-// ─── Prep / packing list ────────────────────────────────────────────────────
-// Backed by the `packing_items` table (migration 010). A vibe-aware starter
-// template seeds the list on first open.
-
 // ─── Main content ────────────────────────────────────────────────────────────
 
-export function PlanRouteDomain({ trip, stops, setStops, currentUserId, members, routePath, setRoutePath, routeLegs, setRouteLegs, onSelectSection, onPrefetchSection, onOpenMore, capabilities, onStopSyncPaused }: PlanRouteDomainProps) {
+export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itineraryEnabled, onItemSyncPaused, currentUserId, members, routePath, setRoutePath, routeLegs, setRouteLegs, onSelectSection, onPrefetchSection, onOpenMore, capabilities, onStopSyncPaused }: PlanRouteDomainProps) {
   const { canEdit } = capabilities
-  const router = useRouter()
   const distanceUnit = useDistanceUnit()
   const [activeTab, setActiveTab] = useState<'route' | 'days'>('route')
   const [isAddSheetOpen, setIsAddSheetOpen] = useState(false)
+  const [itineraryCreateRequest, setItineraryCreateRequest] = useState<ItineraryCreateRequest | null>(null)
   const [MapComponent, setMapComponent] = useState<typeof import('@/components/map/mapbox/TripboxMap').TripboxMap | null>(null)
   const [mapLoadFailed, setMapLoadFailed] = useState(false)
   const [isAddOpen, setIsAddOpen] = useState(false)
@@ -173,9 +109,25 @@ export function PlanRouteDomain({ trip, stops, setStops, currentUserId, members,
     })
   }, [stops])
 
+  // PlanRouteDomain stays mounted behind `display: none` while another section
+  // is active (see TripMobileClient), so on first mount — unless Plan is the
+  // initial section — stageRef measures 0 and the sheet would open collapsed.
+  // A ResizeObserver catches the display:none → block transition (the first
+  // non-zero measurement) and sets the default height then, instead of once
+  // at mount time.
+  const sheetInitializedRef = useRef(false)
   useEffect(() => {
-    const h = stageRef.current?.clientHeight ?? window.innerHeight
-    sheetHeight.set(Math.round(h * SHEET_DEFAULT_RATIO))
+    const node = stageRef.current
+    if (!node) return
+    const applyDefault = (height: number) => {
+      if (sheetInitializedRef.current || height <= 0) return
+      sheetInitializedRef.current = true
+      sheetHeight.set(Math.round(height * SHEET_DEFAULT_RATIO))
+    }
+    applyDefault(node.clientHeight)
+    const observer = new ResizeObserver(([entry]) => applyDefault(entry.contentRect.height))
+    observer.observe(node)
+    return () => observer.disconnect()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -442,7 +394,6 @@ export function PlanRouteDomain({ trip, stops, setStops, currentUserId, members,
     [trip.id, stops.length, currentUserId, canEdit, setStops]
   )
 
-  const stopSchedule = computeStopSchedule(trip.start_date, stops, nights)
   const routeLoading = stops.length >= 2 && routeLegs.length === 0
   const summaryDistanceText = formatDistanceValue(routeLegs.reduce((sum, l) => sum + l.distanceMeters, 0), distanceUnit)
   const summaryMin = Math.round(routeLegs.reduce((sum, l) => sum + l.durationSeconds, 0) / 60)
@@ -518,9 +469,9 @@ export function PlanRouteDomain({ trip, stops, setStops, currentUserId, members,
           readOnly={!canEdit}
           members={members}
           tripId={trip.id}
-          onBack={() => router.push('/trips')}
+          onBack={() => onSelectSection('overview')}
           onOpenMore={onOpenMore}
-          backLabel="Back to trips"
+          backLabel="Back to overview"
         />
 
         {/* draggable bottom sheet */}
@@ -797,7 +748,19 @@ export function PlanRouteDomain({ trip, stops, setStops, currentUserId, members,
               </>
             )}
 
-            {activeTab === 'days' && <DaysTab stops={stops} routeLegs={routeLegs} schedule={stopSchedule} tripName={tripTitle(trip, stops)} />}
+            {activeTab === 'days' && (
+              <ItineraryTimeline
+                trip={trip}
+                stops={stops}
+                items={items}
+                setItems={setItems}
+                onItemSyncPaused={onItemSyncPaused}
+                canEdit={canEdit}
+                currentUserId={currentUserId}
+                itineraryEnabled={itineraryEnabled}
+                createRequest={itineraryCreateRequest}
+              />
+            )}
           </div>
 
           <TripPrimaryNav active="plan" onSelect={onSelectSection} onOpenMore={onOpenMore} onPrefetch={onPrefetchSection} />
@@ -819,6 +782,11 @@ export function PlanRouteDomain({ trip, stops, setStops, currentUserId, members,
         open={isAddSheetOpen}
         onClose={() => setIsAddSheetOpen(false)}
         onAddPlace={() => { setAddInitialQuery(''); setIsAddOpen(true) }}
+        onAddItem={(type: ItineraryItemType) => {
+          // The item form lives on the Days timeline; land there before opening it.
+          setActiveTab('days')
+          setItineraryCreateRequest({ type, nonce: Date.now() })
+        }}
       />}
 
       {canEdit && isAddOpen && <DestinationDialog initialQuery={addInitialQuery} onClose={() => setIsAddOpen(false)} onAdd={handleAddStop} />}
@@ -975,158 +943,3 @@ function SortableStopItem({ id, disabled, children }: {
     </div>
   )
 }
-
-function DaysTab({ stops, routeLegs, schedule, tripName }: { stops: Stop[]; routeLegs: RouteLeg[]; schedule: StopSchedule[]; tripName: string }) {
-  const distanceUnit = useDistanceUnit()
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({})
-  const [weather, setWeather] = useState<Record<string, DayWeather | null>>({})
-
-  // Refetch only when a stop or its arrival date actually changes.
-  const weatherKey = stops.map((s, i) => `${s.id}:${schedule[i]?.arrival ?? ''}`).join('|')
-  useEffect(() => {
-    if (!stops.length) return
-    let cancelled = false
-    fetchWeatherForStops(
-      stops.map((s, i) => ({ id: s.id, lat: s.lat, lng: s.lng, date: schedule[i]?.arrival ?? null }))
-    ).then((w) => {
-      if (!cancelled) setWeather(w)
-    })
-    return () => {
-      cancelled = true
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [weatherKey])
-
-  if (stops.length === 0) return <ComingSoon label="Day-by-day planning" />
-
-  const exportIcs = () => {
-    const events = stops
-      .map((s, i) => ({ name: s.name, address: s.address, arrival: schedule[i]?.arrival, departure: schedule[i]?.departure }))
-      .filter((e): e is { name: string; address: string | null; arrival: string; departure: string } => !!(e.arrival && e.departure))
-    if (!events.length) {
-      showToast('Set trip dates first to export the calendar.', 'info')
-      return
-    }
-    downloadTripIcs(tripName, events)
-    showToast('Calendar file downloaded.', 'success')
-  }
-
-  return (
-    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 12 }}>
-      {schedule[0]?.arrival && (
-        <button
-          onClick={exportIcs}
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, width: '100%', padding: '12px 16px', borderRadius: 14, background: GLASS_FILL, border: `1px solid ${GLASS_BORDER}`, cursor: 'pointer', fontFamily: 'inherit' }}
-        >
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={ACCENT_LIGHT} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="3" y="4.5" width="18" height="17" rx="2.5" />
-            <path d="M8 2.5v4M16 2.5v4M3 9.5h18M12 13v5M9.5 15.5h5" />
-          </svg>
-          <span style={{ color: '#fff', fontWeight: 700, fontSize: 13 }}>Add to calendar (.ics)</span>
-        </button>
-      )}
-      {stops.map((stop, idx) => {
-        const isOpen = !!expanded[stop.id]
-        const sched = schedule[idx]
-        const dayLabel = sched
-          ? sched.dayStart === sched.dayEnd
-            ? `Day ${sched.dayStart}`
-            : `Days ${sched.dayStart}–${sched.dayEnd}`
-          : `Day ${idx + 1}`
-        const dateChip = sched?.arrival ? formatDayChip(sched.arrival) : null
-        const hasDetail = !!(stop.notes || stop.address)
-        const prevStop = idx > 0 ? stops[idx - 1] : null
-        const leg = idx > 0 ? routeLegs[idx - 1] : null
-        const w = weather[stop.id]
-        return (
-          <div key={stop.id}>
-            {prevStop && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '0 0 12px', padding: 12, background: 'rgba(0,0,0,.18)', borderRadius: 14 }}>
-                <div style={{ flex: 1, textAlign: 'center' }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: 'rgba(215,215,255,.85)' }}>{prevStop.name}</div>
-                </div>
-                <div style={{ flex: 1.2, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                  <div style={{ width: '100%', height: 2, background: 'linear-gradient(to right, transparent, #8888e4, transparent)' }} />
-                  <div style={{ fontSize: 10.5, color: 'rgba(215,215,255,.6)', fontWeight: 600, whiteSpace: 'nowrap' }}>
-                    {leg
-                      ? `${leg.durationText} · ${formatDistanceValue(leg.distanceMeters, distanceUnit)}`
-                      : <span aria-hidden="true" style={{ display: 'inline-block', width: 64, height: 8, borderRadius: 999, background: 'rgba(255,255,255,.12)', animation: 'pulseglow 1.6s ease-in-out infinite' }} />}
-                  </div>
-                </div>
-                <div style={{ flex: 1, textAlign: 'center' }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: 'rgba(215,215,255,.85)' }}>{stop.name}</div>
-                </div>
-              </div>
-            )}
-            <button
-              type="button"
-              disabled={!hasDetail}
-              onClick={() => hasDetail && setExpanded((e) => ({ ...e, [stop.id]: !e[stop.id] }))}
-              aria-expanded={hasDetail ? isOpen : undefined}
-              style={{
-                width: '100%', textAlign: 'left', color: 'inherit', fontFamily: 'inherit',
-                background: GLASS_FILL, border: `1px solid ${GLASS_BORDER}`, borderRadius: 20,
-                padding: 16, cursor: hasDetail ? 'pointer' : 'default', backdropFilter: 'blur(20px)',
-                boxShadow: '0 6px 20px rgba(0,0,0,.2)',
-              }}
-            >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
-              <div style={{ minWidth: 0 }}>
-                <div style={{ fontSize: 11.5, fontWeight: 700, color: 'rgba(215,215,255,.55)', textTransform: 'uppercase', letterSpacing: '.06em' }}>
-                  {dayLabel}{dateChip ? ` · ${dateChip}` : ''}
-                </div>
-                <div style={{ fontSize: 17, fontWeight: 800, letterSpacing: '-0.01em', marginTop: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {stop.name}
-                </div>
-                {prevStop && <div style={{ fontSize: 12, fontWeight: 700, color: ACCENT_LIGHT, marginTop: 3 }}>Travel Day</div>}
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 'none' }}>
-                {w && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 10px', borderRadius: 999, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.08)' }}>
-                    <WeatherIcon kind={w.kind} />
-                    <div style={{ fontSize: 12.5, fontWeight: 700, color: 'rgba(255,255,255,.92)', whiteSpace: 'nowrap' }}>
-                      {w.high}° <span style={{ color: 'rgba(215,215,255,.5)', fontWeight: 600 }}>/ {w.low}°</span>
-                    </div>
-                  </div>
-                )}
-                {hasDetail && (
-                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style={{ flex: 'none', transition: 'transform .25s ease', transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-                    <path d="M4 6L8 10L12 6" stroke="rgba(215,215,255,.6)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                )}
-              </div>
-            </div>
-
-            {isOpen && (
-              <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid rgba(255,255,255,.1)', display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {stop.address && (
-                  <div>
-                    <div style={{ fontSize: 10.5, fontWeight: 700, color: 'rgba(215,215,255,.5)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 4 }}>Address</div>
-                    <div style={{ fontSize: 13, color: 'rgba(215,215,255,.88)', lineHeight: 1.5 }}>{stop.address}</div>
-                  </div>
-                )}
-                {stop.notes && (
-                  <div>
-                    <div style={{ fontSize: 10.5, fontWeight: 700, color: 'rgba(215,215,255,.5)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 4 }}>Notes</div>
-                    <div style={{ fontSize: 13, color: 'rgba(215,215,255,.88)', lineHeight: 1.5 }}>{stop.notes}</div>
-                  </div>
-                )}
-              </div>
-            )}
-            </button>
-          </div>
-        )
-      })}
-    </div>
-  )
-}
-
-function ComingSoon({ label }: { label: string }) {
-  return (
-    <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '40px 16px', textAlign: 'center' }}>
-      <span style={{ color: 'rgba(255,255,255,.5)', fontSize: 14, fontWeight: 600 }}>{label}</span>
-      <span style={{ color: 'rgba(215,215,255,.55)', fontSize: 12.5 }}>Coming soon</span>
-    </div>
-  )
-}
-

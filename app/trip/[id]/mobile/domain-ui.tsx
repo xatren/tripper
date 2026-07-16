@@ -18,7 +18,7 @@ export const GLASS_FILL = 'rgba(255,255,255,.055)'
 export const GLASS_BORDER = 'rgba(255,255,255,.13)'
 
 /** Trip workspace's top-level primary-nav destinations. */
-export type Section = 'plan' | 'explore' | 'bookings' | 'more'
+export type Section = 'overview' | 'plan' | 'explore' | 'bookings' | 'more'
 
 /** Full-screen domains reachable through the More sheet. */
 export type MoreDestination = 'budget' | 'packing' | 'journal' | 'members' | 'settings' | 'export' | 'offline'

@@ -94,6 +94,60 @@ export interface Stop {
   nights?: number;
 }
 
+// ---- Unified itinerary (migration `20260716120000_itinerary_items`) ----
+
+export type ItineraryItemType =
+  | 'place'
+  | 'activity'
+  | 'stay'
+  | 'flight'
+  | 'transport'
+  | 'restaurant'
+  | 'reservation'
+  | 'note'
+  | 'free_time';
+
+export type ItineraryItemStatus =
+  | 'planned'
+  | 'on_the_way'
+  | 'arrived'
+  | 'completed'
+  | 'skipped';
+
+/**
+ * One entry on the daily timeline. `stops` stays the geographic route
+ * backbone; an item may reference the stop it happens at via `stop_id`.
+ * Stops without a linked item are projected into the timeline client-side
+ * (see app/trip/[id]/mobile/itinerary-projection.ts) — no backfill required.
+ */
+export interface ItineraryItem {
+  id: string;
+  trip_id: string;
+  stop_id: string | null;
+  item_type: ItineraryItemType;
+  title: string;
+  notes: string | null;
+  /** Absolute instants for timed items; null for date-only/all-day entries. */
+  start_at: string | null;
+  end_at: string | null;
+  all_day: boolean;
+  /** Wall-clock day (YYYY-MM-DD) driving day grouping; null = unscheduled. */
+  local_date: string | null;
+  /** IANA zone the times were picked in. */
+  timezone: string | null;
+  order_index: number;
+  lat: number | null;
+  lng: number | null;
+  address: string | null;
+  estimated_cost: number | null;
+  currency: TripCurrency | null;
+  status: ItineraryItemStatus;
+  is_locked: boolean;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 /** Daily journal entry (migration `011_journal`). */
 export interface JournalEntry {
   id: string;

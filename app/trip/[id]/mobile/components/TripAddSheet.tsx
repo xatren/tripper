@@ -1,6 +1,6 @@
 'use client'
 
-import { showToast } from '@/components/ui/toast'
+import type { ItineraryItemType } from '@/types'
 import { SheetOptionRow } from '../domain-ui'
 import { BottomSheet } from './BottomSheet'
 
@@ -8,6 +8,8 @@ export interface TripAddSheetProps {
   open: boolean
   onClose: () => void
   onAddPlace: () => void
+  /** Opens the itinerary item form pre-set to the picked type. */
+  onAddItem: (type: ItineraryItemType) => void
 }
 
 const PLACE_ICON = (
@@ -29,22 +31,25 @@ const NOTE_ICON = (
   <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z" /><path d="M9 13h6M9 17h6" /></svg>
 )
 
-/** Centralized "+ Add" sheet — today only Place is wired up; the rest are honest stubs. */
-export function TripAddSheet({ open, onClose, onAddPlace }: TripAddSheetProps) {
-  const soon = (label: string) => () => showToast(`Adding a ${label.toLowerCase()} is coming soon.`, 'info')
+/** Centralized "+ Add" sheet — Place adds a route stop; the rest create itinerary items. */
+export function TripAddSheet({ open, onClose, onAddPlace, onAddItem }: TripAddSheetProps) {
   const selectPlace = () => {
     onClose()
     onAddPlace()
+  }
+  const selectItem = (type: ItineraryItemType) => () => {
+    onClose()
+    onAddItem(type)
   }
 
   return (
     <BottomSheet open={open} onClose={onClose} titleId="trip-add-sheet-title" title="Add to trip">
       <SheetOptionRow icon={PLACE_ICON} label="Place" hint="Search and add a destination" available onSelect={selectPlace} />
-      <SheetOptionRow icon={ACTIVITY_ICON} label="Activity" available={false} onSelect={soon('Activity')} />
-      <SheetOptionRow icon={STAY_ICON} label="Stay" available={false} onSelect={soon('Stay')} />
-      <SheetOptionRow icon={TRANSPORT_ICON} label="Transport" available={false} onSelect={soon('Transport')} />
-      <SheetOptionRow icon={RESERVATION_ICON} label="Reservation" available={false} onSelect={soon('Reservation')} />
-      <SheetOptionRow icon={NOTE_ICON} label="Note" available={false} onSelect={soon('Note')} />
+      <SheetOptionRow icon={ACTIVITY_ICON} label="Activity" hint="Plan something for a day" available onSelect={selectItem('activity')} />
+      <SheetOptionRow icon={STAY_ICON} label="Stay" hint="Hotel, apartment, camping" available onSelect={selectItem('stay')} />
+      <SheetOptionRow icon={TRANSPORT_ICON} label="Transport" hint="Drive, train, ferry, flight" available onSelect={selectItem('transport')} />
+      <SheetOptionRow icon={RESERVATION_ICON} label="Reservation" hint="Tickets and bookings" available onSelect={selectItem('reservation')} />
+      <SheetOptionRow icon={NOTE_ICON} label="Note" hint="A reminder pinned to a day" available onSelect={selectItem('note')} />
     </BottomSheet>
   )
 }

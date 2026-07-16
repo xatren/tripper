@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { createClient } from './client'
 
-export type TripRealtimeTable = 'stops' | 'packing_items' | 'expenses' | 'journal_entries'
+export type TripRealtimeTable = 'stops' | 'packing_items' | 'expenses' | 'journal_entries' | 'itinerary_items'
 export type TripRealtimeStatus = 'connecting' | 'connected' | 'reconnecting' | 'disconnected'
 
 export interface TripRealtimeChange<Row extends Record<string, unknown> = Record<string, unknown>> {
@@ -23,7 +23,7 @@ interface TripRealtimeContextValue {
 }
 
 const TripRealtimeContext = createContext<TripRealtimeContextValue | null>(null)
-const TABLES: TripRealtimeTable[] = ['stops', 'packing_items', 'expenses', 'journal_entries']
+const TABLES: TripRealtimeTable[] = ['stops', 'packing_items', 'expenses', 'journal_entries', 'itinerary_items']
 
 export function TripRealtimeProvider({ tripId, children }: { tripId: string; children: ReactNode }) {
   const [status, setStatus] = useState<TripRealtimeStatus>('connecting')
