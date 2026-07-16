@@ -18,6 +18,9 @@ export interface TripboxMapPoint {
   title?: string
   /** Shown as a secondary line under the popup title. */
   subtitle?: string
+  itemType?: string
+  emphasis?: 'strong' | 'dimmed'
+  role?: 'start' | 'end' | 'waypoint'
 }
 
 interface TripboxMapProps {
@@ -31,6 +34,11 @@ interface TripboxMapProps {
   defaultZoom?: number
   /** Point id that was just added — its marker plays a short drop-in animation. */
   dropInId?: string | null
+  selectedItemId?: string | null
+  onSelectItem?: (id: string | null) => void
+  cameraTarget?: { lat: number; lng: number; nonce: number } | null
+  userLocation?: { lat: number; lng: number } | null
+  onMapError?: () => void
 }
 
 /** Last-resort fallback center (Istanbul) when a trip has neither stops nor a selected country. */
@@ -52,11 +60,16 @@ const zoomBtnStyle: CSSProperties = {
   lineHeight: 1,
 }
 
-export function TripboxMap({ points, routePath = [], interactive = true, className, defaultCenter, defaultZoom = 9, dropInId = null }: TripboxMapProps) {
+export function TripboxMap({ points, routePath = [], interactive = true, className, defaultCenter, defaultZoom = 9, dropInId = null, selectedItemId, onSelectItem, cameraTarget, userLocation, onMapError }: TripboxMapProps) {
   const reducedMotion = useReducedMotionPreference()
   const mapRef = useRef<MapRef | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
-  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [internalSelectedId, setInternalSelectedId] = useState<string | null>(null)
+  const selectedId = selectedItemId === undefined ? internalSelectedId : selectedItemId
+  const setSelectedId = useCallback((id: string | null) => {
+    if (selectedItemId === undefined) setInternalSelectedId(id)
+    onSelectItem?.(id)
+  }, [onSelectItem, selectedItemId])
 
   const center = useMemo(() => {
     if (points.length === 0) return defaultCenter ?? FALLBACK_CENTER
@@ -97,7 +110,18 @@ export function TripboxMap({ points, routePath = [], interactive = true, classNa
   // Clear any open popup if its point disappears (e.g. stop removed).
   useEffect(() => {
     if (selectedId && !points.some((p) => p.id === selectedId)) setSelectedId(null)
-  }, [points, selectedId])
+  }, [points, selectedId, setSelectedId])
+
+  useEffect(() => {
+    if (!cameraTarget || !mapRef.current) return
+    mapRef.current.flyTo({ center: [cameraTarget.lng, cameraTarget.lat], zoom: 14, pitch: 30, duration: reducedMotion ? 0 : 220, essential: false })
+  }, [cameraTarget, reducedMotion])
+
+  useEffect(() => {
+    const selected = points.find((point) => point.id === selectedId)
+    if (!selected || !mapRef.current) return
+    mapRef.current.flyTo({ center: [selected.lng, selected.lat], zoom: Math.max(mapRef.current.getZoom(), 12), duration: reducedMotion ? 0 : 220, essential: false })
+  }, [points, reducedMotion, selectedId])
 
   // Keep the WebGL canvas's pixel size following the container in real time
   // when it's resized (e.g. by a draggable sheet growing/shrinking the map).
@@ -211,6 +235,7 @@ export function TripboxMap({ points, routePath = [], interactive = true, classNa
           bearing: DEFAULT_BEARING,
         }}
         onLoad={handleLoad}
+        onError={onMapError}
         onClick={() => setSelectedId(null)}
         mapStyle={MAPBOX_DARK_STYLE}
         style={{ width: '100%', height: '100%' }}
@@ -247,12 +272,12 @@ export function TripboxMap({ points, routePath = [], interactive = true, classNa
             <div
               className={p.id === dropInId ? 'tripbox-marker-drop' : undefined}
               style={{
-                width: 24,
-                height: 24,
-                borderRadius: '50%',
-                background: ACCENT,
-                border: '2px solid #0a1020',
-                boxShadow: '0 0 12px rgba(245,140,0,.6)',
+                width: p.id === selectedId ? 34 : 30,
+                height: p.id === selectedId ? 34 : 30,
+                borderRadius: p.role === 'end' ? 9 : '50%',
+                background: p.itemType === 'restaurant' ? '#fb7185' : p.itemType === 'stay' ? '#60a5fa' : p.role === 'end' ? '#a78bfa' : ACCENT,
+                border: `3px solid ${p.id === selectedId ? '#ffffff' : '#0a1020'}`,
+                boxShadow: p.id === selectedId ? '0 0 0 4px rgba(245,166,35,.24), 0 0 18px rgba(245,140,0,.7)' : '0 0 12px rgba(245,140,0,.45)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -260,12 +285,21 @@ export function TripboxMap({ points, routePath = [], interactive = true, classNa
                 fontWeight: 700,
                 color: '#0a1020',
                 cursor: interactive ? 'pointer' : 'default',
+                opacity: p.emphasis === 'dimmed' ? .35 : 1,
+                transform: p.role === 'end' ? 'rotate(45deg)' : undefined,
+                transition: reducedMotion ? 'none' : 'width 200ms ease, height 200ms ease, opacity 200ms ease',
               }}
             >
-              {p.label ?? idx + 1}
+              <span style={{ transform: p.role === 'end' ? 'rotate(-45deg)' : undefined }}>{p.label ?? idx + 1}</span>
             </div>
           </Marker>
         ))}
+
+        {userLocation && (
+          <Marker latitude={userLocation.lat} longitude={userLocation.lng} anchor="center">
+            <div aria-label="Your current location" style={{ width: 18, height: 18, borderRadius: '50%', background: '#38bdf8', border: '3px solid #fff', boxShadow: '0 0 0 6px rgba(56,189,248,.22)' }} />
+          </Marker>
+        )}
 
         {selectedPoint && (
           <Popup

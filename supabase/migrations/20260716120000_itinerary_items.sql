@@ -146,6 +146,7 @@ end;
 $$;
 
 revoke all on function public.reorder_itinerary_day(uuid, date, uuid[]) from public;
+revoke all on function public.reorder_itinerary_day(uuid, date, uuid[]) from anon;
 grant execute on function public.reorder_itinerary_day(uuid, date, uuid[]) to authenticated;
 
 -- Realtime: Postgres Changes still cannot filter DELETE events, so extend the

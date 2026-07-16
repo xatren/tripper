@@ -1,14 +1,13 @@
 'use client'
 
-import { useState, useCallback, useEffect, useRef, type Dispatch, type SetStateAction } from 'react'
+import { useState, useCallback, useEffect, useMemo, useRef, type Dispatch, type SetStateAction } from 'react'
 import { motion, AnimatePresence, useMotionValue, animate } from 'framer-motion'
 import { DndContext, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from '@dnd-kit/sortable'
 import { CSS as DndCSS } from '@dnd-kit/utilities'
 import { SegmentedTabs } from '@/components/ui/segmented-tabs'
 import { createClient } from '@/lib/supabase/client'
-import { DeferredBoundary, DeferredFailure } from '@/components/ui/deferred-boundary'
-import { getFullRoute, type RouteLeg } from '@/lib/mapbox/directions'
+import { getFullRoute, LatestRouteRequestController, type RouteLeg } from '@/lib/mapbox/directions'
 import type { ItineraryItem, ItineraryItemType, Trip, Stop, TripCapabilities, TripMember } from '@/types'
 import { showToast } from '@/components/ui/toast'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
@@ -16,25 +15,14 @@ import { getOptimizedOrder } from '@/lib/mapbox/optimize'
 import { useDistanceUnit, formatDistanceValue } from '@/lib/settings'
 import { DestinationDialog } from './DestinationDialog'
 import { ACCENT, ACCENT_DARK, ACCENT_LIGHT, GLASS_BORDER, GLASS_FILL } from './domain-ui'
-import { formatDateRange, totalNights, tripTitle } from './trip-domain-utils'
-import { TripMobileHeader } from './components/TripMobileHeader'
+import { totalNights } from './trip-domain-utils'
 import { TripPrimaryNav, type PrimaryNavSection } from './components/TripPrimaryNav'
 import { TripAddSheet } from './components/TripAddSheet'
 import { ItineraryTimeline, type ItineraryCreateRequest } from './itinerary/ItineraryTimeline'
-
-function TripMapPlaceholder() {
-  return (
-    <div
-      role="status"
-      aria-label="Loading trip map"
-      style={{
-        position: 'absolute',
-        inset: 0,
-        background: 'radial-gradient(120% 90% at 50% 10%, #12123a 0%, #0a0a28 55%, #06061c 100%)',
-      }}
-    />
-  )
-}
+import { useReducedMotionPreference } from '@/components/motion/ReducedMotionProvider'
+import { buildTimeline } from './itinerary-projection'
+import { TripMapDomain } from './TripMapDomain'
+import { buildTimelineMapPoints, cleanSelectedItemId, timelineDayId, type OtherDayVisibility } from './trip-map-model'
 
 
 /** Bottom-sheet snap heights, in px, resolved against the live viewport height. */
@@ -65,14 +53,17 @@ export interface PlanRouteDomainProps {
 
 // ─── Main content ────────────────────────────────────────────────────────────
 
-export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itineraryEnabled, onItemSyncPaused, currentUserId, members, routePath, setRoutePath, routeLegs, setRouteLegs, onSelectSection, onPrefetchSection, onOpenMore, capabilities, onStopSyncPaused }: PlanRouteDomainProps) {
+export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itineraryEnabled, onItemSyncPaused, currentUserId, routePath, setRoutePath, routeLegs, setRouteLegs, onSelectSection, onPrefetchSection, onOpenMore, capabilities, onStopSyncPaused }: PlanRouteDomainProps) {
   const { canEdit } = capabilities
+  const reducedMotion = useReducedMotionPreference()
   const distanceUnit = useDistanceUnit()
   const [activeTab, setActiveTab] = useState<'route' | 'days'>('route')
   const [isAddSheetOpen, setIsAddSheetOpen] = useState(false)
   const [itineraryCreateRequest, setItineraryCreateRequest] = useState<ItineraryCreateRequest | null>(null)
-  const [MapComponent, setMapComponent] = useState<typeof import('@/components/map/mapbox/TripboxMap').TripboxMap | null>(null)
-  const [mapLoadFailed, setMapLoadFailed] = useState(false)
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
+  const [selectedDayId, setSelectedDayId] = useState<string | null>(null)
+  const [otherDays, setOtherDays] = useState<OtherDayVisibility>('hidden')
+  const [routeStatus, setRouteStatus] = useState<'idle' | 'loading' | 'ready' | 'unavailable'>('idle')
   const [isAddOpen, setIsAddOpen] = useState(false)
   const [addInitialQuery, setAddInitialQuery] = useState('')
   const [aiHint, setAiHint] = useState(false)
@@ -89,15 +80,7 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
 
   const stageRef = useRef<HTMLDivElement>(null)
   const sheetHeight = useMotionValue(420)
-
-  useEffect(() => {
-    let current = true
-    setMapLoadFailed(false)
-    import('@/components/map/mapbox/TripboxMap')
-      .then((module) => { if (current) setMapComponent(() => module.TripboxMap) })
-      .catch(() => { if (current) setMapLoadFailed(true) })
-    return () => { current = false }
-  }, [])
+  const routeRequests = useRef(new LatestRouteRequestController())
 
   useEffect(() => {
     setNights((previous) => {
@@ -173,10 +156,17 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
       const { min, mid, max } = snapPoints()
       const current = sheetHeight.get()
       const nearest = [min, mid, max].reduce((a, b) => (Math.abs(b - current) < Math.abs(a - current) ? b : a))
-      animate(sheetHeight, nearest, { type: 'spring', stiffness: 320, damping: 34 })
+      animate(sheetHeight, nearest, reducedMotion ? { duration: 0 } : { duration: .22, ease: [0.22, 1, 0.36, 1] })
     },
-    [sheetHeight, snapPoints]
+    [reducedMotion, sheetHeight, snapPoints]
   )
+
+  const cycleSheetHeight = useCallback(() => {
+    const { min, mid, max } = snapPoints()
+    const current = sheetHeight.get()
+    const next = current < (min + mid) / 2 ? mid : current < (mid + max) / 2 ? max : min
+    animate(sheetHeight, next, reducedMotion ? { duration: 0 } : { duration: .22, ease: [0.22, 1, 0.36, 1] })
+  }, [reducedMotion, sheetHeight, snapPoints])
 
   // One debounced Directions request per actual route change. Keying on the
   // coordinate signature means renames, nights, and failed-reorder reverts to a
@@ -187,20 +177,28 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
     if (stops.length < 2) {
       setRoutePath([])
       setRouteLegs([])
+      setRouteStatus('idle')
       return
     }
-    const controller = new AbortController()
+    setRouteStatus('loading')
+    const requests = routeRequests.current
+    const controller = requests.begin()
     const timer = setTimeout(() => {
       const points = stops.map((s) => ({ lat: s.lat, lng: s.lng }))
       getFullRoute(points, { signal: controller.signal }).then((full) => {
-        if (controller.signal.aborted || !full) return
+        if (!requests.isCurrent(controller)) return
+        if (!full) {
+          setRouteStatus('unavailable')
+          return
+        }
         setRoutePath(full.route.polylinePath)
         setRouteLegs(full.legs)
+        setRouteStatus('ready')
       })
     }, 300)
     return () => {
       clearTimeout(timer)
-      controller.abort()
+      requests.cancel(controller)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [routeKey])
@@ -394,7 +392,7 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
     [trip.id, stops.length, currentUserId, canEdit, setStops]
   )
 
-  const routeLoading = stops.length >= 2 && routeLegs.length === 0
+  const routeLoading = routeStatus === 'loading'
   const summaryDistanceText = formatDistanceValue(routeLegs.reduce((sum, l) => sum + l.distanceMeters, 0), distanceUnit)
   const summaryMin = Math.round(routeLegs.reduce((sum, l) => sum + l.durationSeconds, 0) / 60)
   const summaryDuration = `${Math.floor(summaryMin / 60)}h ${String(summaryMin % 60).padStart(2, '0')}m`
@@ -409,6 +407,55 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
   // Example searches for the empty state: the wizard's destination countries
   // when available, otherwise a generic starter set.
   const emptyStateSuggestions = (trip.countries?.length ? trip.countries.map((c) => c.name) : ['Rome', 'Barcelona', 'Tokyo']).slice(0, 3)
+
+  const timeline = useMemo(() => buildTimeline({
+    tripStartDate: trip.start_date ?? null,
+    tripEndDate: trip.end_date ?? null,
+    stops,
+    items,
+  }), [items, stops, trip.end_date, trip.start_date])
+
+  const timelineMapPoints = useMemo(
+    () => buildTimelineMapPoints(timeline.days, selectedDayId, otherDays),
+    [otherDays, selectedDayId, timeline.days],
+  )
+  const mapPoints = useMemo(() => activeTab === 'route'
+    ? stops.map((stop, index) => ({
+        id: `stop:${stop.id}`, lat: stop.lat, lng: stop.lng, label: index + 1,
+        title: stop.name, subtitle: stop.address ?? undefined, itemType: 'place',
+        emphasis: 'strong' as const,
+        role: index === 0 ? 'start' as const : index === stops.length - 1 ? 'end' as const : 'waypoint' as const,
+      }))
+    : timelineMapPoints.map((point) => ({ ...point, label: point.order })),
+    [activeTab, stops, timelineMapPoints],
+  )
+
+  useEffect(() => {
+    const validIds = [
+      ...stops.map((stop) => `stop:${stop.id}`),
+      ...items.map((item) => `item:${item.id}`),
+    ]
+    setSelectedItemId((current) => cleanSelectedItemId(current, validIds))
+  }, [items, stops])
+
+  const selectedDay = timeline.days.find((day) => timelineDayId(day) === selectedDayId)
+  const routeRequestParts = Math.max(1, Math.ceil((stops.length - 1) / 24))
+  const routeSummary = stops.length < 2
+    ? `${stops.length} ${stops.length === 1 ? 'stop' : 'stops'}`
+    : routeStatus === 'unavailable'
+      ? 'Route unavailable · itinerary still available'
+      : routeStatus === 'loading'
+        ? 'Calculating route…'
+        : `${summaryDistanceText} · ${summaryDuration}${routeRequestParts > 1 ? ` · ${routeRequestParts} route parts` : ''}`
+
+  const handleMapSelection = useCallback((id: string | null) => {
+    setSelectedItemId(id)
+    if (!id) return
+    const point = timelineMapPoints.find((candidate) => candidate.id === id)
+    if (point) setSelectedDayId(point.dayId)
+    const { mid } = snapPoints()
+    if (sheetHeight.get() < mid - 8) animate(sheetHeight, mid, reducedMotion ? { duration: 0 } : { duration: .22, ease: [0.22, 1, 0.36, 1] })
+  }, [reducedMotion, sheetHeight, snapPoints, timelineMapPoints])
 
   return (
     <div
@@ -446,33 +493,21 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
             The sheet is a pure overlay on top; it covers more/less of this static map as it moves,
             but the map's own DOM container size (and therefore its camera) never changes. */}
         <div style={{ position: 'absolute', inset: 0, zIndex: 0, background: '#06061c' }}>
-          <DeferredBoundary label="the trip map" style={{ position: 'absolute', inset: 0 }}>
-            {mapLoadFailed ? (
-              <DeferredFailure label="the trip map" onRetry={() => window.location.reload()} style={{ position: 'absolute', inset: 0 }} />
-            ) : MapComponent ? (
-                <MapComponent
-                  points={stops.map((s, idx) => ({ id: s.id, lat: s.lat, lng: s.lng, label: idx + 1, title: s.name, subtitle: s.address ?? undefined }))}
-                  routePath={routePath}
-                  defaultCenter={defaultCenter}
-                  defaultZoom={5}
-                  dropInId={lastAddedStopId}
-                />
-            ) : <TripMapPlaceholder />}
-          </DeferredBoundary>
-          <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(to bottom, transparent 78%, rgba(6,6,28,.6) 100%)' }} />
+          <TripMapDomain
+            points={mapPoints}
+            routePath={routePath}
+            defaultCenter={defaultCenter}
+            selectedItemId={selectedItemId}
+            onSelectItem={handleMapSelection}
+            onBack={() => onSelectSection('overview')}
+            onListToggle={cycleSheetHeight}
+            routeSummary={routeSummary}
+            activeDayLabel={activeTab === 'days' && selectedDay?.dayNumber != null ? `Day ${selectedDay.dayNumber}` : undefined}
+            otherDays={otherDays}
+            onOtherDaysChange={setOtherDays}
+            dropInId={lastAddedStopId ? `stop:${lastAddedStopId}` : null}
+          />
         </div>
-
-        <TripMobileHeader
-          variant="overlay"
-          title={tripTitle(trip, stops)}
-          subtitle={formatDateRange(trip.start_date, trip.end_date) || 'No dates set'}
-          readOnly={!canEdit}
-          members={members}
-          tripId={trip.id}
-          onBack={() => onSelectSection('overview')}
-          onOpenMore={onOpenMore}
-          backLabel="Back to overview"
-        />
 
         {/* draggable bottom sheet */}
         <motion.div
@@ -617,7 +652,23 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
                       <SortableStopItem key={stop.id} id={stop.id} disabled={!canEdit}>
                         {({ attributes, listeners, isDragging }) => (
                           <>
-                        <div {...attributes} {...listeners} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', borderRadius: 14, background: isDragging ? 'rgba(255,255,255,.09)' : stop.id === lastAddedStopId ? 'rgba(245,166,35,.14)' : 'rgba(255,255,255,.045)', border: `1px solid ${isDragging ? 'rgba(245,166,35,.4)' : stop.id === lastAddedStopId ? 'rgba(245,166,35,.55)' : 'rgba(255,255,255,.09)'}`, transition: 'background .7s ease, border-color .7s ease', touchAction: 'manipulation', cursor: canEdit ? (isDragging ? 'grabbing' : 'grab') : 'default' }}>
+                        <div
+                          {...attributes}
+                          {...listeners}
+                          role="button"
+                          tabIndex={0}
+                          aria-pressed={selectedItemId === `stop:${stop.id}`}
+                          onClick={(event) => {
+                            if ((event.target as HTMLElement).closest('button,input')) return
+                            setSelectedItemId(`stop:${stop.id}`)
+                          }}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Enter' || event.key === ' ') {
+                              event.preventDefault()
+                              setSelectedItemId(`stop:${stop.id}`)
+                            }
+                          }}
+                          style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', borderRadius: 14, background: isDragging ? 'rgba(255,255,255,.09)' : selectedItemId === `stop:${stop.id}` ? 'rgba(245,166,35,.16)' : stop.id === lastAddedStopId ? 'rgba(245,166,35,.14)' : 'rgba(255,255,255,.045)', border: `1px solid ${isDragging ? 'rgba(245,166,35,.4)' : selectedItemId === `stop:${stop.id}` ? 'rgba(245,166,35,.7)' : stop.id === lastAddedStopId ? 'rgba(245,166,35,.55)' : 'rgba(255,255,255,.09)'}`, transition: reducedMotion ? 'none' : 'background .22s ease, border-color .22s ease', touchAction: 'manipulation', cursor: canEdit ? (isDragging ? 'grabbing' : 'grab') : 'pointer' }}>
                           {canEdit && <svg width="8" height="14" viewBox="0 0 8 14" fill="none" style={{ flex: 'none', opacity: 0.45 }} aria-hidden="true">
                             <circle cx="2" cy="2" r="1.2" fill="#d7d7ff" /><circle cx="6" cy="2" r="1.2" fill="#d7d7ff" />
                             <circle cx="2" cy="7" r="1.2" fill="#d7d7ff" /><circle cx="6" cy="7" r="1.2" fill="#d7d7ff" />
@@ -759,6 +810,10 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
                 currentUserId={currentUserId}
                 itineraryEnabled={itineraryEnabled}
                 createRequest={itineraryCreateRequest}
+                selectedDayId={selectedDayId}
+                onSelectedDayIdChange={setSelectedDayId}
+                selectedItemId={selectedItemId}
+                onSelectItem={setSelectedItemId}
               />
             )}
           </div>

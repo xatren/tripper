@@ -76,11 +76,11 @@ begin
   end if;
 
   if (
-    select array_agg(privilege_type order by privilege_type)
+    select array_agg(privilege_type::text order by privilege_type::text)
     from information_schema.role_table_grants
     where table_schema = 'public' and table_name = 'itinerary_items'
       and grantee = 'authenticated'
-  ) is distinct from array['DELETE', 'INSERT', 'SELECT', 'UPDATE'] then
+  ) is distinct from array['DELETE', 'INSERT', 'SELECT', 'UPDATE']::text[] then
     raise exception 'authenticated must hold exactly SELECT/INSERT/UPDATE/DELETE on itinerary_items';
   end if;
 end $$;

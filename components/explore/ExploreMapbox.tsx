@@ -125,6 +125,22 @@ export function ExploreMapbox({
     [routePath],
   );
 
+  // Explore can contain hundreds of points. Above the small-list threshold,
+  // keep them in a Mapbox source so clustering and hit testing stay on the GPU
+  // instead of mounting one React/DOM marker per place.
+  const usePointClusters = points.length >= 40;
+  const pointGeoJson = useMemo(
+    () => ({
+      type: "FeatureCollection" as const,
+      features: points.map((point, index) => ({
+        type: "Feature" as const,
+        geometry: { type: "Point" as const, coordinates: [point.lng, point.lat] },
+        properties: { id: index, label: point.label, color: point.color, radius: markerPx(point.size) / 2 },
+      })),
+    }),
+    [points],
+  );
+
   const flyTo = useCallback((target: ExploreCamera, duration = 1400) => {
     const map = mapRef.current;
     if (!map) return;
@@ -293,7 +309,29 @@ export function ExploreMapbox({
           </Source>
         )}
 
-        {points.map((p, i) => {
+        {usePointClusters ? (
+          <Source id="explore-points" type="geojson" data={pointGeoJson} cluster clusterMaxZoom={12} clusterRadius={46}>
+            <Layer
+              id="explore-point-clusters"
+              type="circle"
+              filter={["has", "point_count"]}
+              paint={{ "circle-color": "#f5a623", "circle-radius": ["step", ["get", "point_count"], 18, 30, 23, 100, 29], "circle-stroke-width": 3, "circle-stroke-color": "rgba(10,10,26,.9)", "circle-opacity": .9 }}
+            />
+            <Layer
+              id="explore-point-cluster-count"
+              type="symbol"
+              filter={["has", "point_count"]}
+              layout={{ "text-field": ["get", "point_count_abbreviated"], "text-size": 12 }}
+              paint={{ "text-color": "#0a1020" }}
+            />
+            <Layer
+              id="explore-points-unclustered"
+              type="circle"
+              filter={["!", ["has", "point_count"]]}
+              paint={{ "circle-color": ["get", "color"], "circle-radius": ["max", 5, ["get", "radius"]], "circle-stroke-width": 2, "circle-stroke-color": "rgba(255,255,255,.45)" }}
+            />
+          </Source>
+        ) : points.map((p, i) => {
           const px = markerPx(p.size);
           const isAccent = p.color.includes("245") || p.color.includes("f5a623");
           return (

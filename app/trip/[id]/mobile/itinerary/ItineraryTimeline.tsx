@@ -38,6 +38,10 @@ export interface ItineraryTimelineProps {
   itineraryEnabled: boolean
   /** Set by the trip-level "+ Add" sheet to open the create form pre-typed. */
   createRequest: ItineraryCreateRequest | null
+  selectedDayId?: string | null
+  onSelectedDayIdChange?: (id: string | null) => void
+  selectedItemId?: string | null
+  onSelectItem?: (id: string) => void
 }
 
 const deviceZone = () => {
@@ -90,6 +94,8 @@ function draftFromItem(item: ItineraryItem): ItineraryItemDraft {
 export function ItineraryTimeline({
   trip, stops, items, setItems, onItemSyncPaused,
   canEdit, currentUserId, itineraryEnabled, createRequest,
+  selectedDayId: controlledSelectedDayId, onSelectedDayIdChange,
+  selectedItemId, onSelectItem,
 }: ItineraryTimelineProps) {
   const timeline = useMemo(
     () => buildTimeline({
@@ -104,18 +110,21 @@ export function ItineraryTimeline({
   const dayId = (day: TimelineDay) => day.date ?? `n${day.dayNumber ?? 0}`
   const today = localDateISO()
 
-  const [selectedDayId, setSelectedDayId] = useState<string | null>(null)
+  const [internalSelectedDayId, setInternalSelectedDayId] = useState<string | null>(null)
+  const selectedDayId = controlledSelectedDayId === undefined ? internalSelectedDayId : controlledSelectedDayId
+  const setSelectedDayId = useCallback((id: string | null) => {
+    if (controlledSelectedDayId === undefined) setInternalSelectedDayId(id)
+    onSelectedDayIdChange?.(id)
+  }, [controlledSelectedDayId, onSelectedDayIdChange])
   useEffect(() => {
     if (timeline.days.length === 0) {
       setSelectedDayId(null)
       return
     }
-    setSelectedDayId((current) => {
-      if (current && timeline.days.some((day) => dayId(day) === current)) return current
-      const todayCell = timeline.days.find((day) => day.date === today)
-      return dayId(todayCell ?? timeline.days[0])
-    })
-  }, [timeline.days, today])
+    if (selectedDayId && timeline.days.some((day) => dayId(day) === selectedDayId)) return
+    const todayCell = timeline.days.find((day) => day.date === today)
+    setSelectedDayId(dayId(todayCell ?? timeline.days[0]))
+  }, [selectedDayId, setSelectedDayId, timeline.days, today])
 
   const selectedDay = timeline.days.find((day) => dayId(day) === selectedDayId) ?? null
 
@@ -217,7 +226,7 @@ export function ItineraryTimeline({
       setSheetDraft(null)
       if (localDate) setSelectedDayId(localDate)
     }
-  }, [canEdit, itineraryEnabled, trip.id, items, setItems, nextOrderIndex, currentUserId])
+  }, [canEdit, itineraryEnabled, trip.id, items, setItems, nextOrderIndex, currentUserId, setSelectedDayId])
 
   const toggleComplete = useCallback(async (entry: TimelineEntry) => {
     if (!canEdit || entry.source !== 'item') return
@@ -274,7 +283,7 @@ export function ItineraryTimeline({
       return
     }
     if (targetDate) setSelectedDayId(targetDate)
-  }, [canEdit, items, setItems, nextOrderIndex, onItemSyncPaused])
+  }, [canEdit, items, setItems, nextOrderIndex, onItemSyncPaused, setSelectedDayId])
 
   const reorderDay = useCallback((day: TimelineDay, orderedItemIds: string[]) => {
     if (!canEdit) return
@@ -367,6 +376,8 @@ export function ItineraryTimeline({
             onReorder={reorderDay}
             onAddToDay={canEdit && itineraryEnabled ? () => setSheetDraft(emptyDraft('activity', selectedDay.date ?? '', (trip.currency ?? 'USD') as TripCurrency)) : undefined}
             onSyncPaused={onItemSyncPaused}
+            selectedItemId={selectedItemId}
+            onSelectItem={onSelectItem}
           />
         </section>
       )}

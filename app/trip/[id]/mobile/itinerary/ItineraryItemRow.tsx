@@ -18,6 +18,8 @@ export interface ItineraryItemRowProps {
   /** dnd-kit handle wiring; absent for read-only rows. */
   dragHandleProps?: HTMLAttributes<HTMLButtonElement> & Record<string, unknown>
   isDragging?: boolean
+  selected?: boolean
+  onSelect?: () => void
 }
 
 function actionButton(label: string, onClick: () => void, icon: ReactNode, danger = false) {
@@ -46,7 +48,7 @@ function actionButton(label: string, onClick: () => void, icon: ReactNode, dange
  * status/booking indicators. Solid dark surface — rows never blur; glass is
  * reserved for the surrounding chrome.
  */
-export function ItineraryItemRow({ entry, timezone, canEdit, onEdit, onToggleComplete, onMove, onDelete, dragHandleProps, isDragging }: ItineraryItemRowProps) {
+export function ItineraryItemRow({ entry, timezone, canEdit, onEdit, onToggleComplete, onMove, onDelete, dragHandleProps, isDragging, selected, onSelect }: ItineraryItemRowProps) {
   const typeMeta = ITEM_TYPE_META[entry.itemType as ItineraryItemType] ?? ITEM_TYPE_META.place
   const statusMeta = STATUS_META[entry.status as ItineraryItemStatus] ?? STATUS_META.planned
   const timeLabel = entry.startAt ? formatWallTime(entry.startAt, timezone) : entry.allDay ? 'All day' : '—'
@@ -58,11 +60,26 @@ export function ItineraryItemRow({ entry, timezone, canEdit, onEdit, onToggleCom
   return (
     <div style={{ opacity: entry.status === 'skipped' ? 0.55 : 1 }}>
       <div
+        role={onSelect ? 'button' : undefined}
+        tabIndex={onSelect ? 0 : undefined}
+        aria-pressed={onSelect ? selected : undefined}
+        onClick={(event) => {
+          if (!onSelect || (event.target as HTMLElement).closest('button')) return
+          onSelect()
+        }}
+        onKeyDown={(event) => {
+          if (onSelect && (event.key === 'Enter' || event.key === ' ')) {
+            event.preventDefault()
+            onSelect()
+          }
+        }}
         style={{
           display: 'flex', alignItems: 'flex-start', gap: 10, padding: '12px 14px',
           borderRadius: tokens.radius16,
           background: isDragging ? 'rgba(255,255,255,.09)' : tokens.surfaceSolid,
-          border: `1px solid ${isDragging ? 'rgba(245,166,35,.4)' : entry.conflict ? 'rgba(251,191,36,.4)' : 'rgba(255,255,255,.09)'}`,
+          border: `1px solid ${isDragging ? 'rgba(245,166,35,.4)' : selected ? 'rgba(245,166,35,.75)' : entry.conflict ? 'rgba(251,191,36,.4)' : 'rgba(255,255,255,.09)'}`,
+          boxShadow: selected ? '0 0 0 2px rgba(245,166,35,.14)' : undefined,
+          cursor: onSelect ? 'pointer' : undefined,
         }}
       >
         {editable && dragHandleProps && (
@@ -103,12 +120,12 @@ export function ItineraryItemRow({ entry, timezone, canEdit, onEdit, onToggleCom
 
         <button
           type="button"
-          onClick={() => editable && onEdit(entry)}
-          disabled={!editable}
-          aria-label={editable ? `Edit ${entry.title}` : undefined}
+          onClick={() => onSelect ? onSelect() : editable && onEdit(entry)}
+          disabled={!editable && !onSelect}
+          aria-label={onSelect ? `Show ${entry.title} on map` : editable ? `Edit ${entry.title}` : undefined}
           style={{
             flex: 1, minWidth: 0, textAlign: 'left', background: 'none', border: 'none', padding: 0,
-            fontFamily: 'inherit', cursor: editable ? 'pointer' : 'default', color: 'inherit',
+            fontFamily: 'inherit', cursor: editable || onSelect ? 'pointer' : 'default', color: 'inherit',
           }}
         >
           <span style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
@@ -156,6 +173,11 @@ export function ItineraryItemRow({ entry, timezone, canEdit, onEdit, onToggleCom
 
       {editable && (
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6, padding: '6px 4px 0' }}>
+          {onSelect && actionButton(
+            'Edit',
+            () => onEdit(entry),
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg>,
+          )}
           {actionButton(
             completed ? 'Mark planned' : 'Mark done',
             () => onToggleComplete(entry),

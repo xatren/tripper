@@ -27,6 +27,8 @@ export interface ItineraryDaySectionProps {
   onAddToDay?: () => void
   /** Pause/resume realtime item sync while a drag is in flight. */
   onSyncPaused: (paused: boolean) => void
+  selectedItemId?: string | null
+  onSelectItem?: (id: string) => void
 }
 
 function SortableRow({ entry, children }: {
@@ -42,7 +44,7 @@ function SortableRow({ entry, children }: {
 }
 
 /** One day's timeline: pinned route arrivals, then the reorderable item list. */
-export function ItineraryDaySection({ day, canEdit, onEdit, onToggleComplete, onMove, onDelete, onReorder, onAddToDay, onSyncPaused }: ItineraryDaySectionProps) {
+export function ItineraryDaySection({ day, canEdit, onEdit, onToggleComplete, onMove, onDelete, onReorder, onAddToDay, onSyncPaused, selectedItemId, onSelectItem }: ItineraryDaySectionProps) {
   const sensors = useSensors(
     // Small pointer distance / touch long-press so buttons inside rows keep
     // working as taps; keyboard sensor preserves non-pointer reordering.
@@ -79,6 +81,8 @@ export function ItineraryDaySection({ day, canEdit, onEdit, onToggleComplete, on
         onDelete={onDelete}
         dragHandleProps={handleProps}
         isDragging={isDragging}
+        selected={selectedItemId === entry.key}
+        onSelect={() => onSelectItem?.(entry.key)}
       />
     </>
   )
