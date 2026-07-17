@@ -48,12 +48,18 @@ test('focus and custom modal contracts remain present', () => {
 })
 
 test('packing and budget row actions keep mobile-sized hit targets', () => {
-  const packing = read('app/trip/[id]/mobile/PrepDomain.tsx')
-  // Delete lives in the expense detail sheet (tap row -> detail -> edit/delete),
-  // not inline in the category list — see app/trip/[id]/mobile/BudgetDomain.tsx.
+  const packing = read('app/trip/[id]/mobile/prep/PackingSection.tsx')
+  const prepTasks = read('app/trip/[id]/mobile/prep/TaskSection.tsx')
+  // Item delete lives in the prep detail sheet (tap row -> detail -> delete),
+  // mirroring the expense detail sheet contract below.
+  const prepSheets = read('app/trip/[id]/mobile/prep/PrepSheets.tsx')
   const budgetDetail = read('app/trip/[id]/mobile/budget/ExpenseDetailSheet.tsx')
 
   assert.match(packing, /aria-label=\{item\.checked \? `Uncheck \$\{item\.label\}` : `Check \$\{item\.label\}`\}[\s\S]*?width: 44, height: 44/)
-  assert.match(packing, /aria-label=\{`Remove \$\{item\.label\}`\}[\s\S]*?width: 44, height: 44/)
+  assert.match(packing, /aria-label=\{`Open details for \$\{item\.label\}`\}[\s\S]*?minHeight: 44/)
+  assert.match(packing, /aria-label=\{`Reorder \$\{item\.label\}`\}[\s\S]*?width: 44, height: 44/)
+  assert.match(prepTasks, /aria-label=\{task\.done \? `Mark \$\{task\.title\} not done` : `Mark \$\{task\.title\} done`\}[\s\S]*?width: 44, height: 44/)
+  assert.match(prepSheets, /\{confirmDelete \? 'Tap again to delete' : 'Delete'\}/)
+  assert.match(prepSheets, /aria-label="Decrease quantity"[\s\S]*?width: 44, height: 44/)
   assert.match(budgetDetail, /onClick=\{\(\) => onDelete\(expense\)\}[\s\S]*?minHeight: 44/)
 })

@@ -135,29 +135,30 @@ export function AddExpenseSheet({ trip, members, currentUserId, draft, itinerary
     ? 'You'
     : (member.profile?.display_name?.trim() || member.profile?.email?.split('@')[0] || 'Trip member')
 
+  // Memoized so SplitEditor's resolution stays referentially stable across
+  // re-renders that don't actually change the split inputs — without this,
+  // a fresh array every render feeds a new "resolution" object into
+  // SplitEditor's onResolutionChange effect on every render, which calls
+  // setResolution here, triggering another render: an infinite update loop.
+  // Must run before the null-draft early return: hooks cannot be conditional.
+  const participants: SplitParticipant[] = useMemo(() => (form ? members.map((member) => ({
+    memberId: member.user_id,
+    name: memberName(member),
+    included: form.participantIds.includes(member.user_id),
+    exactAmount: form.exactAmounts[member.user_id] ?? '',
+    percentage: form.percentages[member.user_id] ?? '',
+  })) : []),
+  // memberName is a stable-enough closure over currentUserId (already listed) and
+  // the per-member profile data carried by `members` itself — not a separate dep.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [members, form?.participantIds, form?.exactAmounts, form?.percentages, currentUserId])
+
   if (!draft || !form) return null
 
   const set = <K extends keyof ExpenseDraft>(key: K, value: ExpenseDraft[K]) =>
     setForm((previous) => (previous ? { ...previous, [key]: value } : previous))
 
   const amountMinor = Math.round((Number(form.amount) || 0) * 100)
-
-  // Memoized so SplitEditor's resolution stays referentially stable across
-  // re-renders that don't actually change the split inputs — without this,
-  // a fresh array every render feeds a new "resolution" object into
-  // SplitEditor's onResolutionChange effect on every render, which calls
-  // setResolution here, triggering another render: an infinite update loop.
-  const participants: SplitParticipant[] = useMemo(() => members.map((member) => ({
-    memberId: member.user_id,
-    name: memberName(member),
-    included: form.participantIds.includes(member.user_id),
-    exactAmount: form.exactAmounts[member.user_id] ?? '',
-    percentage: form.percentages[member.user_id] ?? '',
-  })),
-  // memberName is a stable-enough closure over currentUserId (already listed) and
-  // the per-member profile data carried by `members` itself — not a separate dep.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  [members, form.participantIds, form.exactAmounts, form.percentages, currentUserId])
 
   const toggleParticipant = (memberId: string) => set(
     'participantIds',

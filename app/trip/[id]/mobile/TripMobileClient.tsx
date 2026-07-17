@@ -398,7 +398,7 @@ function TripMobileContent({ trip, stops: initialStops, items: initialItems, iti
             <div style={{ display: visibleScreen === 'packing' ? 'block' : 'none' }} aria-hidden={visibleScreen !== 'packing'}>
               <DeferredBoundary label="the packing section" style={{ minHeight: 180 }}>
                 <Suspense fallback={<DomainLoading label="packing" />}>
-                  <PrepDomain tripId={trip.id} vibe={trip.vibe} userId={currentUserId} canEdit={capabilities.canEdit} />
+                  <PrepDomain tripId={trip.id} vibe={trip.vibe} userId={currentUserId} canEdit={capabilities.canEdit} members={members} />
                 </Suspense>
               </DeferredBoundary>
             </div>
