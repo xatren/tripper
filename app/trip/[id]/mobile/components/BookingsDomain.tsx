@@ -1,129 +1,322 @@
 'use client'
 
-import { useState } from 'react'
-import type { Stop, Trip } from '@/types'
-import { EmptyState, MobileListRow, StatusChip, tokens } from '@/components/mobile'
-import { BOOKING_PARTNERS, bookingUrl, computeStopSchedule, formatDateRange } from '../trip-domain-utils'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import type { ItineraryItem, Reservation, ReservationType, Stop, Trip, TripCapabilities } from '@/types'
+import { EmptyState, FilterChip, tokens } from '@/components/mobile'
+import { createClient } from '@/lib/supabase/client'
+import { useTripRealtimeTable } from '@/lib/supabase/trip-realtime'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+import { showToast } from '@/components/ui/toast'
+import { RetryCard } from '../domain-ui'
+import { DOCUMENTS_BUCKET, filterReservations, splitReservations } from '../bookings/bookings-logic'
+import { RESERVATION_TYPE_META } from '../bookings/bookings-ui'
+import { ReservationCard } from '../bookings/ReservationCard'
+import { ReservationDetailSheet } from '../bookings/ReservationDetailSheet'
+import { ReservationEditorSheet, draftFromReservation, emptyReservationDraft, type ReservationDraft } from '../bookings/ReservationEditorSheet'
+import { FindStaySection } from '../bookings/FindStaySection'
+
+// Session-lifetime cache so re-opening the Bookings tab never refetches.
+const reservationsCache = new Map<string, Reservation[]>()
 
 export interface BookingsDomainProps {
   trip: Trip
   stops: Stop[]
+  items: ItineraryItem[]
+  setItems: React.Dispatch<React.SetStateAction<ItineraryItem[]>>
+  itineraryEnabled: boolean
+  currentUserId: string
+  capabilities: TripCapabilities
+  onSelectSection: (section: 'overview' | 'plan' | 'explore' | 'bookings') => void
+}
+
+type Segment = 'bookings' | 'find-stay'
+
+const SECTION_TITLE_STYLE: React.CSSProperties = {
+  fontSize: 12, fontWeight: 700, color: 'var(--color-text-secondary)',
+  textTransform: 'uppercase', letterSpacing: '.06em', margin: '4px 0 2px',
 }
 
 /**
- * Top-level Bookings screen — reservation partner links per stop.
- * Dense-content screen: cards sit on the opaque raised surface (no per-card
- * backdrop blur) per the Liquid Glass usage rules.
+ * Top-level Bookings screen: the traveller's own reservation records with
+ * documents, plus the separate "Find a stay" partner-search flow. Cards sit on
+ * the opaque raised surface; the filter row is the screen's glass tier.
  */
-export function BookingsDomain({ trip, stops }: BookingsDomainProps) {
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({})
+export function BookingsDomain({ trip, stops, items, setItems, itineraryEnabled, currentUserId, capabilities, onSelectSection }: BookingsDomainProps) {
+  const [segment, setSegment] = useState<Segment>('bookings')
+  const [reservations, setReservationsState] = useState<Reservation[] | null>(() => reservationsCache.get(trip.id) ?? null)
+  const [loadError, setLoadError] = useState(false)
+  const [reloadToken, setReloadToken] = useState(0)
+  const [typeFilter, setTypeFilter] = useState<ReservationType | 'all'>('all')
+  const [search, setSearch] = useState('')
+  const [detailId, setDetailId] = useState<string | null>(null)
+  const [editorDraft, setEditorDraft] = useState<ReservationDraft | null>(null)
+  const [pendingDelete, setPendingDelete] = useState<Reservation | null>(null)
 
-  if (stops.length === 0) {
-    return (
-      <EmptyState
-        icon={
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="3" y="5" width="18" height="14" rx="2" />
-            <path d="M3 10h18M8 5v14" strokeDasharray="2 2" />
-          </svg>
-        }
-        title="No stops yet"
-        description="Add a destination in Plan to see booking links here."
-      />
-    )
+  const setReservations = useCallback((rows: Reservation[]) => {
+    reservationsCache.set(trip.id, rows)
+    setReservationsState(rows)
+  }, [trip.id])
+
+  const refreshReservations = useCallback(async (surfaceError = false) => {
+    const { data, error } = await createClient()
+      .from('reservations')
+      .select('*, reservation_attachments(*)')
+      .eq('trip_id', trip.id)
+      .order('start_at', { ascending: true, nullsFirst: false })
+    if (!error && data) {
+      setReservations(data as Reservation[])
+      setLoadError(false)
+    } else if (surfaceError) {
+      setReservationsState([])
+      setLoadError(true)
+    }
+  }, [setReservations, trip.id])
+
+  useEffect(() => {
+    if (reloadToken === 0 && reservationsCache.has(trip.id)) return
+    let cancelled = false
+    setReservationsState(null)
+    setLoadError(false)
+    void refreshReservations(true).then(() => {
+      if (cancelled) return
+    })
+    return () => { cancelled = true }
+  }, [refreshReservations, trip.id, reloadToken])
+
+  // Attachments live in a child table without trip_id (like journal photos),
+  // so any reservation event triggers a scoped parent refetch shortly after.
+  useTripRealtimeTable<Reservation & Record<string, unknown>>(
+    'reservations',
+    useCallback((change) => {
+      const row = (change.eventType === 'DELETE' ? change.old : change.new) as Partial<Reservation>
+      if (!row.id) return
+      if (change.eventType === 'DELETE') {
+        setReservationsState((previous) => {
+          const next = (previous ?? []).filter((reservation) => reservation.id !== row.id)
+          reservationsCache.set(trip.id, next)
+          return next
+        })
+        setPendingDelete((pending) => (pending?.id === row.id ? null : pending))
+        setDetailId((current) => (current === row.id ? null : current))
+        return
+      }
+      void refreshReservations(false)
+    }, [refreshReservations, trip.id]),
+    useCallback(() => { void refreshReservations(false) }, [refreshReservations]),
+  )
+
+  const detailReservation = useMemo(
+    () => (detailId ? (reservations ?? []).find((reservation) => reservation.id === detailId) ?? null : null),
+    [detailId, reservations],
+  )
+
+  // The upcoming/previous boundary only needs to be right for this visit —
+  // a per-mount timestamp keeps render pure.
+  const [nowMs] = useState(() => Date.now())
+  const filtered = useMemo(
+    () => filterReservations(reservations ?? [], typeFilter, search),
+    [reservations, typeFilter, search],
+  )
+  const { upcoming, previous } = useMemo(() => splitReservations(filtered, nowMs), [filtered, nowMs])
+
+  const fallbackCurrency = trip.currency ?? 'USD'
+
+  const deleteReservation = async (reservation: Reservation) => {
+    setPendingDelete(null)
+    const supabase = createClient()
+    const paths = (reservation.reservation_attachments ?? []).map((attachment) => attachment.storage_path)
+    if (paths.length > 0) {
+      const { error: storageError } = await supabase.storage.from(DOCUMENTS_BUCKET).remove(paths)
+      if (storageError) {
+        showToast("Couldn't remove the booking's documents, so the booking was kept. Retry is safe.", 'error')
+        return
+      }
+    }
+    const { error } = await supabase.from('reservations').delete().eq('id', reservation.id)
+    if (error) {
+      showToast("Documents were removed, but the booking record wasn't. Retry deletion to finish cleanup.", 'error')
+      return
+    }
+    setDetailId(null)
+    setReservations((reservationsCache.get(trip.id) ?? []).filter((entry) => entry.id !== reservation.id))
+    showToast('Booking deleted.', 'success')
   }
 
-  const nights = Object.fromEntries(stops.map((s) => [s.id, s.nights ?? 1]))
-  const schedule = computeStopSchedule(trip.start_date, stops, nights)
+  const canEdit = capabilities.canEdit
 
   return (
-    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 14 }}>
-      {stops.map((stop, idx) => {
-        const moreOpen = !!expanded[stop.id]
-        const shown = moreOpen ? BOOKING_PARTNERS : BOOKING_PARTNERS.slice(0, 3)
-        const arrival = schedule[idx]?.arrival ?? stop.arrival_date
-        const departure = schedule[idx]?.departure ?? stop.departure_date
-        const hasDates = !!(arrival && departure)
-        const dateRange = formatDateRange(arrival, departure)
-        return (
-          <section
-            key={stop.id}
-            aria-label={`Bookings for ${stop.name}`}
-            style={{ background: tokens.surfaceRaised, border: '1px solid rgba(255,255,255,.08)', borderRadius: tokens.radius20, padding: 16, boxShadow: '0 6px 20px rgba(0,0,0,.2)' }}
+    <div style={{ paddingTop: 14, paddingBottom: 20, display: 'flex', flexDirection: 'column', gap: 14 }}>
+      {/* Segment switch — saved records vs. external partner search. */}
+      <div
+        role="tablist"
+        aria-label="Bookings sections"
+        className="glass-standard"
+        style={{ display: 'flex', gap: 4, padding: 4, borderRadius: tokens.radius16 }}
+      >
+        {([
+          { key: 'bookings' as const, label: 'My bookings' },
+          { key: 'find-stay' as const, label: 'Find a stay' },
+        ]).map((option) => (
+          <button
+            key={option.key}
+            role="tab"
+            aria-selected={segment === option.key}
+            onClick={() => setSegment(option.key)}
+            style={{
+              flex: 1, minHeight: 44, borderRadius: 12, cursor: 'pointer', fontFamily: 'inherit',
+              background: segment === option.key ? 'rgba(245,166,35,.16)' : 'none',
+              border: `1px solid ${segment === option.key ? 'rgba(245,140,0,.4)' : 'transparent'}`,
+              color: segment === option.key ? tokens.accentLight : tokens.textSecondary,
+              fontSize: 13, fontWeight: 700,
+            }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
-              <div style={{ minWidth: 0 }}>
-                <div style={{ fontSize: 15.5, fontWeight: 700, letterSpacing: '-0.01em', color: tokens.textPrimary }}>Stay in {stop.name}</div>
-                {dateRange && <div style={{ fontSize: 12, color: tokens.textSecondary, marginTop: 3, fontWeight: 500 }}>{dateRange}</div>}
+            {option.label}
+          </button>
+        ))}
+      </div>
+
+      {segment === 'find-stay' ? (
+        <FindStaySection trip={trip} stops={stops} />
+      ) : (
+        <>
+          {canEdit && (
+            <button
+              type="button"
+              onClick={() => setEditorDraft(emptyReservationDraft(fallbackCurrency))}
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, minHeight: 48,
+                borderRadius: 14, border: 'none', cursor: 'pointer',
+                background: tokens.accentCtaGradient, color: tokens.textOnAccent,
+                fontWeight: 800, fontSize: 14, fontFamily: 'inherit', boxShadow: '0 0 24px rgba(245,140,0,.25)',
+              }}
+            >
+              <svg aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2.5V13.5M2.5 8H13.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+              Add booking
+            </button>
+          )}
+
+          <input
+            aria-label="Search bookings"
+            type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search title, provider, confirmation…"
+            style={{
+              width: '100%', minHeight: 44, padding: '10px 14px', borderRadius: 12,
+              background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.14)',
+              color: '#fff', fontSize: 13.5, fontFamily: 'inherit', outline: 'none',
+            }}
+          />
+
+          <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 2 }}>
+            <FilterChip selected={typeFilter === 'all'} onClick={() => setTypeFilter('all')} style={{ flex: 'none' }}>
+              All
+            </FilterChip>
+            {(Object.keys(RESERVATION_TYPE_META) as ReservationType[]).map((type) => (
+              <FilterChip key={type} selected={typeFilter === type} onClick={() => setTypeFilter(type)} style={{ flex: 'none' }}>
+                {RESERVATION_TYPE_META[type].label}
+              </FilterChip>
+            ))}
+          </div>
+
+          {reservations === null && (
+            <div style={{ height: 96, borderRadius: 16, background: 'rgba(255,255,255,.035)', border: '1px solid rgba(255,255,255,.08)', animation: 'pulseglow 1.6s ease-in-out infinite' }} />
+          )}
+
+          {loadError && (
+            <RetryCard
+              title="Couldn't load your bookings"
+              hint="Check your connection — or run the reservations migration if you haven't yet."
+              onRetry={() => setReloadToken((token) => token + 1)}
+            />
+          )}
+
+          {reservations !== null && !loadError && reservations.length === 0 && (
+            <EmptyState
+              icon={
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="7" width="18" height="12" rx="2" /><path d="M3 11h18M16 7V5a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v2" />
+                </svg>
+              }
+              title="No bookings yet"
+              description={canEdit
+                ? 'Add your flights, stays, and tickets so every confirmation lives in one place.'
+                : 'Reservations added by trip editors will appear here.'}
+            />
+          )}
+
+          {reservations !== null && !loadError && reservations.length > 0 && filtered.length === 0 && (
+            <div style={{ padding: '18px 16px', borderRadius: 16, background: 'rgba(255,255,255,.035)', border: '1px solid rgba(255,255,255,.08)', textAlign: 'center' }}>
+              <span style={{ color: tokens.textMuted, fontSize: 12.5 }}>Nothing matches this filter.</span>
+            </div>
+          )}
+
+          {upcoming.length > 0 && (
+            <>
+              <div style={SECTION_TITLE_STYLE}>Upcoming</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {upcoming.map((reservation) => (
+                  <ReservationCard key={reservation.id} reservation={reservation} onOpen={(entry) => setDetailId(entry.id)} />
+                ))}
               </div>
-              <a
-                href={bookingUrl('Booking.com', stop, arrival, departure)}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ display: 'flex', alignItems: 'center', gap: 5, minHeight: 44, border: '1px solid rgba(245,140,0,.5)', color: tokens.accentLight, borderRadius: tokens.radiusFull, padding: '8px 13px', flex: 'none', textDecoration: 'none', whiteSpace: 'nowrap' }}
-              >
-                <svg aria-hidden="true" width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M8 2.5V13.5M2.5 8H13.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>
-                <span style={{ fontSize: 12, fontWeight: 700 }}>Add Stay</span>
-              </a>
-            </div>
+            </>
+          )}
 
-            <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column' }}>
-              {shown.map((partner, partnerIdx) => (
-                <MobileListRow
-                  key={partner}
-                  href={bookingUrl(partner, stop, arrival, departure)}
-                  linkProps={{ target: '_blank', rel: 'noopener noreferrer' }}
-                  leading={partner[0]}
-                  title={partner}
-                  divider={partnerIdx < shown.length - 1}
-                  trailing={
-                    <svg aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none" style={{ opacity: 0.5 }}>
-                      <path d="M6 3L11 8L6 13" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  }
-                />
-              ))}
-            </div>
+          {previous.length > 0 && (
+            <>
+              <div style={SECTION_TITLE_STYLE}>Previous</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {previous.map((reservation) => (
+                  <ReservationCard key={reservation.id} reservation={reservation} onOpen={(entry) => setDetailId(entry.id)} />
+                ))}
+              </div>
+            </>
+          )}
+        </>
+      )}
 
-            {BOOKING_PARTNERS.length > 3 && (
-              <button
-                type="button"
-                onClick={() => setExpanded((e) => ({ ...e, [stop.id]: !e[stop.id] }))}
-                aria-expanded={moreOpen}
-                style={{ width: '100%', textAlign: 'center', minHeight: 44, padding: '12px 0 2px', cursor: 'pointer', background: 'none', border: 'none', fontFamily: 'inherit' }}
-              >
-                <span style={{ fontSize: 12.5, fontWeight: 600, color: tokens.textMuted }}>
-                  {moreOpen ? 'Show Fewer Partners' : `Show ${BOOKING_PARTNERS.length - 3} More Partners`}
-                </span>
-              </button>
-            )}
+      {detailReservation && (
+        <ReservationDetailSheet
+          reservation={detailReservation}
+          canEdit={canEdit}
+          onClose={() => setDetailId(null)}
+          onEdit={(reservation) => {
+            setDetailId(null)
+            setEditorDraft(draftFromReservation(reservation, fallbackCurrency))
+          }}
+          onDelete={(reservation) => setPendingDelete(reservation)}
+          onViewItinerary={() => {
+            setDetailId(null)
+            onSelectSection('plan')
+          }}
+        />
+      )}
 
-            <div style={{ marginTop: 10 }}>
-              {hasDates ? (
-                <StatusChip
-                  tone="success"
-                  icon={
-                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M13.5 4.5L6 12L2.5 8.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                  }
-                  style={{ whiteSpace: 'normal' }}
-                >
-                  Destination and dates are automatically pre-filled
-                </StatusChip>
-              ) : (
-                <StatusChip
-                  tone="neutral"
-                  icon={
-                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.6" /><path d="M8 5v3.5M8 11h.01" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
-                  }
-                  style={{ whiteSpace: 'normal' }}
-                >
-                  Set trip dates to pre-fill check-in &amp; check-out
-                </StatusChip>
-              )}
-            </div>
-          </section>
-        )
-      })}
+      <ReservationEditorSheet
+        trip={trip}
+        draft={editorDraft}
+        existingAttachments={
+          editorDraft?.id
+            ? ((reservations ?? []).find((reservation) => reservation.id === editorDraft.id)?.reservation_attachments ?? [])
+            : []
+        }
+        items={items}
+        setItems={setItems}
+        itineraryEnabled={itineraryEnabled}
+        currentUserId={currentUserId}
+        onClose={() => setEditorDraft(null)}
+        onSaved={() => refreshReservations(false)}
+      />
+
+      {canEdit && (
+        <ConfirmDialog
+          open={pendingDelete !== null}
+          title="Delete booking?"
+          message="The booking and its documents will be removed for everyone on this trip."
+          onConfirm={() => pendingDelete && deleteReservation(pendingDelete)}
+          onCancel={() => setPendingDelete(null)}
+        />
+      )}
     </div>
   )
 }

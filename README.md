@@ -99,6 +99,9 @@ The migration directory contains two historical starting schemas, so do **not** 
    - `20260715233000_validate_create_trip_with_stops.sql`
    - `20260716005552_active_schema_grants_and_account_deletion.sql`
    - `20260716120000_itinerary_items.sql` (unified daily itinerary; `supabase/tests/itinerary_rls_assertions.sql` verifies its security contract)
+   - `20260716215756_add_itinerary_visit_duration.sql`
+   - `20260716220137_add_itinerary_place_identity.sql`
+   - `20260716233000_reservations.sql` (real bookings + private `trip-documents` bucket; `supabase/tests/reservations_rls_assertions.sql` verifies its security contract)
 
 Existing projects must use their recorded migration history: `001_initial_schema.sql` is the legacy baseline and must not be applied after `000_full_schema.sql`. Migration `012` backfills `trip_members` from historical owner/collaborator columns and makes role-based RLS authoritative. Migration `011` creates the `trip-photos` bucket; the timestamped privacy migration makes it private and limits reads to trip members and writes to editors/owners. The final timestamped migration makes active-table Data API grants explicit and changes shared-content attribution foreign keys to `ON DELETE SET NULL`, which must be deployed before enabling the account-deletion endpoint.
 

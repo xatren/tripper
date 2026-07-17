@@ -126,3 +126,53 @@ begin
 end $$;
 
 select 'itinerary_items security contract holds' as result;
+
+-- 6. Explore persistence stores narrow provider identity with a paired
+--    constraint, visit duration, and a non-unique partial lookup index. The
+--    index must not block the explicit "Add anyway" product path.
+do $$
+begin
+  if not exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'itinerary_items'
+      and column_name = 'duration_minutes'
+  ) then
+    raise exception 'itinerary_items.duration_minutes is required';
+  end if;
+
+  if not exists (
+    select 1 from pg_constraint
+    where conrelid = 'public.itinerary_items'::regclass
+      and conname = 'itinerary_items_place_identity_paired'
+      and pg_get_constraintdef(oid) like '%place_provider%external_place_id%'
+  ) then
+    raise exception 'provider and external place id must be paired';
+  end if;
+
+  if not exists (
+    select 1 from pg_indexes
+    where schemaname = 'public' and tablename = 'itinerary_items'
+      and indexname = 'itinerary_items_trip_external_place_idx'
+      and indexdef like '%trip_id, place_provider, external_place_id%'
+      and indexdef like '%WHERE (external_place_id IS NOT NULL)%'
+      and indexdef not like 'CREATE UNIQUE INDEX%'
+  ) then
+    raise exception 'expected non-unique partial provider identity index';
+  end if;
+end $$;
+
+select 'itinerary Explore identity contract holds' as result;
+
+-- 7. optimize_itinerary_day_apply (Aşama 8 day-route-optimization apply RPC)
+--    is executable only by authenticated users, matching reorder_itinerary_day.
+do $$
+begin
+  if not has_function_privilege('authenticated', 'public.optimize_itinerary_day_apply(uuid, date, uuid[], timestamptz)', 'execute') then
+    raise exception 'authenticated must be able to execute optimize_itinerary_day_apply';
+  end if;
+  if has_function_privilege('anon', 'public.optimize_itinerary_day_apply(uuid, date, uuid[], timestamptz)', 'execute') then
+    raise exception 'anon must not execute optimize_itinerary_day_apply';
+  end if;
+end $$;
+
+select 'itinerary day optimization apply contract holds' as result;

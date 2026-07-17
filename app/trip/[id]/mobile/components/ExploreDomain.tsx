@@ -1,18 +1,32 @@
 'use client'
 
-import { ACCENT_LIGHT, GLASS_BORDER, GLASS_FILL } from '../domain-ui'
+import type { ItineraryItem, Stop, Trip, TripCapabilities } from '@/types'
+import { GooglePlacesExplorer } from '@/components/explore/GooglePlacesExplorer'
 
-/** Placeholder top-level Explore screen — discovery/recommendations land in a later stage. */
-export function ExploreDomain() {
+export interface ExploreDomainProps {
+  trip: Trip
+  stops: Stop[]
+  items: ItineraryItem[]
+  setItems: React.Dispatch<React.SetStateAction<ItineraryItem[]>>
+  itineraryEnabled: boolean
+  currentUserId: string
+  capabilities: TripCapabilities
+  onSelectSection: (section: 'overview' | 'plan' | 'explore' | 'bookings') => void
+}
+
+export function ExploreDomain({ trip, stops, items, setItems, itineraryEnabled, currentUserId, capabilities, onSelectSection }: ExploreDomainProps) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, minHeight: 320, padding: '40px 20px', textAlign: 'center' }}>
-      <div style={{ width: 56, height: 56, borderRadius: '50%', background: GLASS_FILL, border: `1px solid ${GLASS_BORDER}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke={ACCENT_LIGHT} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M15 9l-2 6-6 2 2-6 6-2z" /></svg>
-      </div>
-      <div style={{ color: '#fff', fontWeight: 700, fontSize: 16 }}>Explore is coming soon</div>
-      <div style={{ color: 'rgba(215,215,255,.6)', fontSize: 13, lineHeight: 1.6, maxWidth: 280 }}>
-        Place recommendations and nearby ideas for your route will show up here in a future update.
-      </div>
-    </div>
+    <GooglePlacesExplorer
+      mode="trip"
+      trips={[{ id: trip.id, title: trip.title, startDate: trip.start_date ?? null, endDate: trip.end_date ?? null, role: capabilities.role }]}
+      activeTrip={trip}
+      activeStops={stops}
+      activeItems={items}
+      setActiveItems={setItems}
+      currentUserId={currentUserId}
+      canEdit={capabilities.canEdit}
+      itineraryEnabled={itineraryEnabled}
+      onViewItinerary={() => onSelectSection('plan')}
+    />
   )
 }

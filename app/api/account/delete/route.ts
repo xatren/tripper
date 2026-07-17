@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 
 const JOURNAL_BUCKET = 'trip-photos'
+const DOCUMENTS_BUCKET = 'trip-documents'
 const STORAGE_DELETE_BATCH_SIZE = 1000
 
 function batches<T>(items: T[], size: number): T[][] {
@@ -11,6 +12,11 @@ function batches<T>(items: T[], size: number): T[][] {
     result.push(items.slice(index, index + size))
   }
   return result
+}
+
+/** Reservation tables can be absent until the Phase 7 migration runs. */
+function isMissingTable(error: { code?: string } | null): boolean {
+  return error?.code === 'PGRST205' || error?.code === '42P01'
 }
 
 export async function POST(request: Request) {
@@ -50,15 +56,36 @@ export async function POST(request: Request) {
   }
 
   const ownedTripIds = (ownedTrips ?? []).map((trip) => trip.id)
-  const [uploadedPhotosResult, ownedEntriesResult] = await Promise.all([
+  const [
+    uploadedPhotosResult, ownedEntriesResult,
+    uploadedDocumentsResult, ownedReservationsResult,
+    uploadedReceiptsResult, ownedExpensesResult,
+  ] = await Promise.all([
     admin.from('journal_photos').select('storage_path').eq('uploaded_by', user.id),
     ownedTripIds.length > 0
       ? admin.from('journal_entries').select('journal_photos(storage_path)').in('trip_id', ownedTripIds)
+      : Promise.resolve({ data: [], error: null }),
+    admin.from('reservation_attachments').select('storage_path').eq('uploaded_by', user.id),
+    ownedTripIds.length > 0
+      ? admin.from('reservations').select('reservation_attachments(storage_path)').in('trip_id', ownedTripIds)
+      : Promise.resolve({ data: [], error: null }),
+    admin.from('expense_receipts').select('storage_path').eq('uploaded_by', user.id),
+    ownedTripIds.length > 0
+      ? admin.from('expenses').select('expense_receipts(storage_path)').in('trip_id', ownedTripIds)
       : Promise.resolve({ data: [], error: null }),
   ])
 
   if (uploadedPhotosResult.error || ownedEntriesResult.error) {
     return NextResponse.json({ error: 'Could not prepare your photos for deletion. Try again.' }, { status: 502 })
+  }
+  // A pre-migration database simply has no reservation documents / receipts to clean.
+  const reservationsDeployed = !isMissingTable(uploadedDocumentsResult.error) && !isMissingTable(ownedReservationsResult.error)
+  if (reservationsDeployed && (uploadedDocumentsResult.error || ownedReservationsResult.error)) {
+    return NextResponse.json({ error: 'Could not prepare your booking documents for deletion. Try again.' }, { status: 502 })
+  }
+  const receiptsDeployed = !isMissingTable(uploadedReceiptsResult.error) && !isMissingTable(ownedExpensesResult.error)
+  if (receiptsDeployed && (uploadedReceiptsResult.error || ownedExpensesResult.error)) {
+    return NextResponse.json({ error: 'Could not prepare your expense receipts for deletion. Try again.' }, { status: 502 })
   }
 
   const storagePaths = new Set<string>()
@@ -71,10 +98,38 @@ export async function POST(request: Request) {
     }
   }
 
+  const documentPaths = new Set<string>()
+  if (reservationsDeployed) {
+    for (const attachment of uploadedDocumentsResult.data ?? []) {
+      if (attachment.storage_path) documentPaths.add(attachment.storage_path)
+    }
+    for (const reservation of ownedReservationsResult.data ?? []) {
+      for (const attachment of reservation.reservation_attachments ?? []) {
+        if (attachment.storage_path) documentPaths.add(attachment.storage_path)
+      }
+    }
+  }
+  if (receiptsDeployed) {
+    for (const receipt of uploadedReceiptsResult.data ?? []) {
+      if (receipt.storage_path) documentPaths.add(receipt.storage_path)
+    }
+    for (const expense of ownedExpensesResult.data ?? []) {
+      for (const receipt of expense.expense_receipts ?? []) {
+        if (receipt.storage_path) documentPaths.add(receipt.storage_path)
+      }
+    }
+  }
+
   for (const pathBatch of batches([...storagePaths], STORAGE_DELETE_BATCH_SIZE)) {
     const { error } = await admin.storage.from(JOURNAL_BUCKET).remove(pathBatch)
     if (error) {
       return NextResponse.json({ error: 'Could not delete all private photos. Your account was kept; try again.' }, { status: 502 })
+    }
+  }
+  for (const pathBatch of batches([...documentPaths], STORAGE_DELETE_BATCH_SIZE)) {
+    const { error } = await admin.storage.from(DOCUMENTS_BUCKET).remove(pathBatch)
+    if (error) {
+      return NextResponse.json({ error: 'Could not delete all booking documents. Your account was kept; try again.' }, { status: 502 })
     }
   }
 
@@ -89,6 +144,32 @@ export async function POST(request: Request) {
     return NextResponse.json({
       error: 'Your photo files were removed, but their records could not be cleaned up. Your account was kept; contact support before retrying.',
     }, { status: 502 })
+  }
+
+  // Same contract for booking documents uploaded to shared trips.
+  if (reservationsDeployed) {
+    const { error: attachmentRowsError } = await admin
+      .from('reservation_attachments')
+      .delete()
+      .eq('uploaded_by', user.id)
+    if (attachmentRowsError) {
+      return NextResponse.json({
+        error: 'Your document files were removed, but their records could not be cleaned up. Your account was kept; contact support before retrying.',
+      }, { status: 502 })
+    }
+  }
+
+  // Same contract for expense receipts uploaded to shared trips.
+  if (receiptsDeployed) {
+    const { error: receiptRowsError } = await admin
+      .from('expense_receipts')
+      .delete()
+      .eq('uploaded_by', user.id)
+    if (receiptRowsError) {
+      return NextResponse.json({
+        error: 'Your receipt files were removed, but their records could not be cleaned up. Your account was kept; contact support before retrying.',
+      }, { status: 502 })
+    }
   }
 
   // Global sign-out removes every refresh session. Existing access JWTs remain

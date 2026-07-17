@@ -139,6 +139,12 @@ export interface ItineraryItem {
   lat: number | null;
   lng: number | null;
   address: string | null;
+  /** Narrow provider identity; never contains an uncontrolled provider response. */
+  place_provider: 'google' | 'mapbox' | null;
+  external_place_id: string | null;
+  normalized_address: string | null;
+  /** User-selected expected visit length; independent from optional start/end time. */
+  duration_minutes: number | null;
   estimated_cost: number | null;
   currency: TripCurrency | null;
   status: ItineraryItemStatus;
@@ -146,6 +152,71 @@ export interface ItineraryItem {
   created_by: string | null;
   created_at: string;
   updated_at: string;
+}
+
+// ---- Real bookings (migration `20260716233000_reservations`) ----
+
+export type ReservationType =
+  | 'flight'
+  | 'stay'
+  | 'car_rental'
+  | 'train'
+  | 'ferry'
+  | 'restaurant'
+  | 'activity'
+  | 'pass'
+  | 'other';
+
+export type ReservationPaymentStatus = 'unpaid' | 'deposit' | 'paid' | 'refunded';
+
+export type ReservationStatus = 'confirmed' | 'pending' | 'cancelled' | 'completed';
+
+/**
+ * A traveller's own booking record — distinct from the external partner-search
+ * links on the Bookings screen. May optionally point at the itinerary item it
+ * realizes (`itinerary_item_id`, SET NULL on item delete).
+ */
+export interface Reservation {
+  id: string;
+  trip_id: string;
+  itinerary_item_id: string | null;
+  reservation_type: ReservationType;
+  provider: string | null;
+  title: string;
+  confirmation_number: string | null;
+  start_at: string | null;
+  end_at: string | null;
+  /** IANA zone the times were entered in. */
+  timezone: string | null;
+  address: string | null;
+  lat: number | null;
+  lng: number | null;
+  amount: number | null;
+  currency: TripCurrency | null;
+  payment_status: ReservationPaymentStatus;
+  status: ReservationStatus;
+  booking_url: string | null;
+  notes: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+  reservation_attachments?: ReservationAttachment[];
+}
+
+/**
+ * Document attached to a reservation, stored in the private `trip-documents`
+ * bucket under `{trip_id}/reservations/{reservation_id}/{uuid}.{ext}`.
+ * Rows are immutable — replacing a file is delete + insert with a fresh path.
+ */
+export interface ReservationAttachment {
+  id: string;
+  reservation_id: string;
+  storage_path: string;
+  original_name: string;
+  mime_type: string;
+  size_bytes: number;
+  uploaded_by: string | null;
+  created_at: string;
 }
 
 /** Daily journal entry (migration `011_journal`). */
@@ -179,6 +250,8 @@ export type ExpenseCategory =
   | 'transport'
   | 'other';
 
+export type ExpenseSplitType = 'equal' | 'exact' | 'percentage';
+
 export interface Expense {
   id: string;
   trip_id: string;
@@ -188,6 +261,12 @@ export interface Expense {
   description: string | null;
   paid_by: string | null;
   created_at: string;
+  /** Present after migration `20260717010000_expense_splits`. */
+  split_type: ExpenseSplitType;
+  /** Editable date shown in the UI; independent from created_at. */
+  expense_date: string;
+  itinerary_item_id: string | null;
+  expense_splits?: ExpenseSplit[];
 }
 
 export const EXPENSE_CATEGORIES: { value: ExpenseCategory; label: string }[] = [
@@ -198,6 +277,63 @@ export const EXPENSE_CATEGORIES: { value: ExpenseCategory; label: string }[] = [
   { value: 'transport', label: 'Transport' },
   { value: 'other', label: 'Other' },
 ];
+
+/**
+ * A participant's resolved share of an expense (migration
+ * `20260717010000_expense_splits`). Rows are written only through the
+ * `save_expense_with_splits` RPC, which enforces that shares reconcile
+ * exactly to the expense total. `member_id` is SET NULL on account deletion,
+ * mirroring `expenses.paid_by`'s attribution contract.
+ */
+export interface ExpenseSplit {
+  id: string;
+  expense_id: string;
+  member_id: string | null;
+  /** Percentage (0-100) when the parent expense's split_type is 'percentage'; null otherwise. */
+  share_value: number | null;
+  share_amount_minor: number;
+  created_at: string;
+}
+
+export type SettlementStatus = 'settled' | 'reopened';
+
+/**
+ * A persisted "mark paid" / undo record (migration
+ * `20260717020000_settlements`). Written only through the
+ * `record_settlement_payment`/`reopen_settlement` RPCs, which enforce
+ * idempotency via a client-generated `idempotency_key`.
+ */
+export interface Settlement {
+  id: string;
+  trip_id: string;
+  from_member: string | null;
+  to_member: string | null;
+  amount_minor: number;
+  status: SettlementStatus;
+  idempotency_key: string;
+  note: string | null;
+  created_by: string | null;
+  settled_at: string;
+  reopened_at: string | null;
+  created_at: string;
+}
+
+/**
+ * Private receipt attached to an expense, stored in the shared
+ * `trip-documents` bucket under `{trip_id}/expenses/{expense_id}/{uuid}.{ext}`
+ * (migration `20260717030000_expense_receipts`). Rows are immutable —
+ * replacing a file is delete + insert with a fresh path.
+ */
+export interface ExpenseReceipt {
+  id: string;
+  expense_id: string;
+  storage_path: string;
+  original_name: string;
+  mime_type: string;
+  size_bytes: number;
+  uploaded_by: string | null;
+  created_at: string;
+}
 
 /** Driving route segment fetched from the Directions API. */
 export interface RouteSegment {

@@ -29,6 +29,9 @@ export interface ItineraryDaySectionProps {
   onSyncPaused: (paused: boolean) => void
   selectedItemId?: string | null
   onSelectItem?: (id: string) => void
+  /** Computes a route-optimization preview for this day (never mutates anything itself). */
+  onOptimize?: () => void
+  isOptimizing?: boolean
 }
 
 function SortableRow({ entry, children }: {
@@ -44,7 +47,7 @@ function SortableRow({ entry, children }: {
 }
 
 /** One day's timeline: pinned route arrivals, then the reorderable item list. */
-export function ItineraryDaySection({ day, canEdit, onEdit, onToggleComplete, onMove, onDelete, onReorder, onAddToDay, onSyncPaused, selectedItemId, onSelectItem }: ItineraryDaySectionProps) {
+export function ItineraryDaySection({ day, canEdit, onEdit, onToggleComplete, onMove, onDelete, onReorder, onAddToDay, onSyncPaused, selectedItemId, onSelectItem, onOptimize, isOptimizing }: ItineraryDaySectionProps) {
   const sensors = useSensors(
     // Small pointer distance / touch long-press so buttons inside rows keep
     // working as taps; keyboard sensor preserves non-pointer reordering.
@@ -112,6 +115,27 @@ export function ItineraryDaySection({ day, canEdit, onEdit, onToggleComplete, on
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      {canEdit && onOptimize && (
+        <button
+          type="button"
+          onClick={onOptimize}
+          disabled={isOptimizing}
+          style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            minHeight: 40, padding: '8px 16px', borderRadius: tokens.radius12,
+            background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.14)',
+            cursor: isOptimizing ? 'default' : 'pointer', fontFamily: 'inherit',
+            opacity: isOptimizing ? 0.6 : 1, alignSelf: 'flex-start',
+          }}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ color: tokens.textPrimary }}>
+            <path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1" />
+          </svg>
+          <span style={{ color: tokens.textPrimary, fontWeight: 700, fontSize: 12.5 }}>
+            {isOptimizing ? 'Optimizing…' : 'Optimize day'}
+          </span>
+        </button>
+      )}
       {pinned.map((entry, index) => (
         <div key={entry.key}>
           {renderRow(entry, index > 0 ? pinned[index - 1] : null)}

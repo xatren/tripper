@@ -1,5 +1,3 @@
-import { MAPBOX_TOKEN } from './client'
-
 // Mapbox Optimization API v1 — solves the visiting order for up to 12 waypoints.
 // First stop stays the departure point and last stays the final destination;
 // only the middle stops are reordered.
@@ -21,14 +19,20 @@ export interface OptimizedTrip {
  * distance/duration (so callers can show a before/after comparison), or
  * null when optimization isn't possible.
  */
-export async function getOptimizedOrder(points: LatLng[]): Promise<OptimizedTrip | null> {
-  if (points.length < 3 || points.length > 12 || !MAPBOX_TOKEN) return null
+export async function getOptimizedOrder(
+  points: LatLng[],
+  opts?: { signal?: AbortSignal; accessToken?: string; fetcher?: typeof fetch },
+): Promise<OptimizedTrip | null> {
+  const accessToken = opts?.accessToken ?? process.env.NEXT_PUBLIC_MAPBOX_TOKEN
+  if (points.length < 3 || points.length > 12 || !accessToken) return null
+  if (opts?.signal?.aborted) return null
   const coords = points.map((p) => `${p.lng},${p.lat}`).join(';')
   const url =
     `https://api.mapbox.com/optimized-trips/v1/mapbox/driving/${coords}` +
-    `?source=first&destination=last&roundtrip=false&access_token=${MAPBOX_TOKEN}`
+    `?source=first&destination=last&roundtrip=false&access_token=${encodeURIComponent(accessToken)}`
   try {
-    const res = await fetch(url)
+    const fetcher = opts?.fetcher ?? fetch
+    const res = await fetcher(url, { signal: opts?.signal })
     if (!res.ok) return null
     const data = await res.json()
     if (data.code !== 'Ok' || !Array.isArray(data.waypoints)) return null

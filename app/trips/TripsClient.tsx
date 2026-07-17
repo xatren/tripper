@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Search, MoreVertical, Ticket, Trash2, Briefcase, Plus, X } from "lucide-react";
 import type { Profile, Trip, TripCapabilities } from "@/types";
 import { createClient } from "@/lib/supabase/client";
+import { removeTripStorageObjects } from "@/lib/trip-storage-cleanup";
 import { formatDate, getInitials } from "@/lib/utils";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
@@ -138,6 +139,10 @@ export function TripsClient({ profile, trips: initialTrips, capabilitiesByTripId
 
   const handleDelete = async (tripId: string) => {
     if (!capabilitiesByTripId[tripId]?.canManageTrip) return;
+    // Storage objects don't cascade with the trip row — remove them first and
+    // keep the trip when cleanup fails so no private file is ever orphaned.
+    const cleanup = await removeTripStorageObjects(supabase, tripId);
+    if (!cleanup.ok) { showToast("Couldn't remove the trip's photos and documents, so the trip was kept. Retry is safe.", "error"); return; }
     const { error } = await supabase.from("trips").delete().eq("id", tripId);
     if (error) { showToast("Couldn't delete the trip. Please try again.", "error"); return; }
     setTrips(t => t.filter(tr => tr.id !== tripId));

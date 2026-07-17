@@ -98,7 +98,11 @@ function TripMobileContent({ trip, stops: initialStops, items: initialItems, iti
   const [activeSection, setActiveSection] = useState<PrimaryNavSection>(initialSection)
   const [isMoreSheetOpen, setIsMoreSheetOpen] = useState(false)
   const [activeMoreDestination, setActiveMoreDestination] = useState<MoreDestination | null>(null)
-  const [visitedLazy, setVisitedLazy] = useState<Set<LazySection | MoreDestination>>(() => new Set())
+  const [visitedLazy, setVisitedLazy] = useState<Set<LazySection | MoreDestination>>(() => {
+    const visited = new Set<LazySection | MoreDestination>()
+    if (initialSection === 'explore' || initialSection === 'bookings') visited.add(initialSection)
+    return visited
+  })
   const [stops, setStops] = useState(initialStops)
   const [items, setItems] = useState(initialItems)
   const [routePath, setRoutePath] = useState<{ lat: number; lng: number }[]>([])
@@ -349,7 +353,16 @@ function TripMobileContent({ trip, stops: initialStops, items: initialItems, iti
             <div style={{ display: visibleScreen === 'explore' ? 'block' : 'none' }} aria-hidden={visibleScreen !== 'explore'}>
               <DeferredBoundary label="the explore section" style={{ minHeight: 180 }}>
                 <Suspense fallback={<DomainLoading label="explore" />}>
-                  <ExploreDomain />
+                  <ExploreDomain
+                    trip={trip}
+                    stops={stops}
+                    items={items}
+                    setItems={setItems}
+                    itineraryEnabled={itineraryEnabled}
+                    currentUserId={currentUserId}
+                    capabilities={capabilities}
+                    onSelectSection={selectSection}
+                  />
                 </Suspense>
               </DeferredBoundary>
             </div>
@@ -358,7 +371,16 @@ function TripMobileContent({ trip, stops: initialStops, items: initialItems, iti
             <div style={{ display: visibleScreen === 'bookings' ? 'block' : 'none' }} aria-hidden={visibleScreen !== 'bookings'}>
               <DeferredBoundary label="the bookings section" style={{ minHeight: 180 }}>
                 <Suspense fallback={<DomainLoading label="bookings" />}>
-                  <BookingsDomain trip={trip} stops={stops} />
+                  <BookingsDomain
+                    trip={trip}
+                    stops={stops}
+                    items={items}
+                    setItems={setItems}
+                    itineraryEnabled={itineraryEnabled}
+                    currentUserId={currentUserId}
+                    capabilities={capabilities}
+                    onSelectSection={selectSection}
+                  />
                 </Suspense>
               </DeferredBoundary>
             </div>
@@ -367,7 +389,7 @@ function TripMobileContent({ trip, stops: initialStops, items: initialItems, iti
             <div style={{ display: visibleScreen === 'budget' ? 'block' : 'none' }} aria-hidden={visibleScreen !== 'budget'}>
               <DeferredBoundary label="the budget section" style={{ minHeight: 180 }}>
                 <Suspense fallback={<DomainLoading label="budget" />}>
-                  <BudgetDomain trip={trip} members={members} currentUserId={currentUserId} canEdit={capabilities.canEdit} />
+                  <BudgetDomain trip={trip} members={members} currentUserId={currentUserId} canEdit={capabilities.canEdit} itineraryItems={items} itineraryEnabled={itineraryEnabled} />
                 </Suspense>
               </DeferredBoundary>
             </div>

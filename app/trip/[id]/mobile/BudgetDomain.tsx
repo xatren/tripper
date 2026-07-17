@@ -4,10 +4,14 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useTripRealtimeTable } from '@/lib/supabase/trip-realtime'
 import { showToast } from '@/components/ui/toast'
-import type { Expense, ExpenseCategory, Trip, TripMember } from '@/types'
+import type { Expense, ExpenseCategory, ItineraryItem, Settlement, Trip, TripMember } from '@/types'
 import { CURRENCY_SYMBOLS, EXPENSE_CATEGORIES } from '@/types'
 import { ACCENT, ACCENT_DARK, ACCENT_LIGHT, GLASS_BORDER, GLASS_FILL, RetryCard } from './domain-ui'
-import { calculateEqualSplitSettlement, MISSING_PAYER_ID } from './budget-settlement'
+import { calculateSettlementWithSplits, MISSING_PAYER_ID } from './budget-settlement'
+import { AddExpenseSheet, draftFromExpense, emptyExpenseDraft, type ExpenseDraft } from './budget/AddExpenseSheet'
+import { SettlementScreen } from './budget/SettlementScreen'
+import { ExpenseDetailSheet } from './budget/ExpenseDetailSheet'
+import { RECEIPTS_BUCKET } from './budget/expense-receipts-logic'
 
 const EXPENSE_CATEGORY_ICONS: Record<ExpenseCategory, (color: string) => ReactNode> = {
   fuel: (c) => (
@@ -72,16 +76,23 @@ export interface BudgetDomainProps {
   members: TripMember[]
   currentUserId: string
   canEdit: boolean
+  itineraryItems?: ItineraryItem[]
+  itineraryEnabled?: boolean
 }
 
-// Session-lifetime cache preserves the original instant tab re-entry behavior.
+// Session-lifetime caches preserve the original instant tab re-entry behavior.
 const expenseCache = new Map<string, Expense[]>()
+const settlementCache = new Map<string, Settlement[]>()
 
-export function BudgetDomain({ trip, members, currentUserId, canEdit }: BudgetDomainProps) {
+export function BudgetDomain({ trip, members, currentUserId, canEdit, itineraryItems = [], itineraryEnabled = false }: BudgetDomainProps) {
   const [expenses, setExpenses] = useState<Expense[]>(() => expenseCache.get(trip.id) ?? [])
+  const [settlements, setSettlements] = useState<Settlement[]>(() => settlementCache.get(trip.id) ?? [])
   const [loading, setLoading] = useState(() => !expenseCache.has(trip.id))
   const [error, setError] = useState(false)
   const [reloadToken, setReloadToken] = useState(0)
+  const [expenseDraft, setExpenseDraft] = useState<ExpenseDraft | null>(null)
+  const [detailExpense, setDetailExpense] = useState<Expense | null>(null)
+  const [settlementOpen, setSettlementOpen] = useState(false)
 
   const updateExpenses = useCallback((update: (previous: Expense[]) => Expense[]) => {
     setExpenses((previous) => {
@@ -91,10 +102,18 @@ export function BudgetDomain({ trip, members, currentUserId, canEdit }: BudgetDo
     })
   }, [trip.id])
 
+  const updateSettlements = useCallback((update: (previous: Settlement[]) => Settlement[]) => {
+    setSettlements((previous) => {
+      const next = update(previous)
+      settlementCache.set(trip.id, next)
+      return next
+    })
+  }, [trip.id])
+
   const refreshExpenses = useCallback(async (surfaceError = false) => {
     const { data, error: loadError } = await createClient()
       .from('expenses')
-      .select('*')
+      .select('*, expense_splits(*)')
       .eq('trip_id', trip.id)
       .order('created_at', { ascending: false })
     if (data) updateExpenses(() => data as Expense[])
@@ -104,6 +123,11 @@ export function BudgetDomain({ trip, members, currentUserId, canEdit }: BudgetDo
     }
     return { data, loadError }
   }, [trip.id, updateExpenses])
+
+  const refreshSettlements = useCallback(async () => {
+    const { data } = await createClient().from('settlements').select('*').eq('trip_id', trip.id).order('created_at', { ascending: false })
+    if (data) updateSettlements(() => data as Settlement[])
+  }, [trip.id, updateSettlements])
 
   useEffect(() => {
     if (reloadToken === 0 && expenseCache.has(trip.id)) return
@@ -121,6 +145,8 @@ export function BudgetDomain({ trip, members, currentUserId, canEdit }: BudgetDo
     return () => { cancelled = true }
   }, [refreshExpenses, trip.id, reloadToken])
 
+  useEffect(() => { void refreshSettlements() }, [refreshSettlements])
+
   useTripRealtimeTable<Expense & Record<string, unknown>>(
     'expenses',
     useCallback((change) => {
@@ -129,77 +155,135 @@ export function BudgetDomain({ trip, members, currentUserId, canEdit }: BudgetDo
       updateExpenses((previous) => {
         if (change.eventType === 'DELETE') return previous.filter((expense) => expense.id !== row.id)
         const existing = previous.find((expense) => expense.id === row.id)
+        // Postgres-changes payloads never carry nested embeds — keep whatever
+        // expense_splits are already loaded instead of dropping them.
+        const merged = { ...(existing ?? {}), ...row, expense_splits: existing?.expense_splits ?? [] } as Expense
         const next = existing
-          ? previous.map((expense) => expense.id === row.id ? { ...expense, ...row } as Expense : expense)
-          : [row as Expense, ...previous]
+          ? previous.map((expense) => expense.id === row.id ? merged : expense)
+          : [merged, ...previous]
         return next.sort((a, b) => b.created_at.localeCompare(a.created_at))
       })
     }, [updateExpenses]),
     useCallback(() => { void refreshExpenses(false) }, [refreshExpenses]),
   )
 
-  const handleAdd = useCallback(async (category: ExpenseCategory, description: string, amount: number, paidBy: string) => {
-    if (!canEdit) return
-    const { data, error: saveError } = await createClient()
-      .from('expenses')
-      .insert({ trip_id: trip.id, category, amount, description: description || null, paid_by: paidBy || currentUserId })
-      .select()
-      .single()
-    if (!saveError && data) updateExpenses((previous) => {
-      const row = data as Expense
-      return previous.some((expense) => expense.id === row.id)
-        ? previous.map((expense) => expense.id === row.id ? row : expense)
-        : [row, ...previous]
-    })
-    else showToast("Couldn't save the expense.", 'error')
-  }, [trip.id, currentUserId, canEdit, updateExpenses])
+  // expense_splits changes never arrive as nested embeds in the payload, so
+  // any change to this table just triggers a full refetch of the parent list.
+  useTripRealtimeTable<Record<string, unknown>>(
+    'expense_splits',
+    useCallback(() => { void refreshExpenses(false) }, [refreshExpenses]),
+    useCallback(() => { void refreshExpenses(false) }, [refreshExpenses]),
+  )
+  useTripRealtimeTable<Settlement & Record<string, unknown>>(
+    'settlements',
+    useCallback(() => { void refreshSettlements() }, [refreshSettlements]),
+    useCallback(() => { void refreshSettlements() }, [refreshSettlements]),
+  )
 
-  const handleDelete = useCallback(async (id: string) => {
+  const handleDelete = useCallback(async (expense: Expense) => {
     if (!canEdit) return
-    const { error: deleteError } = await createClient().from('expenses').delete().eq('id', id)
-    if (!deleteError) updateExpenses((previous) => previous.filter((expense) => expense.id !== id))
-    else showToast("Couldn't delete the expense.", 'error')
+    const supabase = createClient()
+    const { data: receiptRows } = await supabase.from('expense_receipts').select('storage_path').eq('expense_id', expense.id)
+    const paths = (receiptRows ?? []).map((row) => row.storage_path)
+    if (paths.length > 0) {
+      const { error: storageError } = await supabase.storage.from(RECEIPTS_BUCKET).remove(paths)
+      if (storageError) {
+        showToast("Couldn't remove the expense's receipts, so it was kept. Retry is safe.", 'error')
+        return
+      }
+    }
+    const { error: deleteError } = await supabase.from('expenses').delete().eq('id', expense.id)
+    if (!deleteError) {
+      updateExpenses((previous) => previous.filter((item) => item.id !== expense.id))
+      setDetailExpense(null)
+    } else {
+      showToast("Couldn't delete the expense.", 'error')
+    }
   }, [canEdit, updateExpenses])
 
+  const openAdd = useCallback((category?: ExpenseCategory) => {
+    const draft = emptyExpenseDraft(currentUserId, members.map((member) => member.user_id))
+    setExpenseDraft(category ? { ...draft, category } : draft)
+  }, [currentUserId, members])
+
+  const openEdit = useCallback((expense: Expense) => {
+    setDetailExpense(null)
+    setExpenseDraft(draftFromExpense(expense, members.map((member) => member.user_id)))
+  }, [members])
+
   return (
-    <BudgetView
-      trip={trip}
-      expenses={expenses}
-      loading={loading}
-      error={error}
-      onRetry={() => setReloadToken((token) => token + 1)}
-      members={members}
-      currentUserId={currentUserId}
-      onAdd={handleAdd}
-      onDelete={handleDelete}
-      canEdit={canEdit}
-    />
+    <>
+      <BudgetView
+        trip={trip}
+        expenses={expenses}
+        settlements={settlements}
+        loading={loading}
+        error={error}
+        onRetry={() => setReloadToken((token) => token + 1)}
+        members={members}
+        currentUserId={currentUserId}
+        canEdit={canEdit}
+        onAddExpense={openAdd}
+        onOpenExpense={setDetailExpense}
+        onOpenSettlement={() => setSettlementOpen(true)}
+      />
+      {expenseDraft && (
+        <AddExpenseSheet
+          trip={trip}
+          members={members}
+          currentUserId={currentUserId}
+          draft={expenseDraft}
+          itineraryItems={itineraryEnabled ? itineraryItems : []}
+          onClose={() => setExpenseDraft(null)}
+          onSaved={() => { void refreshExpenses(false) }}
+        />
+      )}
+      <ExpenseDetailSheet
+        expense={detailExpense}
+        members={members}
+        currentUserId={currentUserId}
+        currency={trip.currency ?? 'USD'}
+        canEdit={canEdit}
+        onClose={() => setDetailExpense(null)}
+        onEdit={openEdit}
+        onDelete={(expense) => { void handleDelete(expense) }}
+      />
+      {settlementOpen && (
+        <SettlementScreen
+          trip={trip}
+          members={members}
+          expenses={expenses}
+          currentUserId={currentUserId}
+          canEdit={canEdit}
+          onClose={() => setSettlementOpen(false)}
+        />
+      )}
+    </>
   )
 }
 
 function BudgetView({
-  trip, expenses, loading, error, onRetry, members, currentUserId, onAdd, onDelete, canEdit,
+  trip, expenses, settlements, loading, error, onRetry, members, currentUserId, canEdit,
+  onAddExpense, onOpenExpense, onOpenSettlement,
 }: {
   trip: Trip
   expenses: Expense[]
+  settlements: Settlement[]
   loading: boolean
   error: boolean
   onRetry: () => void
   members: TripMember[]
   currentUserId: string
-  onAdd: (category: ExpenseCategory, description: string, amount: number, paidBy: string) => Promise<void>
-  onDelete: (id: string) => void
   canEdit: boolean
+  onAddExpense: (category?: ExpenseCategory) => void
+  onOpenExpense: (expense: Expense) => void
+  onOpenSettlement: () => void
 }) {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({})
-  const [draftDesc, setDraftDesc] = useState<Record<string, string>>({})
-  const [draftAmount, setDraftAmount] = useState<Record<string, string>>({})
-  const [draftPayer, setDraftPayer] = useState<Record<string, string>>({})
-  const [submitting, setSubmitting] = useState<string | null>(null)
 
-  // Detects which category a newly-added expense belongs to (by diffing ids,
-  // not by hooking submitExpense) so the ring pulses no matter where the
-  // expense came from. Cleared after the pulse has had time to play.
+  // Detects which category a newly-added expense belongs to (by diffing ids)
+  // so the ring pulses no matter where the expense came from (AddExpenseSheet
+  // or another collaborator via realtime). Cleared after the pulse plays.
   const [justUpdatedCat, setJustUpdatedCat] = useState<string | null>(null)
   const prevExpenseIdsRef = useRef<Set<string>>(new Set(expenses.map((e) => e.id)))
   useEffect(() => {
@@ -224,9 +308,6 @@ function BudgetView({
     const member = activeMemberById.get(payerId)
     return member ? memberName(member, currentUserId) : formerPayerName(payerId)
   }
-  const defaultPayerId = activeMemberById.has(currentUserId)
-    ? currentUserId
-    : (activeMembers[0]?.user_id ?? currentUserId)
 
   const sym = CURRENCY_SYMBOLS[trip.currency ?? 'USD'] ?? '$'
   const spent = expenses.reduce((sum, e) => sum + Number(e.amount), 0)
@@ -235,9 +316,11 @@ function BudgetView({
   const pct = total > 0 ? Math.min(100, Math.round((spent / total) * 100)) : 0
   const overBudget = total > 0 && remaining < 0
 
-  const settlement = calculateEqualSplitSettlement(
+  const settledPayments = settlements.filter((s) => s.status === 'settled')
+  const settlement = calculateSettlementWithSplits(
     activeMembers.map((member) => ({ id: member.user_id })),
     expenses,
+    settledPayments.map((s) => ({ from_member: s.from_member, to_member: s.to_member, amount_minor: s.amount_minor, status: s.status })),
   )
   const balancesById = new Map(settlement.balances.map((balance) => [balance.memberId, balance]))
   const displayedBalances = [
@@ -246,28 +329,30 @@ function BudgetView({
   ]
   const isSettled = settlement.balances.every((balance) => balance.netMinor === 0)
 
-  const submitExpense = async (cat: ExpenseCategory) => {
-    const amountRaw = parseFloat(draftAmount[cat] ?? '')
-    if (!amountRaw || amountRaw <= 0) return
-    setSubmitting(cat)
-    await onAdd(cat, (draftDesc[cat] ?? '').trim(), amountRaw, draftPayer[cat] ?? defaultPayerId)
-    setDraftDesc((d) => ({ ...d, [cat]: '' }))
-    setDraftAmount((d) => ({ ...d, [cat]: '' }))
-    setSubmitting(null)
-  }
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingTop: 14 }}>
       <div style={{ background: GLASS_FILL, border: `1px solid ${GLASS_BORDER}`, borderRadius: 20, padding: 16, backdropFilter: 'blur(20px)', boxShadow: '0 6px 20px rgba(0,0,0,.2)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-          <div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10, gap: 10 }}>
+          <div style={{ minWidth: 0 }}>
             <div style={{ fontSize: 15.5, fontWeight: 800, letterSpacing: '-0.01em' }}>Trip Budget</div>
             <div style={{ fontSize: 12, color: 'rgba(215,215,255,.6)', marginTop: 2, fontWeight: 500 }}>
               {sym}{formatMoney(spent)} of {sym}{formatMoney(total)} spent
             </div>
           </div>
-          <div style={{ fontSize: 20, fontWeight: 800, color: ACCENT_LIGHT }}>
-            {total > 0 ? `${pct}%` : '—'}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 'none' }}>
+            <div style={{ fontSize: 20, fontWeight: 800, color: ACCENT_LIGHT }}>
+              {total > 0 ? `${pct}%` : '—'}
+            </div>
+            {canEdit && (
+              <button
+                type="button"
+                onClick={() => onAddExpense()}
+                aria-label="Add expense"
+                style={{ width: 36, height: 36, borderRadius: 12, background: GLASS_FILL, border: `1px solid ${GLASS_BORDER}`, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flex: 'none' }}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={ACCENT_LIGHT} strokeWidth="2.4" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
+              </button>
+            )}
           </div>
         </div>
         <div style={{ height: 6, borderRadius: 999, background: 'rgba(255,255,255,.08)', overflow: 'hidden' }}>
@@ -306,9 +391,20 @@ function BudgetView({
       )}
 
       {activeMembers.length > 0 && !loading && !error && (
-        <div style={{ background: GLASS_FILL, border: `1px solid ${isSettled ? GLASS_BORDER : 'rgba(245,166,35,.3)'}`, borderRadius: 20, padding: 16, backdropFilter: 'blur(20px)', boxShadow: '0 6px 20px rgba(0,0,0,.2)' }}>
-          <div style={{ fontSize: 11.5, fontWeight: 700, color: 'rgba(215,215,255,.55)', textTransform: 'uppercase', letterSpacing: '.06em' }}>
-            Equal split · {activeMembers.length} {activeMembers.length === 1 ? 'member' : 'members'}
+        <button
+          type="button"
+          onClick={onOpenSettlement}
+          style={{
+            textAlign: 'left', width: '100%', cursor: 'pointer', fontFamily: 'inherit', color: 'inherit',
+            background: GLASS_FILL, border: `1px solid ${isSettled ? GLASS_BORDER : 'rgba(245,166,35,.3)'}`, borderRadius: 20, padding: 16,
+            backdropFilter: 'blur(20px)', boxShadow: '0 6px 20px rgba(0,0,0,.2)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ fontSize: 11.5, fontWeight: 700, color: 'rgba(215,215,255,.55)', textTransform: 'uppercase', letterSpacing: '.06em' }}>
+              Settlement · {activeMembers.length} {activeMembers.length === 1 ? 'member' : 'members'}
+            </div>
+            <span style={{ fontSize: 11.5, fontWeight: 700, color: ACCENT_LIGHT }}>Settle up →</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginTop: 10 }}>
             {displayedBalances.map((balance) => (
@@ -328,13 +424,13 @@ function BudgetView({
           <div style={{ marginTop: 11, paddingTop: 10, borderTop: '1px solid rgba(255,255,255,.08)', fontSize: 12.5, fontWeight: 700, color: isSettled ? '#4ade80' : ACCENT_LIGHT }}>
             {settlement.transfers.length === 0
               ? 'All settled up'
-              : settlement.transfers.map((transfer) => (
+              : settlement.transfers.slice(0, 3).map((transfer) => (
                 <div key={`${transfer.fromMemberId}-${transfer.toMemberId}`} style={{ marginTop: 3 }}>
                   {payerName(transfer.fromMemberId)} pays {payerName(transfer.toMemberId)} {sym}{formatMoney(transfer.amountMinor / 100)}
                 </div>
               ))}
           </div>
-        </div>
+        </button>
       )}
 
       {loading &&
@@ -397,79 +493,44 @@ function BudgetView({
             </button>
             {isOpen && (
               <div style={{ padding: '0 16px 16px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {list.map((item) => (
-                  <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 10px', borderRadius: 12, background: 'rgba(255,255,255,.035)' }}>
-                    <span style={{ flex: 1, minWidth: 0, fontSize: 13.5, fontWeight: 600, color: 'rgba(255,255,255,.92)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {item.description || label}
-                    </span>
-                    {(() => {
-                      const itemPayerId = item.paid_by || MISSING_PAYER_ID
-                      const itemPayerName = payerName(itemPayerId)
-                      const payerMember = activeMemberById.get(itemPayerId)
-                      return (
-                        <span
-                          title={`Paid by ${itemPayerName === 'You' ? 'you' : itemPayerName}`}
-                          style={{ width: 20, height: 20, borderRadius: '50%', flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8.5, fontWeight: 800, color: '#fff', background: itemPayerId === currentUserId ? 'linear-gradient(135deg,#f5a623,#e8821a)' : payerMember ? 'linear-gradient(135deg,#7c3aed,#4f46e5)' : 'rgba(148,163,184,.55)' }}
-                        >
-                          {itemPayerId === currentUserId ? 'ME' : payerMember ? memberName(payerMember, currentUserId)[0]?.toUpperCase() : '?'}
-                        </span>
-                      )
-                    })()}
-                    <span style={{ fontSize: 13.5, fontWeight: 700, color: ACCENT_LIGHT, flex: 'none' }}>{sym}{formatMoney(Number(item.amount))}</span>
-                    {canEdit && <button
-                      onClick={() => onDelete(item.id)}
-                      aria-label={`Delete ${item.description}`}
-                      style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none', background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(215,215,255,.35)' }}
+                {list.map((item) => {
+                  const itemPayerId = item.paid_by || MISSING_PAYER_ID
+                  const itemPayerName = payerName(itemPayerId)
+                  const payerMember = activeMemberById.get(itemPayerId)
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => onOpenExpense(item)}
+                      style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 10px', borderRadius: 12, background: 'rgba(255,255,255,.035)', border: 'none', width: '100%', textAlign: 'left', cursor: 'pointer', fontFamily: 'inherit', color: 'inherit' }}
                     >
-                      <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M3 3L13 13M13 3L3 13" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
-                    </button>}
-                  </div>
-                ))}
-                {canEdit && activeMembers.length > 0 && (
-                  <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 6, marginTop: 6 }}>
-                    <span style={{ fontSize: 11.5, color: 'rgba(215,215,255,.55)', fontWeight: 600 }}>Paid by</span>
-                    {activeMembers.map((member) => {
-                      const active = (draftPayer[cat] ?? defaultPayerId) === member.user_id
-                      return (
-                        <button
-                          key={member.user_id}
-                          onClick={() => setDraftPayer((d) => ({ ...d, [cat]: member.user_id }))}
-                          aria-pressed={active}
-                          style={{ padding: '5px 12px', borderRadius: 999, fontSize: 12, fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer', background: active ? 'rgba(245,166,35,.18)' : 'rgba(255,255,255,.05)', border: `1px solid ${active ? 'rgba(245,166,35,.45)' : 'rgba(255,255,255,.1)'}`, color: active ? ACCENT_LIGHT : 'rgba(215,215,255,.7)' }}
-                        >
-                          {member.user_id === currentUserId ? 'Me' : memberName(member, currentUserId)}
-                        </button>
-                      )
-                    })}
-                  </div>
-                )}
-                {canEdit && <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
-                  <input
-                    aria-label={`${label} expense description`}
-                    value={draftDesc[cat] ?? ''}
-                    onChange={(e) => setDraftDesc((d) => ({ ...d, [cat]: e.target.value }))}
-                    onKeyDown={(e) => { if (e.key === 'Enter') submitExpense(cat) }}
-                    placeholder="Description"
-                    style={{ flex: 1.4, minWidth: 0, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 10, padding: '8px 12px', fontSize: 13, color: '#fff', outline: 'none', fontFamily: 'inherit' }}
-                  />
-                  <input
-                    aria-label={`${label} expense amount in ${trip.currency ?? 'USD'}`}
-                    value={draftAmount[cat] ?? ''}
-                    onChange={(e) => setDraftAmount((d) => ({ ...d, [cat]: e.target.value }))}
-                    onKeyDown={(e) => { if (e.key === 'Enter') submitExpense(cat) }}
-                    placeholder={`${sym}0`}
-                    inputMode="decimal"
-                    style={{ width: 70, flex: 'none', background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 10, padding: '8px 10px', fontSize: 13, color: '#fff', outline: 'none', fontFamily: 'inherit' }}
-                  />
+                      <span style={{ flex: 1, minWidth: 0, fontSize: 13.5, fontWeight: 600, color: 'rgba(255,255,255,.92)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {item.description || label}
+                      </span>
+                      <span
+                        title={`Paid by ${itemPayerName === 'You' ? 'you' : itemPayerName}`}
+                        style={{ width: 20, height: 20, borderRadius: '50%', flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8.5, fontWeight: 800, color: '#fff', background: itemPayerId === currentUserId ? 'linear-gradient(135deg,#f5a623,#e8821a)' : payerMember ? 'linear-gradient(135deg,#7c3aed,#4f46e5)' : 'rgba(148,163,184,.55)' }}
+                      >
+                        {itemPayerId === currentUserId ? 'ME' : payerMember ? memberName(payerMember, currentUserId)[0]?.toUpperCase() : '?'}
+                      </span>
+                      <span style={{ fontSize: 13.5, fontWeight: 700, color: ACCENT_LIGHT, flex: 'none' }}>{sym}{formatMoney(Number(item.amount))}</span>
+                    </button>
+                  )
+                })}
+                {canEdit && (
                   <button
-                    aria-label={`Add ${label} expense`}
-                    onClick={() => submitExpense(cat)}
-                    disabled={submitting === cat}
-                    style={{ width: 44, height: 44, borderRadius: 10, background: GLASS_FILL, border: `1px solid ${GLASS_BORDER}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none', cursor: submitting === cat ? 'default' : 'pointer', opacity: submitting === cat ? 0.5 : 1 }}
+                    type="button"
+                    onClick={() => onAddExpense(cat)}
+                    style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, minHeight: 44, marginTop: 2,
+                      borderRadius: 12, background: 'rgba(255,255,255,.04)', border: '1px dashed rgba(255,255,255,.2)',
+                      color: 'rgba(215,215,255,.7)', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
+                    }}
                   >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={ACCENT_LIGHT} strokeWidth="2.4" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
+                    Add expense
                   </button>
-                </div>}
+                )}
                 {!canEdit && list.length === 0 && (
                   <div style={{ padding: '4px 2px', fontSize: 12.5, color: 'rgba(215,215,255,.5)' }}>No expenses in this category yet.</div>
                 )}
@@ -482,5 +543,3 @@ function BudgetView({
     </div>
   )
 }
-
-// ─── Journal ────────────────────────────────────────────────────────────────

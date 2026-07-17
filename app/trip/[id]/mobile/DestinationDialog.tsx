@@ -59,8 +59,8 @@ export function DestinationDialog({
     }
     setIsSearching(true)
     debounceRef.current = setTimeout(() => {
-      forwardSearch(q).then((found) => {
-        setResults(found)
+      forwardSearch(q).then(({ results }) => {
+        setResults(results)
         setIsSearching(false)
       })
     }, 220)

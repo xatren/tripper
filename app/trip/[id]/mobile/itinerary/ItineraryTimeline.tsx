@@ -1,11 +1,13 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState, type Dispatch, type SetStateAction } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { showToast } from '@/components/ui/toast'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { DayStrip, InlineError, tokens, type DayStripDay } from '@/components/mobile'
 import { downloadTripIcs } from '@/lib/ics'
+import { getOptimizedOrder } from '@/lib/mapbox/optimize'
+import { getFullRoute, LatestRouteRequestController } from '@/lib/mapbox/directions'
 import type { ItineraryItem, ItineraryItemStatus, ItineraryItemType, Stop, Trip, TripCurrency } from '@/types'
 import {
   buildTimeline, projectStopSchedule,
@@ -18,6 +20,8 @@ import { UnscheduledDrawer } from './UnscheduledDrawer'
 import { ItineraryItemSheet, type DayOption, type ItineraryItemDraft } from './ItineraryItemSheet'
 import { BottomSheet } from '../components/BottomSheet'
 import { toDatetimeLocalValue } from './itinerary-ui'
+import { planDayOptimization, type DayItem, type DayOptimizationPreview } from './route-optimizer'
+import { DayOptimizePreviewSheet } from './DayOptimizePreviewSheet'
 
 export interface ItineraryCreateRequest {
   type: ItineraryItemType
@@ -159,6 +163,19 @@ export function ItineraryTimeline({
   const [saving, setSaving] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<TimelineEntry | null>(null)
   const [moveTarget, setMoveTarget] = useState<TimelineEntry | null>(null)
+
+  // ── Day route optimization (preview, never moves items without Apply) ──
+  const [optimizingDayId, setOptimizingDayId] = useState<string | null>(null)
+  const [dayOptimizePreview, setDayOptimizePreview] = useState<{
+    localDate: string | null
+    preview: DayOptimizationPreview
+    since: string
+  } | null>(null)
+  const optimizeRequests = useRef(new LatestRouteRequestController())
+  // Mirrors `items` so a toast action clicked later (Retry/Undo) always
+  // reverts against the truly current state, not a stale render closure.
+  const itemsRef = useRef(items)
+  useEffect(() => { itemsRef.current = items }, [items])
 
   useEffect(() => {
     if (!createRequest || !canEdit || !itineraryEnabled) return
@@ -307,6 +324,114 @@ export function ItineraryTimeline({
     apply()
   }, [canEdit, items, setItems, trip.id, onItemSyncPaused])
 
+  /**
+   * Persists a full-day order via the optimize-day RPC (optimistic-concurrency
+   * checked against `sinceISO`), with optimistic update + revert-on-error and
+   * a Retry action — same shape as `reorderDay` above, reused for both the
+   * initial Apply and the Undo action's own apply call.
+   */
+  const persistDayOrder = useCallback((orderedItemIds: string[], localDate: string | null, sinceISO: string, previous: ItineraryItem[], onSuccess: () => void) => {
+    // Local recursive retry (mirrors reorderDay's `apply` above) — a plain
+    // closure, not the outer useCallback, so the Retry action can call it
+    // again without self-referencing a hook binding.
+    const attempt = () => {
+      const orderById = new Map(orderedItemIds.map((id, index) => [id, index]))
+      onItemSyncPaused(true)
+      setItems((current) => current.map((item) => (
+        orderById.has(item.id) ? { ...item, order_index: orderById.get(item.id) as number } : item
+      )))
+      supabase()
+        .rpc('optimize_itinerary_day_apply', { p_trip_id: trip.id, p_local_date: localDate, p_item_ids: orderedItemIds, p_since: sinceISO })
+        .then(({ error }) => {
+          onItemSyncPaused(false)
+          if (error) {
+            setItems(previous)
+            showToast("Couldn't save the optimized route — reverted.", 'error', { label: 'Retry', onClick: attempt })
+            return
+          }
+          onSuccess()
+        })
+    }
+    attempt()
+  }, [trip.id, setItems, onItemSyncPaused])
+
+  /**
+   * Computes a candidate reorder for one day (never mutates anything) and
+   * opens the preview sheet. Preflight/feasibility live in the pure
+   * route-optimizer module; this just adapts timeline entries to its input
+   * shape and surfaces the outcome as a toast or a preview.
+   */
+  const handleOptimizeDay = useCallback(async (day: TimelineDay) => {
+    if (!canEdit || !itineraryEnabled) return
+    const id = dayId(day)
+    if (optimizingDayId) return
+
+    const dayItemEntries = day.entries.filter((entry) => entry.source === 'item')
+    if (dayItemEntries.length === 0) {
+      showToast('This day has no items to optimize.', 'info')
+      return
+    }
+    const itemsById = new Map(items.map((it) => [it.id, it]))
+    const dayItems: DayItem[] = dayItemEntries.map((entry) => {
+      const full = itemsById.get(entry.id)
+      return {
+        id: entry.id,
+        lat: entry.lat,
+        lng: entry.lng,
+        isLocked: entry.isLocked,
+        startAt: entry.startAt,
+        endAt: entry.endAt,
+        durationMinutes: full?.duration_minutes ?? null,
+      }
+    })
+    const since = dayItemEntries.reduce((max, entry) => {
+      const updatedAt = itemsById.get(entry.id)?.updated_at
+      return updatedAt && updatedAt > max ? updatedAt : max
+    }, '1970-01-01T00:00:00.000Z')
+
+    const controller = optimizeRequests.current.begin()
+    setOptimizingDayId(id)
+    const outcome = await planDayOptimization(dayItems, {
+      getOptimizedOrder: (points, opts) => getOptimizedOrder(points, { signal: opts?.signal }),
+      getFullRoute: (points, opts) => getFullRoute(points, { signal: opts?.signal }),
+      signal: controller.signal,
+    })
+    if (!optimizeRequests.current.isCurrent(controller)) return // superseded by a newer request
+    setOptimizingDayId(null)
+
+    if (!outcome.ok) {
+      if (outcome.reason === 'cancelled') return
+      showToast(outcome.reason === 'network_error' ? outcome.message : outcome.message, outcome.reason === 'too_few_items' ? 'info' : 'error')
+      return
+    }
+    if (!outcome.preview.changed) {
+      showToast('This day is already optimized! 🎉', 'success')
+      return
+    }
+    setDayOptimizePreview({ localDate: day.date, preview: outcome.preview, since })
+  }, [canEdit, itineraryEnabled, items, optimizingDayId])
+
+  const applyDayOptimization = useCallback(() => {
+    if (!canEdit || !dayOptimizePreview) return
+    const { localDate, preview, since } = dayOptimizePreview
+    const previousItems = itemsRef.current
+    const originalOrder = previousItems
+      .filter((it) => (it.local_date ?? null) === localDate)
+      .sort((a, b) => a.order_index - b.order_index)
+      .map((it) => it.id)
+    setDayOptimizePreview(null)
+    persistDayOrder(preview.order, localDate, since, previousItems, () => {
+      showToast('Route optimized for this day.', 'success', {
+        label: 'Undo',
+        onClick: () => {
+          persistDayOrder(originalOrder, localDate, new Date().toISOString(), itemsRef.current, () => {
+            showToast('Reverted to the previous order.', 'success')
+          })
+        },
+      })
+    })
+  }, [canEdit, dayOptimizePreview, persistDayOrder])
+
   // ── ICS export (parity with the previous Days tab) ──
   const exportIcs = () => {
     const schedule = projectStopSchedule(trip.start_date ?? null, stops)
@@ -378,6 +503,8 @@ export function ItineraryTimeline({
             onSyncPaused={onItemSyncPaused}
             selectedItemId={selectedItemId}
             onSelectItem={onSelectItem}
+            onOptimize={() => void handleOptimizeDay(selectedDay)}
+            isOptimizing={optimizingDayId === dayId(selectedDay)}
           />
         </section>
       )}
@@ -422,6 +549,12 @@ export function ItineraryTimeline({
           setDeleteTarget(null)
         }}
         onCancel={() => setDeleteTarget(null)}
+      />
+
+      <DayOptimizePreviewSheet
+        preview={dayOptimizePreview?.preview ?? null}
+        onApply={applyDayOptimization}
+        onDismiss={() => setDayOptimizePreview(null)}
       />
     </div>
   )
