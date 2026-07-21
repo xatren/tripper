@@ -1,10 +1,11 @@
 'use client'
 
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react'
-import type { ItineraryItem, Stop, Trip, TripCapabilities, TripMember } from '@/types'
+import type { ItineraryItem, MemberRole, Profile, Stop, Trip, TripCapabilities, TripMember } from '@/types'
 import type { RouteLeg } from '@/lib/mapbox/directions'
 import { createClient } from '@/lib/supabase/client'
-import { TripRealtimeProvider, TripRealtimeStatusBadge, useTripRealtimeTable } from '@/lib/supabase/trip-realtime'
+import { TripRealtimeProvider, TripRealtimeStatusBadge, useTripPresenceSection, useTripRealtimeTable } from '@/lib/supabase/trip-realtime'
+import { tripCapabilitiesForRole } from '@/lib/trip-capabilities'
 import { PlanRouteDomain } from './PlanRouteDomain'
 import { TripOverviewDomain } from './TripOverviewDomain'
 import type { TripOverviewData } from './overview-data'
@@ -13,12 +14,13 @@ import type { PrimaryNavSection } from './components/TripPrimaryNav'
 import { TripPrimaryNav } from './components/TripPrimaryNav'
 import { TripMobileHeader } from './components/TripMobileHeader'
 import { TripMoreSheet } from './components/TripMoreSheet'
+import { OfflineStatus } from './components/OfflineStatus'
 import { DeferredBoundary } from '@/components/ui/deferred-boundary'
 import { showToast } from '@/components/ui/toast'
 import { useRouter } from 'next/navigation'
 
 type LazySection = 'explore' | 'bookings'
-type MoreDestination = 'budget' | 'packing' | 'journal'
+type MoreDestination = 'budget' | 'packing' | 'journal' | 'travel'
 /** What's actually on screen — Plan's own section, or a More destination layered over it. */
 type VisibleScreen = PrimaryNavSection | MoreDestination
 
@@ -33,12 +35,14 @@ const loadBookingsDomain = () => import('./components/BookingsDomain')
 const loadPrepDomain = () => import('./PrepDomain')
 const loadBudgetDomain = () => import('./BudgetDomain')
 const loadJournalDomain = () => import('./JournalDomain')
+const loadTravelModeDomain = () => import('./TravelModeDomain')
 
 const ExploreDomain = lazy(() => loadExploreDomain().then((module) => ({ default: module.ExploreDomain })))
 const BookingsDomain = lazy(() => loadBookingsDomain().then((module) => ({ default: module.BookingsDomain })))
 const PrepDomain = lazy(() => loadPrepDomain().then((module) => ({ default: module.PrepDomain })))
 const BudgetDomain = lazy(() => loadBudgetDomain().then((module) => ({ default: module.BudgetDomain })))
 const JournalDomain = lazy(() => loadJournalDomain().then((module) => ({ default: module.JournalDomain })))
+const TravelModeDomain = lazy(() => loadTravelModeDomain().then((module) => ({ default: module.TravelModeDomain })))
 
 export interface TripMobileClientProps {
   trip: Trip
@@ -76,12 +80,13 @@ const SCREEN_LABEL: Record<VisibleScreen, string> = {
   budget: 'Budget',
   packing: 'Packing',
   journal: 'Journal',
+  travel: 'Travel Mode',
 }
 
 /** Coordinates navigation and the small amount of state shared by Plan and Journal. */
 export function TripMobileClient({ trip, stops: initialStops, items: initialItems, itineraryEnabled, currentUserId, members, capabilities, initialSection, overview }: TripMobileClientProps) {
   return (
-    <TripRealtimeProvider tripId={trip.id}>
+    <TripRealtimeProvider tripId={trip.id} currentUserId={currentUserId} members={members}>
       <TripMobileContent trip={trip} stops={initialStops} items={initialItems} itineraryEnabled={itineraryEnabled} currentUserId={currentUserId} members={members} capabilities={capabilities} initialSection={initialSection} overview={overview} />
     </TripRealtimeProvider>
   )
@@ -93,7 +98,7 @@ interface HistoryState {
   moreDestination?: MoreDestination
 }
 
-function TripMobileContent({ trip, stops: initialStops, items: initialItems, itineraryEnabled, currentUserId, members, capabilities, initialSection, overview }: TripMobileClientProps) {
+function TripMobileContent({ trip, stops: initialStops, items: initialItems, itineraryEnabled, currentUserId, members: initialMembers, capabilities: initialCapabilities, initialSection, overview }: TripMobileClientProps) {
   const router = useRouter()
   const [activeSection, setActiveSection] = useState<PrimaryNavSection>(initialSection)
   const [isMoreSheetOpen, setIsMoreSheetOpen] = useState(false)
@@ -105,12 +110,59 @@ function TripMobileContent({ trip, stops: initialStops, items: initialItems, iti
   })
   const [stops, setStops] = useState(initialStops)
   const [items, setItems] = useState(initialItems)
+  const [members, setMembers] = useState(initialMembers)
+  const [capabilities, setCapabilities] = useState(initialCapabilities)
   const [routePath, setRoutePath] = useState<{ lat: number; lng: number }[]>([])
   const [routeLegs, setRouteLegs] = useState<RouteLeg[]>([])
   const stopSyncPausedRef = useRef(false)
   const stopResyncPendingRef = useRef(false)
   const itemSyncPausedRef = useRef(false)
   const itemResyncPendingRef = useRef(false)
+
+  const visiblePresenceSection = activeMoreDestination ?? (isMoreSheetOpen ? 'more' : activeSection)
+  useTripPresenceSection(visiblePresenceSection)
+
+  const refreshMembership = useCallback(async () => {
+    const supabase = createClient()
+    const { data: memberships, error } = await supabase
+      .from('trip_members')
+      .select('user_id, role, joined_at')
+      .eq('trip_id', trip.id)
+    if (error || !memberships) return
+    const own = memberships.find((member) => member.user_id === currentUserId)
+    if (!own) {
+      setMembers([])
+      setCapabilities(tripCapabilitiesForRole('viewer'))
+      showToast('Your access to this trip was removed.', 'info')
+      router.replace('/trips?error=permission_revoked')
+      return
+    }
+    const ids = memberships.map((member) => member.user_id)
+    const { data: profiles } = await supabase.from('profiles').select('id,email,display_name,avatar_url').in('id', ids)
+    const byId = new Map(((profiles ?? []) as Profile[]).map((profile) => [profile.id, profile]))
+    setMembers(memberships.map((member) => ({
+      trip_id: trip.id,
+      user_id: member.user_id,
+      role: member.role as MemberRole,
+      joined_at: member.joined_at,
+      profile: byId.get(member.user_id),
+    })))
+    setCapabilities(tripCapabilitiesForRole(own.role as MemberRole))
+  }, [currentUserId, router, trip.id])
+
+  useTripRealtimeTable<TripMember & Record<string, unknown>>(
+    'trip_members',
+    useCallback(() => { void refreshMembership() }, [refreshMembership]),
+    refreshMembership,
+  )
+
+  // A removed user cannot read the trip-scoped delete signal after RLS takes
+  // effect. This low-frequency canonical check closes that revocation gap
+  // while the screen stays open without treating Presence as authorization.
+  useEffect(() => {
+    const interval = window.setInterval(() => void refreshMembership(), 30_000)
+    return () => window.clearInterval(interval)
+  }, [refreshMembership])
 
   const refreshStops = useCallback(async () => {
     if (stopSyncPausedRef.current) {
@@ -293,6 +345,7 @@ function TripMobileContent({ trip, stops: initialStops, items: initialItems, iti
   return (
     <div style={{ width: '100%', minHeight: '100svh', position: 'relative', background: 'var(--gradient-bg-app)', color: 'var(--color-text-primary)', fontFamily: "var(--font-inter),'Inter',system-ui,-apple-system,sans-serif" }}>
       <TripRealtimeStatusBadge />
+      <OfflineStatus userId={currentUserId} tripId={trip.id} />
       <div style={{ display: visibleScreen === 'plan' ? 'block' : 'none' }} aria-hidden={visibleScreen !== 'plan'}>
         <PlanRouteDomain
           trip={trip}
@@ -407,7 +460,24 @@ function TripMobileContent({ trip, stops: initialStops, items: initialItems, iti
             <div style={{ display: visibleScreen === 'journal' ? 'block' : 'none' }} aria-hidden={visibleScreen !== 'journal'}>
               <DeferredBoundary label="the journal section" style={{ minHeight: 180 }}>
                 <Suspense fallback={<DomainLoading label="journal" />}>
-                  <JournalDomain trip={trip} stops={stops} routeLegs={routeLegs} routePath={routePath} currentUserId={currentUserId} canEdit={capabilities.canEdit} />
+                  <JournalDomain trip={trip} stops={stops} routeLegs={routeLegs} routePath={routePath} currentUserId={currentUserId} canEdit={capabilities.canEdit} items={items} />
+                </Suspense>
+              </DeferredBoundary>
+            </div>
+          )}
+          {visitedLazy.has('travel') && (
+            <div style={{ display: visibleScreen === 'travel' ? 'block' : 'none' }} aria-hidden={visibleScreen !== 'travel'}>
+              <DeferredBoundary label="travel mode" style={{ minHeight: 180 }}>
+                <Suspense fallback={<DomainLoading label="travel mode" />}>
+                  <TravelModeDomain
+                    trip={trip}
+                    items={items}
+                    setItems={setItems}
+                    currentUserId={currentUserId}
+                    canEdit={capabilities.canEdit}
+                    onOpenJournal={() => openMoreDestination('journal')}
+                    onRecordExpense={() => openMoreDestination('budget')}
+                  />
                 </Suspense>
               </DeferredBoundary>
             </div>
@@ -416,7 +486,19 @@ function TripMobileContent({ trip, stops: initialStops, items: initialItems, iti
         <TripPrimaryNav active={navActive} onSelect={selectSection} onOpenMore={openMoreSheet} onPrefetch={prefetchSection} />
       </div>
 
-      <TripMoreSheet open={isMoreSheetOpen} onClose={closeMoreSheet} onNavigate={openMoreDestination} trip={trip} stops={stops} />
+      <TripMoreSheet
+        open={isMoreSheetOpen}
+        onClose={closeMoreSheet}
+        onNavigate={openMoreDestination}
+        trip={trip}
+        stops={stops}
+        userId={currentUserId}
+        members={members}
+        itinerary={items}
+        routeGeometry={routePath}
+        capabilities={capabilities}
+        onMembersChanged={() => void refreshMembership()}
+      />
     </div>
   )
 }

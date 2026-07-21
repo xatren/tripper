@@ -199,6 +199,11 @@ export function PackingSection({
                                         <span style={{ marginLeft: 6, fontSize: 11.5, fontWeight: 700, color: tokens.textSecondary, textDecoration: 'none' }}>×{item.quantity}</span>
                                       )}
                                     </span>
+                                    {item._offline_status && (
+                                      <span style={{ display: 'block', marginTop: 2, color: item._offline_status === 'queued' ? tokens.warning : tokens.danger, fontSize: 10.5, fontWeight: 800 }}>
+                                        {item._offline_status === 'queued' ? 'On device · waiting to sync' : 'Sync error'}
+                                      </span>
+                                    )}
                                     {(item.assigned_to || item.priority === 'high' || item.priority === 'low' || item.due_date) && (
                                       <span style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3, minWidth: 0 }}>
                                         <AssigneeBadge userId={item.assigned_to} members={members} currentUserId={currentUserId} />

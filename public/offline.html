@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0a1020">
+  <title>Tripper · Offline</title>
+  <style>
+    :root{color-scheme:dark;font-family:Inter,system-ui,sans-serif;background:#080d18;color:#f8fafc}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 70% 0,rgba(245,166,35,.14),transparent 35%),#080d18}.wrap{max-width:560px;margin:auto;padding:max(28px,env(safe-area-inset-top)) 18px 48px}.badge{display:inline-flex;padding:7px 11px;border:1px solid rgba(251,191,36,.35);border-radius:99px;background:rgba(251,191,36,.1);color:#fbbf24;font-size:12px;font-weight:800}.card{margin-top:16px;padding:16px;border:1px solid rgba(255,255,255,.11);border-radius:18px;background:#101827}.muted{color:#94a3b8;font-size:13px;line-height:1.55}h1{font-size:26px;margin:16px 0 5px}h2{font-size:14px;margin:0 0 10px}.row{padding:10px 0;border-top:1px solid rgba(255,255,255,.08);font-size:13px}.row:first-of-type{border:0}.error{color:#fca5a5}</style>
+</head>
+<body><main class="wrap"><span class="badge">Offline</span><div id="app"><h1>Opening downloaded trip…</h1><p class="muted">Checking the user-scoped device snapshot.</p></div></main>
+<script>
+(() => {
+  const app=document.getElementById('app');
+  const tripId=(location.pathname.match(/\/trip\/([^/]+)\/(?:mobile)?/)||[])[1];
+  const req=indexedDB.open('tripper-private-v1',1);
+  const esc=(v)=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  req.onerror=()=>fail('Offline storage could not be opened.');
+  req.onupgradeneeded=()=>{req.transaction.abort();fail('No downloaded trip is available on this device.');};
+  req.onsuccess=()=>{
+    const db=req.result,tx=db.transaction(['meta','snapshots'],'readonly'),meta=tx.objectStore('meta').get('active_user');
+    meta.onsuccess=()=>{
+      const userId=meta.result;
+      if(!userId||!tripId)return fail('No active user-scoped download matches this trip. Reconnect and sign in.');
+      const get=tx.objectStore('snapshots').get(userId+':'+tripId);
+      get.onsuccess=()=>render(get.result,userId);
+      get.onerror=()=>fail('The downloaded trip could not be read.');
+    };
+  };
+  function fail(message){app.innerHTML='<h1>Trip unavailable offline</h1><p class="muted error">'+esc(message)+'</p><p class="muted">Authenticated pages were not cached. Reconnect to Tripper to download this trip again.</p>';}
+  function render(s,userId){
+    if(!s||s.user_id!==userId||s.trip_id!==tripId||s.key!==userId+':'+tripId||s.schema_version!==1||!valid(s))return fail('This snapshot is missing, corrupt, outdated, or belongs to another user.');
+    const title=esc(s.trip.title||'Downloaded trip'),date=[s.trip.start_date,s.trip.end_date].filter(Boolean).map(esc).join(' – ');
+    const stops=(s.stops||[]).map((x,i)=>'<div class="row">'+(i+1)+'. '+esc(x.name)+'</div>').join('')||'<p class="muted">No destinations saved.</p>';
+    const plan=(s.itinerary||[]).slice(0,30).map(x=>'<div class="row"><strong>'+esc(x.title)+'</strong><br><span class="muted">'+esc(x.local_date||'Unscheduled')+' · '+esc(x.status||'planned')+'</span></div>').join('');
+    app.innerHTML='<h1>'+title+'</h1><p class="muted">'+date+'</p><section class="card"><h2>Route</h2>'+stops+'</section>'+(plan?'<section class="card"><h2>Itinerary</h2>'+plan+'</section>':'')+'<section class="card"><h2>Offline limits</h2><p class="muted">Route geometry is saved, but Mapbox map tiles and sensitive booking documents are not stored. Queued changes sync after the full app reconnects.</p></section><p class="muted">Downloaded '+esc(new Date(s.downloaded_at).toLocaleString())+'</p>';
+  }
+  function valid(s){const copy={...s},expected=copy.checksum;delete copy.checksum;delete copy.size_bytes;const text=JSON.stringify(copy);let hash=0x811c9dc5;for(let i=0;i<text.length;i++){hash^=text.charCodeAt(i);hash=Math.imul(hash,0x01000193)}return expected===(hash>>>0).toString(16).padStart(8,'0')}
+})();
+</script></body></html>

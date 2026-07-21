@@ -33,6 +33,8 @@ export interface PackingItemRow {
   notes?: string | null
   order_index?: number | null
   updated_at?: string
+  /** Device-only status; never persisted to Postgres. */
+  _offline_status?: 'queued' | 'error'
 }
 
 export interface TripTaskRow {

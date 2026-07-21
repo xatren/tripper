@@ -14,6 +14,7 @@
 
 import { useCallback, useEffect, useMemo, useState, type Dispatch, type SetStateAction } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { enqueueMutation } from '@/lib/offline/db'
 import { useTripRealtimeTable } from '@/lib/supabase/trip-realtime'
 import { showToast } from '@/components/ui/toast'
 import { tokens } from '@/components/mobile'
@@ -148,8 +149,20 @@ export function PrepDomain({ tripId, vibe, userId, canEdit, members }: PrepDomai
     const nextChecked = !row.checked
     hapticTap()
     setItems((prev) => prev.map((item) => (item.id === row.id
-      ? { ...item, checked: nextChecked, completed_by: nextChecked ? userId : null, completed_at: nextChecked ? new Date().toISOString() : null }
+      ? { ...item, checked: nextChecked, completed_by: nextChecked ? userId : null, completed_at: nextChecked ? new Date().toISOString() : null, _offline_status: navigator.onLine ? undefined : 'queued' }
       : item)))
+    if (!navigator.onLine) {
+      const completedAt = nextChecked ? new Date().toISOString() : null
+      void enqueueMutation({
+        user_id: userId, trip_id: tripId, entity: 'packing_item', action: 'toggle', entity_id: row.id,
+        payload: { checked: nextChecked, completed_by: nextChecked ? userId : null, completed_at: completedAt },
+        base_version: row.updated_at ?? null,
+      }).then(() => showToast('Saved on this device · queued for sync.', 'info')).catch(() => {
+        setItems((prev) => prev.map((item) => item.id === row.id ? { ...item, checked: row.checked, _offline_status: 'error' } : item))
+        showToast("Couldn't queue this change.", 'error')
+      })
+      return
+    }
     const supabase = createClient()
     const rollback = () => {
       setItems((prev) => prev.map((item) => (item.id === row.id ? { ...item, checked: row.checked, completed_by: row.completed_by ?? null, completed_at: row.completed_at ?? null } : item)))
@@ -170,10 +183,25 @@ export function PrepDomain({ tripId, vibe, userId, canEdit, members }: PrepDomai
           if (legacyError) rollback()
         })
       })
-  }, [canEdit, setItems, userId])
+  }, [canEdit, setItems, tripId, userId])
 
   const quickAddPacking = useCallback(async (category: PackingCategoryKey, label: string) => {
     if (!canEdit) return
+    if (!navigator.onLine) {
+      const id = crypto.randomUUID()
+      const createdAt = new Date().toISOString()
+      const orderIndex = nextOrderIndex(items.filter((item) => item.category === category))
+      const local = { id, trip_id: tripId, category, label, checked: false, created_by: userId, created_at: createdAt, order_index: orderIndex, _offline_status: 'queued' as const }
+      setItems((previous) => [...previous, local])
+      try {
+        await enqueueMutation({ user_id: userId, trip_id: tripId, entity: 'packing_item', action: 'create', entity_id: id, payload: { id, trip_id: tripId, category, label, created_by: userId, order_index: orderIndex } })
+        showToast('Item saved on this device · queued.', 'info')
+      } catch {
+        setItems((previous) => previous.filter((item) => item.id !== id))
+        showToast("Couldn't queue the item.", 'error')
+      }
+      return
+    }
     const supabase = createClient()
     const categoryItems = items.filter((item) => item.category === category)
     const insertRow = { trip_id: tripId, category, label, created_by: userId, order_index: nextOrderIndex(categoryItems) }

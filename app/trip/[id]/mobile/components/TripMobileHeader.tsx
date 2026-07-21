@@ -4,6 +4,7 @@ import { useState } from 'react'
 import type { TripMember } from '@/types'
 import { showToast } from '@/components/ui/toast'
 import { tokens } from '@/components/mobile'
+import { useTripPresence } from '@/lib/supabase/trip-realtime'
 
 export interface TripMobileHeaderProps {
   /** overlay = transparent gradient over the map (Plan); solid = opaque glass bar (Explore/Bookings/More screens). */
@@ -23,12 +24,13 @@ function initialsFor(member: TripMember) {
   return source.trim().charAt(0).toUpperCase() || '?'
 }
 
-function AvatarStack({ members }: { members: TripMember[] }) {
-  const shown = members.slice(0, 3)
+function AvatarStack({ members, onlineIds }: { members: TripMember[]; onlineIds: Set<string> }) {
+  const ordered = [...members].sort((a, b) => Number(onlineIds.has(b.user_id)) - Number(onlineIds.has(a.user_id)))
+  const shown = ordered.slice(0, 3)
   const overflow = members.length - shown.length
   if (shown.length === 0) return null
   return (
-    <div style={{ display: 'flex', alignItems: 'center' }} aria-label={`${members.length} trip member${members.length === 1 ? '' : 's'}`}>
+    <div style={{ display: 'flex', alignItems: 'center' }} aria-label={`${onlineIds.size} of ${members.length} trip members online`}>
       {shown.map((member, index) => (
         <div
           key={member.user_id}
@@ -36,10 +38,11 @@ function AvatarStack({ members }: { members: TripMember[] }) {
           style={{
             width: 26, height: 26, borderRadius: '50%', background: 'rgba(136,136,228,.28)', border: '2px solid #0a0a1e',
             display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 10.5, fontWeight: 700,
-            marginLeft: index === 0 ? 0 : -8,
+            marginLeft: index === 0 ? 0 : -8, position: 'relative',
           }}
         >
           {initialsFor(member)}
+          {onlineIds.has(member.user_id) && <span aria-hidden="true" style={{ position: 'absolute', right: -1, bottom: -1, width: 7, height: 7, borderRadius: '50%', background: '#38d996', border: '1.5px solid #0a0a1e' }} />}
         </div>
       ))}
       {overflow > 0 && (
@@ -64,6 +67,8 @@ const iconButtonStyle = {
 /** Shared trip-workspace header: back, title/date, member avatars, share, overflow (opens More). */
 export function TripMobileHeader({ variant, title, subtitle, readOnly, members, tripId, onBack, onOpenMore, backLabel = 'Back' }: TripMobileHeaderProps) {
   const [sharing, setSharing] = useState(false)
+  const presence = useTripPresence()
+  const onlineIds = new Set(presence.map((entry) => entry.userId))
 
   const handleShare = async () => {
     if (sharing || typeof window === 'undefined') return
@@ -101,7 +106,7 @@ export function TripMobileHeader({ variant, title, subtitle, readOnly, members, 
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 'none' }}>
-        <AvatarStack members={members} />
+        <AvatarStack members={members} onlineIds={onlineIds} />
         <button onClick={handleShare} disabled={sharing} title="Share trip" aria-label="Share trip" style={{ ...iconButtonStyle, width: 36, height: 36, opacity: sharing ? 0.6 : 1 }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" /><path d="M8.6 10.5l6.8-3.9M8.6 13.5l6.8 3.9" /></svg>
         </button>

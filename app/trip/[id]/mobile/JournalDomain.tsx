@@ -1,9 +1,10 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type Dispatch, type SetStateAction } from 'react'
-import type { JournalEntry, Stop, Trip } from '@/types'
+import type { ItineraryItem, JournalEntry, Stop, Trip } from '@/types'
 import type { RouteLeg } from '@/lib/mapbox/directions'
 import { createClient } from '@/lib/supabase/client'
+import { enqueueMutation } from '@/lib/offline/db'
 import { useTripRealtimeTable } from '@/lib/supabase/trip-realtime'
 import { TripSummaryHero } from '@/components/journal/TripSummaryHero'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
@@ -12,6 +13,8 @@ import { convertKm, useDistanceUnit } from '@/lib/settings'
 import { createRandomId } from '@/lib/random-id'
 import { ACCENT_GRADIENT, ACCENT_LIGHT, GLASS_BORDER, GLASS_FILL, RetryCard } from './domain-ui'
 import { formatDateRange, totalNights, tripTitle } from './trip-domain-utils'
+import { allowlistedRecapPayload, buildRecapStats, type RecapShareField } from '@/lib/travel-mode'
+import { BottomSheet } from './components/BottomSheet'
 
 const JOURNAL_BUCKET = 'trip-photos'
 const SIGNED_URL_TTL_SECONDS = 60 * 60
@@ -110,13 +113,17 @@ export interface JournalDomainProps {
   routePath: { lat: number; lng: number }[]
   currentUserId: string
   canEdit: boolean
+  items: ItineraryItem[]
 }
 
 export function JournalDomain({
-  trip, stops, routeLegs, routePath, currentUserId, canEdit,
+  trip, stops, routeLegs, routePath, currentUserId, canEdit, items,
 }: JournalDomainProps) {
   const distanceUnit = useDistanceUnit()
   const [sharing, setSharing] = useState(false)
+  const [recapPreviewOpen, setRecapPreviewOpen] = useState(false)
+  const [expenseCount, setExpenseCount] = useState(0)
+  const [recapFields, setRecapFields] = useState<RecapShareField[]>(['title', 'dateRange', 'routePath', 'stops', 'distance', 'distanceUnit', 'durationHours', 'days', 'plannedCount', 'visitedCount', 'photoCount', 'journalCount'])
   const [entries, setEntriesState] = useState<JournalEntry[] | null>(() => journalCache.get(trip.id) ?? null)
   const [entriesError, setEntriesError] = useState(false)
   const [reloadToken, setReloadToken] = useState(0)
@@ -337,6 +344,25 @@ export function JournalDomain({
     const note = draftNote.trim()
     if (saving || !hasContent) return
     setSaving(true)
+    if (!navigator.onLine) {
+      const entryId = draftEntryId ?? crypto.randomUUID()
+      const createdAt = new Date().toISOString()
+      try {
+        await enqueueMutation({
+          user_id: currentUserId, trip_id: trip.id, entity: 'journal_entry', action: draftEntryId ? 'update_note' : 'create', entity_id: entryId,
+          payload: draftEntryId ? { note: note || null } : { id: entryId, trip_id: trip.id, entry_date: draftDate, note: note || null, created_by: currentUserId, created_at: createdAt },
+        })
+        if (!draftEntryId) setEntries((previous) => sortJournalEntries([...(previous ?? []), { id: entryId, trip_id: trip.id, entry_date: draftDate, note: note || null, created_by: currentUserId, created_at: createdAt, journal_photos: [] }]))
+        setDraftNote('')
+        setDraftEntryId(null)
+        showToast(draftPhotos.length ? 'Journal text queued. Photos stay on this screen and require a connection.' : 'Journal note saved on this device · queued.', 'info')
+      } catch {
+        showToast("Couldn't queue the journal note.", 'error')
+      } finally {
+        setSaving(false)
+      }
+      return
+    }
     const supabase = createClient()
     const { data: { session } } = await supabase.auth.getSession()
     if (!session) {
@@ -464,6 +490,33 @@ export function JournalDomain({
   const durationHours = routeLegs.reduce((sum, l) => sum + l.durationSeconds, 0) / 3600
   const days = trip.start_date && trip.end_date ? totalNights(trip) + 1 : stops.length
   const recapReady = stops.length >= 2 && routePath.length >= 2
+  const recapStats = buildRecapStats({ itinerary: items, journal: entries ?? [], expenses: Array.from({ length: expenseCount }, (_, index) => ({ id: String(index) })), routeLegs })
+  const firstShareableNote = (entries ?? []).find((entry) => !entry.is_hidden && entry.note)?.note ?? undefined
+  const firstShareablePhoto = (entries ?? []).flatMap((entry) => entry.journal_photos ?? []).find((photo) => signedPhotoUrls[photo.storage_path])
+
+  const setRecapField = (field: RecapShareField, enabled: boolean) => setRecapFields((current) => enabled ? [...new Set([...current, field])] : current.filter((key) => key !== field))
+
+  const shareRecap = async () => {
+    if (sharing) return
+    setSharing(true)
+    try {
+      const raw = {
+        title: tripTitle(trip, stops), dateRange: formatDateRange(trip.start_date, trip.end_date) || 'Dates not set',
+        routePath, stops: stops.map((stop) => ({ lat: stop.lat, lng: stop.lng, name: stop.name })),
+        distance: distanceValue, distanceUnit, durationHours, days,
+        plannedCount: recapStats.planned, visitedCount: recapStats.visited, photoCount: recapStats.photos,
+        journalCount: recapStats.journal, expenseCount: recapStats.expenses,
+        memoryText: firstShareableNote, photoUrl: firstShareablePhoto ? signedPhotoUrls[firstShareablePhoto.storage_path]?.url : undefined,
+      }
+      const { shareTripRecap } = await loadRecapImage()
+      const result = await shareTripRecap(allowlistedRecapPayload(raw, recapFields) as typeof raw)
+      if (result === 'failed') showToast("Couldn't create the recap image.", 'error')
+      else if (result === 'downloaded') showToast('Recap image downloaded.', 'success')
+      setRecapPreviewOpen(false)
+    } catch {
+      showToast("Couldn't create the recap. Try again when you're online.", 'error')
+    } finally { setSharing(false) }
+  }
 
   const inputStyle: CSSProperties = { background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 10, padding: '8px 12px', fontSize: 13, color: '#fff', outline: 'none', fontFamily: 'inherit' }
 
@@ -483,27 +536,9 @@ export function JournalDomain({
           />
           <button
             onClick={async () => {
-              if (sharing) return
-              setSharing(true)
-              try {
-                const { shareTripRecap } = await loadRecapImage()
-                const result = await shareTripRecap({
-                  title: tripTitle(trip, stops),
-                  dateRange: formatDateRange(trip.start_date, trip.end_date) || 'Dates not set',
-                  routePath,
-                  stops: stops.map((s) => ({ lat: s.lat, lng: s.lng, name: s.name })),
-                  distance: distanceValue,
-                  distanceUnit,
-                  durationHours,
-                  days,
-                })
-                if (result === 'failed') showToast("Couldn't create the recap image.", 'error')
-                else if (result === 'downloaded') showToast('Recap image downloaded — story-ready! 📸', 'success')
-              } catch {
-                showToast("Couldn't load recap generation. Try again when you're online.", 'error')
-              } finally {
-                setSharing(false)
-              }
+              const { count } = await createClient().from('expenses').select('id', { count: 'exact', head: true }).eq('trip_id', trip.id)
+              setExpenseCount(count ?? 0)
+              setRecapPreviewOpen(true)
             }}
             onPointerEnter={() => { if (navigator.onLine) void loadRecapImage().catch(() => undefined) }}
             onFocus={() => { if (navigator.onLine) void loadRecapImage().catch(() => undefined) }}
@@ -515,7 +550,7 @@ export function JournalDomain({
               <path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7" />
               <path d="M16 6l-4-4-4 4M12 2v13" />
             </svg>
-            {sharing ? 'Creating image…' : 'Share trip recap'}
+            Preview &amp; share recap
           </button>
         </>
       ) : (
@@ -683,7 +718,7 @@ export function JournalDomain({
             <div key={entry.id} style={{ borderRadius: 16, background: 'rgba(255,255,255,.035)', border: '1px solid rgba(255,255,255,.08)', padding: '12px 14px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span style={{ fontSize: 12.5, fontWeight: 700, color: ACCENT_LIGHT }}>{formatJournalDate(entry.entry_date)}</span>
-                {canEdit && <button
+                {canEdit && entry.created_by === currentUserId && <button
                   onClick={() => setPendingDelete(entry)}
                   aria-label="Delete entry"
                   style={{ marginLeft: 'auto', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(215,215,255,.35)' }}
@@ -760,6 +795,30 @@ export function JournalDomain({
         onConfirm={() => pendingDelete && deleteEntry(pendingDelete)}
         onCancel={() => setPendingDelete(null)}
       />}
+      <BottomSheet open={recapPreviewOpen} onClose={() => !sharing && setRecapPreviewOpen(false)} titleId="recap-privacy-title" title="Choose what to share">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ padding: 12, borderRadius: 14, background: 'rgba(255,255,255,.04)', color: 'rgba(255,255,255,.72)', fontSize: 12, lineHeight: 1.5 }}>
+            Private by default: confirmation numbers, private notes, member debt and precise locations are never included.
+          </div>
+          {([
+            ['distance', 'Route distance & drive time', true],
+            ['visitedCount', `Visited stops · ${recapStats.visited}/${recapStats.planned}`, true],
+            ['photoCount', `Photo count · ${recapStats.photos}`, true],
+            ['journalCount', `Memory count · ${recapStats.journal}`, true],
+            ['expenseCount', `Expense count · ${expenseCount}`, true],
+            ['memoryText', firstShareableNote ? 'First journal note' : 'No note available', !!firstShareableNote],
+            ['photoUrl', firstShareablePhoto ? 'First journal photo' : 'No photo available', !!firstShareablePhoto],
+          ] as [RecapShareField, string, boolean][]).map(([field, label, available]) => (
+            <label key={field} style={{ minHeight: 48, display: 'flex', alignItems: 'center', gap: 10, opacity: available ? 1 : .45, color: '#fff', fontSize: 13 }}>
+              <input type="checkbox" disabled={!available} checked={recapFields.includes(field)} onChange={(event) => {
+                setRecapField(field, event.target.checked)
+                if (field === 'distance') setRecapField('durationHours', event.target.checked)
+              }} /> {label}
+            </label>
+          ))}
+          <button type="button" onClick={() => void shareRecap()} disabled={sharing} style={{ minHeight: 48, borderRadius: 14, border: 0, background: ACCENT_GRADIENT, color: '#1a0800', fontWeight: 850 }}>{sharing ? 'Creating image…' : 'Share selected recap'}</button>
+        </div>
+      </BottomSheet>
     </div>
   )
 }

@@ -3,7 +3,8 @@
 // in Cache Storage, so it cannot be shown to a different local user.
 
 const CACHE_PREFIX = 'tripper-'
-const STATIC_CACHE = 'tripper-static-v2'
+const STATIC_CACHE = 'tripper-static-v3'
+const OFFLINE_SHELL = '/offline.html'
 
 function isTripperCache(name) {
   return name.startsWith(CACHE_PREFIX)
@@ -24,8 +25,8 @@ function isSafeStaticAsset(url) {
   )
 }
 
-self.addEventListener('install', () => {
-  self.skipWaiting()
+self.addEventListener('install', (event) => {
+  event.waitUntil(caches.open(STATIC_CACHE).then((cache) => cache.add(OFFLINE_SHELL)).then(() => self.skipWaiting()))
 })
 
 self.addEventListener('activate', (event) => {
@@ -54,13 +55,7 @@ self.addEventListener('fetch', (event) => {
     // Never cache navigations. A failed protected navigation must not expose
     // an earlier user's SSR page while the device is offline.
     event.respondWith(
-      fetch(req).catch(
-        () => new Response('You are offline. Reconnect to continue.', {
-          status: 503,
-          statusText: 'Service Unavailable',
-          headers: { 'Content-Type': 'text/plain; charset=utf-8' },
-        })
-      )
+      fetch(req).catch(() => caches.open(STATIC_CACHE).then((cache) => cache.match(OFFLINE_SHELL)).then((shell) => shell || new Response('You are offline.', { status: 503 })))
     )
     return
   }
@@ -81,4 +76,11 @@ self.addEventListener('fetch', (event) => {
       )
     )
   )
+})
+
+self.addEventListener('sync', (event) => {
+  if (event.tag !== 'tripper-mutation-sync') return
+  event.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
+    for (const client of clients) client.postMessage({ type: 'TRIPPER_SYNC_REQUESTED' })
+  }))
 })

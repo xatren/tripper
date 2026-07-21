@@ -53,7 +53,7 @@ export interface PlanRouteDomainProps {
 
 // ─── Main content ────────────────────────────────────────────────────────────
 
-export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itineraryEnabled, onItemSyncPaused, currentUserId, routePath, setRoutePath, routeLegs, setRouteLegs, onSelectSection, onPrefetchSection, onOpenMore, capabilities, onStopSyncPaused }: PlanRouteDomainProps) {
+export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itineraryEnabled, onItemSyncPaused, currentUserId, members, routePath, setRoutePath, routeLegs, setRouteLegs, onSelectSection, onPrefetchSection, onOpenMore, capabilities, onStopSyncPaused }: PlanRouteDomainProps) {
   const { canEdit } = capabilities
   const reducedMotion = useReducedMotionPreference()
   const distanceUnit = useDistanceUnit()
@@ -808,6 +808,7 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
                 onItemSyncPaused={onItemSyncPaused}
                 canEdit={canEdit}
                 currentUserId={currentUserId}
+                members={members}
                 itineraryEnabled={itineraryEnabled}
                 createRequest={itineraryCreateRequest}
                 selectedDayId={selectedDayId}

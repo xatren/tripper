@@ -39,7 +39,7 @@ export interface TripOverviewDomainProps {
   /** Whether the overview screen is currently on screen (it stays mounted). */
   visible: boolean
   onSelectSection: (section: PrimaryNavSection) => void
-  onOpenDestination: (destination: 'budget' | 'packing' | 'journal') => void
+  onOpenDestination: (destination: 'budget' | 'packing' | 'journal' | 'travel') => void
 }
 
 // ─── Section data (server-seeded, client-retryable) ─────────────────────────
@@ -454,6 +454,7 @@ export function TripOverviewDomain({ trip, stops, members, capabilities, initial
           hasStops={stops.length > 0}
           onViewPlan={() => onSelectSection('plan')}
           onAddMemory={() => onOpenDestination('journal')}
+          onTravelMode={() => onOpenDestination('travel')}
         />
       )}
 
@@ -615,7 +616,7 @@ function UpcomingReadiness({ hasStops, hasDates, totalDays, coveredDays, packing
 
 // ─── Active ──────────────────────────────────────────────────────────────────
 
-function ActiveContent({ dayNumber, totalDays, todayISO, currentStop, nextStop, nextArrival, nextLeg, distanceUnit, weather, weatherPlace, canEdit, hasStops, onViewPlan, onAddMemory }: {
+function ActiveContent({ dayNumber, totalDays, todayISO, currentStop, nextStop, nextArrival, nextLeg, distanceUnit, weather, weatherPlace, canEdit, hasStops, onViewPlan, onAddMemory, onTravelMode }: {
   dayNumber: number
   totalDays: number
   todayISO: string | null
@@ -630,6 +631,7 @@ function ActiveContent({ dayNumber, totalDays, todayISO, currentStop, nextStop, 
   hasStops: boolean
   onViewPlan: () => void
   onAddMemory: () => void
+  onTravelMode: () => void
 }) {
   if (!hasStops) {
     return (
@@ -683,6 +685,10 @@ function ActiveContent({ dayNumber, totalDays, todayISO, currentStop, nextStop, 
           </StatusChip>
         </div>
       )}
+
+      <div style={{ marginTop: 14 }}>
+        <PrimaryButton onClick={onTravelMode}>Open Travel Mode</PrimaryButton>
+      </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 14 }}>
         {navUrl && navTarget && (

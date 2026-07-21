@@ -21,7 +21,7 @@ export const GLASS_BORDER = 'rgba(255,255,255,.13)'
 export type Section = 'overview' | 'plan' | 'explore' | 'bookings' | 'more'
 
 /** Full-screen domains reachable through the More sheet. */
-export type MoreDestination = 'budget' | 'packing' | 'journal' | 'members' | 'settings' | 'export' | 'offline'
+export type MoreDestination = 'budget' | 'packing' | 'journal' | 'members' | 'activity' | 'settings' | 'export' | 'offline'
 
 export interface SoonBadgeProps {
   label?: string

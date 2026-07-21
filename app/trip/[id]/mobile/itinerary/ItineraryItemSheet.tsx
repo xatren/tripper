@@ -2,8 +2,10 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { tokens, FilterChip, InlineError } from '@/components/mobile'
-import { CURRENCY_SYMBOLS, type ItineraryItemStatus, type ItineraryItemType, type TripCurrency } from '@/types'
+import { CURRENCY_SYMBOLS, type ItineraryItemStatus, type ItineraryItemType, type TripCurrency, type TripMember } from '@/types'
 import { ITEM_TYPE_META, STATUS_META } from './itinerary-ui'
+import { CommentSection } from '../components/CollaborationSheets'
+import { useTripEditingEntity, useTripPresence } from '@/lib/supabase/trip-realtime'
 
 /** Editable wall-clock draft; the timeline converts it to/from row instants. */
 export interface ItineraryItemDraft {
@@ -37,13 +39,18 @@ export interface ItineraryItemSheetProps {
   saving: boolean
   onClose: () => void
   onSave: (draft: ItineraryItemDraft) => void
+  tripId: string
+  currentUserId: string
+  members: TripMember[]
+  canComment: boolean
 }
 
-type Step = 'basics' | 'schedule' | 'details'
+type Step = 'basics' | 'schedule' | 'details' | 'comments'
 const STEPS: { key: Step; label: string }[] = [
   { key: 'basics', label: 'Basics' },
   { key: 'schedule', label: 'Schedule' },
   { key: 'details', label: 'Details' },
+  { key: 'comments', label: 'Comments' },
 ]
 
 const FIELD_STYLE = {
@@ -66,10 +73,12 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
  * (Basics → Schedule → Details); Save is available from every step once the
  * draft is valid, so steps are navigation, not a wizard lock.
  */
-export function ItineraryItemSheet({ draft, dayOptions, saving, onClose, onSave }: ItineraryItemSheetProps) {
+export function ItineraryItemSheet({ draft, dayOptions, saving, onClose, onSave, tripId, currentUserId, members, canComment }: ItineraryItemSheetProps) {
   const [step, setStep] = useState<Step>('basics')
   const [form, setForm] = useState<ItineraryItemDraft | null>(draft)
   const [error, setError] = useState<string | null>(null)
+  const presence = useTripPresence()
+  useTripEditingEntity(draft?.id ?? null)
 
   useEffect(() => {
     setForm(draft)
@@ -110,7 +119,9 @@ export function ItineraryItemSheet({ draft, dayOptions, saving, onClose, onSave 
     onSave(form)
   }
 
-  const stepIndex = STEPS.findIndex((s) => s.key === step)
+  const availableSteps = form.id ? STEPS : STEPS.filter((item) => item.key !== 'comments')
+  const stepIndex = availableSteps.findIndex((s) => s.key === step)
+  const otherEditor = form.id ? presence.find((entry) => entry.userId !== currentUserId && entry.editingEntityId === form.id) : undefined
 
   return (
     <div
@@ -161,7 +172,7 @@ export function ItineraryItemSheet({ draft, dayOptions, saving, onClose, onSave 
 
       {/* Step selector */}
       <nav aria-label="Form sections" style={{ flex: 'none', display: 'flex', gap: 6, padding: '12px 16px 0' }}>
-        {STEPS.map((s, index) => (
+        {availableSteps.map((s, index) => (
           <button
             key={s.key}
             type="button"
@@ -181,6 +192,7 @@ export function ItineraryItemSheet({ draft, dayOptions, saving, onClose, onSave 
 
       <main style={{ flex: 1, overflowY: 'auto', padding: '16px 16px max(24px, env(safe-area-inset-bottom))', display: 'flex', flexDirection: 'column', gap: 16 }}>
         {error && <InlineError>{error}</InlineError>}
+        {otherEditor && <div aria-live="off" style={{ alignSelf: 'flex-start', padding: '5px 9px', borderRadius: 999, background: 'rgba(56,217,150,.1)', border: '1px solid rgba(56,217,150,.25)', color: '#8ee8bd', fontSize: 11.5 }}>{otherEditor.profile?.display_name || 'A trip member'} is editing this activity</div>}
 
         {step === 'basics' && (
           <>
@@ -278,20 +290,24 @@ export function ItineraryItemSheet({ draft, dayOptions, saving, onClose, onSave 
           </>
         )}
 
+        {step === 'comments' && form.id && (
+          <CommentSection tripId={tripId} entityType="itinerary_item" entityId={form.id} currentUserId={currentUserId} members={members} canComment={canComment} />
+        )}
+
         <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
           {stepIndex > 0 && (
             <button
               type="button"
-              onClick={() => setStep(STEPS[stepIndex - 1].key)}
+              onClick={() => setStep(availableSteps[stepIndex - 1].key)}
               style={{ flex: 1, minHeight: 44, borderRadius: 12, background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.12)', color: tokens.textPrimary, fontSize: 13.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}
             >
               Back
             </button>
           )}
-          {stepIndex < STEPS.length - 1 && (
+          {stepIndex < availableSteps.length - 1 && (
             <button
               type="button"
-              onClick={() => setStep(STEPS[stepIndex + 1].key)}
+              onClick={() => setStep(availableSteps[stepIndex + 1].key)}
               style={{ flex: 1, minHeight: 44, borderRadius: 12, background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.12)', color: tokens.textPrimary, fontSize: 13.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}
             >
               Next

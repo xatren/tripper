@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { FilterChip, InlineError, tokens } from '@/components/mobile'
 import { createClient } from '@/lib/supabase/client'
+import { enqueueMutation } from '@/lib/offline/db'
 import { showToast } from '@/components/ui/toast'
 import { createRandomId } from '@/lib/random-id'
 import type { Expense, ExpenseCategory, ExpenseSplitType, ItineraryItem, Trip, TripMember } from '@/types'
@@ -198,6 +199,28 @@ export function AddExpenseSheet({ trip, members, currentUserId, draft, itinerary
       share_value: form.splitType === 'percentage' ? Number(form.percentages[share.memberId] ?? 0) : null,
       share_amount_minor: share.shareMinor,
     }))
+
+    if (!navigator.onLine) {
+      if (form.id || splitsPayload.length > 0 || receipts.length > 0) {
+        setSaving(false)
+        setError('Offline expense creation supports new equal-split expenses without receipts. Reconnect for edits, custom splits, or uploads.')
+        return
+      }
+      const id = crypto.randomUUID()
+      try {
+        await enqueueMutation({
+          user_id: currentUserId, trip_id: trip.id, entity: 'expense', action: 'create', entity_id: id,
+          payload: { id, trip_id: trip.id, category: form.category, description: form.description.trim() || null, amount: Number(form.amount), paid_by: form.paidBy, expense_date: form.expenseDate, itinerary_item_id: form.itineraryItemId, split_type: 'equal' },
+        })
+        setSaving(false)
+        showToast('Expense saved on this device · queued.', 'info')
+        onClose()
+      } catch {
+        setSaving(false)
+        setError("Couldn't queue this expense.")
+      }
+      return
+    }
 
     const { data, error: rpcError } = await supabase.rpc('save_expense_with_splits', {
       p_trip_id: trip.id,

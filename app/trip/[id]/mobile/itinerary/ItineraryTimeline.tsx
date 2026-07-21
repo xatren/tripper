@@ -2,13 +2,14 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { enqueueMutation } from '@/lib/offline/db'
 import { showToast } from '@/components/ui/toast'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { DayStrip, InlineError, tokens, type DayStripDay } from '@/components/mobile'
 import { downloadTripIcs } from '@/lib/ics'
 import { getOptimizedOrder } from '@/lib/mapbox/optimize'
 import { getFullRoute, LatestRouteRequestController } from '@/lib/mapbox/directions'
-import type { ItineraryItem, ItineraryItemStatus, ItineraryItemType, Stop, Trip, TripCurrency } from '@/types'
+import type { ItineraryItem, ItineraryItemStatus, ItineraryItemType, Stop, Trip, TripCurrency, TripMember } from '@/types'
 import {
   buildTimeline, projectStopSchedule,
   type TimelineDay, type TimelineEntry,
@@ -22,6 +23,7 @@ import { BottomSheet } from '../components/BottomSheet'
 import { toDatetimeLocalValue } from './itinerary-ui'
 import { planDayOptimization, type DayItem, type DayOptimizationPreview } from './route-optimizer'
 import { DayOptimizePreviewSheet } from './DayOptimizePreviewSheet'
+import { canTransitionStatus } from '@/lib/travel-mode'
 
 export interface ItineraryCreateRequest {
   type: ItineraryItemType
@@ -38,6 +40,7 @@ export interface ItineraryTimelineProps {
   onItemSyncPaused: (paused: boolean) => void
   canEdit: boolean
   currentUserId: string
+  members: TripMember[]
   /** False until the itinerary_items migration is applied to this database. */
   itineraryEnabled: boolean
   /** Set by the trip-level "+ Add" sheet to open the create form pre-typed. */
@@ -97,7 +100,7 @@ function draftFromItem(item: ItineraryItem): ItineraryItemDraft {
  */
 export function ItineraryTimeline({
   trip, stops, items, setItems, onItemSyncPaused,
-  canEdit, currentUserId, itineraryEnabled, createRequest,
+  canEdit, currentUserId, members, itineraryEnabled, createRequest,
   selectedDayId: controlledSelectedDayId, onSelectedDayIdChange,
   selectedItemId, onSelectItem,
 }: ItineraryTimelineProps) {
@@ -175,6 +178,7 @@ export function ItineraryTimeline({
   // Mirrors `items` so a toast action clicked later (Retry/Undo) always
   // reverts against the truly current state, not a stale render closure.
   const itemsRef = useRef(items)
+  const statusInFlightRef = useRef(new Set<string>())
   useEffect(() => { itemsRef.current = items }, [items])
 
   useEffect(() => {
@@ -247,15 +251,39 @@ export function ItineraryTimeline({
 
   const toggleComplete = useCallback(async (entry: TimelineEntry) => {
     if (!canEdit || entry.source !== 'item') return
-    const nextStatus: ItineraryItemStatus = entry.status === 'completed' ? 'planned' : 'completed'
+    const nextStatus: ItineraryItemStatus = 'completed'
+    if (!canTransitionStatus(entry.status as ItineraryItemStatus, nextStatus) || statusInFlightRef.current.has(entry.id)) return
+    statusInFlightRef.current.add(entry.id)
     const previous = items
     setItems((current) => current.map((item) => (item.id === entry.id ? { ...item, status: nextStatus } : item)))
-    const { error } = await supabase().from('itinerary_items').update({ status: nextStatus }).eq('id', entry.id)
+    if (!navigator.onLine) {
+      const source = items.find((item) => item.id === entry.id)
+      try {
+        await enqueueMutation({ user_id: currentUserId, trip_id: trip.id, entity: 'itinerary_item', action: 'update_status', entity_id: entry.id, payload: { status: nextStatus }, base_version: source?.updated_at ?? null })
+        showToast('Status saved on this device · queued.', 'info')
+      } catch {
+        setItems(previous)
+        showToast("Couldn't queue the status change.", 'error')
+      } finally {
+        statusInFlightRef.current.delete(entry.id)
+      }
+      return
+    }
+    const source = items.find((item) => item.id === entry.id)
+    const { error } = await supabase().rpc('transition_itinerary_status', {
+      p_trip_id: trip.id,
+      p_item_id: entry.id,
+      p_target_status: nextStatus,
+      p_occurred_at: new Date().toISOString(),
+      p_idempotency_key: crypto.randomUUID(),
+      p_expected_updated_at: source?.updated_at ?? null,
+    })
+    statusInFlightRef.current.delete(entry.id)
     if (error) {
       setItems(previous)
       showToast("Couldn't update the status.", 'error')
     }
-  }, [canEdit, items, setItems])
+  }, [canEdit, currentUserId, items, setItems, trip.id])
 
   const deleteEntry = useCallback(async (entry: TimelineEntry) => {
     if (!canEdit || entry.source !== 'item') return
@@ -527,6 +555,10 @@ export function ItineraryTimeline({
         saving={saving}
         onClose={() => setSheetDraft(null)}
         onSave={(draft) => void saveDraft(draft)}
+        tripId={trip.id}
+        currentUserId={currentUserId}
+        members={members}
+        canComment={canEdit}
       />
 
       <MoveToDaySheet

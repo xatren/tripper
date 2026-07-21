@@ -4,15 +4,22 @@
 
 import type { DistanceUnit } from './settings'
 
-interface RecapData {
+export interface RecapData {
   title: string
   dateRange: string
   routePath: { lat: number; lng: number }[]
   stops: { lat: number; lng: number; name: string }[]
-  distance: number
-  distanceUnit: DistanceUnit
-  durationHours: number
-  days: number
+  distance?: number
+  distanceUnit?: DistanceUnit
+  durationHours?: number
+  days?: number
+  plannedCount?: number
+  visitedCount?: number
+  photoCount?: number
+  journalCount?: number
+  expenseCount?: number
+  memoryText?: string
+  photoUrl?: string
 }
 
 const W = 1080
@@ -56,7 +63,7 @@ function projectRoute(data: RecapData, box: { x: number; y: number; w: number; h
   })
 }
 
-export function renderRecapCanvas(data: RecapData): HTMLCanvasElement {
+export function renderRecapCanvas(data: RecapData, photo?: CanvasImageSource): HTMLCanvasElement {
   const canvas = document.createElement('canvas')
   canvas.width = W
   canvas.height = H
@@ -88,6 +95,20 @@ export function renderRecapCanvas(data: RecapData): HTMLCanvasElement {
   ctx.roundRect(box.x, box.y, box.w, box.h, 40)
   ctx.fill()
   ctx.stroke()
+
+  if (photo) {
+    ctx.save()
+    ctx.beginPath()
+    ctx.roundRect(box.x + 16, box.y + 16, box.w - 32, 300, 26)
+    ctx.clip()
+    ctx.drawImage(photo, box.x + 16, box.y + 16, box.w - 32, 300)
+    const scrim = ctx.createLinearGradient(0, box.y + 16, 0, box.y + 316)
+    scrim.addColorStop(0, 'rgba(4,8,18,.12)')
+    scrim.addColorStop(1, 'rgba(4,8,18,.82)')
+    ctx.fillStyle = scrim
+    ctx.fillRect(box.x + 16, box.y + 16, box.w - 32, 300)
+    ctx.restore()
+  }
 
   const project = projectRoute(data, box)
 
@@ -126,13 +147,24 @@ export function renderRecapCanvas(data: RecapData): HTMLCanvasElement {
   })
 
   // stats row
+  if (data.memoryText) {
+    const text = data.memoryText.length > 70 ? `${data.memoryText.slice(0, 69)}…` : data.memoryText
+    ctx.fillStyle = 'rgba(5,9,18,.76)'
+    ctx.beginPath(); ctx.roundRect(box.x + 36, box.y + box.h - 132, box.w - 72, 88, 22); ctx.fill()
+    ctx.fillStyle = '#fff'; ctx.font = font(600, 30)
+    ctx.fillText(`“${text}”`, box.x + 58, box.y + box.h - 78, box.w - 116)
+  }
+
   const stats = [
-    { value: `${Math.round(data.distance)}`, suffix: data.distanceUnit, label: 'DISTANCE' },
-    { value: `${Math.round(data.durationHours)}`, suffix: 'h', label: 'DRIVE TIME' },
-    { value: `${data.days}`, suffix: '', label: 'DAYS' },
-    { value: `${data.stops.length}`, suffix: '', label: 'STOPS' },
-  ]
-  const cellW = (W - 168 - 3 * 24) / 4
+    data.distance != null ? { value: `${Math.round(data.distance)}`, suffix: data.distanceUnit ?? '', label: 'DISTANCE' } : null,
+    data.durationHours != null ? { value: `${Math.round(data.durationHours)}`, suffix: 'h', label: 'DRIVE TIME' } : null,
+    data.days != null ? { value: `${data.days}`, suffix: '', label: 'DAYS' } : null,
+    data.visitedCount != null ? { value: `${data.visitedCount}/${data.plannedCount ?? data.visitedCount}`, suffix: '', label: 'VISITED' } : null,
+    data.photoCount != null ? { value: `${data.photoCount}`, suffix: '', label: 'PHOTOS' } : null,
+    data.journalCount != null ? { value: `${data.journalCount}`, suffix: '', label: 'MEMORIES' } : null,
+    data.expenseCount != null ? { value: `${data.expenseCount}`, suffix: '', label: 'EXPENSES' } : null,
+  ].filter((stat): stat is { value: string; suffix: string; label: string } => stat !== null).slice(0, 4)
+  const cellW = (W - 168 - Math.max(0, stats.length - 1) * 24) / Math.max(1, stats.length)
   stats.forEach((s, i) => {
     const x = 84 + i * (cellW + 24)
     const y = 1400
@@ -166,11 +198,33 @@ export function renderRecapCanvas(data: RecapData): HTMLCanvasElement {
 }
 
 /** Renders the recap and opens the native share sheet (or downloads the PNG). */
+async function shareTextFallback(data: RecapData): Promise<'shared' | 'downloaded' | 'failed'> {
+  const text = [data.title, data.dateRange, data.visitedCount != null ? `${data.visitedCount}/${data.plannedCount ?? data.visitedCount} visited` : null].filter(Boolean).join(' · ')
+  try {
+    if (typeof navigator.share === 'function') {
+      await navigator.share({ title: data.title, text })
+      return 'shared'
+    }
+    const url = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' }))
+    const anchor = document.createElement('a')
+    anchor.href = url; anchor.download = 'trip-recap.txt'; document.body.appendChild(anchor); anchor.click(); anchor.remove(); URL.revokeObjectURL(url)
+    return 'downloaded'
+  } catch (error) {
+    return error instanceof Error && error.name === 'AbortError' ? 'shared' : 'failed'
+  }
+}
+
 export async function shareTripRecap(data: RecapData): Promise<'shared' | 'downloaded' | 'failed'> {
   try {
-    const canvas = renderRecapCanvas(data)
+    let photo: ImageBitmap | undefined
+    if (data.photoUrl && typeof createImageBitmap === 'function') {
+      const response = await fetch(data.photoUrl, { credentials: 'omit' })
+      if (response.ok) photo = await createImageBitmap(await response.blob())
+    }
+    const canvas = renderRecapCanvas(data, photo)
+    photo?.close()
     const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'))
-    if (!blob) return 'failed'
+    if (!blob) return shareTextFallback(data)
     const file = new File([blob], 'trip-recap.png', { type: 'image/png' })
     if (typeof navigator.share === 'function' && navigator.canShare?.({ files: [file] })) {
       await navigator.share({ files: [file], title: data.title })
@@ -188,6 +242,6 @@ export async function shareTripRecap(data: RecapData): Promise<'shared' | 'downl
   } catch (err) {
     // AbortError = user closed the share sheet; treat as silent success
     if (err instanceof Error && err.name === 'AbortError') return 'shared'
-    return 'failed'
+    return shareTextFallback(data)
   }
 }

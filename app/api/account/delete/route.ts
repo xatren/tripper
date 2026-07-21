@@ -172,6 +172,17 @@ export async function POST(request: Request) {
     }
   }
 
+  // Phase 13 private memories are creator-only. SET NULL would make them
+  // permanently unreadable but still retained, so erase them before Auth
+  // deletion. Trip-visible plan history keeps its attribution via SET NULL.
+  const [privateEventsResult, privateEntriesResult] = await Promise.all([
+    admin.from('trip_events').delete().eq('created_by', user.id).eq('visibility', 'private'),
+    admin.from('journal_entries').delete().eq('created_by', user.id).eq('visibility', 'private'),
+  ])
+  if ((!isMissingTable(privateEventsResult.error) && privateEventsResult.error) || (!isMissingTable(privateEntriesResult.error) && privateEntriesResult.error)) {
+    return NextResponse.json({ error: 'Could not remove all private travel memories. Your account was kept; try again.' }, { status: 502 })
+  }
+
   // Global sign-out removes every refresh session. Existing access JWTs remain
   // valid until expiry, but deleting the profile removes all membership rows,
   // so active RLS policies no longer authorize those tokens.

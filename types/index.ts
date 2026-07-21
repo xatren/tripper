@@ -68,6 +68,39 @@ export interface Profile {
   avatar_url?: string;
 }
 
+export type TripCommentEntityType =
+  | 'trip' | 'stop' | 'itinerary_item' | 'reservation' | 'expense'
+  | 'packing_item' | 'journal_entry' | 'trip_task';
+
+export interface TripComment {
+  id: string;
+  trip_id: string;
+  entity_type: TripCommentEntityType;
+  entity_id: string;
+  body: string;
+  created_by: string;
+  parent_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export type TripActivityType =
+  | 'item_created' | 'item_moved' | 'item_completed'
+  | 'reservation_created' | 'reservation_status_changed'
+  | 'member_joined' | 'member_role_changed' | 'member_removed'
+  | 'invite_rotated' | 'comment_created';
+
+export interface TripActivity {
+  id: number;
+  trip_id: string;
+  event_type: TripActivityType;
+  entity_type: string | null;
+  entity_id: string | null;
+  actor_id: string | null;
+  metadata: Record<string, unknown>;
+  created_at: string;
+}
+
 // ---- New schema types (stops / expenses / photos) ----
 
 export interface Stop {
@@ -226,9 +259,36 @@ export interface JournalEntry {
   /** ISO date (YYYY-MM-DD). */
   entry_date: string;
   note: string | null;
+  /** Optional plan association; journal data remains a separate source. */
+  itinerary_item_id?: string | null;
+  /** User/device occurrence time. `created_at` remains the server record time. */
+  occurred_at?: string | null;
+  visibility?: 'trip' | 'private';
+  is_hidden?: boolean;
+  /** Only populated after the user explicitly chooses a location. */
+  location_lat?: number | null;
+  location_lng?: number | null;
   created_by: string | null;
   created_at: string;
   journal_photos?: JournalPhoto[];
+}
+
+export type TripEventType = 'arrived' | 'completed' | 'photo' | 'note' | 'unplanned' | 'expense-link';
+
+/** Immutable plan-history or user-authored travel event (Phase 13). */
+export interface TripEvent {
+  id: string;
+  trip_id: string;
+  itinerary_item_id: string | null;
+  event_type: TripEventType;
+  occurred_at: string;
+  recorded_at: string;
+  created_by: string | null;
+  visibility: 'trip' | 'private';
+  metadata: Record<string, string | number | boolean | null>;
+  is_hidden: boolean;
+  idempotency_key: string;
+  updated_at: string;
 }
 
 /** Photo attached to a journal entry, stored in the `trip-photos` bucket (migration `011_journal`). */

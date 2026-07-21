@@ -8,6 +8,7 @@ import { ChevronLeft, Settings, Camera, Lock, LogOut, Trash2, Pencil, ChevronRig
 import { createClient } from "@/lib/supabase/client";
 import { getInitials } from "@/lib/utils";
 import { clearTripperCaches } from "@/components/pwa/RegisterSW";
+import { clearPrivateOfflineData } from "@/lib/offline/db";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import type { Profile } from "@/types";
 import { Home, Briefcase, Compass, FileText } from "lucide-react";
@@ -114,7 +115,7 @@ export function ProfileClient({ profile, trips }: Props) {
     setAccountError(null);
     const { error } = await supabase.auth.signOut();
     if (error) { setAccountError(error.message); return; }
-    await clearTripperCaches();
+    await Promise.all([clearTripperCaches(), clearPrivateOfflineData()]);
     router.replace("/login");
     router.refresh();
   };
@@ -135,7 +136,7 @@ export function ProfileClient({ profile, trips }: Props) {
         return;
       }
       await supabase.auth.signOut({ scope: 'local' });
-      await clearTripperCaches();
+      await Promise.all([clearTripperCaches(), clearPrivateOfflineData()]);
       router.replace('/login?account_deleted=1');
       router.refresh();
     } catch {
