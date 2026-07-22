@@ -71,5 +71,5 @@ test('each protected route has reusable loading and retry boundaries', () => {
     assert.match(read(`app/${route}/error.tsx`), /RouteError/)
     assert.match(read(`app/${route}/loading.tsx`), /RouteLoading/)
   }
-  assert.match(read('components/route-state.tsx'), /unstable_retry\(\)/)
+  assert.match(read('components/route-state.tsx'), /reset\(\)/)
 })

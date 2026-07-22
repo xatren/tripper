@@ -24,7 +24,7 @@ export function RouteLoading() {
   )
 }
 
-export function RouteError({ unstable_retry }: { error: Error & { digest?: string }; unstable_retry: () => void }) {
+export function RouteError({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
   return (
     <main style={shellStyle}>
       <div role="alert" style={{ width: '100%', maxWidth: 390, padding: 24, borderRadius: 22, textAlign: 'center', background: 'rgba(255,255,255,.055)', border: '1px solid rgba(255,255,255,.12)', backdropFilter: 'blur(18px)' }}>
@@ -35,7 +35,7 @@ export function RouteError({ unstable_retry }: { error: Error & { digest?: strin
         </p>
         <button
           type="button"
-          onClick={() => unstable_retry()}
+          onClick={() => reset()}
           style={{ minHeight: 46, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '0 18px', border: 0, borderRadius: 13, background: 'linear-gradient(135deg, #f5a623, #f8c04a)', color: '#1a0800', font: 'inherit', fontWeight: 800, cursor: 'pointer' }}
         >
           <RefreshCw aria-hidden="true" style={{ width: 17, height: 17 }} />

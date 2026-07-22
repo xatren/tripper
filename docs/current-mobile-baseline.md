@@ -27,7 +27,7 @@ Roles referenced below (`owner`/`editor`/`viewer`) come from `trip_members.role`
 - **Error**: shared `RouteError` — generic "We couldn't load this page" + "Try again" button
 - **Empty**: `EmptyState` component, "No trips yet"
 - **Known risks**:
-  - **`RouteError` retry is broken.** `components/route-state.tsx` destructures `{ unstable_retry }` from props, but Next.js's `error.tsx` boundary only ever passes `{ error, reset }` — `unstable_retry` is `undefined`, so clicking "Try again" throws. This affects every route sharing `RouteError`: dashboard, trips, profile, settings.
+  - ~~`RouteError` retry is broken~~ — **fixed 2026-07-22**. `components/route-state.tsx` now destructures `{ reset }`, matching what Next.js's `error.tsx` boundary actually passes (`{ error, reset }`); "Try again" calls `reset()` correctly on every route sharing `RouteError`.
   - `/dashboard?error=invalid_invite` (set by the join flow, see §5) is never read or displayed by `DashboardClient.tsx` — a failed invite silently dumps the user here with no explanation.
 
 ## 3. Trips list
@@ -35,11 +35,10 @@ Roles referenced below (`owner`/`editor`/`viewer`) come from `trip_members.role`
 - **Route**: `/trips`
 - **Components**: [app/trips/page.tsx](app/trips/page.tsx), [app/trips/TripsClient.tsx](app/trips/TripsClient.tsx), [app/trips/error.tsx](app/trips/error.tsx), [app/trips/loading.tsx](app/trips/loading.tsx)
 - **Supabase**: same `profiles`/`trips`/`trip_members` triad as dashboard, `trips` ordered by `start_date`; client-side `trips` delete
-- **Loading/Error**: same shared `RouteLoading`/`RouteError` — same broken-retry issue as §2
+- **Loading/Error**: same shared `RouteLoading`/`RouteError` — retry now works correctly (fixed 2026-07-22, see §2)
 - **Empty**: per-tab `EMPTY_COPY` table, rendered via `<EmptyState>`
 - **Known risks**:
   - `EmptyState`'s "new trip" CTA routes to `/dashboard` rather than directly to `/trips/new` — an extra hop.
-  - Shares the `RouteError` broken-retry bug.
 
 ## 4. New trip wizard
 
@@ -76,7 +75,7 @@ Roles referenced below (`owner`/`editor`/`viewer`) come from `trip_members.role`
 - **Routes**: `/profile`, `/settings`
 - **Components**: [app/profile/page.tsx](app/profile/page.tsx), [app/profile/ProfileClient.tsx](app/profile/ProfileClient.tsx), [app/settings/page.tsx](app/settings/page.tsx), [app/settings/SettingsClient.tsx](app/settings/SettingsClient.tsx), [lib/settings.ts](lib/settings.ts) (localStorage-only, no Supabase)
 - **Supabase**: profile page — `profiles` select + `trips` select for stats; client-side `profiles` update (display name), `supabase.auth.signOut()`; settings page — `profiles` select only, no client-side writes (settings are pure `localStorage` via `lib/settings.ts`, e.g. distance unit km/mi)
-- **Loading/Error**: same shared `RouteLoading`/`RouteError` — same broken-retry issue
+- **Loading/Error**: same shared `RouteLoading`/`RouteError` — retry now works correctly (fixed 2026-07-22, see §2)
 - **Empty**: n/a — always renders the shell with `?? ""` fallbacks
 - **Known risks**:
   - Account deletion (`ProfileClient.tsx`) calls `POST /api/account/delete` with a custom `x-tripper-confirm: delete-account` header as the confirmation gate. The route itself is server-only and re-validates the session — the header is a UX confirmation signal, not the authorization boundary, but worth keeping in mind if the endpoint is ever touched.
@@ -116,9 +115,9 @@ Roles referenced below (`owner`/`editor`/`viewer`) come from `trip_members.role`
 ### Budget — [BudgetDomain.tsx](app/trip/[id]/mobile/BudgetDomain.tsx) (~486 lines)
 
 - **Supabase**: `expenses` select/insert/delete (no update — expenses are append/delete-only by design, matching the RLS grants)
-- **Loading/error/empty**: skeleton rows while loading; `RetryCard` on error; settlement block is correctly gated on `!loading && !error`
-- **Known risks**:
-  - The top summary card (spend/remaining) is **not** gated on the `error` flag the way the settlement block is — during a load failure it still renders using the empty `expenses` array, showing "$0 spent" as if the trip genuinely has no expenses rather than surfacing the failure. This is the clearest instance in the codebase of an error state being visually indistinguishable from an empty state.
+- **Loading/error/empty**: skeleton rows while loading; `RetryCard` on error; settlement block and top summary card are both correctly gated on `!loading && !error` (fixed 2026-07-22)
+- **Known risks**: none currently tracked for this domain.
+  - ~~The top summary card (spend/remaining) was **not** gated on the `error` flag~~ — **fixed 2026-07-22**. `BudgetDomain.tsx` now derives a `dataUnavailable` flag (`error && !loading`) that swaps the spend/percent/remaining figures for "Spend data unavailable" / "—" instead of rendering fabricated zeros from the empty `expenses` array during a load failure.
 
 ### Journal — [JournalDomain.tsx](app/trip/[id]/mobile/JournalDomain.tsx) (~765 lines)
 
@@ -130,8 +129,8 @@ Roles referenced below (`owner`/`editor`/`viewer`) come from `trip_members.role`
 
 ## Cross-cutting risks
 
-1. **`RouteError`'s `unstable_retry` bug** affects dashboard, trips, profile, and settings identically — the single highest-leverage fix in this audit (one shared component, four routes).
+1. ~~`RouteError`'s `unstable_retry` bug affects dashboard, trips, profile, and settings identically~~ — **fixed 2026-07-22** (`components/route-state.tsx` now uses the `reset` prop Next.js actually passes).
 2. **`/join/[code]` bypasses `lib/safe-redirect.ts`** — not currently exploitable, but inconsistent with the rest of the auth surface.
 3. **`?error=invalid_invite` and `?error=auth_callback_failed` are set but never displayed** anywhere in the app — dead query-param contracts.
-4. **Error-vs-empty conflation** shows up in Budget's summary card (§9) but is correctly avoided in Journal's entries list and Budget's own settlement block — worth a consistent "always gate on `error` before deriving summary numbers" rule.
+4. ~~Error-vs-empty conflation in Budget's summary card~~ — **fixed 2026-07-22**; the summary card now gates on `error` the same way the settlement block and Journal's entries list already did. The "always gate on `error` before deriving summary numbers" rule is now consistently followed across the audited domains.
 5. Capability gating (`canEdit`/`canManageTrip` from `lib/trip-capabilities.ts`) is applied consistently as UI-layer defense-in-depth on top of RLS, with the sole exception noted in Journal above.

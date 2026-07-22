@@ -315,6 +315,9 @@ function BudgetView({
   const remaining = total - spent
   const pct = total > 0 ? Math.min(100, Math.round((spent / total) * 100)) : 0
   const overBudget = total > 0 && remaining < 0
+  // The expense list failed to load, so `spent`/`remaining` are derived from an
+  // empty array and would misrepresent the trip as having no spend at all.
+  const dataUnavailable = error && !loading
 
   const settledPayments = settlements.filter((s) => s.status === 'settled')
   const settlement = calculateSettlementWithSplits(
@@ -336,12 +339,12 @@ function BudgetView({
           <div style={{ minWidth: 0 }}>
             <div style={{ fontSize: 15.5, fontWeight: 800, letterSpacing: '-0.01em' }}>Trip Budget</div>
             <div style={{ fontSize: 12, color: 'rgba(215,215,255,.6)', marginTop: 2, fontWeight: 500 }}>
-              {sym}{formatMoney(spent)} of {sym}{formatMoney(total)} spent
+              {dataUnavailable ? 'Spend data unavailable' : `${sym}${formatMoney(spent)} of ${sym}${formatMoney(total)} spent`}
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 'none' }}>
             <div style={{ fontSize: 20, fontWeight: 800, color: ACCENT_LIGHT }}>
-              {total > 0 ? `${pct}%` : '—'}
+              {dataUnavailable ? '—' : total > 0 ? `${pct}%` : '—'}
             </div>
             {canEdit && (
               <button
@@ -356,9 +359,9 @@ function BudgetView({
           </div>
         </div>
         <div style={{ height: 6, borderRadius: 999, background: 'rgba(255,255,255,.08)', overflow: 'hidden' }}>
-          <div style={{ height: '100%', width: `${pct}%`, borderRadius: 999, background: `linear-gradient(90deg, ${ACCENT_DARK}, ${ACCENT_LIGHT})`, transition: 'width .3s ease' }} />
+          <div style={{ height: '100%', width: dataUnavailable ? '0%' : `${pct}%`, borderRadius: 999, background: `linear-gradient(90deg, ${ACCENT_DARK}, ${ACCENT_LIGHT})`, transition: 'width .3s ease' }} />
         </div>
-        {total > 0 && overBudget ? (
+        {dataUnavailable ? null : total > 0 && overBudget ? (
           <button
             type="button"
             onClick={() => setExpanded(Object.fromEntries(EXPENSE_CATEGORIES.map((c) => [c.value, true])))}
@@ -385,7 +388,7 @@ function BudgetView({
       {error && !loading && (
         <RetryCard
           title="Couldn't load expenses"
-          hint="Your budget summary is shown, but the expense list didn't come through."
+          hint="Your budget summary and expense list didn't come through."
           onRetry={onRetry}
         />
       )}
