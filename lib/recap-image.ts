@@ -26,6 +26,43 @@ const W = 1080
 const H = 1920
 const ACCENT = '#f5a623'
 const ACCENT_LIGHT = '#f8c04a'
+const ROUTE_BOX = { x: 84, y: 460, w: W - 168, h: 860 }
+
+// The canvas needs a font family it can actually resolve — next/font hashes
+// "Inter" into a scoped CSS variable, so the literal string "Inter" never
+// matches a loaded face and canvas silently falls back to the OS default
+// (different weight/metrics per platform). We load real Inter faces under a
+// private family name so the exported image looks the same everywhere.
+const CANVAS_FONT_FAMILY = 'Tripper Recap Inter'
+let fontLoadPromise: Promise<string> | null = null
+
+async function ensureCanvasFont(): Promise<string> {
+  const fallback = 'system-ui, sans-serif'
+  if (typeof document === 'undefined' || typeof FontFace === 'undefined') return fallback
+  if (!fontLoadPromise) {
+    fontLoadPromise = (async () => {
+      try {
+        const cssResponse = await fetch(
+          'https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&display=swap',
+        )
+        const css = await cssResponse.text()
+        const faces = [...css.matchAll(/font-weight:\s*(\d+);[\s\S]*?url\((https:\/\/fonts\.gstatic\.com\/[^)]+\.woff2)\) format\('woff2'\)/g)]
+        if (faces.length === 0) return fallback
+        await Promise.all(
+          faces.map(async ([, weight, url]) => {
+            const face = new FontFace(CANVAS_FONT_FAMILY, `url(${url})`, { weight })
+            document.fonts.add(await face.load())
+          }),
+        )
+        await document.fonts.ready
+        return `${CANVAS_FONT_FAMILY}, ${fallback}`
+      } catch {
+        return fallback
+      }
+    })()
+  }
+  return fontLoadPromise
+}
 
 function drawBackground(ctx: CanvasRenderingContext2D) {
   const grad = ctx.createLinearGradient(0, 0, W * 0.7, H)
@@ -48,6 +85,87 @@ function drawBackground(ctx: CanvasRenderingContext2D) {
   glow(W - 60, H * 0.72, 360, 'rgba(0,100,160,.12)')
 }
 
+/** Draws text with uniform tracking (canvas `letterSpacing` support is inconsistent across browsers). */
+function fillTrackedText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, tracking: number) {
+  let cursor = x
+  for (const char of text) {
+    ctx.fillText(char, cursor, y)
+    cursor += ctx.measureText(char).width + tracking
+  }
+}
+
+function downsample<T>(points: readonly T[], max: number): T[] {
+  if (points.length <= max) return [...points]
+  const step = (points.length - 1) / (max - 1)
+  const result: T[] = []
+  for (let i = 0; i < max; i++) result.push(points[Math.round(i * step)])
+  return result
+}
+
+function encodeNumber(input: number): string {
+  let num = input
+  let encoded = ''
+  while (num >= 0x20) {
+    encoded += String.fromCharCode((0x20 | (num & 0x1f)) + 63)
+    num >>= 5
+  }
+  return encoded + String.fromCharCode(num + 63)
+}
+
+function encodeSignedNumber(num: number): string {
+  let sgnNum = num << 1
+  if (num < 0) sgnNum = ~sgnNum
+  return encodeNumber(sgnNum)
+}
+
+/** Google polyline algorithm, precision 5 — the format Mapbox's Static Images API expects for path overlays. */
+function encodePolyline(points: readonly { lat: number; lng: number }[]): string {
+  let lastLat = 0
+  let lastLng = 0
+  let result = ''
+  for (const { lat, lng } of points) {
+    const lat5 = Math.round(lat * 1e5)
+    const lng5 = Math.round(lng * 1e5)
+    result += encodeSignedNumber(lat5 - lastLat) + encodeSignedNumber(lng5 - lastLng)
+    lastLat = lat5
+    lastLng = lng5
+  }
+  return result
+}
+
+/**
+ * Renders the route on a real Mapbox basemap (dark style, matching the in-app map) with the
+ * path and numbered stop pins baked in server-side — this keeps the route pixel-perfectly
+ * aligned to the roads/coastline under it, which client-side lat/lng→pixel projection can't
+ * guarantee. Falls back to `undefined` (caller draws the old abstract card) when offline or
+ * unconfigured.
+ */
+async function fetchRouteBasemap(data: RecapData): Promise<ImageBitmap | undefined> {
+  const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
+  if (!token || typeof createImageBitmap !== 'function') return undefined
+  const pathPoints = data.routePath.length >= 2 ? data.routePath : data.stops
+  if (pathPoints.length < 2) return undefined
+
+  const width = Math.min(1280, Math.round(ROUTE_BOX.w))
+  const height = Math.min(1280, Math.round(ROUTE_BOX.h))
+  const encodedPath = encodeURIComponent(encodePolyline(downsample(pathPoints, 200)))
+  const pins = data.stops.slice(0, 50).map((stop, i) => {
+    const color = i === 0 || i === data.stops.length - 1 ? ACCENT_LIGHT.slice(1) : 'ffffff'
+    const label = Math.min(i + 1, 99)
+    return `pin-s-${label}+${color}(${stop.lng.toFixed(5)},${stop.lat.toFixed(5)})`
+  })
+  const overlays = [`path-5+${ACCENT.slice(1)}-0.85(${encodedPath})`, ...pins].join(',')
+  const url = `https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/${overlays}/auto/${width}x${height}?padding=70&attribution=false&logo=false&access_token=${token}`
+
+  try {
+    const response = await fetch(url)
+    if (!response.ok) return undefined
+    return await createImageBitmap(await response.blob())
+  } catch {
+    return undefined
+  }
+}
+
 function projectRoute(data: RecapData, box: { x: number; y: number; w: number; h: number }) {
   const pts = data.routePath.length >= 2 ? data.routePath : data.stops
   const lats = pts.map((p) => p.lat)
@@ -63,19 +181,43 @@ function projectRoute(data: RecapData, box: { x: number; y: number; w: number; h
   })
 }
 
-export function renderRecapCanvas(data: RecapData, photo?: CanvasImageSource): HTMLCanvasElement {
+interface RecapAssets {
+  photo?: ImageBitmap
+  basemap?: ImageBitmap
+  fontFamily: string
+}
+
+async function loadRecapAssets(data: RecapData): Promise<RecapAssets> {
+  const [fontFamily, basemap, photo] = await Promise.all([
+    ensureCanvasFont(),
+    fetchRouteBasemap(data),
+    (async () => {
+      if (!data.photoUrl || typeof createImageBitmap !== 'function') return undefined
+      try {
+        const response = await fetch(data.photoUrl, { credentials: 'omit' })
+        if (!response.ok) return undefined
+        return await createImageBitmap(await response.blob())
+      } catch {
+        return undefined
+      }
+    })(),
+  ])
+  return { fontFamily, basemap, photo }
+}
+
+export function renderRecapCanvas(data: RecapData, assets: RecapAssets): HTMLCanvasElement {
   const canvas = document.createElement('canvas')
   canvas.width = W
   canvas.height = H
   const ctx = canvas.getContext('2d')!
-  const font = (weight: number, size: number) => `${weight} ${size}px Inter, system-ui, sans-serif`
+  const font = (weight: number, size: number) => `${weight} ${size}px ${assets.fontFamily}`
 
   drawBackground(ctx)
 
   // header
   ctx.fillStyle = 'rgba(215,215,255,.55)'
-  ctx.font = font(700, 34)
-  ctx.fillText('T R I P  R E C A P', 84, 190)
+  ctx.font = font(700, 32)
+  fillTrackedText(ctx, 'TRIP RECAP', 84, 190, 10)
 
   ctx.fillStyle = '#ffffff'
   ctx.font = font(800, 88)
@@ -87,21 +229,25 @@ export function renderRecapCanvas(data: RecapData, photo?: CanvasImageSource): H
   ctx.fillText(data.dateRange, 84, 368)
 
   // route panel
-  const box = { x: 84, y: 460, w: W - 168, h: 860 }
-  ctx.fillStyle = 'rgba(255,255,255,.045)'
-  ctx.strokeStyle = 'rgba(255,255,255,.13)'
-  ctx.lineWidth = 2
+  const box = ROUTE_BOX
+  ctx.save()
   ctx.beginPath()
   ctx.roundRect(box.x, box.y, box.w, box.h, 40)
-  ctx.fill()
-  ctx.stroke()
+  ctx.clip()
 
-  if (photo) {
+  if (assets.basemap) {
+    ctx.drawImage(assets.basemap, box.x, box.y, box.w, box.h)
+  } else {
+    ctx.fillStyle = 'rgba(255,255,255,.045)'
+    ctx.fillRect(box.x, box.y, box.w, box.h)
+  }
+
+  if (assets.photo) {
     ctx.save()
     ctx.beginPath()
     ctx.roundRect(box.x + 16, box.y + 16, box.w - 32, 300, 26)
     ctx.clip()
-    ctx.drawImage(photo, box.x + 16, box.y + 16, box.w - 32, 300)
+    ctx.drawImage(assets.photo, box.x + 16, box.y + 16, box.w - 32, 300)
     const scrim = ctx.createLinearGradient(0, box.y + 16, 0, box.y + 316)
     scrim.addColorStop(0, 'rgba(4,8,18,.12)')
     scrim.addColorStop(1, 'rgba(4,8,18,.82)')
@@ -110,51 +256,75 @@ export function renderRecapCanvas(data: RecapData, photo?: CanvasImageSource): H
     ctx.restore()
   }
 
-  const project = projectRoute(data, box)
+  if (!assets.basemap) {
+    // Vector fallback: draws the route ourselves when the real map couldn't be fetched.
+    const project = projectRoute(data, box)
+    if (data.routePath.length >= 2) {
+      ctx.strokeStyle = ACCENT
+      ctx.lineWidth = 7
+      ctx.lineJoin = 'round'
+      ctx.lineCap = 'round'
+      ctx.shadowColor = 'rgba(245,140,0,.6)'
+      ctx.shadowBlur = 24
+      ctx.beginPath()
+      data.routePath.forEach((p, i) => {
+        const { x, y } = project(p)
+        if (i === 0) ctx.moveTo(x, y)
+        else ctx.lineTo(x, y)
+      })
+      ctx.stroke()
+      ctx.shadowBlur = 0
+    }
 
-  if (data.routePath.length >= 2) {
-    ctx.strokeStyle = ACCENT
-    ctx.lineWidth = 7
-    ctx.lineJoin = 'round'
-    ctx.lineCap = 'round'
-    ctx.shadowColor = 'rgba(245,140,0,.6)'
-    ctx.shadowBlur = 24
-    ctx.beginPath()
-    data.routePath.forEach((p, i) => {
-      const { x, y } = project(p)
-      if (i === 0) ctx.moveTo(x, y)
-      else ctx.lineTo(x, y)
+    data.stops.forEach((s, i) => {
+      const { x, y } = project(s)
+      ctx.fillStyle = '#0c0c26'
+      ctx.beginPath()
+      ctx.arc(x, y, 22, 0, Math.PI * 2)
+      ctx.fill()
+      ctx.fillStyle = i === 0 || i === data.stops.length - 1 ? ACCENT_LIGHT : '#ffffff'
+      ctx.beginPath()
+      ctx.arc(x, y, 15, 0, Math.PI * 2)
+      ctx.fill()
+      ctx.fillStyle = '#0c0c26'
+      ctx.font = font(800, 20)
+      ctx.textAlign = 'center'
+      ctx.fillText(String(i + 1), x, y + 7)
+      ctx.textAlign = 'left'
     })
-    ctx.stroke()
-    ctx.shadowBlur = 0
   }
 
-  data.stops.forEach((s, i) => {
-    const { x, y } = project(s)
-    ctx.fillStyle = '#0c0c26'
-    ctx.beginPath()
-    ctx.arc(x, y, 22, 0, Math.PI * 2)
-    ctx.fill()
-    ctx.fillStyle = i === 0 || i === data.stops.length - 1 ? ACCENT_LIGHT : '#ffffff'
-    ctx.beginPath()
-    ctx.arc(x, y, 15, 0, Math.PI * 2)
-    ctx.fill()
-    ctx.fillStyle = '#0c0c26'
-    ctx.font = font(800, 20)
-    ctx.textAlign = 'center'
-    ctx.fillText(String(i + 1), x, y + 7)
-    ctx.textAlign = 'left'
-  })
+  // bottom scrim so the quote card stays legible over map or photo detail
+  const bottomScrim = ctx.createLinearGradient(0, box.y + box.h - 200, 0, box.y + box.h)
+  bottomScrim.addColorStop(0, 'rgba(4,8,18,0)')
+  bottomScrim.addColorStop(1, 'rgba(4,8,18,.55)')
+  ctx.fillStyle = bottomScrim
+  ctx.fillRect(box.x, box.y + box.h - 200, box.w, 200)
 
-  // stats row
+  ctx.strokeStyle = 'rgba(255,255,255,.13)'
+  ctx.lineWidth = 2
+  ctx.beginPath()
+  ctx.roundRect(box.x, box.y, box.w, box.h, 40)
+  ctx.stroke()
+  ctx.restore()
+
   if (data.memoryText) {
     const text = data.memoryText.length > 70 ? `${data.memoryText.slice(0, 69)}…` : data.memoryText
     ctx.fillStyle = 'rgba(5,9,18,.76)'
     ctx.beginPath(); ctx.roundRect(box.x + 36, box.y + box.h - 132, box.w - 72, 88, 22); ctx.fill()
     ctx.fillStyle = '#fff'; ctx.font = font(600, 30)
-    ctx.fillText(`“${text}”`, box.x + 58, box.y + box.h - 78, box.w - 116)
+    ctx.fillText(`"${text}"`, box.x + 58, box.y + box.h - 78, box.w - 116)
   }
 
+  if (assets.basemap) {
+    ctx.fillStyle = 'rgba(215,215,255,.45)'
+    ctx.font = font(500, 20)
+    ctx.textAlign = 'right'
+    ctx.fillText('Map © Mapbox © OpenStreetMap', box.x + box.w - 20, box.y + box.h - 16)
+    ctx.textAlign = 'left'
+  }
+
+  // stats row
   const stats = [
     data.distance != null ? { value: `${Math.round(data.distance)}`, suffix: data.distanceUnit ?? '', label: 'DISTANCE' } : null,
     data.durationHours != null ? { value: `${Math.round(data.durationHours)}`, suffix: 'h', label: 'DRIVE TIME' } : null,
@@ -176,11 +346,11 @@ export function renderRecapCanvas(data: RecapData, photo?: CanvasImageSource): H
     ctx.stroke()
     ctx.textAlign = 'center'
     ctx.fillStyle = '#ffffff'
-    ctx.font = font(800, 60)
-    ctx.fillText(s.value + (s.suffix ? ` ${s.suffix}` : ''), x + cellW / 2, y + 95)
+    ctx.font = font(800, 56)
+    ctx.fillText(s.value + (s.suffix ? ` ${s.suffix}` : ''), x + cellW / 2, y + 95, cellW - 16)
     ctx.fillStyle = 'rgba(215,215,255,.5)'
-    ctx.font = font(600, 26)
-    ctx.fillText(s.label, x + cellW / 2, y + 150)
+    ctx.font = font(600, 24)
+    ctx.fillText(s.label, x + cellW / 2, y + 150, cellW - 16)
     ctx.textAlign = 'left'
   })
 
@@ -216,13 +386,10 @@ async function shareTextFallback(data: RecapData): Promise<'shared' | 'downloade
 
 export async function shareTripRecap(data: RecapData): Promise<'shared' | 'downloaded' | 'failed'> {
   try {
-    let photo: ImageBitmap | undefined
-    if (data.photoUrl && typeof createImageBitmap === 'function') {
-      const response = await fetch(data.photoUrl, { credentials: 'omit' })
-      if (response.ok) photo = await createImageBitmap(await response.blob())
-    }
-    const canvas = renderRecapCanvas(data, photo)
-    photo?.close()
+    const assets = await loadRecapAssets(data)
+    const canvas = renderRecapCanvas(data, assets)
+    assets.photo?.close()
+    assets.basemap?.close()
     const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'))
     if (!blob) return shareTextFallback(data)
     const file = new File([blob], 'trip-recap.png', { type: 'image/png' })
