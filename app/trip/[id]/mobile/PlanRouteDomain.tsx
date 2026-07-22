@@ -407,6 +407,10 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
   // Example searches for the empty state: the wizard's destination countries
   // when available, otherwise a generic starter set.
   const emptyStateSuggestions = (trip.countries?.length ? trip.countries.map((c) => c.name) : ['Rome', 'Barcelona', 'Tokyo']).slice(0, 3)
+  const stopSearchCountries = (trip.countries ?? []).flatMap((country) => country.code ? [country.code] : [])
+  const stopSearchCountryLabel = stopSearchCountries.length > 0
+    ? (trip.countries ?? []).filter((country) => country.code).map((country) => country.name).join(', ')
+    : undefined
 
   const timeline = useMemo(() => buildTimeline({
     tripStartDate: trip.start_date ?? null,
@@ -576,7 +580,7 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
           </div>
 
           {/* content */}
-          <div style={{ flex: 1, padding: '4px 20px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, overflowY: 'auto' }}>
+          <div style={{ flex: 1, minHeight: 0, padding: '4px 20px calc(86px + env(safe-area-inset-bottom, 0px))', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, overflowY: 'auto' }}>
 
             {activeTab === 'route' && (
               <>
@@ -818,9 +822,13 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
               />
             )}
           </div>
-
-          <TripPrimaryNav active="plan" onSelect={onSelectSection} onOpenMore={onOpenMore} onPrefetch={onPrefetchSection} />
         </motion.div>
+
+        {/* Keep the primary navigation independent from the draggable sheet.
+            When the sheet snaps closed its overflow must not clip the nav. */}
+        <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 4 }}>
+          <TripPrimaryNav active="plan" onSelect={onSelectSection} onOpenMore={onOpenMore} onPrefetch={onPrefetchSection} />
+        </div>
         </>
       </div>
 
@@ -845,7 +853,15 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
         }}
       />}
 
-      {canEdit && isAddOpen && <DestinationDialog initialQuery={addInitialQuery} onClose={() => setIsAddOpen(false)} onAdd={handleAddStop} />}
+      {canEdit && isAddOpen && (
+        <DestinationDialog
+          initialQuery={addInitialQuery}
+          countryCodes={stopSearchCountries}
+          countryLabel={stopSearchCountryLabel}
+          onClose={() => setIsAddOpen(false)}
+          onAdd={handleAddStop}
+        />
+      )}
 
       {canEdit && <OptimizePreviewSheet preview={optimizePreview} onApply={applyOptimizePreview} onDismiss={() => setOptimizePreview(null)} />}
 

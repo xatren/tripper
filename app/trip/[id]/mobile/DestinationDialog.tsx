@@ -5,17 +5,20 @@ import { forwardSearch, type GeocodeResult } from '@/lib/mapbox/geocoding'
 
 export interface DestinationDialogProps {
   initialQuery?: string
+  countryCodes?: string[]
+  countryLabel?: string
   onClose: () => void
   onAdd: (lat: number, lng: number, name: string, address: string) => Promise<void>
 }
 
 export function DestinationDialog({
-  initialQuery = '', onClose, onAdd,
+  initialQuery = '', countryCodes = [], countryLabel, onClose, onAdd,
 }: DestinationDialogProps) {
   const [query, setQuery] = useState(initialQuery)
   const [results, setResults] = useState<GeocodeResult[]>([])
   const [isSearching, setIsSearching] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const countryCodeFilter = countryCodes.join(',')
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const sheetRef = useRef<HTMLDivElement>(null)
   const returnFocusRef = useRef<HTMLElement | null>(typeof document !== 'undefined' ? document.activeElement as HTMLElement | null : null)
@@ -59,13 +62,13 @@ export function DestinationDialog({
     }
     setIsSearching(true)
     debounceRef.current = setTimeout(() => {
-      forwardSearch(q).then(({ results }) => {
+      forwardSearch(q, { countryCodes: countryCodeFilter ? countryCodeFilter.split(',') : [] }).then(({ results }) => {
         setResults(results)
         setIsSearching(false)
       })
     }, 220)
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
-  }, [query])
+  }, [countryCodeFilter, query])
 
   const handleSelect = useCallback(
     async (result: GeocodeResult) => {
@@ -93,7 +96,10 @@ export function DestinationDialog({
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
           <div style={{ width: 36, height: 5, borderRadius: 3, background: 'rgba(255,255,255,.18)' }} />
         </div>
-        <div id="add-destination-title" style={{ color: '#ffffff', fontWeight: 700, fontSize: 16, marginBottom: 14 }}>Add a destination</div>
+        <div id="add-destination-title" style={{ color: '#ffffff', fontWeight: 700, fontSize: 16 }}>Add a destination</div>
+        {countryLabel
+          ? <div style={{ color: 'rgba(215,215,255,.55)', fontSize: 12, marginTop: 4, marginBottom: 14 }}>Search is limited to {countryLabel}.</div>
+          : <div style={{ marginBottom: 14 }} />}
         <div style={{ position: 'relative', marginBottom: 8 }}>
           <label htmlFor="destination-search" className="sr-only">Search for a destination</label>
           <input
@@ -101,7 +107,7 @@ export function DestinationDialog({
             autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search a place…"
+            placeholder={countryLabel ? `Search in ${countryLabel}…` : 'Search a place…'}
             style={{ width: '100%', height: 48, borderRadius: 14, background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.12)', color: '#ffffff', fontSize: 15, fontFamily: 'inherit', padding: '0 14px', outline: 'none', boxSizing: 'border-box' }}
           />
           {isSearching && (
@@ -121,7 +127,7 @@ export function DestinationDialog({
             </button>
           ))}
           {query && !isSearching && results.length === 0 && (
-            <div style={{ color: 'rgba(215,215,255,.55)', fontSize: 13, padding: '16px 8px', textAlign: 'center' }}>No results</div>
+            <div style={{ color: 'rgba(215,215,255,.55)', fontSize: 13, padding: '16px 8px', textAlign: 'center' }}>{countryLabel ? `No results in ${countryLabel}` : 'No results'}</div>
           )}
         </div>
       </div>

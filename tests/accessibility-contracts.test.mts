@@ -8,15 +8,15 @@ test('auth fields keep explicit labels, named password toggles, and associated e
   const login = read('app/(auth)/login/page.tsx')
   const signup = read('app/(auth)/sign-up/page.tsx')
 
-  for (const id of ['login-email', 'login-password']) {
+  for (const id of ['login-username', 'login-password']) {
     assert.match(login, new RegExp(`htmlFor="${id}"`))
     assert.match(login, new RegExp(`id="${id}"`))
   }
-  for (const id of ['signup-name', 'signup-email', 'signup-password', 'signup-confirm-password']) {
+  for (const id of ['signup-username', 'signup-password']) {
     assert.match(signup, new RegExp(`id="${id}"`))
   }
   assert.match(login, /aria-label=\{showPass \? 'Hide password' : 'Show password'\}/)
-  assert.match(signup, /aria-label=\{showConfirm \? 'Hide confirmation password' : 'Show confirmation password'\}/)
+  assert.match(signup, /aria-label=\{showPass \? 'Hide password' : 'Show password'\}/)
   assert.match(login, /id="login-error" role="alert"/)
   assert.match(signup, /id="signup-error" role="alert"/)
 })

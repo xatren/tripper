@@ -7,6 +7,7 @@ import { motion } from 'framer-motion'
 import { MapPin, ArrowLeft, Eye, EyeOff } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { getSafeRedirectPath } from '@/lib/safe-redirect'
+import { USERNAME_PATTERN, usernameToEmail } from '@/lib/auth/username'
 
 /* ── Design tokens ─────────────────────────────────────────────────── */
 const C = {
@@ -98,40 +99,40 @@ function Field({ id, label, children }: { id: string; label: string; children: R
    PAGE
 ═══════════════════════════════════════════════════════════════════ */
 export default function SignUpPage() {
-  const [displayName, setDisplayName] = useState('')
-  const [email, setEmail]             = useState('')
+  const [username, setUsername]       = useState('')
   const [password, setPassword]       = useState('')
-  const [confirm, setConfirm]         = useState('')
   const [showPass, setShowPass]       = useState(false)
-  const [showConfirm, setShowConfirm] = useState(false)
   const [loading, setLoading]         = useState(false)
   const [error, setError]             = useState<string | null>(null)
   const router = useRouter()
 
   async function handleSignUp(e: React.FormEvent) {
     e.preventDefault()
-    if (password !== confirm) { setError('Passwords don\'t match'); return }
+    if (!USERNAME_PATTERN.test(username.trim())) {
+      setError('Username must be 3–30 characters and use only letters, numbers, or underscores')
+      return
+    }
     if (password.length < 6)  { setError('Password must be at least 6 characters'); return }
 
     setLoading(true); setError(null)
     const supabase = createClient()
     const rawNext = new URLSearchParams(window.location.search).get('next')
     const safeNext = getSafeRedirectPath(rawNext, window.location.origin)
-    const emailRedirectTo = new URL('/auth/callback', window.location.origin)
-    emailRedirectTo.searchParams.set('next', safeNext)
-    const { error } = await supabase.auth.signUp({
-      email, password,
-      options: {
-        emailRedirectTo: emailRedirectTo.toString(),
-        data: {
-          full_name:    displayName || email.split('@')[0],
-          display_name: displayName || email.split('@')[0],
-        },
-      },
+    const response = await fetch('/api/auth/sign-up', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password }),
     })
+    const result = await response.json() as { error?: string }
 
-    if (error) { setError(error.message); setLoading(false) }
-    else router.push('/sign-up/success')
+    if (!response.ok) { setError(result.error ?? 'Could not create account'); setLoading(false); return }
+
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: usernameToEmail(username),
+      password,
+    })
+    if (signInError) { setError(signInError.message); setLoading(false) }
+    else router.push(safeNext)
   }
 
   return (
@@ -174,25 +175,15 @@ export default function SignUpPage() {
           <div style={{ background: C.glassFill, backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: `1px solid ${C.glassBorder}`, borderRadius: 20, padding: '24px 20px' }}>
             <form onSubmit={handleSignUp} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
 
-              <Field id="signup-name" label="Full name">
+              <Field id="signup-username" label="Username">
                 <input
-                  id="signup-name"
+                  id="signup-username"
                   className="auth-input"
-                  type="text" placeholder="Your full name"
-                  autoComplete="name"
-                  value={displayName} onChange={e => setDisplayName(e.target.value)}
-                />
-              </Field>
-
-              <Field id="signup-email" label="Email">
-                <input
-                  id="signup-email"
-                  className="auth-input"
-                  type="email" placeholder="you@example.com"
-                  required autoComplete="email"
+                  type="text" placeholder="Choose a username"
+                  required autoComplete="username"
                   aria-invalid={Boolean(error)}
                   aria-describedby={error ? 'signup-error' : undefined}
-                  value={email} onChange={e => setEmail(e.target.value)}
+                  value={username} onChange={e => setUsername(e.target.value)}
                 />
               </Field>
 
@@ -214,28 +205,6 @@ export default function SignUpPage() {
                     aria-pressed={showPass}
                     style={{ position: 'absolute', right: 4, top: '50%', transform: 'translateY(-50%)', width: 44, height: 44, background: 'none', border: 'none', cursor: 'pointer', color: C.grayAtla, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     {showPass ? <EyeOff size={17} /> : <Eye size={17} />}
-                  </button>
-                </div>
-              </Field>
-
-              <Field id="signup-confirm-password" label="Confirm password">
-                <div style={{ position: 'relative' }}>
-                  <input
-                    id="signup-confirm-password"
-                    className="auth-input"
-                    type={showConfirm ? 'text' : 'password'}
-                    placeholder="Re-enter your password"
-                    required autoComplete="new-password"
-                    aria-invalid={Boolean(error)}
-                    aria-describedby={error ? 'signup-error' : undefined}
-                    value={confirm} onChange={e => setConfirm(e.target.value)}
-                    style={{ paddingRight: 48 }}
-                  />
-                  <button type="button" onClick={() => setShowConfirm(v => !v)}
-                    aria-label={showConfirm ? 'Hide confirmation password' : 'Show confirmation password'}
-                    aria-pressed={showConfirm}
-                    style={{ position: 'absolute', right: 4, top: '50%', transform: 'translateY(-50%)', width: 44, height: 44, background: 'none', border: 'none', cursor: 'pointer', color: C.grayAtla, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {showConfirm ? <EyeOff size={17} /> : <Eye size={17} />}
                   </button>
                 </div>
               </Field>

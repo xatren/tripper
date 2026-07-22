@@ -82,6 +82,7 @@ export function TripRealtimeProvider({ tripId, currentUserId, members, children 
   useEffect(() => {
     let disposed = false
     let connectedOnce = false
+    let subscribed = false
     const supabase = createClient()
     const connectionId = typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`
     let channel = supabase.channel(`trip:${tripId}`, {
@@ -146,7 +147,7 @@ export function TripRealtimeProvider({ tripId, currentUserId, members, children 
     channel = channel.on('presence', { event: 'sync' }, syncPresence)
 
     const track = () => {
-      if (disposed) return
+      if (disposed || !subscribed) return
       void channel.track({
         connection_id: connectionId,
         user_id: currentUserId,
@@ -170,6 +171,7 @@ export function TripRealtimeProvider({ tripId, currentUserId, members, children 
     const handleChannelStatus = (nextStatus: string) => {
       if (disposed) return
       if (nextStatus === 'SUBSCRIBED') {
+        subscribed = true
         connectedOnce = true
         setStatus('connected')
         track()
@@ -179,8 +181,10 @@ export function TripRealtimeProvider({ tripId, currentUserId, members, children 
           for (const listener of listeners) listener.onResync()
         }
       } else if (nextStatus === 'CHANNEL_ERROR' || nextStatus === 'TIMED_OUT') {
+        subscribed = false
         setStatus('reconnecting')
       } else if (nextStatus === 'CLOSED') {
+        subscribed = false
         setStatus(navigator.onLine ? 'reconnecting' : 'disconnected')
       }
     }
@@ -202,7 +206,9 @@ export function TripRealtimeProvider({ tripId, currentUserId, members, children 
       window.clearInterval(staleSweep)
       window.removeEventListener('offline', markDisconnected)
       window.removeEventListener('online', markReconnecting)
-      void channel.untrack()
+      // removeChannel leaves the channel and clears its Presence state. Calling
+      // untrack before an async join completes pushes Presence to an unjoined
+      // channel and rejects during effect cleanup.
       void supabase.removeChannel(channel)
     }
   }, [currentUserId, tripId])

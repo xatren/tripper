@@ -7,6 +7,7 @@ import { motion } from 'framer-motion'
 import { MapPin, ArrowLeft, Eye, EyeOff } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { getSafeRedirectPath } from '@/lib/safe-redirect'
+import { isValidLoginIdentifier, loginIdentifierToEmail } from '@/lib/auth/username'
 
 /* ── Design tokens ─────────────────────────────────────────────────── */
 const C = {
@@ -97,7 +98,7 @@ function SmallIcon() {
    PAGE
 ═══════════════════════════════════════════════════════════════════ */
 export default function LoginPage() {
-  const [email, setEmail]               = useState('')
+  const [username, setUsername]         = useState('')
   const [password, setPassword]         = useState('')
   const [showPass, setShowPass]         = useState(false)
   const [loading, setLoading]           = useState(false)
@@ -108,9 +109,16 @@ export default function LoginPage() {
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
+    if (!isValidLoginIdentifier(username)) {
+      setError('Enter a valid username or email address')
+      return
+    }
     setLoading(true); setError(null)
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) { setError(error.message); setLoading(false) }
+    const { error } = await supabase.auth.signInWithPassword({ email: loginIdentifierToEmail(username), password })
+    if (error) {
+      setError(error.code === 'invalid_credentials' ? 'Incorrect username/email or password' : error.message)
+      setLoading(false)
+    }
     else {
       const rawNext = new URLSearchParams(window.location.search).get('next')
       router.push(getSafeRedirectPath(rawNext, window.location.origin))
@@ -189,17 +197,17 @@ export default function LoginPage() {
             {/* Form */}
             <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <label htmlFor="login-email" style={{ color: C.offWhite, fontSize: 13, fontWeight: 500, letterSpacing: '-0.01em' }}>
-                  Email
+                <label htmlFor="login-username" style={{ color: C.offWhite, fontSize: 13, fontWeight: 500, letterSpacing: '-0.01em' }}>
+                  Username or email
                 </label>
                 <input
-                  id="login-email"
+                  id="login-username"
                   className="auth-input"
-                  type="email" placeholder="you@example.com"
-                  required autoComplete="email"
+                  type="text" placeholder="Username or you@example.com"
+                  required autoComplete="username"
                   aria-invalid={Boolean(error)}
                   aria-describedby={error ? 'login-error' : undefined}
-                  value={email} onChange={e => setEmail(e.target.value)}
+                  value={username} onChange={e => setUsername(e.target.value)}
                 />
               </div>
 

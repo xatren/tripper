@@ -26,8 +26,8 @@ export function AppBottomNav({ active, profile }: { active: AppNavTab; profile: 
   return (
     <nav
       style={{
-        position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)',
-        width: '100%', maxWidth: 430, background: 'rgba(5,5,20,0.90)',
+        position: 'fixed', bottom: 0, left: 0, right: 0,
+        width: 'auto', background: 'rgba(5,5,20,0.90)',
         borderTop: '1px solid rgba(255,255,255,0.08)', backdropFilter: 'blur(24px)',
         display: 'flex', alignItems: 'stretch',
         paddingBottom: 'env(safe-area-inset-bottom, 16px)', zIndex: 50,

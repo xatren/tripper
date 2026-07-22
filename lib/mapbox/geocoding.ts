@@ -31,6 +31,8 @@ function toResult(f: MapboxFeature): GeocodeResult {
 
 export interface ForwardSearchOptions {
   proximity?: { lat: number; lng: number }
+  /** ISO 3166-1 alpha-2 codes used as a hard result filter. */
+  countryCodes?: string[]
   /** Mapbox `types` filter, e.g. 'poi' to constrain results to points of interest. */
   types?: string
   /** Required when a result will be persisted beyond the current session. */
@@ -61,6 +63,10 @@ export async function forwardSearch(
     limit: String(Math.min(10, Math.max(1, opts.limit ?? 6))),
   })
   if (opts.proximity) params.set('proximity', `${opts.proximity.lng},${opts.proximity.lat}`)
+  const countryCodes = [...new Set((opts.countryCodes ?? [])
+    .map((code) => code.trim().toLowerCase())
+    .filter((code) => /^[a-z]{2}$/.test(code)))]
+  if (countryCodes.length) params.set('country', countryCodes.join(','))
   if (opts.types) params.set('types', opts.types)
   if (opts.permanent) params.set('permanent', 'true')
 

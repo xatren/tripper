@@ -34,10 +34,14 @@ export interface Trip {
 
 /** Destination country picked in the New Trip wizard (migration `009_trip_countries`). */
 export interface TripCountry {
+  /** ISO 3166-1 alpha-2 code. Optional for trips created before the country-picker redesign. */
+  code?: string;
   name: string;
   flag: string;
   lat: number;
   lng: number;
+  /** Stable visit order; array order remains the backwards-compatible source of truth. */
+  selectionOrder?: number;
 }
 
 /** Currencies offered in the New Trip wizard (migration `008_trip_persistence`). */

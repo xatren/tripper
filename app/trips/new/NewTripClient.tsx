@@ -1,11 +1,26 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
 import { CURRENCY_SYMBOLS, type TripCurrency } from '@/types';
 import { showToast } from '@/components/ui/toast';
+import { CountryGlobe } from '@/components/trips/new/CountryGlobe';
+import {
+  COUNTRY_SELECTION_STORAGE_KEY,
+  EMPTY_COUNTRY_SELECTION,
+  enableMultiCountry,
+  getCountryOptions,
+  parseCountrySelection,
+  removeCountry,
+  searchCountries,
+  selectCountry,
+  serializeCountrySelection,
+  type CountryOption,
+  type CountrySelectionState,
+  type SelectedTripCountry,
+} from '@/lib/trip-country-selection';
 import {
   budgetError,
   currencyError,
@@ -17,12 +32,7 @@ import {
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-interface Country {
-  name: string;
-  flag: string;
-  lat: number;
-  lng: number;
-}
+type Country = SelectedTripCountry;
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -37,23 +47,6 @@ const VIBES = [
   { name: 'Beach',    emoji: '🏖️', from: '#093345', to: '#0891b2' },
   { name: 'Mountain', emoji: '🏔️', from: '#1e1260', to: '#7c3aed' },
   { name: 'Backpack', emoji: '🎒', from: '#5c1a07', to: '#ea580c' },
-];
-
-const COUNTRIES: Country[] = [
-  { name: 'Japan',     flag: '🇯🇵', lat: 36,  lng: 138  },
-  { name: 'Thailand',  flag: '🇹🇭', lat: 15,  lng: 101  },
-  { name: 'Greece',    flag: '🇬🇷', lat: 39,  lng: 22   },
-  { name: 'Portugal',  flag: '🇵🇹', lat: 39,  lng: -8   },
-  { name: 'Italy',     flag: '🇮🇹', lat: 42,  lng: 12   },
-  { name: 'France',    flag: '🇫🇷', lat: 46,  lng: 2    },
-  { name: 'Spain',     flag: '🇪🇸', lat: 40,  lng: -3   },
-  { name: 'USA',       flag: '🇺🇸', lat: 38,  lng: -97  },
-  { name: 'Turkey',    flag: '🇹🇷', lat: 39,  lng: 35   },
-  { name: 'Germany',   flag: '🇩🇪', lat: 51,  lng: 10   },
-  { name: 'Iceland',   flag: '🇮🇸', lat: 65,  lng: -18  },
-  { name: 'Morocco',   flag: '🇲🇦', lat: 32,  lng: -5   },
-  { name: 'Mexico',    flag: '🇲🇽', lat: 23,  lng: -102 },
-  { name: 'Australia', flag: '🇦🇺', lat: -25, lng: 133  },
 ];
 
 const CURRENCIES = Object.keys(CURRENCY_SYMBOLS) as TripCurrency[];
@@ -87,9 +80,9 @@ function Orbs() {
   );
 }
 
-function Shell({ children }: { children: React.ReactNode }) {
+function Shell({ children, scroll = false }: { children: React.ReactNode; scroll?: boolean }) {
   return (
-    <div style={{ width: '100%', maxWidth: 430, minHeight: '100svh', background: BG, position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column', margin: '0 auto' }}>
+    <div style={{ width: '100%', maxWidth: 430, minHeight: '100svh', height: scroll ? '100svh' : undefined, background: BG, position: 'relative', overflowX: 'hidden', overflowY: scroll ? 'auto' : 'hidden', display: 'flex', flexDirection: 'column', margin: '0 auto', overscrollBehavior: 'contain' }}>
       <Orbs />
       <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', flex: 1, padding: '0 24px 40px' }}>
         {children}
@@ -147,9 +140,9 @@ function FieldError({ id, message }: { id: string; message: string | null }) {
   return <p id={id} role="alert" style={{ margin: '10px 0 0', fontSize: 13, lineHeight: 1.4, color: '#fca5a5' }}>{message}</p>;
 }
 
-function ContinueBtn({ onClick, label = 'Continue →' }: { onClick: () => void; label?: string }) {
+function ContinueBtn({ onClick, label = 'Continue →', disabled = false }: { onClick: () => void; label?: string; disabled?: boolean }) {
   return (
-    <button onClick={onClick} style={{ width: '100%', height: 62, borderRadius: 20, background: BTN_GRAD, border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 17, fontWeight: 700, color: '#1a0e00', letterSpacing: '-.2px', outline: 'none', flexShrink: 0, boxShadow: `0 8px 32px ${ACCENT}55, inset 0 1px 0 rgba(255,255,255,.35)` }}>
+    <button disabled={disabled} onClick={onClick} style={{ width: '100%', height: 62, borderRadius: 20, background: disabled ? 'rgba(255,255,255,.075)' : BTN_GRAD, border: disabled ? '1px solid rgba(255,255,255,.08)' : 'none', cursor: disabled ? 'not-allowed' : 'pointer', fontFamily: 'inherit', fontSize: 17, fontWeight: 700, color: disabled ? 'rgba(255,255,255,.28)' : '#1a0e00', letterSpacing: '-.2px', outline: 'none', flexShrink: 0, boxShadow: disabled ? 'none' : `0 8px 32px ${ACCENT}55, inset 0 1px 0 rgba(255,255,255,.35)`, transition: 'background .2s, color .2s, box-shadow .2s' }}>
       {label}
     </button>
   );
@@ -241,40 +234,128 @@ function Step1({ name, setName, vibe, setVibe, onNext, onBack }: {
 
 // ─── Step 2 — Dates ───────────────────────────────────────────────────────────
 
-function DateCard({ label, fmt, dateVal, onChange, inputRef, describedBy, invalid }: {
-  label: string;
-  fmt: { day: string; my: string };
-  dateVal: string;
-  onChange: (v: string) => void;
-  inputRef: React.RefObject<HTMLInputElement | null>;
-  describedBy?: string;
-  invalid?: boolean;
+function isoDate(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function rangeLabel(date: string) {
+  if (!date) return 'Select';
+  return new Date(`${date}T00:00:00`).toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
+}
+
+function DateRangeSheet({ open, startDate, endDate, onClose, onApply }: {
+  open: boolean; startDate: string; endDate: string;
+  onClose: () => void; onApply: (start: string, end: string) => void;
 }) {
-  const [focused, setFocused] = useState(false);
-  const inputId = `trip-${label.toLowerCase()}-date`;
+  const initialMonth = startDate ? new Date(`${startDate}T00:00:00`) : new Date();
+  const [month, setMonth] = useState(() => new Date(initialMonth.getFullYear(), initialMonth.getMonth(), 1));
+  const [draftStart, setDraftStart] = useState(startDate);
+  const [draftEnd, setDraftEnd] = useState(endDate);
+  const [hoveredDate, setHoveredDate] = useState('');
+
+  useEffect(() => {
+    if (!open) return;
+    setDraftStart(startDate); setDraftEnd(endDate); setHoveredDate('');
+    const selected = startDate ? new Date(`${startDate}T00:00:00`) : new Date();
+    setMonth(new Date(selected.getFullYear(), selected.getMonth(), 1));
+    const closeOnEscape = (event: KeyboardEvent) => { if (event.key === 'Escape') onClose(); };
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', closeOnEscape);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', closeOnEscape);
+    };
+  }, [open, startDate, endDate, onClose]);
+
+  if (!open) return null;
+  const firstDay = new Date(month.getFullYear(), month.getMonth(), 1);
+  const mondayOffset = (firstDay.getDay() + 6) % 7;
+  const gridStart = new Date(month.getFullYear(), month.getMonth(), 1 - mondayOffset);
+  const days = Array.from({ length: 42 }, (_, index) => {
+    const date = new Date(gridStart); date.setDate(gridStart.getDate() + index); return date;
+  });
+  const chooseDate = (value: string) => {
+    if (!draftStart || draftEnd) { setDraftStart(value); setDraftEnd(''); return; }
+    if (value < draftStart) { setDraftEnd(draftStart); setDraftStart(value); return; }
+    setDraftEnd(value);
+  };
+  const canApply = Boolean(draftStart && draftEnd);
+  const previewEnd = draftEnd || (hoveredDate >= draftStart ? hoveredDate : '');
+  const selectedNights = draftStart && draftEnd ? nightsBetween(draftStart, draftEnd) : 0;
+  const startIndex = days.findIndex(date => isoDate(date) === draftStart);
+  const endIndex = days.findIndex(date => isoDate(date) === draftEnd);
+  const badgeLeft = startIndex >= 0 && endIndex >= 0 && Math.floor(startIndex / 7) === Math.floor(endIndex / 7)
+    ? (((startIndex % 7) + (endIndex % 7)) / 2 + .5) / 7 * 100
+    : 50;
+  const DATE_ACCENT = '#FFC82C';
 
   return (
-    <div
-      style={{ flex: 1, borderRadius: 22, padding: '18px 16px', background: 'rgba(255,255,255,.04)', border: `1.5px solid ${focused ? ACCENT : dateVal ? `${ACCENT}66` : 'rgba(255,255,255,.08)'}`, boxShadow: focused ? `0 0 0 3px ${ACCENT}22` : 'none', position: 'relative', cursor: 'pointer', transition: 'border .2s, box-shadow .2s', backdropFilter: 'blur(12px)' }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
-        <CalIcon />
-        <label htmlFor={inputId} style={{ fontSize: 11, fontWeight: 600, color: 'rgba(200,185,255,.5)', letterSpacing: '.8px', textTransform: 'uppercase' as const }}>{label}</label>
-      </div>
-      <div style={{ fontSize: 38, fontWeight: 800, color: dateVal ? 'rgba(255,255,255,.95)' : 'rgba(255,255,255,.2)', letterSpacing: '-1.5px', lineHeight: 1 }}>{fmt.day}</div>
-      <div style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,.45)', marginTop: 4 }}>{fmt.my}</div>
-      <input
-        id={inputId}
-        ref={inputRef}
-        aria-invalid={invalid}
-        aria-describedby={describedBy}
-        type="date"
-        value={dateVal}
-        onChange={e => onChange(e.target.value)}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer', zIndex: 1 }}
-      />
+    <div role="presentation" onMouseDown={e => { if (e.target === e.currentTarget) onClose(); }} style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', background: 'rgba(0,0,12,.72)', backdropFilter: 'blur(6px)' }}>
+      <motion.div role="dialog" aria-modal="true" aria-labelledby="date-range-title" initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: 'spring', stiffness: 340, damping: 32 }} style={{ width: '100%', maxWidth: 430, borderRadius: '28px 28px 0 0', padding: '12px 20px max(22px, env(safe-area-inset-bottom))', background: '#0F0C20', border: '1px solid rgba(255,255,255,.12)', boxShadow: '0 -20px 60px rgba(0,0,0,.55)', overflow: 'hidden' }}>
+        <div style={{ width: 42, height: 4, margin: '0 auto 16px', borderRadius: 4, background: 'rgba(255,255,255,.18)' }} />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+          <div><h3 id="date-range-title" style={{ margin: 0, fontSize: 19, color: '#fff' }}>Select travel dates</h3><p style={{ margin: '3px 0 0', fontSize: 12, color: 'rgba(215,215,255,.45)' }}>{draftStart && !draftEnd ? 'Now select your return date' : 'Choose departure and return'}</p></div>
+          <button type="button" onClick={onClose} aria-label="Close date picker" style={{ width: 44, height: 44, borderRadius: 14, border: '1px solid rgba(255,255,255,.1)', background: 'rgba(255,255,255,.06)', color: '#fff', fontSize: 22, cursor: 'pointer' }}>×</button>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', gap: 10, padding: '12px 14px', marginBottom: 16, borderRadius: 16, background: 'rgba(255,200,44,.06)', border: '1px solid rgba(255,200,44,.22)' }}>
+          <div><span style={{ display: 'block', fontSize: 10, color: 'rgba(215,215,255,.4)', textTransform: 'uppercase' }}>Departure</span><strong style={{ fontSize: 15, color: draftStart ? '#fff' : 'rgba(255,255,255,.35)' }}>{rangeLabel(draftStart)}</strong></div>
+          <span style={{ color: ACCENT }}>→</span>
+          <div style={{ textAlign: 'right' }}><span style={{ display: 'block', fontSize: 10, color: 'rgba(215,215,255,.4)', textTransform: 'uppercase' }}>Return</span><strong style={{ fontSize: 15, color: draftEnd ? '#fff' : 'rgba(255,255,255,.35)' }}>{rangeLabel(draftEnd)}</strong></div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+          <button type="button" onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() - 1, 1))} aria-label="Previous month" style={{ width: 44, height: 44, borderRadius: 13, border: 0, background: 'rgba(255,255,255,.05)', color: '#fff', fontSize: 22, cursor: 'pointer' }}>‹</button>
+          <strong style={{ fontSize: 15, color: '#fff' }}>{month.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</strong>
+          <button type="button" onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() + 1, 1))} aria-label="Next month" style={{ width: 44, height: 44, borderRadius: 13, border: 0, background: 'rgba(255,255,255,.05)', color: '#fff', fontSize: 22, cursor: 'pointer' }}>›</button>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', textAlign: 'center', marginBottom: 5 }}>
+          {['M','T','W','T','F','S','S'].map((day, index) => <span key={`${day}-${index}`} style={{ fontSize: 10, color: 'rgba(215,215,255,.32)', padding: 5 }}>{day}</span>)}
+        </div>
+        <div style={{ position: 'relative', paddingTop: 34 }}>
+          <AnimatePresence>
+            {canApply && (
+              <motion.div
+                key={`${draftStart}-${draftEnd}`}
+                initial={{ opacity: 0, y: 6, scale: .92 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 4, scale: .94 }}
+                transition={{ duration: .22, ease: 'easeOut' }}
+                aria-live="polite"
+                style={{ position: 'absolute', zIndex: 4, top: 0, left: `${badgeLeft}%`, translate: '-50% 0', minWidth: 88, height: 27, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 12px', borderRadius: 999, background: DATE_ACCENT, color: '#1d1600', boxShadow: '0 5px 20px rgba(255,200,44,.26)', fontSize: 12, fontWeight: 800, whiteSpace: 'nowrap', pointerEvents: 'none' }}
+              >
+                {selectedNights} {selectedNights === 1 ? 'Night' : 'Nights'}
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', rowGap: 3 }}>
+          {days.map((date, index) => {
+            const value = isoDate(date); const endpoint = value === draftStart || value === draftEnd;
+            const inRange = Boolean(draftStart && previewEnd && value > draftStart && value < previewEnd);
+            const currentMonth = date.getMonth() === month.getMonth();
+            const isStart = value === draftStart; const isEnd = value === (draftEnd || previewEnd);
+            const rowStart = index % 7 === 0; const rowEnd = index % 7 === 6;
+            const hasRange = Boolean(draftStart && previewEnd);
+            const stripBackground = !hasRange ? 'transparent'
+              : isStart && isEnd ? 'transparent'
+              : isStart ? (rowEnd ? 'transparent' : 'linear-gradient(to right, transparent 0 50%, rgba(255,200,44,.15) 50% 100%)')
+              : isEnd ? (rowStart ? 'transparent' : 'linear-gradient(to right, rgba(255,200,44,.15) 0 50%, transparent 50% 100%)')
+              : inRange ? 'linear-gradient(90deg, rgba(255,200,44,.11), rgba(255,200,44,.19), rgba(255,200,44,.11))' : 'transparent';
+            const stripRadius = inRange && rowStart ? '15px 0 0 15px' : inRange && rowEnd ? '0 15px 15px 0' : 0;
+            return (
+              <div key={value} onMouseEnter={() => !draftEnd && setHoveredDate(value)} onMouseLeave={() => setHoveredDate('')} style={{ height: 42, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <motion.span aria-hidden="true" initial={false} animate={{ opacity: hasRange && (inRange || isStart || isEnd) ? 1 : 0, scaleX: hasRange && (inRange || isStart || isEnd) ? 1 : .15 }} transition={{ type: 'spring', stiffness: 360, damping: 30, delay: hasRange ? Math.min(Math.abs(index - Math.max(0, startIndex)) * .012, .12) : 0 }} style={{ position: 'absolute', left: 0, right: 0, top: 6, bottom: 6, borderRadius: stripRadius, background: stripBackground, transformOrigin: isEnd ? 'left center' : 'right center', boxShadow: inRange ? 'inset 0 1px 0 rgba(255,200,44,.08), inset 0 -1px 0 rgba(255,200,44,.05)' : 'none', willChange: 'transform, opacity' }} />
+                <motion.button type="button" onClick={() => chooseDate(value)} aria-label={date.toLocaleDateString('en-US', { dateStyle: 'full' })} aria-pressed={endpoint} initial={false} animate={endpoint ? { scale: [1, 1.15, 1], boxShadow: ['0 0 0 rgba(255,200,44,0)', '0 0 28px rgba(255,200,44,.72)', '0 5px 20px rgba(255,200,44,.38)'] } : { scale: 1, boxShadow: '0 0 0 rgba(255,200,44,0)' }} whileTap={{ scale: .9 }} transition={{ duration: .34, ease: 'easeOut' }} style={{ position: 'relative', zIndex: 1, width: 38, height: 38, padding: 0, border: endpoint ? `1px solid ${DATE_ACCENT}` : '1px solid transparent', borderRadius: '50%', background: endpoint ? DATE_ACCENT : 'transparent', color: endpoint ? '#1a0e00' : currentMonth ? 'rgba(255,255,255,.9)' : 'rgba(255,255,255,.22)', fontWeight: endpoint ? 800 : 500, cursor: 'pointer', willChange: 'transform, box-shadow' }}>{date.getDate()}</motion.button>
+              </div>
+            );
+          })}
+          </div>
+        </div>
+        <button type="button" onClick={() => onApply('', '')} style={{ width: '100%', minHeight: 44, marginTop: 10, border: 0, background: 'transparent', color: 'rgba(215,215,255,.55)', fontFamily: 'inherit', fontSize: 13, cursor: 'pointer' }}>Dates not decided yet</button>
+        <button type="button" disabled={!canApply} onClick={() => onApply(draftStart, draftEnd)} style={{ width: '100%', height: 56, borderRadius: 18, border: 0, background: canApply ? BTN_GRAD : 'rgba(255,255,255,.08)', color: canApply ? '#1a0e00' : 'rgba(255,255,255,.3)', fontFamily: 'inherit', fontSize: 16, fontWeight: 750, cursor: canApply ? 'pointer' : 'default' }}>Apply dates</button>
+      </motion.div>
     </div>
   );
 }
@@ -286,17 +367,17 @@ function Step2({ startDate, setStartDate, endDate, setEndDate, onNext, onBack }:
 }) {
   const nights = nightsBetween(startDate, endDate);
   const [error, setError] = useState<string | null>(null);
-  const startRef = useRef<HTMLInputElement>(null);
-  const endRef = useRef<HTMLInputElement>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const closePicker = useCallback(() => setPickerOpen(false), []);
   const validate = () => {
     const nextError = dateError(startDate, endDate);
     setError(nextError);
     if (!nextError) return onNext();
-    if (!startDate) startRef.current?.focus();
-    else endRef.current?.focus();
+    setPickerOpen(true);
   };
-  const updateStart = (value: string) => { setStartDate(value); setError(null); };
-  const updateEnd = (value: string) => { setEndDate(value); setError(null); };
+  const applyDates = useCallback((start: string, end: string) => {
+    setStartDate(start); setEndDate(end); setError(null); setPickerOpen(false);
+  }, [setStartDate, setEndDate]);
   return (
     <Shell>
       <div style={{ height: 54, flexShrink: 0 }} />
@@ -304,19 +385,16 @@ function Step2({ startDate, setStartDate, endDate, setEndDate, onNext, onBack }:
       <Dots step={2} />
       <Label>When are you going?</Label>
 
-      <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
-        <DateCard label="Departure" fmt={fmtDate(startDate)} dateVal={startDate} onChange={updateStart} inputRef={startRef} describedBy={error ? 'date-error' : undefined} invalid={Boolean(error)} />
-        <DateCard label="Return" fmt={fmtDate(endDate)} dateVal={endDate} onChange={updateEnd} inputRef={endRef} describedBy={error ? 'date-error' : undefined} invalid={Boolean(error)} />
-      </div>
+      <button type="button" onClick={() => setPickerOpen(true)} aria-haspopup="dialog" aria-expanded={pickerOpen} aria-describedby={error ? 'date-error' : undefined} style={{ width: '100%', padding: '17px 18px', marginBottom: 20, borderRadius: 20, border: `1.5px solid ${error ? '#f87171' : startDate ? `${ACCENT}70` : 'rgba(255,255,255,.1)'}`, background: 'rgba(255,255,255,.045)', color: '#fff', textAlign: 'left', fontFamily: 'inherit', cursor: 'pointer', boxShadow: startDate ? `0 0 24px ${ACCENT}12` : 'none' }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, fontSize: 11, fontWeight: 700, letterSpacing: '.9px', color: ACCENT, textTransform: 'uppercase' }}><CalIcon /> Travel dates</span>
+        <span style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', gap: 10 }}>
+          <span><small style={{ display: 'block', marginBottom: 3, color: 'rgba(215,215,255,.35)' }}>Departure</small><strong style={{ fontSize: 18, color: startDate ? '#fff' : 'rgba(255,255,255,.3)' }}>{rangeLabel(startDate)}</strong></span>
+          <span style={{ color: ACCENT, fontSize: 18 }}>→</span>
+          <span style={{ textAlign: 'right' }}><small style={{ display: 'block', marginBottom: 3, color: 'rgba(215,215,255,.35)' }}>Return</small><strong style={{ fontSize: 18, color: endDate ? '#fff' : 'rgba(255,255,255,.3)' }}>{rangeLabel(endDate)}</strong></span>
+        </span>
+        <span style={{ display: 'block', marginTop: 12, fontSize: 12, color: nights > 0 ? ACCENT : 'rgba(215,215,255,.32)' }}>{nights > 0 ? `${nights} nights · ${nights + 1} days` : 'Tap to choose your date range'}</span>
+      </button>
       <FieldError id="date-error" message={error} />
-
-      {nights > 0 && (
-        <div style={{ textAlign: 'center', marginBottom: 20 }}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: `${ACCENT}18`, border: `1px solid ${ACCENT}44`, borderRadius: 20, padding: '8px 16px', fontSize: 13, fontWeight: 600, color: ACCENT }}>
-            🌙 {nights} night{nights !== 1 ? 's' : ''} · {nights + 1} day{nights + 1 !== 1 ? 's' : ''}
-          </span>
-        </div>
-      )}
 
       <div style={{ borderRadius: 18, padding: '16px 18px', background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.07)', display: 'flex', alignItems: 'center', marginTop: error ? 16 : 0, marginBottom: 32 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -331,12 +409,14 @@ function Step2({ startDate, setStartDate, endDate, setEndDate, onNext, onBack }:
       <div style={{ flex: 1 }} />
       <ContinueBtn onClick={validate} />
       <BackBtn onClick={onBack} />
+      <AnimatePresence><DateRangeSheet open={pickerOpen} startDate={startDate} endDate={endDate} onClose={closePicker} onApply={applyDates} /></AnimatePresence>
     </Shell>
   );
 }
 
 // ─── Mini Globe ───────────────────────────────────────────────────────────────
 
+/* Previous canvas-based country step retained in git history.
 function MiniGlobe({ destinations }: { destinations: Country[] }) {
   const ref = useRef<HTMLCanvasElement>(null);
 
@@ -541,6 +621,176 @@ function Step3({ destinations, setDestinations, onNext, onBack }: {
 
 // ─── Step 4 — Budget ──────────────────────────────────────────────────────────
 
+*/
+
+function Step3({ selection, setSelection, onNext, onBack }: {
+  selection: CountrySelectionState;
+  setSelection: React.Dispatch<React.SetStateAction<CountrySelectionState>>;
+  onNext: () => void; onBack: () => void;
+}) {
+  const [query, setQuery] = useState('');
+  const [showDrop, setShowDrop] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
+  const countries = useMemo(() => getCountryOptions('en'), []);
+  const options = useMemo(() => searchCountries(countries, query).slice(0, 8), [countries, query]);
+  const popular = useMemo(
+    () => ['JP', 'TH', 'GR', 'PT'].map(code => countries.find(country => country.code === code)).filter((country): country is CountryOption => Boolean(country)),
+    [countries],
+  );
+  const plural = selection.mode === 'multi-country';
+
+  const choose = (country: CountryOption) => {
+    setSelection(previous => selectCountry(previous, country));
+    setQuery('');
+    setShowDrop(false);
+    setActiveIndex(0);
+    setError(null);
+  };
+  const validate = () => {
+    const nextError = destinationsError(selection.countries);
+    setError(nextError);
+    if (!nextError) return onNext();
+    searchRef.current?.focus();
+  };
+
+  return (
+    <Shell scroll>
+      <div style={{ height: 'max(28px, env(safe-area-inset-top))', flexShrink: 0 }} />
+      <Header step={3} onBack={onBack} />
+
+      <div style={{ marginBottom: 20 }}>
+        <h1 style={{ margin: 0, maxWidth: 340, color: 'rgba(255,255,255,.96)', fontSize: 28, lineHeight: 1.12, letterSpacing: '-.8px', fontWeight: 800 }}>
+          {plural ? 'Which countries are you visiting?' : 'Which country are you visiting?'}
+        </h1>
+        <p style={{ margin: '8px 0 0', color: 'rgba(218,207,255,.5)', fontSize: 14, lineHeight: 1.45 }}>
+          {plural ? 'Add the countries in the order you plan to visit them.' : 'We’ll tailor your recommendations to it.'}
+        </p>
+      </div>
+
+      <div style={{ position: 'relative', marginBottom: 16 }}>
+        <div style={{ height: 54, borderRadius: 18, background: 'rgba(255,255,255,.055)', border: `1px solid ${showDrop ? 'rgba(245,158,11,.52)' : 'rgba(255,255,255,.1)'}`, boxShadow: showDrop ? `0 0 0 3px ${ACCENT}18` : 'none', display: 'flex', alignItems: 'center', gap: 12, padding: '0 16px', transition: 'border .2s, box-shadow .2s' }}>
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <circle cx="11" cy="11" r="7" stroke={ACCENT} strokeWidth="2" />
+            <path d="m16.4 16.4 4.1 4.1" stroke={ACCENT} strokeWidth="2" strokeLinecap="round" />
+          </svg>
+          <input
+            id="country-search"
+            ref={searchRef}
+            value={query}
+            role="combobox"
+            aria-label="Search countries"
+            aria-autocomplete="list"
+            aria-controls="country-options"
+            aria-expanded={showDrop && query.length > 0}
+            aria-activedescendant={showDrop && query && options[activeIndex] ? `country-option-${activeIndex}` : undefined}
+            onChange={e => { setQuery(e.target.value); setShowDrop(true); setActiveIndex(0); setError(null); }}
+            onFocus={() => setShowDrop(true)}
+            onBlur={() => setTimeout(() => setShowDrop(false), 150)}
+            onKeyDown={(e) => {
+              if (e.key === 'ArrowDown' && options.length) {
+                e.preventDefault(); setShowDrop(true); setActiveIndex(i => (i + 1) % options.length);
+              } else if (e.key === 'ArrowUp' && options.length) {
+                e.preventDefault(); setShowDrop(true); setActiveIndex(i => (i - 1 + options.length) % options.length);
+              } else if (e.key === 'Enter' && showDrop && options[activeIndex]) {
+                e.preventDefault(); choose(options[activeIndex]);
+              } else if (e.key === 'Escape') {
+                e.preventDefault(); setShowDrop(false);
+              }
+            }}
+            placeholder="Search countries..."
+            aria-invalid={Boolean(error)}
+            aria-describedby={error ? 'destinations-error' : undefined}
+            style={{ flex: 1, minWidth: 0, background: 'transparent', border: 'none', outline: 'none', fontFamily: 'inherit', fontSize: 15, color: 'rgba(255,255,255,.9)', caretColor: ACCENT }}
+          />
+          {query && <button type="button" aria-label="Clear country search" onMouseDown={event => event.preventDefault()} onClick={() => { setQuery(''); searchRef.current?.focus(); }} style={{ width: 44, height: 44, marginRight: -12, border: 0, background: 'transparent', color: 'rgba(255,255,255,.44)', fontSize: 18, cursor: 'pointer' }}>×</button>}
+        </div>
+
+        {showDrop && query && (
+          <div id="country-options" role="listbox" aria-label="Country suggestions" style={{ position: 'absolute', top: 60, left: 0, right: 0, maxHeight: 316, overflowY: 'auto', background: 'rgba(14,8,38,.985)', border: '1px solid rgba(255,255,255,.12)', borderRadius: 17, boxShadow: '0 18px 50px rgba(0,0,0,.48)', zIndex: 30 }}>
+            {options.length === 0 ? (
+              <div role="status" style={{ padding: '18px 16px', color: 'rgba(218,207,255,.48)', fontSize: 13 }}>No countries found for “{query}”.</div>
+            ) : options.map((country, index) => {
+              const selected = selection.countries.some(item => item.code === country.code);
+              return (
+                <button
+                  type="button"
+                  id={`country-option-${index}`}
+                  key={country.code}
+                  role="option"
+                  aria-selected={selected}
+                  disabled={plural && selected}
+                  onMouseDown={(event) => event.preventDefault()}
+                  onClick={() => choose(country)}
+                  style={{ width: '100%', minHeight: 50, padding: '8px 14px', display: 'flex', alignItems: 'center', gap: 12, border: 0, borderBottom: '1px solid rgba(255,255,255,.05)', cursor: plural && selected ? 'default' : 'pointer', background: index === activeIndex ? 'rgba(245,158,11,.14)' : 'transparent', color: '#fff', fontFamily: 'inherit', textAlign: 'left', opacity: plural && selected ? .52 : 1 }}
+                >
+                  <span aria-hidden="true" style={{ fontSize: 23 }}>{country.flag}</span>
+                  <span style={{ flex: 1, fontSize: 14, fontWeight: 600 }}>{country.name}</span>
+                  <span style={{ color: selected ? ACCENT : 'rgba(218,207,255,.3)', fontSize: 11, fontWeight: 700 }}>{selected ? '✓ Selected' : country.code}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+      <FieldError id="destinations-error" message={error} />
+
+      <div aria-label="Interactive country globe" style={{ borderRadius: 20, overflow: 'hidden', marginBottom: 20, background: '#08021A', border: '1px solid rgba(138,94,220,.22)', boxShadow: '0 16px 44px rgba(0,0,0,.3), inset 0 1px rgba(255,255,255,.04)' }}>
+        <CountryGlobe countries={selection.countries} activeCountryCode={selection.activeCountryCode} />
+      </div>
+
+      <section aria-labelledby="selected-countries-label" style={{ marginBottom: 20 }}>
+        <Label id="selected-countries-label">{plural ? 'Your countries' : 'Selected country'}</Label>
+        {selection.countries.length === 0 ? (
+          <div style={{ minHeight: 58, borderRadius: 17, padding: '0 16px', display: 'flex', alignItems: 'center', border: '1px dashed rgba(255,255,255,.14)', color: 'rgba(218,207,255,.35)', fontSize: 13 }}>No country selected yet</div>
+        ) : selection.countries.map((country, index) => (
+          <div key={country.code} style={{ minHeight: 58, marginTop: index ? 8 : 0, borderRadius: 17, padding: '7px 9px 7px 14px', display: 'flex', alignItems: 'center', gap: 11, background: 'linear-gradient(110deg, rgba(245,158,11,.12), rgba(96,50,190,.1))', border: `1px solid ${selection.activeCountryCode === country.code ? `${ACCENT}78` : 'rgba(255,255,255,.09)'}` }}>
+            {plural && <span aria-hidden="true" style={{ width: 24, height: 24, borderRadius: 8, display: 'grid', placeItems: 'center', background: 'rgba(255,255,255,.07)', color: 'rgba(218,207,255,.52)', fontSize: 11, fontWeight: 800 }}>{index + 1}</span>}
+            <span aria-hidden="true" style={{ fontSize: 25 }}>{country.flag}</span>
+            <span style={{ flex: 1, minWidth: 0 }}>
+              <strong style={{ display: 'block', color: 'rgba(255,255,255,.92)', fontSize: 14 }}>{country.name}</strong>
+              <span style={{ display: 'block', marginTop: 2, color: 'rgba(218,207,255,.36)', fontSize: 10 }}>{country.code} · {plural ? `Stop ${index + 1}` : 'Trip country'}</span>
+            </span>
+            {plural ? (
+              <button type="button" aria-label={`Remove ${country.name}, country ${index + 1}`} onClick={() => setSelection(previous => removeCountry(previous, country.code))} style={{ width: 44, height: 44, border: 0, borderRadius: 13, background: 'transparent', color: 'rgba(255,255,255,.5)', fontSize: 19, cursor: 'pointer' }}>×</button>
+            ) : (
+              <button type="button" onClick={() => { setQuery(''); searchRef.current?.focus(); setShowDrop(true); }} style={{ minHeight: 44, padding: '0 10px', border: 0, background: 'transparent', color: ACCENT, fontFamily: 'inherit', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Change</button>
+            )}
+          </div>
+        ))}
+      </section>
+
+      <section aria-labelledby="popular-countries-label" style={{ marginBottom: 22 }}>
+        <Label id="popular-countries-label">Popular countries</Label>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 9 }}>
+          {popular.map(country => {
+            const selected = selection.countries.some(item => item.code === country.code);
+            return (
+              <button key={country.code} type="button" aria-pressed={selected} onClick={() => choose(country)} style={{ minHeight: 48, borderRadius: 16, padding: '0 12px', display: 'flex', alignItems: 'center', gap: 8, background: selected ? `${ACCENT}18` : 'rgba(255,255,255,.045)', border: `1px solid ${selected ? `${ACCENT}92` : 'rgba(255,255,255,.09)'}`, fontSize: 13, fontWeight: 600, color: selected ? '#fff' : 'rgba(255,255,255,.7)', cursor: 'pointer', outline: 'none', fontFamily: 'inherit', textAlign: 'left' }}>
+                <span aria-hidden="true" style={{ fontSize: 21 }}>{country.flag}</span><span style={{ flex: 1 }}>{country.name}</span>{selected && <span aria-hidden="true" style={{ color: ACCENT }}>✓</span>}
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      <ContinueBtn disabled={selection.countries.length === 0} onClick={validate} />
+      {selection.countries.length === 0 && <p style={{ margin: '9px 0 0', textAlign: 'center', color: 'rgba(218,207,255,.34)', fontSize: 11 }}>Select a country to continue.</p>}
+      <button
+        type="button"
+        onClick={() => {
+          if (!plural) setSelection(previous => enableMultiCountry(previous));
+          requestAnimationFrame(() => searchRef.current?.focus());
+        }}
+        style={{ width: '100%', minHeight: 48, marginTop: 8, marginBottom: 'max(4px, env(safe-area-inset-bottom))', border: 0, background: 'transparent', color: 'rgba(231,222,255,.58)', fontFamily: 'inherit', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+      >
+        + Add another country
+      </button>
+    </Shell>
+  );
+}
+
 function Step4({ budget, setBudget, currency, setCurrency, nights, onNext, onBack }: {
   budget: string; setBudget: (v: string) => void;
   currency: string; setCurrency: (v: string) => void;
@@ -676,12 +926,20 @@ function Step5({ name, vibe, startDate, endDate, destinations, budget, currency,
         p_total_budget: raw,
         p_currency: currency,
         p_vibe: vibe,
-        p_countries: destinations,
+        p_countries: destinations.map(({ code, name: countryName, flag, lat, lng, selectionOrder }) => ({
+          code,
+          name: countryName,
+          flag,
+          lat,
+          lng,
+          selectionOrder,
+        })),
         p_focus_lat: destinations[0]?.lat ?? null,
         p_focus_lng: destinations[0]?.lng ?? null,
       });
       const tripId = (data as { trip_id?: string } | null)?.trip_id;
       if (!error && tripId) {
+        sessionStorage.removeItem(COUNTRY_SELECTION_STORAGE_KEY);
         setDone(true);
         router.push(`/trip/${tripId}/mobile`);
       } else {
@@ -781,9 +1039,23 @@ export function NewTripClient() {
   const [vibe,        setVibe]        = useState<string | null>(null);
   const [startDate,   setStartDate]   = useState('');
   const [endDate,     setEndDate]     = useState('');
-  const [destinations,setDestinations]= useState<Country[]>([]);
+  const [countrySelection, setCountrySelection] = useState<CountrySelectionState>(EMPTY_COUNTRY_SELECTION);
+  const [countryDraftHydrated, setCountryDraftHydrated] = useState(false);
   const [budget,      setBudget]      = useState('');
   const [currency,    setCurrency]    = useState('EUR');
+
+  useEffect(() => {
+    const saved = parseCountrySelection(sessionStorage.getItem(COUNTRY_SELECTION_STORAGE_KEY));
+    if (saved) setCountrySelection(saved);
+    setCountryDraftHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!countryDraftHydrated) return;
+    sessionStorage.setItem(COUNTRY_SELECTION_STORAGE_KEY, serializeCountrySelection(countrySelection));
+  }, [countryDraftHydrated, countrySelection]);
+
+  const destinations = countrySelection.countries;
 
   const nights = nightsBetween(startDate, endDate);
 
@@ -825,7 +1097,7 @@ export function NewTripClient() {
         >
           {step === 1 && <Step1 name={name} setName={setName} vibe={vibe} setVibe={setVibe} {...common} />}
           {step === 2 && <Step2 startDate={startDate} setStartDate={setStartDate} endDate={endDate} setEndDate={setEndDate} {...common} />}
-          {step === 3 && <Step3 destinations={destinations} setDestinations={setDestinations} {...common} />}
+          {step === 3 && <Step3 selection={countrySelection} setSelection={setCountrySelection} {...common} />}
           {step === 4 && <Step4 budget={budget} setBudget={setBudget} currency={currency} setCurrency={setCurrency} nights={nights} {...common} />}
           {step === 5 && <Step5 name={name} vibe={vibe} startDate={startDate} endDate={endDate} destinations={destinations} budget={budget} currency={currency} onBack={back} />}
         </motion.div>

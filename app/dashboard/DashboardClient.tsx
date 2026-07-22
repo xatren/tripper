@@ -62,6 +62,13 @@ function getNights(start?: string | null, end?: string | null): number | null {
   return Math.round((new Date(end).getTime() - new Date(start).getTime()) / 86_400_000);
 }
 
+function isTripCompleted(trip: Trip): boolean {
+  const completionDate = trip.end_date ?? trip.start_date;
+  if (!completionDate) return false;
+  const daysUntilCompletion = getDaysUntil(completionDate);
+  return daysUntilCompletion !== null && daysUntilCompletion < 0;
+}
+
 function getGreeting(): string {
   const h = new Date().getHours();
   if (h < 12) return "Good morning";
@@ -99,6 +106,7 @@ export function DashboardClient({ profile, trips: initialTrips, capabilitiesByTr
   const supabase = createClient();
 
   const firstName   = profile?.display_name?.split(" ")[0] ?? profile?.email?.split("@")[0] ?? "Traveler";
+  const dashboardTrips = trips.filter((trip) => !isTripCompleted(trip));
   const upcomingCount = trips.filter((t) => { const d = getDaysUntil(t.start_date); return d !== null && d >= 0; }).length;
 
   // ── handlers ─────────────────────────────────────────────────────────────
@@ -210,12 +218,12 @@ export function DashboardClient({ profile, trips: initialTrips, capabilitiesByTr
             </motion.button>
           </motion.div>
 
-          {trips.length === 0 ? (
+          {dashboardTrips.length === 0 ? (
             <EmptyState onCreateClick={() => router.push("/trips/new")} />
           ) : (
             <AnimatePresence>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                {trips.map((trip, i) => (
+                {dashboardTrips.map((trip, i) => (
                   <motion.div
                     key={trip.id}
                     initial={{ opacity: 0, y: 20 }}
@@ -238,7 +246,7 @@ export function DashboardClient({ profile, trips: initialTrips, capabilitiesByTr
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 + trips.length * 0.06, duration: 0.35, ease: "easeOut" }}
+                  transition={{ delay: 0.2 + dashboardTrips.length * 0.06, duration: 0.35, ease: "easeOut" }}
                 >
                   <motion.button
                     onClick={() => router.push("/trips/new")}
@@ -259,7 +267,7 @@ export function DashboardClient({ profile, trips: initialTrips, capabilitiesByTr
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.26 + trips.length * 0.06, duration: 0.35, ease: "easeOut" }}
+                  transition={{ delay: 0.26 + dashboardTrips.length * 0.06, duration: 0.35, ease: "easeOut" }}
                 >
                   <motion.button
                     onClick={() => { setError(null); setJoin(true); }}
@@ -286,26 +294,44 @@ export function DashboardClient({ profile, trips: initialTrips, capabilitiesByTr
 
       {/* ── Join Trip dialog ── */}
       <Dialog open={isJoinOpen} onOpenChange={setJoin}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Join a Trip</DialogTitle>
-            <DialogDescription>Enter the invite code shared by your travel buddy</DialogDescription>
+        <DialogContent
+          className="w-[calc(100%-32px)] max-w-[340px] gap-0 rounded-[20px] border-white/[0.12] bg-[#0e0e22]/[0.97] p-5 shadow-[0_16px_48px_rgba(0,0,0,0.5)] backdrop-blur-2xl"
+          style={FONT}
+        >
+          <DialogHeader className="pr-9 text-left">
+            <DialogTitle className="text-[18px] font-extrabold leading-6 tracking-[-0.01em] text-white">Join a trip</DialogTitle>
+            <DialogDescription className="mt-1 text-[13px] leading-[1.5] text-[rgba(215,215,255,0.65)]">
+              Enter the invite code shared by your travel buddy.
+            </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleJoin} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              <Label htmlFor="inviteCode">Invite Code</Label>
-              <Input id="inviteCode" placeholder="e.g. ABC12345" value={joinCode} onChange={(e) => setJoinCode(e.target.value)} required aria-invalid={Boolean(error)} aria-describedby={error ? "join-error" : undefined} />
+          <form onSubmit={handleJoin} className="mt-[18px] flex flex-col gap-4">
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="inviteCode" className="text-[13px] font-semibold text-white/80">Invite code</Label>
+              <Input
+                id="inviteCode"
+                autoFocus
+                autoCapitalize="characters"
+                autoComplete="off"
+                spellCheck={false}
+                placeholder="e.g. ABC12345"
+                value={joinCode}
+                onChange={(e) => { setJoinCode(e.target.value.toUpperCase()); if (error) setError(null); }}
+                required
+                aria-invalid={Boolean(error)}
+                aria-describedby={error ? "join-error" : undefined}
+                className="h-12 rounded-xl border-white/[0.10] bg-white/[0.05] px-3.5 text-[14px] font-semibold uppercase tracking-[0.06em] text-white shadow-none placeholder:font-normal placeholder:normal-case placeholder:tracking-normal placeholder:text-white/30 focus-visible:border-amber-400/60 focus-visible:ring-2 focus-visible:ring-amber-400/15"
+              />
+              {error && <p id="join-error" role="alert" className="m-0 text-xs leading-4 text-red-400">{error}</p>}
             </div>
             <motion.button
               type="submit"
-              style={{ width: "100%", padding: "13px", borderRadius: 12, background: AMBER_GRAD, color: "#1a0800", fontWeight: 700, fontSize: 15, border: "none", cursor: "pointer", boxShadow: AMBER_GLOW, ...FONT }}
-              whileTap={{ scale: 0.96 }}
-              whileHover={{ scale: 1.02 }}
+              disabled={loading || !joinCode.trim()}
+              style={{ width: "100%", height: 48, padding: "0 18px", borderRadius: 12, background: AMBER_GRAD, color: "#1a0800", fontWeight: 700, fontSize: 14, border: "none", cursor: loading || !joinCode.trim() ? "not-allowed" : "pointer", boxShadow: AMBER_GLOW, opacity: loading || !joinCode.trim() ? 0.55 : 1, ...FONT }}
+              whileTap={loading || !joinCode.trim() ? undefined : { scale: 0.97 }}
               transition={TAP_SPRING}
             >
               {loading ? "Joining…" : "Join Trip"}
             </motion.button>
-            {error && <p id="join-error" role="alert" style={{ color: "#ef4444", fontSize: 13, textAlign: "center", margin: 0 }}>{error}</p>}
           </form>
         </DialogContent>
       </Dialog>
@@ -418,9 +444,9 @@ function EmptyState({ onCreateClick }: { onCreateClick: () => void }) {
       <div style={{ width: 64, height: 64, borderRadius: 18, background: AMBER_GRAD, boxShadow: AMBER_GLOW, margin: "0 auto 20px", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <MapPin style={{ width: 30, height: 30, color: "#1a0800" }} />
       </div>
-      <p style={{ color: "#fff", fontWeight: 600, fontSize: 17, margin: "0 0 8px" }}>No trips yet</p>
+      <p style={{ color: "#fff", fontWeight: 600, fontSize: 17, margin: "0 0 8px" }}>No active or upcoming trips</p>
       <p style={{ color: "rgba(215,215,255,0.60)", fontSize: 14, margin: "0 0 28px" }}>
-        Create your first trip or join one with an invite code
+        Start planning a new trip. Your completed trips are still available in Trips.
       </p>
       <motion.button
         onClick={onCreateClick}
@@ -429,7 +455,7 @@ function EmptyState({ onCreateClick }: { onCreateClick: () => void }) {
         whileHover={{ scale: 1.03 }}
         transition={TAP_SPRING}
       >
-        Create Your First Trip
+        Create a New Trip
       </motion.button>
     </motion.div>
   );
