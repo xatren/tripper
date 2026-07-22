@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import localFont from 'next/font/local';
 import { Inter } from 'next/font/google';
+import { Analytics } from '@vercel/analytics/next';
 import { RegisterSW } from '@/components/pwa/RegisterSW';
 import { Toaster } from '@/components/ui/toast';
 import { ReducedMotionProvider } from '@/components/motion/ReducedMotionProvider';
@@ -50,6 +51,7 @@ export default function RootLayout({
           {children}
           <Toaster />
           <RegisterSW />
+          <Analytics />
         </ReducedMotionProvider>
       </body>
     </html>
