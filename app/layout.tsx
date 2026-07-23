@@ -1,26 +1,22 @@
 import type { Metadata, Viewport } from 'next';
-import localFont from 'next/font/local';
-import { Inter } from 'next/font/google';
+import { Inter, Fraunces } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
 import { RegisterSW } from '@/components/pwa/RegisterSW';
 import { Toaster } from '@/components/ui/toast';
 import { ReducedMotionProvider } from '@/components/motion/ReducedMotionProvider';
 import './globals.css';
 
-const geistSans = localFont({
-  src: './fonts/GeistVF.woff',
-  variable: '--font-geist-sans',
-  weight: '100 900',
-});
-const geistMono = localFont({
-  src: './fonts/GeistMonoVF.woff',
-  variable: '--font-geist-mono',
-  weight: '100 900',
-});
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
   weight: ['400', '500', '600', '700', '800'],
+});
+// Display face — trip titles, hero headlines, empty-state prompts. Body stays Inter.
+const fraunces = Fraunces({
+  subsets: ['latin'],
+  variable: '--font-fraunces',
+  weight: ['400', '500', '600', '700'],
+  style: ['normal', 'italic'],
 });
 
 export const metadata: Metadata = {
@@ -45,7 +41,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} antialiased bg-[#0A0A0F] text-white`}
+        className={`${inter.variable} ${fraunces.variable} antialiased bg-[#0A0A0F] text-white`}
       >
         <ReducedMotionProvider>
           {children}

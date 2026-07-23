@@ -64,29 +64,46 @@
   --color-bg-deep: #071216;
   --gradient-bg-app: linear-gradient(145deg, var(--color-bg-base), var(--color-bg-mid), var(--color-bg-deep));
 
+  /* Golden-hour atmosphere (Dusk Edition) — opt-in via the .atmosphere utility on
+     hero / onboarding / empty-state / trip-header surfaces ONLY. App chrome and
+     dense content screens stay flat on the grounds. Coral/magenta (the ember +
+     glow) lives only in this ambient layer — never on a button, chip or control,
+     so it can't collide with --color-danger. */
+  --color-horizon: #140f2c;
+  --color-ember: #241633;
+  --gradient-atmosphere: linear-gradient(180deg, #060616 0%, #0a0920 38%, var(--color-horizon) 72%, var(--color-ember) 100%);
+  --glow-sunset: radial-gradient(120% 62% at 50% 116%, rgba(245, 150, 70, 0.2), rgba(232, 92, 107, 0.08) 42%, transparent 66%);
+
+  /* Typography — Inter is the UI workhorse; Fraunces (serif) for display moments
+     (trip titles, hero headlines, empty-state prompts). Apply via the Tailwind
+     `font-display` utility (maps to var(--font-fraunces)); next/font injects that
+     variable on <body>, so the utility resolves on any content element. */
+
   /* Opaque surfaces — preferred for dense content (itinerary, bookings, budget,
      packing, journal text) where blur hurts readability and paint cost. */
   --color-surface-solid: #11122b;
-  --color-surface-raised: #191a38;
+  --color-surface-raised: #20203f; /* opened up so elevation reads (was #191a38) */
 
-  /* Text */
+  /* Text — warmed a hair; muted lifted to clear WCAG AA. */
   --color-text-primary: #ffffff;
-  --color-text-secondary: rgba(215, 215, 255, 0.75);
-  --color-text-muted: rgba(215, 215, 255, 0.55);
+  --color-text-secondary: rgba(222, 220, 240, 0.76);
+  --color-text-muted: rgba(222, 220, 240, 0.58); /* was rgba(215,215,255,.55) ~4.3:1 (failed AA) → ~5.4:1 */
   --color-text-on-accent: #1a0800;
 
-  /* Accent + status */
+  /* Accent + status. Core accent stays #f5a623 for brand recognition (and to keep
+     the literal ACCENT constants in domain-ui.tsx in sync). The CTA gradient is the
+     Dusk Edition signature — golden-hour, coral-free so it never reads as danger. */
   --color-accent: #f5a623;
-  --color-accent-light: #f8c04a;
-  --color-accent-dark: #e8821a;
-  --gradient-accent: linear-gradient(135deg, #f5a623, #f8c04a);
-  --gradient-accent-cta: linear-gradient(145deg, #f8c04a, #e8821a);
-  --color-success: #4ade80;
+  --color-accent-light: #ffc766;
+  --color-accent-dark: #e07b1e;
+  --gradient-accent: linear-gradient(135deg, #f5a623, #ffc766);
+  --gradient-accent-cta: linear-gradient(120deg, #ffc766 0%, #f5a623 55%, #e07b1e 100%);
+  --color-success: #5cc98d;
   --color-success-soft: #86efac;
-  --color-warning: #fbbf24;
-  --color-danger: #f87171;
-  --color-info: #60a5fa;
-  --color-ai: #8888e4;
+  --color-warning: #fcd34d; /* pushed yellower — clears the amber CTA */
+  --color-danger: #f06b6b;
+  --color-info: #6ba4dc;
+  --color-ai: #9086de;
 
   /* Glass tiers — strong glass only on floating nav, sheets, headers, selected
      previews and map controls; never on every list item. */
@@ -171,6 +188,24 @@
   .glass-elevated {
     background: rgba(14, 14, 36, 0.985);
   }
+}
+
+/* Golden-hour atmosphere — scoped opt-in. Apply ONLY to hero / onboarding /
+   empty-state / trip-header surfaces; never to app chrome or dense content
+   screens (see the scope rule on the atmosphere tokens above). The ::after layer
+   is a ~5% film grain that kills OLED banding on the dark gradient. */
+.atmosphere {
+  position: relative;
+  background: var(--glow-sunset), var(--gradient-atmosphere);
+}
+.atmosphere::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)'/%3E%3C/svg%3E");
 }
 
 @layer base {
