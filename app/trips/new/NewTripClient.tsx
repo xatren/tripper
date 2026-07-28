@@ -29,6 +29,7 @@ import {
   titleError,
   vibeError,
 } from '@/lib/trip-validation';
+import { DUSK, SUNSET_GRADIENT } from '@/components/design/tokens';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -36,9 +37,8 @@ type Country = SelectedTripCountry;
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-const ACCENT = '#F59E0B';
-const BG = 'linear-gradient(175deg, rgba(12,4,35,.97) 0%, rgba(0,0,20,.99) 100%)';
-const BTN_GRAD = 'linear-gradient(130deg, #c27802 0%, #F59E0B 48%, #fde47a 100%)';
+const ACCENT = DUSK.amber;
+const BTN_GRAD = SUNSET_GRADIENT;
 
 const VIBES = [
   { name: 'Road',     emoji: '🚗', from: '#1a2332', to: '#3d5166' },
@@ -82,7 +82,7 @@ function Orbs() {
 
 function Shell({ children, scroll = false }: { children: React.ReactNode; scroll?: boolean }) {
   return (
-    <div style={{ width: '100%', maxWidth: 430, minHeight: '100svh', height: scroll ? '100svh' : undefined, background: BG, position: 'relative', overflowX: 'hidden', overflowY: scroll ? 'auto' : 'hidden', display: 'flex', flexDirection: 'column', margin: '0 auto', overscrollBehavior: 'contain' }}>
+    <div className="atmosphere" style={{ width: '100%', maxWidth: 430, minHeight: '100svh', height: scroll ? '100svh' : undefined, position: 'relative', overflowX: 'hidden', overflowY: scroll ? 'auto' : 'hidden', display: 'flex', flexDirection: 'column', margin: '0 auto', overscrollBehavior: 'contain' }}>
       <Orbs />
       <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', flex: 1, padding: '0 24px 40px' }}>
         {children}
@@ -142,7 +142,7 @@ function FieldError({ id, message }: { id: string; message: string | null }) {
 
 function ContinueBtn({ onClick, label = 'Continue →', disabled = false }: { onClick: () => void; label?: string; disabled?: boolean }) {
   return (
-    <button disabled={disabled} onClick={onClick} style={{ width: '100%', height: 62, borderRadius: 20, background: disabled ? 'rgba(255,255,255,.075)' : BTN_GRAD, border: disabled ? '1px solid rgba(255,255,255,.08)' : 'none', cursor: disabled ? 'not-allowed' : 'pointer', fontFamily: 'inherit', fontSize: 17, fontWeight: 700, color: disabled ? 'rgba(255,255,255,.28)' : '#1a0e00', letterSpacing: '-.2px', outline: 'none', flexShrink: 0, boxShadow: disabled ? 'none' : `0 8px 32px ${ACCENT}55, inset 0 1px 0 rgba(255,255,255,.35)`, transition: 'background .2s, color .2s, box-shadow .2s' }}>
+    <button disabled={disabled} onClick={onClick} style={{ width: '100%', height: 62, borderRadius: 20, background: disabled ? 'rgba(255,255,255,.075)' : BTN_GRAD, border: disabled ? '1px solid rgba(255,255,255,.08)' : 'none', cursor: disabled ? 'not-allowed' : 'pointer', fontFamily: 'inherit', fontSize: 17, fontWeight: 700, color: disabled ? 'rgba(255,255,255,.28)' : DUSK.onAmber, letterSpacing: '-.2px', outline: 'none', flexShrink: 0, boxShadow: disabled ? 'none' : `0 8px 32px ${ACCENT}55, inset 0 1px 0 rgba(255,255,255,.35)`, transition: 'background .2s, color .2s, box-shadow .2s' }}>
       {label}
     </button>
   );
@@ -298,21 +298,21 @@ function DateRangeSheet({ open, startDate, endDate, onClose, onApply }: {
       <motion.div role="dialog" aria-modal="true" aria-labelledby="date-range-title" initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: 'spring', stiffness: 340, damping: 32 }} style={{ width: '100%', maxWidth: 430, borderRadius: '28px 28px 0 0', padding: '12px 20px max(22px, env(safe-area-inset-bottom))', background: '#0F0C20', border: '1px solid rgba(255,255,255,.12)', boxShadow: '0 -20px 60px rgba(0,0,0,.55)', overflow: 'hidden' }}>
         <div style={{ width: 42, height: 4, margin: '0 auto 16px', borderRadius: 4, background: 'rgba(255,255,255,.18)' }} />
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-          <div><h3 id="date-range-title" style={{ margin: 0, fontSize: 19, color: '#fff' }}>Select travel dates</h3><p style={{ margin: '3px 0 0', fontSize: 12, color: 'rgba(215,215,255,.45)' }}>{draftStart && !draftEnd ? 'Now select your return date' : 'Choose departure and return'}</p></div>
-          <button type="button" onClick={onClose} aria-label="Close date picker" style={{ width: 44, height: 44, borderRadius: 14, border: '1px solid rgba(255,255,255,.1)', background: 'rgba(255,255,255,.06)', color: '#fff', fontSize: 22, cursor: 'pointer' }}>×</button>
+          <div><h3 id="date-range-title" style={{ margin: 0, fontSize: 19, color: DUSK.textPrimary }}>Select travel dates</h3><p style={{ margin: '3px 0 0', fontSize: 12, color: DUSK.textMuted }}>{draftStart && !draftEnd ? 'Now select your return date' : 'Choose departure and return'}</p></div>
+          <button type="button" onClick={onClose} aria-label="Close date picker" style={{ width: 44, height: 44, borderRadius: 14, border: '1px solid rgba(255,255,255,.1)', background: 'rgba(255,255,255,.06)', color: DUSK.textPrimary, fontSize: 22, cursor: 'pointer' }}>×</button>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', gap: 10, padding: '12px 14px', marginBottom: 16, borderRadius: 16, background: 'rgba(255,200,44,.06)', border: '1px solid rgba(255,200,44,.22)' }}>
-          <div><span style={{ display: 'block', fontSize: 10, color: 'rgba(215,215,255,.4)', textTransform: 'uppercase' }}>Departure</span><strong style={{ fontSize: 15, color: draftStart ? '#fff' : 'rgba(255,255,255,.35)' }}>{rangeLabel(draftStart)}</strong></div>
+          <div><span style={{ display: 'block', fontSize: 10, color: DUSK.textMuted, textTransform: 'uppercase' }}>Departure</span><strong style={{ fontSize: 15, color: draftStart ? DUSK.textPrimary : 'rgba(255,255,255,.35)' }}>{rangeLabel(draftStart)}</strong></div>
           <span style={{ color: ACCENT }}>→</span>
-          <div style={{ textAlign: 'right' }}><span style={{ display: 'block', fontSize: 10, color: 'rgba(215,215,255,.4)', textTransform: 'uppercase' }}>Return</span><strong style={{ fontSize: 15, color: draftEnd ? '#fff' : 'rgba(255,255,255,.35)' }}>{rangeLabel(draftEnd)}</strong></div>
+          <div style={{ textAlign: 'right' }}><span style={{ display: 'block', fontSize: 10, color: DUSK.textMuted, textTransform: 'uppercase' }}>Return</span><strong style={{ fontSize: 15, color: draftEnd ? DUSK.textPrimary : 'rgba(255,255,255,.35)' }}>{rangeLabel(draftEnd)}</strong></div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-          <button type="button" onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() - 1, 1))} aria-label="Previous month" style={{ width: 44, height: 44, borderRadius: 13, border: 0, background: 'rgba(255,255,255,.05)', color: '#fff', fontSize: 22, cursor: 'pointer' }}>‹</button>
-          <strong style={{ fontSize: 15, color: '#fff' }}>{month.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</strong>
-          <button type="button" onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() + 1, 1))} aria-label="Next month" style={{ width: 44, height: 44, borderRadius: 13, border: 0, background: 'rgba(255,255,255,.05)', color: '#fff', fontSize: 22, cursor: 'pointer' }}>›</button>
+          <button type="button" onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() - 1, 1))} aria-label="Previous month" style={{ width: 44, height: 44, borderRadius: 13, border: 0, background: 'rgba(255,255,255,.05)', color: DUSK.textPrimary, fontSize: 22, cursor: 'pointer' }}>‹</button>
+          <strong style={{ fontSize: 15, color: DUSK.textPrimary }}>{month.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</strong>
+          <button type="button" onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() + 1, 1))} aria-label="Next month" style={{ width: 44, height: 44, borderRadius: 13, border: 0, background: 'rgba(255,255,255,.05)', color: DUSK.textPrimary, fontSize: 22, cursor: 'pointer' }}>›</button>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', textAlign: 'center', marginBottom: 5 }}>
-          {['M','T','W','T','F','S','S'].map((day, index) => <span key={`${day}-${index}`} style={{ fontSize: 10, color: 'rgba(215,215,255,.32)', padding: 5 }}>{day}</span>)}
+          {['M','T','W','T','F','S','S'].map((day, index) => <span key={`${day}-${index}`} style={{ fontSize: 10, color: DUSK.textMuted, padding: 5 }}>{day}</span>)}
         </div>
         <div style={{ position: 'relative', paddingTop: 34 }}>
           <AnimatePresence>
@@ -347,14 +347,14 @@ function DateRangeSheet({ open, startDate, endDate, onClose, onApply }: {
             return (
               <div key={value} onMouseEnter={() => !draftEnd && setHoveredDate(value)} onMouseLeave={() => setHoveredDate('')} style={{ height: 42, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <motion.span aria-hidden="true" initial={false} animate={{ opacity: hasRange && (inRange || isStart || isEnd) ? 1 : 0, scaleX: hasRange && (inRange || isStart || isEnd) ? 1 : .15 }} transition={{ type: 'spring', stiffness: 360, damping: 30, delay: hasRange ? Math.min(Math.abs(index - Math.max(0, startIndex)) * .012, .12) : 0 }} style={{ position: 'absolute', left: 0, right: 0, top: 6, bottom: 6, borderRadius: stripRadius, background: stripBackground, transformOrigin: isEnd ? 'left center' : 'right center', boxShadow: inRange ? 'inset 0 1px 0 rgba(255,200,44,.08), inset 0 -1px 0 rgba(255,200,44,.05)' : 'none', willChange: 'transform, opacity' }} />
-                <motion.button type="button" onClick={() => chooseDate(value)} aria-label={date.toLocaleDateString('en-US', { dateStyle: 'full' })} aria-pressed={endpoint} initial={false} animate={endpoint ? { scale: [1, 1.15, 1], boxShadow: ['0 0 0 rgba(255,200,44,0)', '0 0 28px rgba(255,200,44,.72)', '0 5px 20px rgba(255,200,44,.38)'] } : { scale: 1, boxShadow: '0 0 0 rgba(255,200,44,0)' }} whileTap={{ scale: .9 }} transition={{ duration: .34, ease: 'easeOut' }} style={{ position: 'relative', zIndex: 1, width: 38, height: 38, padding: 0, border: endpoint ? `1px solid ${DATE_ACCENT}` : '1px solid transparent', borderRadius: '50%', background: endpoint ? DATE_ACCENT : 'transparent', color: endpoint ? '#1a0e00' : currentMonth ? 'rgba(255,255,255,.9)' : 'rgba(255,255,255,.22)', fontWeight: endpoint ? 800 : 500, cursor: 'pointer', willChange: 'transform, box-shadow' }}>{date.getDate()}</motion.button>
+                <motion.button type="button" onClick={() => chooseDate(value)} aria-label={date.toLocaleDateString('en-US', { dateStyle: 'full' })} aria-pressed={endpoint} initial={false} animate={endpoint ? { scale: [1, 1.15, 1], boxShadow: ['0 0 0 rgba(255,200,44,0)', '0 0 28px rgba(255,200,44,.72)', '0 5px 20px rgba(255,200,44,.38)'] } : { scale: 1, boxShadow: '0 0 0 rgba(255,200,44,0)' }} whileTap={{ scale: .9 }} transition={{ duration: .34, ease: 'easeOut' }} style={{ position: 'relative', zIndex: 1, width: 38, height: 38, padding: 0, border: endpoint ? `1px solid ${DATE_ACCENT}` : '1px solid transparent', borderRadius: '50%', background: endpoint ? DATE_ACCENT : 'transparent', color: endpoint ? DUSK.onAmber : currentMonth ? 'rgba(255,255,255,.9)' : 'rgba(255,255,255,.22)', fontWeight: endpoint ? 800 : 500, cursor: 'pointer', willChange: 'transform, box-shadow' }}>{date.getDate()}</motion.button>
               </div>
             );
           })}
           </div>
         </div>
-        <button type="button" onClick={() => onApply('', '')} style={{ width: '100%', minHeight: 44, marginTop: 10, border: 0, background: 'transparent', color: 'rgba(215,215,255,.55)', fontFamily: 'inherit', fontSize: 13, cursor: 'pointer' }}>Dates not decided yet</button>
-        <button type="button" disabled={!canApply} onClick={() => onApply(draftStart, draftEnd)} style={{ width: '100%', height: 56, borderRadius: 18, border: 0, background: canApply ? BTN_GRAD : 'rgba(255,255,255,.08)', color: canApply ? '#1a0e00' : 'rgba(255,255,255,.3)', fontFamily: 'inherit', fontSize: 16, fontWeight: 750, cursor: canApply ? 'pointer' : 'default' }}>Apply dates</button>
+        <button type="button" onClick={() => onApply('', '')} style={{ width: '100%', minHeight: 44, marginTop: 10, border: 0, background: 'transparent', color: DUSK.textMuted, fontFamily: 'inherit', fontSize: 13, cursor: 'pointer' }}>Dates not decided yet</button>
+        <button type="button" disabled={!canApply} onClick={() => onApply(draftStart, draftEnd)} style={{ width: '100%', height: 56, borderRadius: 18, border: 0, background: canApply ? BTN_GRAD : 'rgba(255,255,255,.08)', color: canApply ? DUSK.onAmber : 'rgba(255,255,255,.3)', fontFamily: 'inherit', fontSize: 16, fontWeight: 750, cursor: canApply ? 'pointer' : 'default' }}>Apply dates</button>
       </motion.div>
     </div>
   );
@@ -385,14 +385,14 @@ function Step2({ startDate, setStartDate, endDate, setEndDate, onNext, onBack }:
       <Dots step={2} />
       <Label>When are you going?</Label>
 
-      <button type="button" onClick={() => setPickerOpen(true)} aria-haspopup="dialog" aria-expanded={pickerOpen} aria-describedby={error ? 'date-error' : undefined} style={{ width: '100%', padding: '17px 18px', marginBottom: 20, borderRadius: 20, border: `1.5px solid ${error ? '#f87171' : startDate ? `${ACCENT}70` : 'rgba(255,255,255,.1)'}`, background: 'rgba(255,255,255,.045)', color: '#fff', textAlign: 'left', fontFamily: 'inherit', cursor: 'pointer', boxShadow: startDate ? `0 0 24px ${ACCENT}12` : 'none' }}>
+      <button type="button" onClick={() => setPickerOpen(true)} aria-haspopup="dialog" aria-expanded={pickerOpen} aria-describedby={error ? 'date-error' : undefined} style={{ width: '100%', padding: '17px 18px', marginBottom: 20, borderRadius: 20, border: `1.5px solid ${error ? '#f87171' : startDate ? `${ACCENT}70` : 'rgba(255,255,255,.1)'}`, background: 'rgba(255,255,255,.045)', color: DUSK.textPrimary, textAlign: 'left', fontFamily: 'inherit', cursor: 'pointer', boxShadow: startDate ? `0 0 24px ${ACCENT}12` : 'none' }}>
         <span style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, fontSize: 11, fontWeight: 700, letterSpacing: '.9px', color: ACCENT, textTransform: 'uppercase' }}><CalIcon /> Travel dates</span>
         <span style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', gap: 10 }}>
-          <span><small style={{ display: 'block', marginBottom: 3, color: 'rgba(215,215,255,.35)' }}>Departure</small><strong style={{ fontSize: 18, color: startDate ? '#fff' : 'rgba(255,255,255,.3)' }}>{rangeLabel(startDate)}</strong></span>
+          <span><small style={{ display: 'block', marginBottom: 3, color: DUSK.textMuted }}>Departure</small><strong style={{ fontSize: 18, color: startDate ? DUSK.textPrimary : 'rgba(255,255,255,.3)' }}>{rangeLabel(startDate)}</strong></span>
           <span style={{ color: ACCENT, fontSize: 18 }}>→</span>
-          <span style={{ textAlign: 'right' }}><small style={{ display: 'block', marginBottom: 3, color: 'rgba(215,215,255,.35)' }}>Return</small><strong style={{ fontSize: 18, color: endDate ? '#fff' : 'rgba(255,255,255,.3)' }}>{rangeLabel(endDate)}</strong></span>
+          <span style={{ textAlign: 'right' }}><small style={{ display: 'block', marginBottom: 3, color: DUSK.textMuted }}>Return</small><strong style={{ fontSize: 18, color: endDate ? DUSK.textPrimary : 'rgba(255,255,255,.3)' }}>{rangeLabel(endDate)}</strong></span>
         </span>
-        <span style={{ display: 'block', marginTop: 12, fontSize: 12, color: nights > 0 ? ACCENT : 'rgba(215,215,255,.32)' }}>{nights > 0 ? `${nights} nights · ${nights + 1} days` : 'Tap to choose your date range'}</span>
+        <span style={{ display: 'block', marginTop: 12, fontSize: 12, color: nights > 0 ? ACCENT : DUSK.textMuted }}>{nights > 0 ? `${nights} nights · ${nights + 1} days` : 'Tap to choose your date range'}</span>
       </button>
       <FieldError id="date-error" message={error} />
 
@@ -723,7 +723,7 @@ function Step3({ selection, setSelection, onNext, onBack }: {
                   disabled={plural && selected}
                   onMouseDown={(event) => event.preventDefault()}
                   onClick={() => choose(country)}
-                  style={{ width: '100%', minHeight: 50, padding: '8px 14px', display: 'flex', alignItems: 'center', gap: 12, border: 0, borderBottom: '1px solid rgba(255,255,255,.05)', cursor: plural && selected ? 'default' : 'pointer', background: index === activeIndex ? 'rgba(245,158,11,.14)' : 'transparent', color: '#fff', fontFamily: 'inherit', textAlign: 'left', opacity: plural && selected ? .52 : 1 }}
+                  style={{ width: '100%', minHeight: 50, padding: '8px 14px', display: 'flex', alignItems: 'center', gap: 12, border: 0, borderBottom: '1px solid rgba(255,255,255,.05)', cursor: plural && selected ? 'default' : 'pointer', background: index === activeIndex ? 'rgba(245,158,11,.14)' : 'transparent', color: DUSK.textPrimary, fontFamily: 'inherit', textAlign: 'left', opacity: plural && selected ? .52 : 1 }}
                 >
                   <span aria-hidden="true" style={{ fontSize: 23 }}>{country.flag}</span>
                   <span style={{ flex: 1, fontSize: 14, fontWeight: 600 }}>{country.name}</span>
@@ -767,7 +767,7 @@ function Step3({ selection, setSelection, onNext, onBack }: {
           {popular.map(country => {
             const selected = selection.countries.some(item => item.code === country.code);
             return (
-              <button key={country.code} type="button" aria-pressed={selected} onClick={() => choose(country)} style={{ minHeight: 48, borderRadius: 16, padding: '0 12px', display: 'flex', alignItems: 'center', gap: 8, background: selected ? `${ACCENT}18` : 'rgba(255,255,255,.045)', border: `1px solid ${selected ? `${ACCENT}92` : 'rgba(255,255,255,.09)'}`, fontSize: 13, fontWeight: 600, color: selected ? '#fff' : 'rgba(255,255,255,.7)', cursor: 'pointer', outline: 'none', fontFamily: 'inherit', textAlign: 'left' }}>
+              <button key={country.code} type="button" aria-pressed={selected} onClick={() => choose(country)} style={{ minHeight: 48, borderRadius: 16, padding: '0 12px', display: 'flex', alignItems: 'center', gap: 8, background: selected ? `${ACCENT}18` : 'rgba(255,255,255,.045)', border: `1px solid ${selected ? `${ACCENT}92` : 'rgba(255,255,255,.09)'}`, fontSize: 13, fontWeight: 600, color: selected ? DUSK.textPrimary : 'rgba(255,255,255,.7)', cursor: 'pointer', outline: 'none', fontFamily: 'inherit', textAlign: 'left' }}>
                 <span aria-hidden="true" style={{ fontSize: 21 }}>{country.flag}</span><span style={{ flex: 1 }}>{country.name}</span>{selected && <span aria-hidden="true" style={{ color: ACCENT }}>✓</span>}
               </button>
             );
@@ -1020,7 +1020,7 @@ function Step5({ name, vibe, startDate, endDate, destinations, budget, currency,
         onClick={create}
         disabled={loading || done}
         aria-describedby={submissionError ? 'create-error' : undefined}
-        style={{ width: '100%', height: 70, borderRadius: 22, background: done ? 'linear-gradient(130deg, #14532d, #22c55e)' : BTN_GRAD, border: 'none', cursor: loading || done ? 'default' : 'pointer', fontFamily: 'inherit', fontSize: 18, fontWeight: 700, color: done ? '#fff' : '#1a0e00', letterSpacing: '-.3px', outline: 'none', boxShadow: done ? '0 8px 32px rgba(34,197,94,.4)' : `0 8px 32px ${ACCENT}55`, transition: 'all .4s ease' }}
+        style={{ width: '100%', height: 70, borderRadius: 22, background: done ? 'linear-gradient(130deg, #14532d, #22c55e)' : BTN_GRAD, border: 'none', cursor: loading || done ? 'default' : 'pointer', fontFamily: 'inherit', fontSize: 18, fontWeight: 700, color: done ? DUSK.textPrimary : DUSK.onAmber, letterSpacing: '-.3px', outline: 'none', boxShadow: done ? '0 8px 32px rgba(34,197,94,.4)' : `0 8px 32px ${ACCENT}55`, transition: 'all .4s ease' }}
       >
         {done ? '✓ Trip Created!' : loading ? 'Creating...' : 'Create Trip 🚀'}
       </button>

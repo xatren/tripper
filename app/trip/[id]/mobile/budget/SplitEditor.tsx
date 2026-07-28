@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo } from 'react'
 import { tokens } from '@/components/mobile'
+import { DUSK } from '@/components/design/tokens'
 import type { ExpenseSplitType } from '@/types'
 import { resolveEqualShares, resolveExactShares, resolvePercentageShares, type ShareResult } from '../budget-settlement'
 
@@ -162,7 +163,7 @@ export function SplitEditor({
                 value={participant.exactAmount}
                 onChange={(e) => onChangeExactAmount(participant.memberId, e.target.value)}
                 placeholder="0.00"
-                style={{ width: 74, minHeight: 32, padding: '4px 8px', borderRadius: 8, background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.14)', color: '#fff', fontSize: 12.5, fontFamily: 'inherit', outline: 'none', textAlign: 'right', flex: 'none' }}
+                style={{ width: 74, minHeight: 32, padding: '4px 8px', borderRadius: 8, background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.14)', color: DUSK.textPrimary, fontSize: 12.5, fontFamily: 'inherit', outline: 'none', textAlign: 'right', flex: 'none' }}
               />
             )}
             {splitType === 'percentage' && participant.included && (
@@ -172,7 +173,7 @@ export function SplitEditor({
                 value={participant.percentage}
                 onChange={(e) => onChangePercentage(participant.memberId, e.target.value)}
                 placeholder="0"
-                style={{ width: 54, minHeight: 32, padding: '4px 8px', borderRadius: 8, background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.14)', color: '#fff', fontSize: 12.5, fontFamily: 'inherit', outline: 'none', textAlign: 'right', flex: 'none' }}
+                style={{ width: 54, minHeight: 32, padding: '4px 8px', borderRadius: 8, background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.14)', color: DUSK.textPrimary, fontSize: 12.5, fontFamily: 'inherit', outline: 'none', textAlign: 'right', flex: 'none' }}
               />
             )}
           </div>

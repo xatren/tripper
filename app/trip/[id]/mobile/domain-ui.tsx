@@ -2,20 +2,22 @@
 
 import type { ReactNode } from 'react'
 import { tokens } from '@/components/mobile/tokens'
+import { DUSK, SUNSET_GRADIENT } from '@/components/design/tokens'
 
 /*
- * LEGACY ALIASES of the design tokens in app/globals.css (--color-accent,
- * --glass-standard-*, …). They must stay literal: SVG presentation attributes
- * (`stroke={ACCENT}`) and alpha interpolations (`` `${ACCENT}22` ``) can't
- * consume `var()` strings. New code should import `tokens` from
- * '@/components/mobile' and use inline `style` instead.
+ * Dusk Edition aliases, sourced from components/design/tokens.ts. They must
+ * stay literal strings (not CSS var() references): SVG presentation
+ * attributes (`stroke={ACCENT}`) and alpha interpolations (`` `${ACCENT}22` ``)
+ * can't consume `var()` strings, but DUSK's values are already plain literals,
+ * so re-exporting them here keeps this module's call sites unchanged while
+ * pointing at the single shared token source.
  */
-export const ACCENT = '#f5a623'
-export const ACCENT_LIGHT = '#f8c04a'
-export const ACCENT_DARK = '#e8821a'
-export const ACCENT_GRADIENT = 'linear-gradient(135deg, #f5a623, #f8c04a)'
-export const GLASS_FILL = 'rgba(255,255,255,.055)'
-export const GLASS_BORDER = 'rgba(255,255,255,.13)'
+export const ACCENT = DUSK.amber
+export const ACCENT_LIGHT = DUSK.amberLight
+export const ACCENT_DARK = DUSK.amberDeep
+export const ACCENT_GRADIENT = SUNSET_GRADIENT
+export const GLASS_FILL = DUSK.glassFill
+export const GLASS_BORDER = DUSK.glassBorder
 
 /** Trip workspace's top-level primary-nav destinations. */
 export type Section = 'overview' | 'plan' | 'explore' | 'bookings' | 'more'

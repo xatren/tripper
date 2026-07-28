@@ -6,6 +6,7 @@ import type { RouteReplayPoint } from './RouteReplayMap'
 import type { DistanceUnit } from '@/lib/settings'
 import { useReducedMotionPreference } from '@/components/motion/ReducedMotionProvider'
 import { DeferredBoundary } from '@/components/ui/deferred-boundary'
+import { DUSK } from '@/components/design/tokens'
 
 const RouteReplayMap = lazy(() =>
   import('./RouteReplayMap').then((module) => ({ default: module.RouteReplayMap })),
@@ -61,11 +62,11 @@ export function TripSummaryHero({ title, dateRange, points, routePath, distance:
       }}
     >
       <div style={{ position: 'relative', padding: '20px 20px 14px' }}>
-        <div style={{ fontSize: 11.5, fontWeight: 700, color: 'rgba(215,215,255,.55)', letterSpacing: '.08em' }}>
+        <div style={{ fontSize: 11.5, fontWeight: 700, color: DUSK.textMuted, letterSpacing: '.08em' }}>
           TRIP RECAP
         </div>
-        <div style={{ fontSize: 20, fontWeight: 800, letterSpacing: '-0.02em', color: '#fff', marginTop: 4 }}>{title}</div>
-        <div style={{ fontSize: 12.5, color: 'rgba(215,215,255,.6)', marginTop: 2, fontWeight: 500 }}>{dateRange}</div>
+        <div style={{ fontSize: 20, fontWeight: 800, letterSpacing: '-0.02em', color: DUSK.textPrimary, marginTop: 4 }}>{title}</div>
+        <div style={{ fontSize: 12.5, color: DUSK.textMuted, marginTop: 2, fontWeight: 500 }}>{dateRange}</div>
       </div>
 
       <DeferredBoundary label="the route replay" style={{ height: 220 }}>
@@ -96,11 +97,11 @@ export function TripSummaryHero({ title, dateRange, points, routePath, distance:
 function StatCell({ label, value, suffix }: { label: string; value: string; suffix: string }) {
   return (
     <div style={{ flex: 1, textAlign: 'center', padding: '10px 4px', borderRadius: 14, background: 'rgba(255,255,255,.04)', border: `1px solid ${GLASS_BORDER}` }}>
-      <div style={{ fontSize: 17, fontWeight: 800, color: '#fff', letterSpacing: '-0.02em' }}>
+      <div style={{ fontSize: 17, fontWeight: 800, color: DUSK.textPrimary, letterSpacing: '-0.02em' }}>
         {value}
         {suffix && <span style={{ fontSize: 11, fontWeight: 700, color: ACCENT, marginLeft: 2 }}>{suffix}</span>}
       </div>
-      <div style={{ fontSize: 10, fontWeight: 600, color: 'rgba(215,215,255,.5)', letterSpacing: '.05em', marginTop: 2 }}>
+      <div style={{ fontSize: 10, fontWeight: 600, color: DUSK.textMuted, letterSpacing: '.05em', marginTop: 2 }}>
         {label}
       </div>
     </div>

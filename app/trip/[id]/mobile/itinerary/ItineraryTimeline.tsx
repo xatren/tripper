@@ -24,6 +24,7 @@ import { toDatetimeLocalValue } from './itinerary-ui'
 import { planDayOptimization, type DayItem, type DayOptimizationPreview } from './route-optimizer'
 import { DayOptimizePreviewSheet } from './DayOptimizePreviewSheet'
 import { canTransitionStatus } from '@/lib/travel-mode'
+import { DUSK } from '@/components/design/tokens'
 
 export interface ItineraryCreateRequest {
   type: ItineraryItemType
@@ -622,7 +623,7 @@ function MoveToDaySheet({ entry, dayOptions, onClose, onMove }: {
           <select
             value={targetDate}
             onChange={(event) => setTargetDate(event.target.value)}
-            style={{ width: '100%', minHeight: 44, padding: '10px 12px', borderRadius: 12, background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.14)', color: '#fff', fontSize: 14, fontFamily: 'inherit' }}
+            style={{ width: '100%', minHeight: 44, padding: '10px 12px', borderRadius: 12, background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.14)', color: DUSK.textPrimary, fontSize: 14, fontFamily: 'inherit' }}
           >
             <option value="">Unscheduled</option>
             {dayOptions.map((option) => (
@@ -637,7 +638,7 @@ function MoveToDaySheet({ entry, dayOptions, onClose, onMove }: {
               type="time"
               value={time}
               onChange={(event) => setTime(event.target.value)}
-              style={{ width: '100%', minHeight: 44, padding: '10px 12px', borderRadius: 12, background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.14)', color: '#fff', fontSize: 14, fontFamily: 'inherit' }}
+              style={{ width: '100%', minHeight: 44, padding: '10px 12px', borderRadius: 12, background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.14)', color: DUSK.textPrimary, fontSize: 14, fontFamily: 'inherit' }}
             />
           </label>
         )}

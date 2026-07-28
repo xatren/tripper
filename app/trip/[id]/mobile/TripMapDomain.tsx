@@ -6,6 +6,7 @@ import { DeferredBoundary, DeferredFailure } from '@/components/ui/deferred-boun
 import type { TripboxMapPoint } from '@/components/map/mapbox/TripboxMap'
 import { MAPBOX_TOKEN } from '@/lib/mapbox/client'
 import { getMapAvailability, type OtherDayVisibility } from './trip-map-model'
+import { DUSK } from '@/components/design/tokens'
 
 function TripMapPlaceholder() {
   return <div role="status" aria-label="Loading trip map" style={{ position: 'absolute', inset: 0, background: 'radial-gradient(120% 90% at 50% 10%, #12123a 0%, #0a0a28 55%, #06061c 100%)' }} />
@@ -13,7 +14,7 @@ function TripMapPlaceholder() {
 
 const controlStyle: React.CSSProperties = {
   width: 44, height: 44, borderRadius: 14, border: '1px solid rgba(255,255,255,.16)',
-  background: 'rgba(10,10,26,.72)', backdropFilter: 'blur(18px)', color: '#fff',
+  background: 'rgba(10,10,26,.72)', backdropFilter: 'blur(18px)', color: DUSK.textPrimary,
   display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
   boxShadow: '0 8px 24px rgba(0,0,0,.28)',
 }
@@ -102,7 +103,7 @@ export function TripMapDomain(props: TripMapDomainProps) {
         : null
 
   return (
-    <div style={{ position: 'absolute', inset: 0, background: '#06061c' }}>
+    <div style={{ position: 'absolute', inset: 0, background: DUSK.night }}>
       <DeferredBoundary label="the trip map" style={{ position: 'absolute', inset: 0 }}>
         {mapLoadFailed ? (
           <DeferredFailure label="the trip map" onRetry={() => window.location.reload()} style={{ position: 'absolute', inset: 0 }} />
@@ -123,6 +124,7 @@ export function TripMapDomain(props: TripMapDomainProps) {
       </DeferredBoundary>
 
       <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'linear-gradient(to bottom, rgba(6,6,28,.25), transparent 24%, transparent 78%, rgba(6,6,28,.65) 100%)' }} />
+      <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'var(--glow-sunset)' }} />
 
       {availabilityMessage && <div role="status" style={{ position: 'absolute', left: 16, right: 16, top: 'calc(max(16px, env(safe-area-inset-top)) + 108px)', zIndex: 4, padding: '10px 12px', borderRadius: 12, background: 'rgba(10,10,26,.86)', border: '1px solid rgba(255,255,255,.12)', color: 'rgba(255,255,255,.72)', fontSize: 12, textAlign: 'center' }}>{availabilityMessage}</div>}
 
@@ -136,7 +138,7 @@ export function TripMapDomain(props: TripMapDomainProps) {
         <button type="button" onClick={requestLocation} disabled={locationState === 'denied'} aria-label={locationState === 'denied' ? 'Location permission denied' : 'Show current location'} style={{ ...controlStyle, opacity: locationState === 'denied' ? .5 : 1 }}><LocateFixed size={20} /></button>
       </div>
 
-      <div aria-live="polite" style={{ position: 'absolute', top: 'calc(max(16px, env(safe-area-inset-top)) + 54px)', left: '50%', transform: 'translateX(-50%)', zIndex: 3, maxWidth: 'calc(100% - 144px)', minHeight: 36, padding: '8px 12px', borderRadius: 999, background: 'rgba(10,10,26,.72)', border: '1px solid rgba(255,255,255,.14)', backdropFilter: 'blur(16px)', color: '#fff', display: 'flex', alignItems: 'center', gap: 7, fontSize: 12, fontWeight: 750, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+      <div aria-live="polite" style={{ position: 'absolute', top: 'calc(max(16px, env(safe-area-inset-top)) + 54px)', left: '50%', transform: 'translateX(-50%)', zIndex: 3, maxWidth: 'calc(100% - 144px)', minHeight: 36, padding: '8px 12px', borderRadius: 999, background: 'rgba(10,10,26,.72)', border: '1px solid rgba(255,255,255,.14)', backdropFilter: 'blur(16px)', color: DUSK.textPrimary, display: 'flex', alignItems: 'center', gap: 7, fontSize: 12, fontWeight: 750, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
         <MapPinned size={15} color="#f5a623" aria-hidden="true" />
         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{props.activeDayLabel ? `${props.activeDayLabel} · ` : ''}{props.routeSummary}</span>
       </div>
@@ -147,7 +149,7 @@ export function TripMapDomain(props: TripMapDomainProps) {
         <div role="dialog" aria-modal="false" aria-label="Map layers" style={{ position: 'absolute', top: 'max(16px, env(safe-area-inset-top))', right: 16, zIndex: 6, width: 'min(290px, calc(100% - 32px))', padding: 14, borderRadius: 20, background: 'rgba(10,10,26,.9)', border: '1px solid rgba(255,255,255,.16)', backdropFilter: 'blur(24px)', boxShadow: '0 18px 48px rgba(0,0,0,.45)' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', minHeight: 44 }}><strong style={{ fontSize: 15 }}>Map layers</strong><button type="button" onClick={() => setLayersOpen(false)} aria-label="Close layers" style={{ ...controlStyle, width: 36, height: 36, boxShadow: 'none' }}><X size={18} /></button></div>
           <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', minHeight: 44, gap: 12, fontSize: 13.5 }}><span>Trip places</span><input type="checkbox" checked readOnly aria-label="Trip places visible" /></label>
-          <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', minHeight: 44, gap: 12, fontSize: 13.5 }}><span>Other days</span><select value={props.otherDays} onChange={(event) => props.onOtherDaysChange(event.target.value as OtherDayVisibility)} style={{ minHeight: 36, borderRadius: 9, background: '#17172f', color: '#fff', border: '1px solid rgba(255,255,255,.15)', padding: '0 8px' }}><option value="hidden">Hidden</option><option value="dimmed">Dimmed</option></select></label>
+          <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', minHeight: 44, gap: 12, fontSize: 13.5 }}><span>Other days</span><select value={props.otherDays} onChange={(event) => props.onOtherDaysChange(event.target.value as OtherDayVisibility)} style={{ minHeight: 36, borderRadius: 9, background: '#17172f', color: DUSK.textPrimary, border: '1px solid rgba(255,255,255,.15)', padding: '0 8px' }}><option value="hidden">Hidden</option><option value="dimmed">Dimmed</option></select></label>
           <div style={{ height: 1, background: 'rgba(255,255,255,.1)', margin: '5px 0' }} />
           {unavailableLayers.map((label) => <div key={label} aria-disabled="true" style={{ minHeight: 38, display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: 'rgba(255,255,255,.38)', fontSize: 13 }}><span>{label}</span><span style={{ fontSize: 10 }}>No data source</span></div>)}
         </div>

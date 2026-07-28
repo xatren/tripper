@@ -16,21 +16,21 @@ export function applyAppTheme(map: mapboxgl.Map) {
         map.setPaintProperty(layer.id, 'background-color', '#06061c')
       } else if (layer.type === 'fill') {
         if (sourceLayer === 'water') {
-          map.setPaintProperty(layer.id, 'fill-color', '#0c1330')
+          map.setPaintProperty(layer.id, 'fill-color', '#150f2a')
         } else if (sourceLayer === 'landuse' || sourceLayer === 'landcover' || sourceLayer === 'national_park') {
-          map.setPaintProperty(layer.id, 'fill-color', '#0a0f22')
+          map.setPaintProperty(layer.id, 'fill-color', '#120c1e')
         }
       } else if (layer.type === 'line') {
         if (sourceLayer === 'road' || sourceLayer === 'bridge' || sourceLayer === 'tunnel') {
-          map.setPaintProperty(layer.id, 'line-color', '#242440')
+          map.setPaintProperty(layer.id, 'line-color', '#3a2740')
         } else if (sourceLayer === 'admin') {
-          map.setPaintProperty(layer.id, 'line-color', '#33335a')
+          map.setPaintProperty(layer.id, 'line-color', '#4a3050')
         }
       } else if (layer.type === 'symbol') {
         if (sourceLayer === 'poi_label' || sourceLayer === 'transit_stop_label') {
           map.setLayoutProperty(layer.id, 'visibility', 'none')
         } else if (sourceLayer === 'road_label' || sourceLayer === 'place_label' || sourceLayer === 'natural_label') {
-          map.setPaintProperty(layer.id, 'text-color', '#7a7aa0')
+          map.setPaintProperty(layer.id, 'text-color', '#a3899e')
           map.setPaintProperty(layer.id, 'text-halo-color', '#06061c')
           map.setPaintProperty(layer.id, 'text-halo-width', 1)
         }

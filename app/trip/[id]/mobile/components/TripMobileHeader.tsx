@@ -5,6 +5,7 @@ import type { TripMember } from '@/types'
 import { showToast } from '@/components/ui/toast'
 import { tokens } from '@/components/mobile'
 import { useTripPresence } from '@/lib/supabase/trip-realtime'
+import { DUSK } from '@/components/design/tokens'
 
 export interface TripMobileHeaderProps {
   /** overlay = transparent gradient over the map (Plan); solid = opaque glass bar (Explore/Bookings/More screens). */
@@ -37,7 +38,7 @@ function AvatarStack({ members, onlineIds }: { members: TripMember[]; onlineIds:
           title={member.profile?.display_name || member.profile?.email}
           style={{
             width: 26, height: 26, borderRadius: '50%', background: 'rgba(136,136,228,.28)', border: '2px solid #0a0a1e',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 10.5, fontWeight: 700,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', color: DUSK.textPrimary, fontSize: 10.5, fontWeight: 700,
             marginLeft: index === 0 ? 0 : -8, position: 'relative',
           }}
         >
@@ -49,7 +50,7 @@ function AvatarStack({ members, onlineIds }: { members: TripMember[]; onlineIds:
         <div
           style={{
             width: 26, height: 26, borderRadius: '50%', background: 'rgba(255,255,255,.1)', border: '2px solid #0a0a1e',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(215,215,255,.8)', fontSize: 9.5, fontWeight: 700, marginLeft: -8,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', color: DUSK.textSecondary, fontSize: 9.5, fontWeight: 700, marginLeft: -8,
           }}
         >
           +{overflow}

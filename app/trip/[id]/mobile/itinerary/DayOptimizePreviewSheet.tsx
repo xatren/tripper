@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useDistanceUnit, formatDistanceValue } from '@/lib/settings'
 import { ACCENT_LIGHT, ACCENT_DARK } from '../domain-ui'
+import { DUSK } from '@/components/design/tokens'
 import type { DayOptimizationPreview } from './route-optimizer'
 
 export interface DayOptimizePreviewSheetProps {
@@ -80,10 +81,10 @@ export function DayOptimizePreviewSheet({ preview, onApply, onDismiss }: DayOpti
               maxHeight: '80vh', overflowY: 'auto',
             }}
           >
-            <div id="day-optimize-preview-title" style={{ fontSize: 16, fontWeight: 800, color: '#fff', letterSpacing: '-0.01em' }}>
+            <div id="day-optimize-preview-title" style={{ fontSize: 16, fontWeight: 800, color: DUSK.textPrimary, letterSpacing: '-0.01em' }}>
               Optimized day
             </div>
-            <div style={{ fontSize: 13, color: 'rgba(215,215,255,.65)', marginTop: 6, lineHeight: 1.5 }}>
+            <div style={{ fontSize: 13, color: DUSK.textMuted, marginTop: 6, lineHeight: 1.5 }}>
               {improved
                 ? 'Reordering this day shortens the drive. Apply to update the plan.'
                 : "This order doesn't save distance or time, but you can still apply it if you prefer the sequence."}
@@ -94,30 +95,30 @@ export function DayOptimizePreviewSheet({ preview, onApply, onDismiss }: DayOpti
                 <div style={{ fontSize: 20, fontWeight: 800, color: ACCENT_LIGHT }}>
                   {improved ? '−' : ''}{distanceText}
                 </div>
-                <div style={{ fontSize: 11, color: 'rgba(215,215,255,.55)', marginTop: 2 }}>distance</div>
+                <div style={{ fontSize: 11, color: DUSK.textMuted, marginTop: 2 }}>distance</div>
               </div>
               <div style={{ flex: 1, borderRadius: 14, padding: '12px 14px', background: 'rgba(245,166,35,.1)', border: '1px solid rgba(245,166,35,.3)' }}>
                 <div style={{ fontSize: 20, fontWeight: 800, color: ACCENT_LIGHT }}>
                   {improved ? '−' : ''}{min} min
                 </div>
-                <div style={{ fontSize: 11, color: 'rgba(215,215,255,.55)', marginTop: 2 }}>drive time</div>
+                <div style={{ fontSize: 11, color: DUSK.textMuted, marginTop: 2 }}>drive time</div>
               </div>
             </div>
 
             {lockedCount > 0 && (
-              <div style={{ fontSize: 12, color: 'rgba(215,215,255,.6)', marginTop: 12 }}>
+              <div style={{ fontSize: 12, color: DUSK.textMuted, marginTop: 12 }}>
                 {lockedCount} locked item{lockedCount === 1 ? '' : 's'} stayed in place.
               </div>
             )}
 
             {skippedCount > 0 && (
               <div style={{ borderRadius: 12, padding: '10px 12px', background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', marginTop: 10 }}>
-                <div style={{ fontSize: 11.5, fontWeight: 700, color: 'rgba(215,215,255,.75)', textTransform: 'uppercase', letterSpacing: '.04em', marginBottom: 6 }}>
+                <div style={{ fontSize: 11.5, fontWeight: 700, color: DUSK.textSecondary, textTransform: 'uppercase', letterSpacing: '.04em', marginBottom: 6 }}>
                   {skippedCount} section{skippedCount === 1 ? '' : 's'} left unchanged
                 </div>
                 <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 4 }}>
                   {preview.skippedSegments.map((segment, index) => (
-                    <li key={index} style={{ fontSize: 12, color: 'rgba(215,215,255,.65)', lineHeight: 1.4 }}>
+                    <li key={index} style={{ fontSize: 12, color: DUSK.textMuted, lineHeight: 1.4 }}>
                       {segment.message}
                     </li>
                   ))}

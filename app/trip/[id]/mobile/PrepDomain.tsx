@@ -20,6 +20,7 @@ import { showToast } from '@/components/ui/toast'
 import { tokens } from '@/components/mobile'
 import type { TripMember } from '@/types'
 import { ACCENT_DARK, ACCENT_GRADIENT, ACCENT_LIGHT, GLASS_BORDER, GLASS_FILL, RetryCard } from './domain-ui'
+import { DUSK } from '@/components/design/tokens'
 import {
   applyRealtimeChange, buildReadinessSections, comparePackingRows, computeReadiness,
   nextOrderIndex, reorderUpdates, whoBringsWhat,
@@ -483,7 +484,7 @@ export function PrepDomain({ tripId, vibe, userId, canEdit, members }: PrepDomai
           {canEdit && (
             <button
               onClick={() => setTemplateOpen(true)}
-              style={{ marginTop: 14, minHeight: 44, padding: '11px 22px', borderRadius: 12, background: ACCENT_GRADIENT, border: 'none', color: '#1a0800', fontWeight: 800, fontSize: 13.5, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 0 20px rgba(245,140,0,.25)' }}
+              style={{ marginTop: 14, minHeight: 44, padding: '11px 22px', borderRadius: 12, background: ACCENT_GRADIENT, border: 'none', color: DUSK.onAmber, fontWeight: 800, fontSize: 13.5, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 0 20px rgba(245,140,0,.25)' }}
             >
               Browse {vibe ?? 'Road'} starter list
             </button>

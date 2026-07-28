@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { forwardSearch, type GeocodeResult } from '@/lib/mapbox/geocoding'
+import { DUSK } from '@/components/design/tokens'
 
 export interface DestinationDialogProps {
   initialQuery?: string
@@ -98,7 +99,7 @@ export function DestinationDialog({
         </div>
         <div id="add-destination-title" style={{ color: '#ffffff', fontWeight: 700, fontSize: 16 }}>Add a destination</div>
         {countryLabel
-          ? <div style={{ color: 'rgba(215,215,255,.55)', fontSize: 12, marginTop: 4, marginBottom: 14 }}>Search is limited to {countryLabel}.</div>
+          ? <div style={{ color: DUSK.textMuted, fontSize: 12, marginTop: 4, marginBottom: 14 }}>Search is limited to {countryLabel}.</div>
           : <div style={{ marginBottom: 14 }} />}
         <div style={{ position: 'relative', marginBottom: 8 }}>
           <label htmlFor="destination-search" className="sr-only">Search for a destination</label>
@@ -123,11 +124,11 @@ export function DestinationDialog({
               style={{ width: '100%', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 2, padding: '10px 8px', background: 'none', border: 'none', borderBottom: '1px solid rgba(255,255,255,.06)', cursor: isSaving ? 'default' : 'pointer', fontFamily: 'inherit' }}
             >
               <span style={{ color: '#ffffff', fontSize: 14, fontWeight: 600 }}>{r.name}</span>
-              <span style={{ color: 'rgba(215,215,255,.55)', fontSize: 12 }}>{r.address}</span>
+              <span style={{ color: DUSK.textMuted, fontSize: 12 }}>{r.address}</span>
             </button>
           ))}
           {query && !isSearching && results.length === 0 && (
-            <div style={{ color: 'rgba(215,215,255,.55)', fontSize: 13, padding: '16px 8px', textAlign: 'center' }}>{countryLabel ? `No results in ${countryLabel}` : 'No results'}</div>
+            <div style={{ color: DUSK.textMuted, fontSize: 13, padding: '16px 8px', textAlign: 'center' }}>{countryLabel ? `No results in ${countryLabel}` : 'No results'}</div>
           )}
         </div>
       </div>

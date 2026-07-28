@@ -1,6 +1,7 @@
 'use client'
 
 import { Component, type CSSProperties, type ReactNode } from 'react'
+import { DUSK } from '@/components/design/tokens'
 
 interface DeferredBoundaryProps {
   children: ReactNode
@@ -21,7 +22,7 @@ export function DeferredFailure({ label, onRetry, style }: { label: string; onRe
       <button
         type="button"
         onClick={onRetry}
-        style={{ minHeight: 44, padding: '0 16px', borderRadius: 12, border: '1px solid rgba(255,255,255,.2)', background: 'rgba(255,255,255,.08)', color: '#fff', font: 'inherit', fontWeight: 700, cursor: 'pointer' }}
+        style={{ minHeight: 44, padding: '0 16px', borderRadius: 12, border: '1px solid rgba(255,255,255,.2)', background: 'rgba(255,255,255,.08)', color: DUSK.textPrimary, font: 'inherit', fontWeight: 700, cursor: 'pointer' }}
       >
         Retry
       </button>

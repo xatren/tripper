@@ -15,6 +15,7 @@ import { getOptimizedOrder } from '@/lib/mapbox/optimize'
 import { useDistanceUnit, formatDistanceValue } from '@/lib/settings'
 import { DestinationDialog } from './DestinationDialog'
 import { ACCENT, ACCENT_DARK, ACCENT_LIGHT, GLASS_BORDER, GLASS_FILL } from './domain-ui'
+import { DUSK } from '@/components/design/tokens'
 import { totalNights } from './trip-domain-utils'
 import { TripPrimaryNav, type PrimaryNavSection } from './components/TripPrimaryNav'
 import { TripAddSheet } from './components/TripAddSheet'
@@ -463,10 +464,10 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
 
   return (
     <div
+      className="atmosphere"
       style={{
         width: '100%',
         minHeight: '100svh',
-        background: 'linear-gradient(145deg, #06061c, #0a1020, #071216)',
         fontFamily: "var(--font-inter),'Inter',system-ui,-apple-system,sans-serif",
         position: 'relative',
         overflow: 'clip',
@@ -496,7 +497,7 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
         {/* map layer — fixed, full-bleed, never resized or re-rendered by the sheet drag.
             The sheet is a pure overlay on top; it covers more/less of this static map as it moves,
             but the map's own DOM container size (and therefore its camera) never changes. */}
-        <div style={{ position: 'absolute', inset: 0, zIndex: 0, background: '#06061c' }}>
+        <div style={{ position: 'absolute', inset: 0, zIndex: 0, background: DUSK.night }}>
           <TripMapDomain
             points={mapPoints}
             routePath={routePath}
@@ -540,20 +541,20 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
           {stops.length > 0 && (
             <div
               aria-live="polite"
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, padding: '0 16px 10px', flex: 'none', fontSize: 12.5, fontWeight: 700, color: 'rgba(215,215,255,.85)' }}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, padding: '0 16px 10px', flex: 'none', fontSize: 12.5, fontWeight: 700, color: DUSK.textSecondary }}
             >
               <span>{stops.length} {stops.length === 1 ? 'stop' : 'stops'}</span>
               {stops.length >= 2 && (
                 routeLoading ? (
                   <>
-                    <span aria-hidden="true" style={{ width: 3, height: 3, borderRadius: '50%', background: 'rgba(215,215,255,.35)' }} />
+                    <span aria-hidden="true" style={{ width: 3, height: 3, borderRadius: '50%', background: DUSK.textMuted }} />
                     <span aria-hidden="true" style={{ width: 96, height: 9, borderRadius: 999, background: 'rgba(255,255,255,.12)', animation: 'pulseglow 1.6s ease-in-out infinite' }} />
                   </>
                 ) : (
                   <>
-                    <span aria-hidden="true" style={{ width: 3, height: 3, borderRadius: '50%', background: 'rgba(215,215,255,.35)' }} />
+                    <span aria-hidden="true" style={{ width: 3, height: 3, borderRadius: '50%', background: DUSK.textMuted }} />
                     <span>{summaryDistanceText}</span>
-                    <span aria-hidden="true" style={{ width: 3, height: 3, borderRadius: '50%', background: 'rgba(215,215,255,.35)' }} />
+                    <span aria-hidden="true" style={{ width: 3, height: 3, borderRadius: '50%', background: DUSK.textMuted }} />
                     <span>{summaryDuration}</span>
                   </>
                 )
@@ -599,7 +600,7 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
                       </svg>
                       <div>
                         <div style={{ fontSize: 20, fontWeight: 800, letterSpacing: '-0.01em' }}>{nightsPlanned} / {nightsTarget}</div>
-                        <div style={{ fontSize: 12, color: 'rgba(215,215,255,.7)', fontWeight: 500, marginTop: 2 }}>Nights Planned</div>
+                        <div style={{ fontSize: 12, color: DUSK.textSecondary, fontWeight: 500, marginTop: 2 }}>Nights Planned</div>
                       </div>
                     </div>
                     {canEdit && <button
@@ -608,7 +609,7 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
                       style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,.07)', border: '1px solid rgba(255,255,255,.15)', borderRadius: 999, padding: '10px 14px', flex: 'none', cursor: optimizing ? 'default' : 'pointer', fontFamily: 'inherit', opacity: optimizing ? 0.6 : 1 }}
                     >
                       <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style={optimizing ? { animation: 'pulseglow 1s ease-in-out infinite' } : undefined}><path d="M8 1L9.3 5.6L14 7L9.3 8.4L8 13L6.7 8.4L2 7L6.7 5.6L8 1Z" fill={ACCENT_LIGHT} /></svg>
-                      <span style={{ fontSize: 12.5, fontWeight: 600, color: '#fff' }}>{optimizing ? 'Optimizing…' : 'Optimize'}</span>
+                      <span style={{ fontSize: 12.5, fontWeight: 600, color: DUSK.textPrimary }}>{optimizing ? 'Optimizing…' : 'Optimize'}</span>
                     </button>}
                   </div>
                 )}
@@ -618,23 +619,23 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
                     <div style={{ width: 46, height: 46, borderRadius: '50%', background: 'rgba(136,136,228,.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 2 }}>
                       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(136,136,228,.85)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M9 20l-5.5-2V4l5.5 2 6-2 5.5 2v14l-5.5-2-6 2z" /><path d="M9 6v14M15 4v14" /></svg>
                     </div>
-                    <div style={{ color: '#ffffff', fontWeight: 600, fontSize: 16, textAlign: 'center' }}>{canEdit ? 'Add your first destination' : 'No destinations yet'}</div>
-                    <div style={{ color: 'rgba(215,215,255,.55)', fontWeight: 400, fontSize: 13, textAlign: 'center' }}>{canEdit ? 'Search any city or place to start your route' : 'An editor can add the first stop to this shared route.'}</div>
+                    <div style={{ color: DUSK.textPrimary, fontWeight: 600, fontSize: 16, textAlign: 'center' }}>{canEdit ? 'Add your first destination' : 'No destinations yet'}</div>
+                    <div style={{ color: DUSK.textMuted, fontWeight: 400, fontSize: 13, textAlign: 'center' }}>{canEdit ? 'Search any city or place to start your route' : 'An editor can add the first stop to this shared route.'}</div>
                     {canEdit && <button
                       onClick={() => { setAddInitialQuery(''); setIsAddOpen(true) }}
-                      style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 7, padding: '12px 22px', borderRadius: 13, background: `linear-gradient(145deg, ${ACCENT_LIGHT}, ${ACCENT_DARK})`, border: 'none', color: '#1a0800', fontWeight: 800, fontSize: 13.5, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 0 22px rgba(245,140,0,.3)' }}
+                      style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 7, padding: '12px 22px', borderRadius: 13, background: `linear-gradient(145deg, ${ACCENT_LIGHT}, ${ACCENT_DARK})`, border: 'none', color: DUSK.onAmber, fontWeight: 800, fontSize: 13.5, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 0 22px rgba(245,140,0,.3)' }}
                     >
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
                       Add your first stop
                     </button>}
                     {canEdit && emptyStateSuggestions.length > 0 && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', justifyContent: 'center', marginTop: 6 }}>
-                        <span style={{ fontSize: 11.5, color: 'rgba(215,215,255,.45)', fontWeight: 600 }}>Try:</span>
+                        <span style={{ fontSize: 11.5, color: DUSK.textMuted, fontWeight: 600 }}>Try:</span>
                         {emptyStateSuggestions.map((q) => (
                           <button
                             key={q}
                             onClick={() => { setAddInitialQuery(q); setIsAddOpen(true) }}
-                            style={{ padding: '5px 12px', borderRadius: 999, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.12)', color: 'rgba(215,215,255,.8)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}
+                            style={{ padding: '5px 12px', borderRadius: 999, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.12)', color: DUSK.textSecondary, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}
                           >
                             {q}
                           </button>
@@ -644,6 +645,7 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
                   </div>
                 ) : (
                   <DndContext
+                    id="plan-stops-dnd"
                     sensors={dndSensors}
                     collisionDetection={closestCenter}
                     onDragStart={() => onStopSyncPaused(true)}
@@ -700,20 +702,20 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
                                   handleRenameStop(stop.id, editDraft)
                                   setEditingStopId(null)
                                 }}
-                                style={{ width: '100%', background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.15)', borderRadius: 8, padding: '4px 8px', fontSize: 14, fontWeight: 600, color: '#fff', outline: 'none', fontFamily: 'inherit' }}
+                                style={{ width: '100%', background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.15)', borderRadius: 8, padding: '4px 8px', fontSize: 14, fontWeight: 600, color: DUSK.textPrimary, outline: 'none', fontFamily: 'inherit' }}
                               />
                             ) : (
-                              <div style={{ color: '#ffffff', fontWeight: 600, fontSize: 14, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{stop.name}</div>
+                              <div style={{ color: DUSK.textPrimary, fontWeight: 600, fontSize: 14, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{stop.name}</div>
                             )}
                             {stop.address && (
-                              <div style={{ color: 'rgba(215,215,255,.55)', fontSize: 11.5, marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{stop.address}</div>
+                              <div style={{ color: DUSK.textMuted, fontSize: 11.5, marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{stop.address}</div>
                             )}
                           </div>
                           {canEdit ? <div style={{ display: 'flex', alignItems: 'center', gap: 2, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 999, padding: 4, flex: 'none' }}>
                             <button
                               aria-label={`Remove a night in ${stop.name}`}
                               onClick={() => changeNights(stop.id, -1)}
-                              style={{ width: 26, height: 26, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'rgba(215,215,255,.8)', background: 'none', border: 'none' }}
+                              style={{ width: 26, height: 26, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: DUSK.textSecondary, background: 'none', border: 'none' }}
                             >
                               <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M2.5 8H13.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>
                             </button>
@@ -725,7 +727,7 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
                             >
                               <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M8 2.5V13.5M2.5 8H13.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>
                             </button>
-                          </div> : <span style={{ fontSize: 12, color: 'rgba(215,215,255,.58)', fontWeight: 600, flex: 'none' }}>{nights[stop.id] ?? 1} {(nights[stop.id] ?? 1) === 1 ? 'night' : 'nights'}</span>}
+                          </div> : <span style={{ fontSize: 12, color: DUSK.textMuted, fontWeight: 600, flex: 'none' }}>{nights[stop.id] ?? 1} {(nights[stop.id] ?? 1) === 1 ? 'night' : 'nights'}</span>}
                         </div>
 
                         {canEdit && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6, padding: '6px 4px 0' }}>
@@ -736,7 +738,7 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
                             }}
                             title="Rename stop"
                             aria-label={`Rename ${stop.name}`}
-                            style={{ width: 30, height: 30, borderRadius: 9, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.08)', color: 'rgba(215,215,255,.6)' }}
+                            style={{ width: 30, height: 30, borderRadius: 9, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.08)', color: DUSK.textMuted }}
                           >
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg>
                           </button>
@@ -757,14 +759,14 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
                             </div>
                             {routeLegs[idx] ? (
                               <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', minWidth: 0 }}>
-                                <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: 'rgba(215,215,255,.55)', fontWeight: 500, whiteSpace: 'nowrap' }}>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: DUSK.textMuted, fontWeight: 500, whiteSpace: 'nowrap' }}>
                                   <svg width="11" height="11" viewBox="0 0 16 16" fill="none" style={{ flex: 'none' }}>
                                     <path d="M2 12L6 4L9 9L11 6L14 12" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
                                   </svg>
                                   {formatDistanceValue(routeLegs[idx].distanceMeters, distanceUnit)}
                                 </span>
-                                <span style={{ width: 3, height: 3, borderRadius: '50%', background: 'rgba(215,215,255,.35)', flex: 'none' }} />
-                                <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: 'rgba(215,215,255,.55)', fontWeight: 500, whiteSpace: 'nowrap' }}>
+                                <span style={{ width: 3, height: 3, borderRadius: '50%', background: DUSK.textMuted, flex: 'none' }} />
+                                <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: DUSK.textMuted, fontWeight: 500, whiteSpace: 'nowrap' }}>
                                   <svg width="11" height="11" viewBox="0 0 16 16" fill="none" style={{ flex: 'none' }}>
                                     <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.4" />
                                     <path d="M8 4.5V8L10.5 9.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
@@ -788,7 +790,7 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
 
                 {canEdit && <><div style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%' }}>
                   <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,.08)' }} />
-                  <div style={{ color: 'rgba(215,215,255,.55)', fontSize: 12, fontWeight: 500 }}>or</div>
+                  <div style={{ color: DUSK.textMuted, fontSize: 12, fontWeight: 500 }}>or</div>
                   <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,.08)' }} />
                 </div>
 
@@ -839,7 +841,7 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
           aria-label="Add to trip"
           style={{ position: 'fixed', right: 18, bottom: 96, width: 56, height: 56, borderRadius: '50%', background: `linear-gradient(145deg, ${ACCENT_LIGHT}, ${ACCENT_DARK})`, boxShadow: '0 0 32px rgba(245,140,0,.45), 0 8px 20px rgba(0,0,0,.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 5, border: 'none', cursor: 'pointer' }}
         >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.6" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={DUSK.textPrimary} strokeWidth="2.6" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
         </button>}
 
       {canEdit && <TripAddSheet
@@ -946,10 +948,10 @@ function OptimizePreviewSheet({
               boxShadow: '0 16px 48px rgba(0,0,0,.5)', backdropFilter: 'blur(24px)',
             }}
           >
-            <div id="optimize-preview-title" style={{ fontSize: 16, fontWeight: 800, color: '#fff', letterSpacing: '-0.01em' }}>
+            <div id="optimize-preview-title" style={{ fontSize: 16, fontWeight: 800, color: DUSK.textPrimary, letterSpacing: '-0.01em' }}>
               Optimized route
             </div>
-            <div style={{ fontSize: 13, color: 'rgba(215,215,255,.65)', marginTop: 6, lineHeight: 1.5 }}>
+            <div style={{ fontSize: 13, color: DUSK.textSecondary, marginTop: 6, lineHeight: 1.5 }}>
               {improved
                 ? "Reordering your middle stops shortens the drive. Apply to update your route."
                 : "This order doesn't save distance or time, but you can still apply it if you prefer the sequence."}
@@ -960,13 +962,13 @@ function OptimizePreviewSheet({
                 <div style={{ fontSize: 20, fontWeight: 800, color: ACCENT_LIGHT }}>
                   {improved ? '−' : ''}{distanceText}
                 </div>
-                <div style={{ fontSize: 11, color: 'rgba(215,215,255,.55)', marginTop: 2 }}>distance</div>
+                <div style={{ fontSize: 11, color: DUSK.textMuted, marginTop: 2 }}>distance</div>
               </div>
               <div style={{ flex: 1, borderRadius: 14, padding: '12px 14px', background: 'rgba(245,166,35,.1)', border: '1px solid rgba(245,166,35,.3)' }}>
                 <div style={{ fontSize: 20, fontWeight: 800, color: ACCENT_LIGHT }}>
                   {improved ? '−' : ''}{min} min
                 </div>
-                <div style={{ fontSize: 11, color: 'rgba(215,215,255,.55)', marginTop: 2 }}>drive time</div>
+                <div style={{ fontSize: 11, color: DUSK.textMuted, marginTop: 2 }}>drive time</div>
               </div>
             </div>
 
@@ -976,7 +978,7 @@ function OptimizePreviewSheet({
                 onClick={onDismiss}
                 style={{
                   flex: 1, height: 44, borderRadius: 12, background: 'rgba(255,255,255,.06)',
-                  border: '1px solid rgba(255,255,255,.12)', color: 'rgba(255,255,255,.85)',
+                  border: '1px solid rgba(255,255,255,.12)', color: DUSK.textSecondary,
                   fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
                 }}
               >
@@ -988,7 +990,7 @@ function OptimizePreviewSheet({
                 style={{
                   flex: 1, height: 44, borderRadius: 12,
                   background: `linear-gradient(145deg, ${ACCENT_LIGHT}, ${ACCENT_DARK})`,
-                  border: 'none', color: '#1a1004', fontSize: 14, fontWeight: 700,
+                  border: 'none', color: DUSK.onAmber, fontSize: 14, fontWeight: 700,
                   cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 6px 20px rgba(245,166,35,.3)',
                 }}
               >

@@ -5,6 +5,7 @@ import { tokens, StatusChip } from '@/components/mobile'
 import type { ItineraryItemStatus, ItineraryItemType } from '@/types'
 import type { TimelineEntry } from '../itinerary-projection'
 import { BOOKING_TYPES, ITEM_TYPE_META, STATUS_META, formatDuration, formatWallTime } from './itinerary-ui'
+import { DUSK } from '@/components/design/tokens'
 
 export interface ItineraryItemRowProps {
   entry: TimelineEntry
@@ -89,7 +90,7 @@ export function ItineraryItemRow({ entry, timezone, canEdit, onEdit, onToggleCom
             {...dragHandleProps}
             style={{
               flex: 'none', width: 24, minHeight: 44, display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: 'none', border: 'none', cursor: isDragging ? 'grabbing' : 'grab', color: 'rgba(215,215,255,.45)',
+              background: 'none', border: 'none', cursor: isDragging ? 'grabbing' : 'grab', color: DUSK.textMuted,
               touchAction: 'none', padding: 0,
             }}
           >
@@ -133,7 +134,7 @@ export function ItineraryItemRow({ entry, timezone, canEdit, onEdit, onToggleCom
               {entry.title}
             </span>
             {entry.isLocked && (
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(215,215,255,.55)" strokeWidth="2" aria-label="Locked" style={{ flex: 'none' }}>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={DUSK.textMuted} strokeWidth="2" aria-label="Locked" style={{ flex: 'none' }}>
                 <rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" />
               </svg>
             )}

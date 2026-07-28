@@ -37,8 +37,8 @@ export function SegmentedTabs<T extends string = string>({ options, value, onVal
             value={opt.value}
             className={cn(
               'flex-1 cursor-pointer rounded-[11px] border border-transparent py-[9px] text-[13px] font-bold outline-none',
-              'text-[rgba(215,215,255,.55)] [transition:all_0.25s_ease]',
-              'hover:text-[rgba(215,215,255,.8)]',
+              'text-[rgba(222,220,240,0.58)] [transition:all_0.25s_ease]',
+              'hover:text-[rgba(222,220,240,0.76)]',
               'focus-visible:ring-2 focus-visible:ring-[rgba(245,166,35,.5)]',
               'data-[state=active]:border-[rgba(245,140,0,.4)] data-[state=active]:bg-[rgba(245,140,0,.16)] data-[state=active]:text-[var(--color-accent-light)]'
             )}

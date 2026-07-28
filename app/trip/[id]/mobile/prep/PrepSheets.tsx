@@ -18,6 +18,7 @@ import {
   type TemplateRow, type TripTaskRow,
 } from './prep-logic'
 import { buildTemplateRows, PACKING_CATEGORY_LABEL, PACKING_CATEGORY_META, PRIORITY_META, VIBE_PACKING_EMOJI } from './prep-data'
+import { DUSK } from '@/components/design/tokens'
 
 const fieldLabelStyle = {
   display: 'block', fontSize: 11.5, fontWeight: 700, color: tokens.textMuted,
@@ -26,7 +27,7 @@ const fieldLabelStyle = {
 
 const inputStyle = {
   width: '100%', background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.12)',
-  borderRadius: 12, padding: '12px 12px', fontSize: 14, color: '#fff', outline: 'none',
+  borderRadius: 12, padding: '12px 12px', fontSize: 14, color: DUSK.textPrimary, outline: 'none',
   fontFamily: 'inherit', minHeight: 44, boxSizing: 'border-box',
 } as const
 
@@ -233,7 +234,7 @@ export function PrepDetailSheet({
                 aria-label="Decrease quantity"
                 disabled={!canEdit || form.quantity <= 1}
                 onClick={() => setForm((f) => f && { ...f, quantity: Math.max(1, f.quantity - 1) })}
-                style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.14)', color: '#fff', fontSize: 18, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', opacity: form.quantity <= 1 ? .45 : 1 }}
+                style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.14)', color: DUSK.textPrimary, fontSize: 18, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', opacity: form.quantity <= 1 ? .45 : 1 }}
               >
                 −
               </button>
@@ -243,7 +244,7 @@ export function PrepDetailSheet({
                 aria-label="Increase quantity"
                 disabled={!canEdit || form.quantity >= 99}
                 onClick={() => setForm((f) => f && { ...f, quantity: Math.min(99, f.quantity + 1) })}
-                style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.14)', color: '#fff', fontSize: 18, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', opacity: form.quantity >= 99 ? .45 : 1 }}
+                style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.14)', color: DUSK.textPrimary, fontSize: 18, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', opacity: form.quantity >= 99 ? .45 : 1 }}
               >
                 +
               </button>
@@ -335,7 +336,7 @@ export function PrepDetailSheet({
               type="button"
               onClick={save}
               disabled={saving || !form.name.trim()}
-              style={{ flex: 1, minHeight: 44, borderRadius: 12, background: ACCENT_GRADIENT, border: 'none', color: '#1a0800', fontSize: 14, fontWeight: 800, cursor: saving ? 'default' : 'pointer', fontFamily: 'inherit', opacity: saving || !form.name.trim() ? .6 : 1 }}
+              style={{ flex: 1, minHeight: 44, borderRadius: 12, background: ACCENT_GRADIENT, border: 'none', color: DUSK.onAmber, fontSize: 14, fontWeight: 800, cursor: saving ? 'default' : 'pointer', fontFamily: 'inherit', opacity: saving || !form.name.trim() ? .6 : 1 }}
             >
               {saving ? 'Saving…' : 'Save changes'}
             </button>
@@ -439,7 +440,7 @@ export function TemplatePickerSheet({ open, vibe, existingItems, onClose, onImpo
           type="button"
           onClick={runImport}
           disabled={importing || selected.size === 0}
-          style={{ minHeight: 48, borderRadius: 12, background: ACCENT_GRADIENT, border: 'none', color: '#1a0800', fontSize: 14, fontWeight: 800, cursor: importing || selected.size === 0 ? 'default' : 'pointer', fontFamily: 'inherit', opacity: importing || selected.size === 0 ? .6 : 1, boxShadow: '0 0 20px rgba(245,140,0,.25)' }}
+          style={{ minHeight: 48, borderRadius: 12, background: ACCENT_GRADIENT, border: 'none', color: DUSK.onAmber, fontSize: 14, fontWeight: 800, cursor: importing || selected.size === 0 ? 'default' : 'pointer', fontFamily: 'inherit', opacity: importing || selected.size === 0 ? .6 : 1, boxShadow: '0 0 20px rgba(245,140,0,.25)' }}
         >
           {importing ? 'Importing…' : `Import ${selected.size} item${selected.size === 1 ? '' : 's'}`}
         </button>

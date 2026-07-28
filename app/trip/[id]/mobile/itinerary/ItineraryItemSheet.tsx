@@ -6,6 +6,7 @@ import { CURRENCY_SYMBOLS, type ItineraryItemStatus, type ItineraryItemType, typ
 import { ITEM_TYPE_META, STATUS_META } from './itinerary-ui'
 import { CommentSection } from '../components/CollaborationSheets'
 import { useTripEditingEntity, useTripPresence } from '@/lib/supabase/trip-realtime'
+import { DUSK } from '@/components/design/tokens'
 
 /** Editable wall-clock draft; the timeline converts it to/from row instants. */
 export interface ItineraryItemDraft {
@@ -56,7 +57,7 @@ const STEPS: { key: Step; label: string }[] = [
 const FIELD_STYLE = {
   width: '100%', minHeight: 44, padding: '10px 12px', borderRadius: 12,
   background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.14)',
-  color: '#fff', fontSize: 14, fontFamily: 'inherit', outline: 'none',
+  color: DUSK.textPrimary, fontSize: 14, fontFamily: 'inherit', outline: 'none',
 } as const
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {

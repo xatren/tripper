@@ -8,6 +8,7 @@ import { useTripRealtimeTable } from '@/lib/supabase/trip-realtime'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { showToast } from '@/components/ui/toast'
 import { RetryCard } from '../domain-ui'
+import { DUSK } from '@/components/design/tokens'
 import { DOCUMENTS_BUCKET, filterReservations, splitReservations } from '../bookings/bookings-logic'
 import { RESERVATION_TYPE_META } from '../bookings/bookings-ui'
 import { ReservationCard } from '../bookings/ReservationCard'
@@ -204,7 +205,7 @@ export function BookingsDomain({ trip, stops, items, setItems, itineraryEnabled,
             style={{
               width: '100%', minHeight: 44, padding: '10px 14px', borderRadius: 12,
               background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.14)',
-              color: '#fff', fontSize: 13.5, fontFamily: 'inherit', outline: 'none',
+              color: DUSK.textPrimary, fontSize: 13.5, fontFamily: 'inherit', outline: 'none',
             }}
           />
 

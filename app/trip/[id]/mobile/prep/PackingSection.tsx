@@ -24,6 +24,7 @@ import {
   type PackingCategoryKey, type PackingFilter, type PackingItemRow,
 } from './prep-logic'
 import { AssigneeBadge, PACKING_CATEGORY_META, PriorityChip } from './prep-data'
+import { DUSK } from '@/components/design/tokens'
 
 const FILTERS: { key: PackingFilter; label: string }[] = [
   { key: 'all', label: 'All' },
@@ -136,7 +137,7 @@ export function PackingSection({
                 </div>
               </div>
               <svg aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none" style={{ flex: 'none', transition: 'transform .25s ease', transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-                <path d="M4 6L8 10L12 6" stroke="rgba(215,215,255,.6)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M4 6L8 10L12 6" stroke={DUSK.textMuted} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
             {isOpen && (
@@ -193,7 +194,7 @@ export function PackingSection({
                                   style={{ flex: 1, minWidth: 0, minHeight: 44, display: 'flex', alignItems: 'center', gap: 8, padding: '6px 4px', background: 'none', border: 'none', textAlign: 'left', fontFamily: 'inherit', color: 'inherit', cursor: 'pointer' }}
                                 >
                                   <span style={{ flex: 1, minWidth: 0 }}>
-                                    <span style={{ display: 'block', fontSize: 13.5, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: item.checked ? 'rgba(215,215,255,.55)' : 'rgba(255,255,255,.92)', textDecoration: item.checked ? 'line-through' : 'none' }}>
+                                    <span style={{ display: 'block', fontSize: 13.5, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: item.checked ? DUSK.textMuted : DUSK.textPrimary, textDecoration: item.checked ? 'line-through' : 'none' }}>
                                       {item.label}
                                       {(item.quantity ?? 1) > 1 && (
                                         <span style={{ marginLeft: 6, fontSize: 11.5, fontWeight: 700, color: tokens.textSecondary, textDecoration: 'none' }}>×{item.quantity}</span>
@@ -222,7 +223,7 @@ export function PackingSection({
                                     type="button"
                                     aria-label={`Reorder ${item.label}`}
                                     {...handleProps}
-                                    style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none', background: 'none', border: 'none', cursor: 'grab', color: 'rgba(215,215,255,.4)', touchAction: 'none' }}
+                                    style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none', background: 'none', border: 'none', cursor: 'grab', color: DUSK.textMuted, touchAction: 'none' }}
                                   >
                                     <svg aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none">
                                       <path d="M3 5.5H13M3 8H13M3 10.5H13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -250,7 +251,7 @@ export function PackingSection({
                         setTimeout(() => target.scrollIntoView({ block: 'center', behavior: 'smooth' }), 250)
                       }}
                       placeholder="Add item..."
-                      style={{ flex: 1, minWidth: 0, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 10, padding: '11px 12px', fontSize: 13, color: '#fff', outline: 'none', fontFamily: 'inherit' }}
+                      style={{ flex: 1, minWidth: 0, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 10, padding: '11px 12px', fontSize: 13, color: DUSK.textPrimary, outline: 'none', fontFamily: 'inherit' }}
                     />
                     <button
                       aria-label={`Add item to ${label}`}

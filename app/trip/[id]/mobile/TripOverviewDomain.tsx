@@ -11,6 +11,7 @@ import { fetchDayWeather, type DayWeather } from '@/lib/weather/openMeteo'
 import { useDistanceUnit, formatDistanceValue, type DistanceUnit } from '@/lib/settings'
 import { tokens, InlineError, SkeletonBlock, StatusChip } from '@/components/mobile'
 import { ACCENT_GRADIENT, SoonBadge } from './domain-ui'
+import { DUSK } from '@/components/design/tokens'
 import { computeStopSchedule, formatDateRange, formatHeaderDate, formatMoney, totalNights, type StopSchedule } from './trip-domain-utils'
 import { tripLifecycle, currentTripDay, daysBetween, localDateISO, type TripLifecycle } from './trip-lifecycle'
 import {
@@ -100,7 +101,7 @@ function PrimaryButton({ children, onClick, disabled }: { children: ReactNode; o
       disabled={disabled}
       style={{
         width: '100%', minHeight: 48, padding: '13px 20px', borderRadius: 14, border: 'none',
-        background: ACCENT_GRADIENT, color: '#1a0800', fontWeight: 800, fontSize: 14, fontFamily: 'inherit',
+        background: ACCENT_GRADIENT, color: DUSK.onAmber, fontWeight: 800, fontSize: 14, fontFamily: 'inherit',
         cursor: disabled ? 'default' : 'pointer', opacity: disabled ? 0.6 : 1,
         boxShadow: '0 0 20px rgba(245,140,0,.25)',
       }}
@@ -156,7 +157,7 @@ function OverviewRow({ icon, title, hint, tone = 'neutral', onSelect, trailing }
       {trailing}
       {onSelect && (
         <svg aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none" style={{ flex: 'none' }}>
-          <path d="M6 4L10 8L6 12" stroke="rgba(215,215,255,.5)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M6 4L10 8L6 12" stroke={DUSK.textMuted} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       )}
     </>
@@ -183,7 +184,7 @@ function formatDriveTime(seconds: number) {
 
 const dateInputStyle: CSSProperties = {
   width: '100%', background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.12)',
-  borderRadius: 12, padding: '11px 12px', fontSize: 14, color: '#fff', outline: 'none',
+  borderRadius: 12, padding: '11px 12px', fontSize: 14, color: DUSK.textPrimary, outline: 'none',
   fontFamily: 'inherit', colorScheme: 'dark', minHeight: 44,
 }
 
@@ -698,7 +699,7 @@ function ActiveContent({ dayNumber, totalDays, todayISO, currentStop, nextStop, 
             rel="noopener noreferrer"
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 48,
-              padding: '13px 20px', borderRadius: 14, background: ACCENT_GRADIENT, color: '#1a0800',
+              padding: '13px 20px', borderRadius: 14, background: ACCENT_GRADIENT, color: DUSK.onAmber,
               fontWeight: 800, fontSize: 14, textDecoration: 'none', boxShadow: '0 0 20px rgba(245,140,0,.25)',
             }}
           >

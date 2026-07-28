@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react'
 import { tokens } from '@/components/mobile'
 import { ACCENT, type Section } from '../domain-ui'
+import { DUSK } from '@/components/design/tokens'
 
 export type PrimaryNavSection = Exclude<Section, 'more'>
 
@@ -45,7 +46,7 @@ export function TripPrimaryNav({ active, onSelect, onOpenMore, onPrefetch }: Tri
     >
       {ITEMS.map((item) => {
         const isActive = item.key === active
-        const color = isActive ? ACCENT : 'rgba(215,215,255,.45)'
+        const color = isActive ? ACCENT : DUSK.textMuted
         const handleActivate = () => {
           if (item.key === 'more') onOpenMore()
           else onSelect(item.key)

@@ -16,6 +16,7 @@ import { showToast } from "@/components/ui/toast";
 import type { Profile, Trip, TripCountry } from "@/types";
 import { getInitials } from "@/lib/utils";
 import { getDrivingRoute } from "@/lib/mapbox/directions";
+import { DUSK, FONT_INTER, SUNSET_GRADIENT } from "@/components/design/tokens";
 
 function ExploreMapPlaceholder() {
   return (
@@ -32,10 +33,6 @@ function ExploreMapPlaceholder() {
 }
 
 // ── Tokens ────────────────────────────────────────────────────────────────────
-const FONT: React.CSSProperties = {
-  fontFamily: "var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif",
-};
-const AMBER_GRAD  = "linear-gradient(135deg, #f5a623, #f8c04a)";
 const AMBER_GLOW  = "0 0 20px rgba(245,140,0,0.30)";
 const AVATAR_GRAD = "linear-gradient(135deg, #7c3aed, #4f46e5)";
 const TAP = { type: "spring" as const, stiffness: 420, damping: 22 };
@@ -306,12 +303,12 @@ export function ExploreClient({ profile, trips }: Props) {
         lng: wp.lng,
         label: wp.name,
         size: (i === 0 || i === last ? 0.52 : 0.28) * markerScale,
-        color: i === 0 ? "#f5a623" : i === last ? "#fb923c" : "#60a5fa",
+        color: i === 0 ? DUSK.amber : i === last ? "#fb923c" : "#60a5fa",
       }));
     }
     return [
       ...visitedPlaces.map(p => ({
-        lat: p.lat, lng: p.lng, label: p.name, size: 0.65, color: "#f5a623",
+        lat: p.lat, lng: p.lng, label: p.name, size: 0.65, color: DUSK.amber,
       })),
       ...ROUTES.map(d => ({ lat: d.lat, lng: d.lng, label: d.name, size: 0.32, color: "rgba(130,190,255,0.85)" })),
     ];
@@ -423,7 +420,7 @@ export function ExploreClient({ profile, trips }: Props) {
   return (
     <div
       ref={containerRef}
-      style={{ ...FONT, background: "#000010", height: "100svh", position: "relative", overflow: "hidden", display: "flex", flexDirection: "column" }}
+      style={{ ...FONT_INTER, background: "#000010", height: "100svh", position: "relative", overflow: "hidden", display: "flex", flexDirection: "column" }}
     >
       {/* Ambient orbs */}
       <div style={{ position:"absolute", top:"20%", left:"10%", width:300, height:300, borderRadius:"50%", background:"rgba(245,100,0,0.07)", filter:"blur(100px)", pointerEvents:"none" }} />
@@ -439,7 +436,7 @@ export function ExploreClient({ profile, trips }: Props) {
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}
         >
           <div>
-            <p style={{ fontSize: 20, fontWeight: 800, color: "#fff", margin: 0, letterSpacing: -0.3 }}>
+            <p style={{ fontSize: 20, fontWeight: 800, color: DUSK.textPrimary, margin: 0, letterSpacing: -0.3 }}>
               {preview ? preview.name : "Explore"}
             </p>
             <p style={{ fontSize: 11, color: "rgba(200,210,255,0.45)", margin: 0 }}>
@@ -448,7 +445,7 @@ export function ExploreClient({ profile, trips }: Props) {
           </div>
           <motion.button
             onClick={() => router.push("/profile")}
-            style={{ width: 36, height: 36, borderRadius: "50%", background: AVATAR_GRAD, border: "2px solid #f5a623", boxShadow: AMBER_GLOW, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: "#fff", cursor: "pointer", padding: 0 }}
+            style={{ width: 36, height: 36, borderRadius: "50%", background: AVATAR_GRAD, border: `2px solid ${DUSK.amber}`, boxShadow: AMBER_GLOW, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: DUSK.textPrimary, cursor: "pointer", padding: 0 }}
             whileTap={{ scale: 0.86 }} transition={TAP}
           >
             {getInitials(profile?.display_name ?? profile?.email)}
@@ -499,7 +496,7 @@ export function ExploreClient({ profile, trips }: Props) {
         <AnimatePresence>
           {preview && (
             <motion.div
-              style={{ position:"absolute", bottom:14, left:"50%", transform:"translateX(-50%)", background:"rgba(245,166,35,0.92)", borderRadius:20, padding:"5px 16px", fontSize:12, fontWeight:700, color:"#1a0800", zIndex:10, whiteSpace:"nowrap", ...FONT }}
+              style={{ position:"absolute", bottom:14, left:"50%", transform:"translateX(-50%)", background:"rgba(245,166,35,0.92)", borderRadius:20, padding:"5px 16px", fontSize:12, fontWeight:700, color: DUSK.onAmber, zIndex:10, whiteSpace:"nowrap", ...FONT_INTER }}
               initial={{ opacity:0, y:8, scale:0.9 }} animate={{ opacity:1, y:0, scale:1 }} exit={{ opacity:0, scale:0.9 }} transition={TAP}
             >
               📍 {preview.name} · {preview.country}
@@ -528,8 +525,8 @@ export function ExploreClient({ profile, trips }: Props) {
                   { Icon: Moon,   value: totalNights,             label: "Nights"    },
                 ].map(({ Icon, value, label }, i) => (
                   <div key={label} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", padding:"10px 4px", borderRight: i < 2 ? "1px solid rgba(255,255,255,0.07)" : "none" }}>
-                    <Icon style={{ width:14, height:14, color:"#f5a623", marginBottom:4 }} />
-                    <span style={{ fontSize:19, fontWeight:800, color:"#fff", lineHeight:1 }}>{value}</span>
+                    <Icon style={{ width:14, height:14, color: DUSK.amber, marginBottom:4 }} />
+                    <span style={{ fontSize:19, fontWeight:800, color: DUSK.textPrimary, lineHeight:1 }}>{value}</span>
                     <span style={{ fontSize:10, color:"rgba(200,210,255,0.40)", marginTop:2 }}>{label}</span>
                   </div>
                 ))}
@@ -539,7 +536,7 @@ export function ExploreClient({ profile, trips }: Props) {
               <div style={{ display:"flex", gap:8, padding:"0 16px 10px", flexShrink:0 }}>
                 {(["visited","discover"] as const).map(t => (
                   <motion.button key={t} onClick={() => setTab(t)}
-                    style={{ flex:1, padding:"8px 0", borderRadius:12, background: tab===t ? AMBER_GRAD : "rgba(255,255,255,0.06)", border:`1px solid ${tab===t ? "transparent" : "rgba(255,255,255,0.10)"}`, color: tab===t ? "#1a0800" : "rgba(200,210,255,0.65)", fontSize:13, fontWeight:700, cursor:"pointer", boxShadow: tab===t ? AMBER_GLOW : "none", ...FONT }}
+                    style={{ flex:1, padding:"8px 0", borderRadius:12, background: tab===t ? SUNSET_GRADIENT : "rgba(255,255,255,0.06)", border:`1px solid ${tab===t ? "transparent" : "rgba(255,255,255,0.10)"}`, color: tab===t ? DUSK.onAmber : "rgba(200,210,255,0.65)", fontSize:13, fontWeight:700, cursor:"pointer", boxShadow: tab===t ? AMBER_GLOW : "none", ...FONT_INTER }}
                     whileTap={{ scale:0.95 }} transition={TAP}
                   >
                     {t === "visited" ? "My Countries" : "Discover"}
@@ -592,7 +589,7 @@ export function ExploreClient({ profile, trips }: Props) {
                   <ArrowLeft style={{ width:16, height:16, color:"rgba(200,210,255,0.70)" }} />
                 </motion.button>
                 <div style={{ flex:1, minWidth:0 }}>
-                  <p style={{ fontSize:15, fontWeight:700, color:"#fff", margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{preview.name}</p>
+                  <p style={{ fontSize:15, fontWeight:700, color: DUSK.textPrimary, margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{preview.name}</p>
                   <p style={{ fontSize:11, color:"rgba(200,210,255,0.45)", margin:0 }}>{preview.country} · {preview.tag}</p>
                 </div>
                 <span style={{ fontSize: 22 }}>{preview.emoji}</span>
@@ -609,8 +606,8 @@ export function ExploreClient({ profile, trips }: Props) {
                     { Icon: Sun,   label:"Best Season", value: preview.bestSeason  },
                   ].map(({ Icon, label, value }) => (
                     <div key={label} style={{ background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.09)", borderRadius:12, padding:"10px 8px", textAlign:"center" }}>
-                      <Icon style={{ width:13, height:13, color:"#f5a623", marginBottom:5 }} />
-                      <p style={{ fontSize:12, fontWeight:700, color:"#fff", margin:"0 0 2px", lineHeight:1.2 }}>{value}</p>
+                      <Icon style={{ width:13, height:13, color: DUSK.amber, marginBottom:5 }} />
+                      <p style={{ fontSize:12, fontWeight:700, color: DUSK.textPrimary, margin:"0 0 2px", lineHeight:1.2 }}>{value}</p>
                       <p style={{ fontSize:9, color:"rgba(200,210,255,0.38)", margin:0 }}>{label}</p>
                     </div>
                   ))}
@@ -627,10 +624,10 @@ export function ExploreClient({ profile, trips }: Props) {
                   {preview.waypoints.map((wp, i) => (
                     <div key={wp.name} style={{ display:"flex", alignItems:"center", flexShrink:0 }}>
                       <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:3 }}>
-                        <div style={{ width:26, height:26, borderRadius:"50%", background: i===0||i===preview.waypoints.length-1 ? AMBER_GRAD : "rgba(255,255,255,0.10)", border: i===0||i===preview.waypoints.length-1 ? "none" : "1px solid rgba(255,255,255,0.18)", display:"flex", alignItems:"center", justifyContent:"center", boxShadow: i===0||i===preview.waypoints.length-1 ? AMBER_GLOW : "none", flexShrink:0 }}>
-                          <MapPin style={{ width:11, height:11, color: i===0||i===preview.waypoints.length-1 ? "#1a0800" : "rgba(200,210,255,0.55)" }} />
+                        <div style={{ width:26, height:26, borderRadius:"50%", background: i===0||i===preview.waypoints.length-1 ? SUNSET_GRADIENT : "rgba(255,255,255,0.10)", border: i===0||i===preview.waypoints.length-1 ? "none" : "1px solid rgba(255,255,255,0.18)", display:"flex", alignItems:"center", justifyContent:"center", boxShadow: i===0||i===preview.waypoints.length-1 ? AMBER_GLOW : "none", flexShrink:0 }}>
+                          <MapPin style={{ width:11, height:11, color: i===0||i===preview.waypoints.length-1 ? DUSK.onAmber : "rgba(200,210,255,0.55)" }} />
                         </div>
-                        <p style={{ fontSize:9, fontWeight:600, color: i===0||i===preview.waypoints.length-1 ? "#f5a623" : "rgba(200,210,255,0.50)", margin:0, whiteSpace:"nowrap", maxWidth:56, textAlign:"center", overflow:"hidden", textOverflow:"ellipsis" }}>{wp.name}</p>
+                        <p style={{ fontSize:9, fontWeight:600, color: i===0||i===preview.waypoints.length-1 ? DUSK.amber : "rgba(200,210,255,0.50)", margin:0, whiteSpace:"nowrap", maxWidth:56, textAlign:"center", overflow:"hidden", textOverflow:"ellipsis" }}>{wp.name}</p>
                       </div>
                       {i < preview.waypoints.length-1 && (
                         <div style={{ width:20, height:1, background:"rgba(255,255,255,0.14)", margin:"0 1px", marginBottom:18, flexShrink:0 }} />
@@ -648,7 +645,7 @@ export function ExploreClient({ profile, trips }: Props) {
                       initial={{ opacity:0, x:-8 }} animate={{ opacity:1, x:0 }} transition={{ delay:0.05+i*0.05 }}
                     >
                       <span style={{ fontSize:14 }}>{["✨","🎯","🌟","🔥"][i%4]}</span>
-                      <span style={{ fontSize:12, color:"rgba(215,215,255,0.82)", flex:1 }}>{h}</span>
+                      <span style={{ fontSize:12, color:DUSK.textSecondary, flex:1 }}>{h}</span>
                       <ChevronRight style={{ width:13, height:13, color:"rgba(200,210,255,0.22)", flexShrink:0 }} />
                     </motion.div>
                   ))}
@@ -658,7 +655,7 @@ export function ExploreClient({ profile, trips }: Props) {
                 <motion.button
                   onClick={() => handleUseRoute(preview)}
                   disabled={cloning}
-                  style={{ width:"100%", background:AMBER_GRAD, color:"#1a0800", fontWeight:800, fontSize:15, border:"none", borderRadius:14, padding:"14px", boxShadow:AMBER_GLOW, cursor: cloning ? "default" : "pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:8, opacity: cloning ? 0.6 : 1, ...FONT }}
+                  style={{ width:"100%", background:SUNSET_GRADIENT, color: DUSK.onAmber, fontWeight:800, fontSize:15, border:"none", borderRadius:14, padding:"14px", boxShadow:AMBER_GLOW, cursor: cloning ? "default" : "pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:8, opacity: cloning ? 0.6 : 1, ...FONT_INTER }}
                   whileTap={{ scale:0.97 }} whileHover={{ scale:1.01 }} transition={TAP}
                 >
                   <MapPin style={{ width:16, height:16 }} />
@@ -683,9 +680,9 @@ function CountryCard({ name, lat, lng, index }: { name: string; lat: number; lng
       style={{ background:COUNTRY_COLORS[index%COUNTRY_COLORS.length], borderRadius:16, padding:"16px 12px", position:"relative", overflow:"hidden", minHeight:90, display:"flex", flexDirection:"column", justifyContent:"flex-end" }}
       whileTap={{ scale:0.96 }} transition={TAP}
     >
-      <div style={{ position:"absolute", top:8, right:8, fontSize:9, fontWeight:700, background:"rgba(0,0,0,0.32)", color:"#f5a623", borderRadius:20, padding:"2px 7px", letterSpacing:"0.06em" }}>VISITED</div>
+      <div style={{ position:"absolute", top:8, right:8, fontSize:9, fontWeight:700, background:"rgba(0,0,0,0.32)", color: DUSK.amber, borderRadius:20, padding:"2px 7px", letterSpacing:"0.06em" }}>VISITED</div>
       <MapPin style={{ width:14, height:14, color:"rgba(255,255,255,0.65)", marginBottom:5 }} />
-      <p style={{ fontSize:14, fontWeight:700, color:"#fff", margin:0 }}>{name}</p>
+      <p style={{ fontSize:14, fontWeight:700, color: DUSK.textPrimary, margin:0 }}>{name}</p>
       <p style={{ fontSize:9, color:"rgba(255,255,255,0.40)", margin:"2px 0 0", fontFamily:"monospace" }}>{lat.toFixed(1)}° {lng.toFixed(1)}°</p>
     </motion.div>
   );
@@ -700,9 +697,9 @@ function DiscoverCard({ dest, index, onPress }: { dest: Destination; index: numb
     >
       <div style={{ width:46, height:46, borderRadius:12, background:COUNTRY_COLORS[index%COUNTRY_COLORS.length], display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, flexShrink:0 }}>{dest.emoji}</div>
       <div style={{ flex:1, minWidth:0 }}>
-        <p style={{ fontSize:14, fontWeight:700, color:"#fff", margin:"0 0 1px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{dest.name}</p>
+        <p style={{ fontSize:14, fontWeight:700, color: DUSK.textPrimary, margin:"0 0 1px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{dest.name}</p>
         <p style={{ fontSize:11, color:"rgba(200,210,255,0.45)", margin:"0 0 5px" }}>{dest.country}</p>
-        <span style={{ fontSize:10, fontWeight:600, color:"#f5a623", background:"rgba(245,166,35,0.12)", border:"1px solid rgba(245,166,35,0.25)", borderRadius:20, padding:"2px 8px" }}>{dest.tag}</span>
+        <span style={{ fontSize:10, fontWeight:600, color: DUSK.amber, background:"rgba(245,166,35,0.12)", border:"1px solid rgba(245,166,35,0.25)", borderRadius:20, padding:"2px 8px" }}>{dest.tag}</span>
       </div>
       <Compass style={{ width:16, height:16, color:"rgba(200,210,255,0.25)", flexShrink:0 }} />
     </motion.button>
@@ -715,10 +712,10 @@ function EmptyCountries({ onDiscover }: { onDiscover: () => void }) {
       initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }}
     >
       <p style={{ fontSize:36, margin:"0 0 12px" }}>🌍</p>
-      <p style={{ color:"#fff", fontWeight:600, fontSize:15, margin:"0 0 6px" }}>No countries yet</p>
+      <p style={{ color: DUSK.textPrimary, fontWeight:600, fontSize:15, margin:"0 0 6px" }}>No countries yet</p>
       <p style={{ color:"rgba(200,210,255,0.50)", fontSize:12, margin:"0 0 20px", lineHeight:1.6 }}>Add countries to your trips and they&apos;ll appear on the map.</p>
       <motion.button onClick={onDiscover}
-        style={{ background:AMBER_GRAD, color:"#1a0800", fontWeight:700, fontSize:13, border:"none", borderRadius:12, padding:"10px 22px", boxShadow:AMBER_GLOW, cursor:"pointer", fontFamily:"var(--font-inter),'Inter',system-ui" }}
+        style={{ background:SUNSET_GRADIENT, color: DUSK.onAmber, fontWeight:700, fontSize:13, border:"none", borderRadius:12, padding:"10px 22px", boxShadow:AMBER_GLOW, cursor:"pointer", fontFamily:"var(--font-inter),'Inter',system-ui" }}
         whileTap={{ scale:0.94 }} transition={TAP}
       >Discover Routes</motion.button>
     </motion.div>

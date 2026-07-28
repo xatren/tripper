@@ -1,6 +1,6 @@
 'use client'
 
-import type { CSSProperties, ReactNode } from 'react'
+import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowLeft } from 'lucide-react'
@@ -11,6 +11,19 @@ import {
   DUSK, EASE_STANDARD, FONT_FRAUNCES, FONT_INTER, GROUND_GRADIENT, gradientText,
 } from '@/components/onboarding/dusk/tokens'
 
+/* Sign-up's form runs longer than login/success (extra password-strength
+   row), and a short viewport leaves less clearance above the vehicle's
+   anchored position — park it a little further down in both cases so it
+   can't collide with taller content. Mirrors the matchMedia pattern already
+   used in mobile-entry-flow.tsx. */
+const BASE_VEHICLE_Y: Record<'login' | 'sign-up' | 'success', number> = {
+  login: 700,
+  'sign-up': 736,
+  success: 680,
+}
+const SHORT_VIEWPORT_QUERY = '(max-height: 700px)'
+const SHORT_VIEWPORT_OFFSET = 32
+
 /* ─────────────────────────────────────────────────────────────────────
    DuskAuthShell — the calmed continuation of the finale landscape.
    Same world, further along, completely at rest: no parallax, no loops.
@@ -20,6 +33,7 @@ import {
 const TITLES = {
   login: { before: 'Welcome ', accent: 'back', after: '.', subtitle: 'Sign in to pick your trip back up.' },
   'sign-up': { before: 'Start something ', accent: 'new', after: '.', subtitle: 'Create an account and map the first route.' },
+  success: { before: 'Check your ', accent: 'inbox', after: '.', subtitle: 'We sent a confirmation link — click it to start planning.' },
 } as const
 
 const ROOT: CSSProperties = {
@@ -44,11 +58,22 @@ export function DuskAuthShell({
   variant,
   children,
 }: {
-  variant: 'login' | 'sign-up'
+  variant: 'login' | 'sign-up' | 'success'
   children: ReactNode
 }) {
   const reduced = useReducedMotionPreference()
   const copy = TITLES[variant]
+  const [shortViewport, setShortViewport] = useState(false)
+
+  useEffect(() => {
+    const query = window.matchMedia(SHORT_VIEWPORT_QUERY)
+    const sync = () => setShortViewport(query.matches)
+    sync()
+    query.addEventListener('change', sync)
+    return () => query.removeEventListener('change', sync)
+  }, [])
+
+  const vehicleY = BASE_VEHICLE_Y[variant] + (shortViewport ? SHORT_VIEWPORT_OFFSET : 0)
 
   return (
     <div style={ROOT}>
@@ -63,7 +88,7 @@ export function DuskAuthShell({
         }}
       >
         <div style={{ position: 'relative', width: '100%', maxWidth: 480, height: '100%' }}>
-          <JourneyScene stage="auth" step={3} reduced intro={false} showPin={false} vehicleY={700} />
+          <JourneyScene stage="auth" step={3} reduced intro={false} showPin={false} vehicleY={vehicleY} />
           <div style={SCRIM} />
           <FilmGrain />
         </div>

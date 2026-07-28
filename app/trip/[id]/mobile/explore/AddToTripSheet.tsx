@@ -27,7 +27,7 @@ export interface AddToTripSheetProps {
 const FIELD_STYLE: React.CSSProperties = {
   width: '100%', minHeight: 44, padding: '10px 12px', borderRadius: 12,
   background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.14)',
-  color: '#fff', fontSize: 14, fontFamily: 'inherit', outline: 'none',
+  color: tokens.textPrimary, fontSize: 14, fontFamily: 'inherit', outline: 'none',
 }
 
 /** Day/time/type picker that commits a search result into the trip's itinerary. */

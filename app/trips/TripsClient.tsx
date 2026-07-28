@@ -15,15 +15,11 @@ import {
 import { showToast } from "@/components/ui/toast";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { AppBottomNav } from "@/components/ui/AppBottomNav";
+import { DUSK, FONT_INTER, SUNSET_GRADIENT } from "@/components/design/tokens";
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
-const BG          = "linear-gradient(145deg, #06061c 0%, #0a1020 55%, #071216 100%)";
-const AMBER_GRAD  = "linear-gradient(135deg, #f5a623, #f8c04a)";
 const AMBER_GLOW  = "0 0 20px rgba(245,140,0,0.28)";
 const AVATAR_GRAD = "linear-gradient(135deg, #7c3aed, #4f46e5)";
-const FONT: React.CSSProperties = {
-  fontFamily: "var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif",
-};
 const TAP = { type: "spring" as const, stiffness: 420, damping: 22 };
 
 const CARD_GRADIENTS = [
@@ -72,10 +68,10 @@ function getNights(start?: string | null, end?: string | null): number | null {
 function getStatusBadge(trip: Trip) {
   const status = getStatus(trip);
   const days   = getDaysUntil(trip.start_date);
-  if (status === "ongoing")   return { label: "Live", color: "#f5a623",        bg: "rgba(245,166,35,0.15)",  border: "rgba(245,166,35,0.35)",  pulse: true  };
+  if (status === "ongoing")   return { label: "Live", color: DUSK.amber,        bg: "rgba(245,166,35,0.15)",  border: "rgba(245,166,35,0.35)",  pulse: true  };
   if (status === "upcoming" && days !== null)
                               return { label: days === 0 ? "Departing today!" : `In ${days} day${days !== 1 ? "s" : ""}`, color: "rgb(52,211,153)", bg: "rgba(52,211,153,0.10)", border: "rgba(52,211,153,0.22)", pulse: false };
-  if (status === "completed") return { label: "✓ Completed", color: "rgba(215,215,255,0.45)", bg: "rgba(255,255,255,0.05)", border: "rgba(255,255,255,0.09)", pulse: false };
+  if (status === "completed") return { label: "✓ Completed", color: DUSK.textMuted, bg: "rgba(255,255,255,0.05)", border: "rgba(255,255,255,0.09)", pulse: false };
   return null;
 }
 
@@ -154,7 +150,7 @@ export function TripsClient({ profile, trips: initialTrips, capabilitiesByTripId
   };
 
   return (
-    <div style={{ ...FONT, background: BG, minHeight: "100svh", position: "relative", overflow: "hidden" }}>
+    <div className="atmosphere" style={{ ...FONT_INTER, minHeight: "100svh", position: "relative", overflow: "hidden" }}>
       {/* Orbs */}
       <div style={orb({ top: "2%",  left: "50%", translate: "-50% 0", w: 380, h: 380, color: "rgba(245,166,35,0.22)", blur: 90 })} />
       <div style={orb({ bottom: "22%", left: "-12%",                  w: 280, h: 280, color: "rgba(120,50,220,0.18)",  blur: 80 })} />
@@ -168,12 +164,12 @@ export function TripsClient({ profile, trips: initialTrips, capabilitiesByTripId
           initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 46, height: 46, borderRadius: 13, background: AMBER_GRAD, boxShadow: AMBER_GLOW, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <Briefcase style={{ width: 21, height: 21, color: "#1a0800" }} />
+            <div style={{ width: 46, height: 46, borderRadius: 13, background: SUNSET_GRADIENT, boxShadow: AMBER_GLOW, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Briefcase style={{ width: 21, height: 21, color: DUSK.onAmber }} />
             </div>
             <div>
-              <p style={{ fontSize: 20, fontWeight: 700, color: "#fff", margin: 0, letterSpacing: -0.3 }}>My Trips</p>
-              <p style={{ fontSize: 12, color: "rgba(215,215,255,0.50)", margin: 0 }}>
+              <p style={{ fontSize: 20, fontWeight: 700, color: DUSK.textPrimary, margin: 0, letterSpacing: -0.3 }}>My Trips</p>
+              <p style={{ fontSize: 12, color: DUSK.textMuted, margin: 0 }}>
                 {counts.all} trip{counts.all !== 1 ? "s" : ""} total
               </p>
             </div>
@@ -186,13 +182,13 @@ export function TripsClient({ profile, trips: initialTrips, capabilitiesByTripId
               whileTap={{ scale: 0.86 }} whileHover={{ scale: 1.08 }} transition={TAP}
             >
               {searching
-                ? <X     style={{ width: 17, height: 17, color: "#f5a623" }} />
-                : <Search style={{ width: 17, height: 17, color: "rgba(215,215,255,0.65)" }} />}
+                ? <X     style={{ width: 17, height: 17, color: DUSK.amber }} />
+                : <Search style={{ width: 17, height: 17, color: DUSK.textSecondary }} />}
             </motion.button>
 
             <motion.button
               onClick={() => router.push("/profile")}
-              style={{ width: 38, height: 38, borderRadius: "50%", background: AVATAR_GRAD, border: "2px solid #f5a623", boxShadow: "0 0 14px rgba(245,140,0,0.32)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer", padding: 0 }}
+              style={{ width: 38, height: 38, borderRadius: "50%", background: AVATAR_GRAD, border: `2px solid ${DUSK.amber}`, boxShadow: "0 0 14px rgba(245,140,0,0.32)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: DUSK.textPrimary, cursor: "pointer", padding: 0 }}
               whileTap={{ scale: 0.86 }} transition={TAP}
             >
               {getInitials(profile?.display_name ?? profile?.email)}
@@ -211,14 +207,14 @@ export function TripsClient({ profile, trips: initialTrips, capabilitiesByTripId
               transition={{ duration: 0.2 }}
             >
               <div style={{ position: "relative" }}>
-                <Search style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", width: 16, height: 16, color: "rgba(215,215,255,0.40)" }} />
+                <Search style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", width: 16, height: 16, color: DUSK.textMuted }} />
                 <input
                   aria-label="Search trips"
                   autoFocus
                   value={query}
                   onChange={e => setQuery(e.target.value)}
                   placeholder="Search trips…"
-                  style={{ width: "100%", boxSizing: "border-box", background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 14, padding: "12px 14px 12px 40px", fontSize: 15, color: "#fff", outline: "none", ...FONT }}
+                  style={{ width: "100%", boxSizing: "border-box", background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 14, padding: "12px 14px 12px 40px", fontSize: 15, color: DUSK.textPrimary, outline: "none", ...FONT_INTER }}
                 />
               </div>
             </motion.div>
@@ -237,12 +233,12 @@ export function TripsClient({ profile, trips: initialTrips, capabilitiesByTripId
               <motion.button
                 key={id}
                 onClick={() => setTab(id)}
-                style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", borderRadius: 20, background: active ? AMBER_GRAD : "rgba(255,255,255,0.06)", border: `1px solid ${active ? "transparent" : "rgba(255,255,255,0.11)"}`, color: active ? "#1a0800" : "rgba(215,215,255,0.70)", fontSize: 13, fontWeight: 600, cursor: "pointer", boxShadow: active ? AMBER_GLOW : "none", ...FONT }}
+                style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", borderRadius: 20, background: active ? SUNSET_GRADIENT : "rgba(255,255,255,0.06)", border: `1px solid ${active ? "transparent" : "rgba(255,255,255,0.11)"}`, color: active ? DUSK.onAmber : DUSK.textSecondary, fontSize: 13, fontWeight: 600, cursor: "pointer", boxShadow: active ? AMBER_GLOW : "none", ...FONT_INTER }}
                 whileTap={{ scale: 0.93 }} transition={TAP}
               >
                 {label}
                 {count > 0 && (
-                  <span style={{ fontSize: 11, fontWeight: 700, background: active ? "rgba(0,0,0,0.15)" : "rgba(255,255,255,0.10)", color: active ? "#1a0800" : "rgba(215,215,255,0.55)", borderRadius: 20, padding: "1px 7px", lineHeight: 1.6 }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, background: active ? "rgba(0,0,0,0.15)" : "rgba(255,255,255,0.10)", color: active ? DUSK.onAmber : DUSK.textMuted, borderRadius: 20, padding: "1px 7px", lineHeight: 1.6 }}>
                     {count}
                   </span>
                 )}
@@ -336,7 +332,7 @@ function TripCard({ trip, index, capabilities, onOpen, onDelete, onCopyCode }: {
         <div style={{ width: 56, height: 56, borderRadius: 16, background: muted ? "linear-gradient(135deg,#2a2a3a,#1e1e2e)" : CARD_GRADIENTS[idx], display: "flex", alignItems: "center", justifyContent: "center", fontSize: muted ? 22 : 26, filter: muted ? "grayscale(0.5)" : "none" }}>
           {muted ? "✓" : (trip.vibe && VIBE_EMOJIS[trip.vibe]) || CARD_EMOJIS[idx]}
         </div>
-        <span style={{ position: "absolute", bottom: -4, right: -4, fontSize: 9, fontWeight: 700, letterSpacing: "0.04em", background: capabilities?.canManageTrip ? "rgba(245,166,35,0.90)" : capabilities?.canEdit ? "rgba(124,58,237,0.85)" : "rgba(71,85,105,.9)", color: "#fff", borderRadius: 6, padding: "2px 5px", border: "1.5px solid #0a1020" }}>
+        <span style={{ position: "absolute", bottom: -4, right: -4, fontSize: 9, fontWeight: 700, letterSpacing: "0.04em", background: capabilities?.canManageTrip ? "rgba(245,166,35,0.90)" : capabilities?.canEdit ? "rgba(124,58,237,0.85)" : "rgba(71,85,105,.9)", color: DUSK.textPrimary, borderRadius: 6, padding: "2px 5px", border: "1.5px solid #0a1020" }}>
           {capabilities?.role?.toUpperCase() ?? "VIEWER"}
         </span>
       </div>
@@ -357,10 +353,10 @@ function TripCard({ trip, index, capabilities, onOpen, onDelete, onCopyCode }: {
             </span>
           </div>
         )}
-        <p style={{ fontSize: 16, fontWeight: 700, color: muted ? "rgba(215,215,255,0.60)" : "#fff", margin: "0 0 3px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+        <p style={{ fontSize: 16, fontWeight: 700, color: muted ? DUSK.textSecondary : DUSK.textPrimary, margin: "0 0 3px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
           {trip.title}
         </p>
-        <p style={{ fontSize: 13, color: "rgba(215,215,255,0.50)", margin: 0 }}>
+        <p style={{ fontSize: 13, color: DUSK.textMuted, margin: 0 }}>
           {trip.start_date
             ? `${formatDate(trip.start_date)}${trip.end_date ? ` – ${formatDate(trip.end_date)}` : ""}`
             : "No dates set"}
@@ -375,7 +371,7 @@ function TripCard({ trip, index, capabilities, onOpen, onDelete, onCopyCode }: {
           <motion.button
             type="button"
             aria-label={`Open actions for ${trip.title}`}
-            style={{ width: 44, height: 44, padding: 0, border: 0, background: "transparent", borderRadius: 8, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(215,215,255,0.40)", cursor: "pointer" }}
+            style={{ width: 44, height: 44, padding: 0, border: 0, background: "transparent", borderRadius: 8, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", color: DUSK.textMuted, cursor: "pointer" }}
             whileTap={{ scale: 0.84 }} transition={TAP}
           >
             <MoreVertical style={{ width: 18, height: 18 }} />
@@ -409,16 +405,16 @@ function EmptyState({ tab, query, onNewTrip }: { tab: FilterTab; query: string; 
       initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}
     >
       <p style={{ fontSize: 44, margin: "0 0 16px" }}>{query ? "🔍" : copy.emoji}</p>
-      <p style={{ color: "#fff", fontWeight: 600, fontSize: 17, margin: "0 0 8px" }}>
+      <p style={{ color: DUSK.textPrimary, fontWeight: 600, fontSize: 17, margin: "0 0 8px" }}>
         {query ? `No results for "${query}"` : copy.title}
       </p>
-      <p style={{ color: "rgba(215,215,255,0.52)", fontSize: 14, margin: "0 0 28px", lineHeight: 1.6 }}>
+      <p style={{ color: DUSK.textMuted, fontSize: 14, margin: "0 0 28px", lineHeight: 1.6 }}>
         {query ? "Try a different search term." : copy.sub}
       </p>
       {!query && tab === "all" && (
         <motion.button
           onClick={onNewTrip}
-          style={{ background: AMBER_GRAD, color: "#1a0800", fontWeight: 700, fontSize: 15, border: "none", borderRadius: 14, padding: "13px 28px", boxShadow: AMBER_GLOW, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 8, ...FONT }}
+          style={{ background: SUNSET_GRADIENT, color: DUSK.onAmber, fontWeight: 700, fontSize: 15, border: "none", borderRadius: 14, padding: "13px 28px", boxShadow: AMBER_GLOW, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 8, ...FONT_INTER }}
           whileTap={{ scale: 0.94 }} whileHover={{ scale: 1.03 }} transition={TAP}
         >
           <Plus style={{ width: 18, height: 18 }} />

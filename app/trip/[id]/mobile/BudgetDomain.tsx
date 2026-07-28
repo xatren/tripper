@@ -6,7 +6,8 @@ import { useTripRealtimeTable } from '@/lib/supabase/trip-realtime'
 import { showToast } from '@/components/ui/toast'
 import type { Expense, ExpenseCategory, ItineraryItem, Settlement, Trip, TripMember } from '@/types'
 import { CURRENCY_SYMBOLS, EXPENSE_CATEGORIES } from '@/types'
-import { ACCENT, ACCENT_DARK, ACCENT_LIGHT, GLASS_BORDER, GLASS_FILL, RetryCard } from './domain-ui'
+import { ACCENT, ACCENT_DARK, ACCENT_GRADIENT, ACCENT_LIGHT, GLASS_BORDER, GLASS_FILL, RetryCard } from './domain-ui'
+import { DUSK } from '@/components/design/tokens'
 import { calculateSettlementWithSplits, MISSING_PAYER_ID } from './budget-settlement'
 import { AddExpenseSheet, draftFromExpense, emptyExpenseDraft, type ExpenseDraft } from './budget/AddExpenseSheet'
 import { SettlementScreen } from './budget/SettlementScreen'
@@ -338,7 +339,7 @@ function BudgetView({
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10, gap: 10 }}>
           <div style={{ minWidth: 0 }}>
             <div style={{ fontSize: 15.5, fontWeight: 800, letterSpacing: '-0.01em' }}>Trip Budget</div>
-            <div style={{ fontSize: 12, color: 'rgba(215,215,255,.6)', marginTop: 2, fontWeight: 500 }}>
+            <div style={{ fontSize: 12, color: DUSK.textMuted, marginTop: 2, fontWeight: 500 }}>
               {dataUnavailable ? 'Spend data unavailable' : `${sym}${formatMoney(spent)} of ${sym}${formatMoney(total)} spent`}
             </div>
           </div>
@@ -379,7 +380,7 @@ function BudgetView({
             </svg>
           </button>
         ) : (
-          <div style={{ marginTop: 10, fontSize: 12.5, fontWeight: 600, color: 'rgba(215,215,255,.6)' }}>
+          <div style={{ marginTop: 10, fontSize: 12.5, fontWeight: 600, color: DUSK.textMuted }}>
             {total <= 0 ? 'No budget set for this trip' : `${sym}${formatMoney(remaining)} remaining`}
           </div>
         )}
@@ -404,7 +405,7 @@ function BudgetView({
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ fontSize: 11.5, fontWeight: 700, color: 'rgba(215,215,255,.55)', textTransform: 'uppercase', letterSpacing: '.06em' }}>
+            <div style={{ fontSize: 11.5, fontWeight: 700, color: DUSK.textMuted, textTransform: 'uppercase', letterSpacing: '.06em' }}>
               Settlement · {activeMembers.length} {activeMembers.length === 1 ? 'member' : 'members'}
             </div>
             <span style={{ fontSize: 11.5, fontWeight: 700, color: ACCENT_LIGHT }}>Settle up →</span>
@@ -412,13 +413,13 @@ function BudgetView({
           <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginTop: 10 }}>
             {displayedBalances.map((balance) => (
               <div key={balance.memberId} style={{ display: 'flex', alignItems: 'baseline', flexWrap: 'wrap', gap: '3px 8px', fontSize: 12 }}>
-                <span style={{ flex: 1, minWidth: 0, fontWeight: 700, color: balance.isActiveMember ? 'rgba(255,255,255,.92)' : 'rgba(215,215,255,.65)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                <span style={{ flex: 1, minWidth: 0, fontWeight: 700, color: balance.isActiveMember ? DUSK.textPrimary : DUSK.textSecondary, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {payerName(balance.memberId)}
                 </span>
                 <span style={{ minWidth: 58, textAlign: 'right', fontWeight: 800, color: balance.netMinor === 0 ? '#4ade80' : balance.netMinor > 0 ? '#86efac' : ACCENT_LIGHT }}>
                   {balance.netMinor > 0 ? '+' : balance.netMinor < 0 ? '−' : ''}{sym}{formatMoney(Math.abs(balance.netMinor) / 100)}
                 </span>
-                <span style={{ width: '100%', color: 'rgba(215,215,255,.55)' }}>
+                <span style={{ width: '100%', color: DUSK.textMuted }}>
                   paid {sym}{formatMoney(balance.paidMinor / 100)} · share {sym}{formatMoney(balance.shareMinor / 100)}
                 </span>
               </div>
@@ -485,13 +486,13 @@ function BudgetView({
               </span>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 14.5, fontWeight: 700 }}>{label}</div>
-                <div style={{ fontSize: 11.5, color: 'rgba(215,215,255,.55)', fontWeight: 500, marginTop: 1 }}>
+                <div style={{ fontSize: 11.5, color: DUSK.textMuted, fontWeight: 500, marginTop: 1 }}>
                   {list.length} {list.length === 1 ? 'expense' : 'expenses'}
                 </div>
               </div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: 'rgba(255,255,255,.9)', flex: 'none' }}>{sym}{formatMoney(catSpent)}</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: DUSK.textPrimary, flex: 'none' }}>{sym}{formatMoney(catSpent)}</div>
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style={{ flex: 'none', transition: 'transform .25s ease', transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-                <path d="M4 6L8 10L12 6" stroke="rgba(215,215,255,.6)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M4 6L8 10L12 6" stroke={DUSK.textMuted} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
             {isOpen && (
@@ -507,12 +508,12 @@ function BudgetView({
                       onClick={() => onOpenExpense(item)}
                       style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 10px', borderRadius: 12, background: 'rgba(255,255,255,.035)', border: 'none', width: '100%', textAlign: 'left', cursor: 'pointer', fontFamily: 'inherit', color: 'inherit' }}
                     >
-                      <span style={{ flex: 1, minWidth: 0, fontSize: 13.5, fontWeight: 600, color: 'rgba(255,255,255,.92)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      <span style={{ flex: 1, minWidth: 0, fontSize: 13.5, fontWeight: 600, color: DUSK.textPrimary, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {item.description || label}
                       </span>
                       <span
                         title={`Paid by ${itemPayerName === 'You' ? 'you' : itemPayerName}`}
-                        style={{ width: 20, height: 20, borderRadius: '50%', flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8.5, fontWeight: 800, color: '#fff', background: itemPayerId === currentUserId ? 'linear-gradient(135deg,#f5a623,#e8821a)' : payerMember ? 'linear-gradient(135deg,#7c3aed,#4f46e5)' : 'rgba(148,163,184,.55)' }}
+                        style={{ width: 20, height: 20, borderRadius: '50%', flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8.5, fontWeight: 800, color: DUSK.textPrimary, background: itemPayerId === currentUserId ? ACCENT_GRADIENT : payerMember ? 'linear-gradient(135deg,#7c3aed,#4f46e5)' : 'rgba(148,163,184,.55)' }}
                       >
                         {itemPayerId === currentUserId ? 'ME' : payerMember ? memberName(payerMember, currentUserId)[0]?.toUpperCase() : '?'}
                       </span>
@@ -527,7 +528,7 @@ function BudgetView({
                     style={{
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, minHeight: 44, marginTop: 2,
                       borderRadius: 12, background: 'rgba(255,255,255,.04)', border: '1px dashed rgba(255,255,255,.2)',
-                      color: 'rgba(215,215,255,.7)', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
+                      color: DUSK.textSecondary, fontSize: 12.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
                     }}
                   >
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
@@ -535,7 +536,7 @@ function BudgetView({
                   </button>
                 )}
                 {!canEdit && list.length === 0 && (
-                  <div style={{ padding: '4px 2px', fontSize: 12.5, color: 'rgba(215,215,255,.5)' }}>No expenses in this category yet.</div>
+                  <div style={{ padding: '4px 2px', fontSize: 12.5, color: DUSK.textMuted }}>No expenses in this category yet.</div>
                 )}
               </div>
             )}

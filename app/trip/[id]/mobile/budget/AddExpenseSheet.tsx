@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { enqueueMutation } from '@/lib/offline/db'
 import { showToast } from '@/components/ui/toast'
 import { createRandomId } from '@/lib/random-id'
+import { DUSK } from '@/components/design/tokens'
 import type { Expense, ExpenseCategory, ExpenseSplitType, ItineraryItem, Trip, TripMember } from '@/types'
 import { CURRENCY_SYMBOLS, EXPENSE_CATEGORIES } from '@/types'
 import { SplitEditor, type SplitParticipant, type SplitResolution } from './SplitEditor'
@@ -78,7 +79,7 @@ interface DraftReceipt {
 const FIELD_STYLE = {
   width: '100%', minHeight: 44, padding: '10px 12px', borderRadius: 12,
   background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.14)',
-  color: '#fff', fontSize: 14, fontFamily: 'inherit', outline: 'none',
+  color: DUSK.textPrimary, fontSize: 14, fontFamily: 'inherit', outline: 'none',
 } as const
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {

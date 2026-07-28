@@ -72,6 +72,20 @@ function DomainLoading({ label }: { label: string }) {
   )
 }
 
+function orb(p: { top?: string; bottom?: string; left?: string; right?: string; translate?: string; w: number; h: number; color: string; blur: number }): React.CSSProperties {
+  return {
+    position: 'absolute',
+    ...(p.top !== undefined && { top: p.top }),
+    ...(p.bottom !== undefined && { bottom: p.bottom }),
+    ...(p.left !== undefined && { left: p.left }),
+    ...(p.right !== undefined && { right: p.right }),
+    ...(p.translate !== undefined && { translate: p.translate }),
+    width: p.w, height: p.h, borderRadius: '50%',
+    background: p.color, filter: `blur(${p.blur}px)`,
+    pointerEvents: 'none',
+  }
+}
+
 const SCREEN_LABEL: Record<VisibleScreen, string> = {
   overview: 'Overview',
   plan: 'Plan',
@@ -343,7 +357,10 @@ function TripMobileContent({ trip, stops: initialStops, items: initialItems, iti
   const navActive = isMoreSheetOpen || activeMoreDestination ? 'more' : activeSection
 
   return (
-    <div style={{ width: '100%', minHeight: '100svh', position: 'relative', background: 'var(--gradient-bg-app)', color: 'var(--color-text-primary)', fontFamily: "var(--font-inter),'Inter',system-ui,-apple-system,sans-serif" }}>
+    <div className="atmosphere" style={{ width: '100%', minHeight: '100svh', position: 'relative', color: 'var(--color-text-primary)', fontFamily: "var(--font-inter),'Inter',system-ui,-apple-system,sans-serif" }}>
+      <div style={orb({ top: '2%', left: '50%', translate: '-50% 0', w: 380, h: 380, color: 'rgba(245,166,35,0.22)', blur: 90 })} />
+      <div style={orb({ bottom: '22%', left: '-12%', w: 280, h: 280, color: 'rgba(120,50,220,0.18)', blur: 80 })} />
+      <div style={orb({ top: '48%', right: '-10%', w: 240, h: 240, color: 'rgba(20,210,190,0.14)', blur: 80 })} />
       <TripRealtimeStatusBadge />
       <OfflineStatus userId={currentUserId} tripId={trip.id} />
       <div style={{ display: visibleScreen === 'plan' ? 'block' : 'none' }} aria-hidden={visibleScreen !== 'plan'}>

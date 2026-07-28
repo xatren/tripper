@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { Home, Briefcase, Compass } from 'lucide-react'
 import type { Profile } from '@/types'
 import { getInitials } from '@/lib/utils'
+import { DUSK } from '@/components/design/tokens'
 
 // Single bottom nav shared by Dashboard, Trips, and Explore (previously three
 // diverging copies, one of which shipped a dead "Itinerary" tab).
@@ -50,13 +51,13 @@ export function AppBottomNav({ active, profile }: { active: AppNavTab; profile: 
             transition={TAP}
           >
             {id === 'profile' ? (
-              <div style={{ width: 26, height: 26, borderRadius: '50%', background: AVATAR_GRAD, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: '#fff', border: isActive ? '1.5px solid #f5a623' : 'none' }}>
+              <div style={{ width: 26, height: 26, borderRadius: '50%', background: AVATAR_GRAD, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: DUSK.textPrimary, border: isActive ? '1.5px solid #f5a623' : 'none' }}>
                 {getInitials(profile?.display_name ?? profile?.email)}
               </div>
             ) : Icon ? (
-              <Icon style={{ width: 22, height: 22, color: isActive ? '#f5a623' : 'rgba(215,215,255,0.40)' }} />
+              <Icon style={{ width: 22, height: 22, color: isActive ? '#f5a623' : DUSK.textMuted }} />
             ) : null}
-            <span style={{ fontSize: 10, fontWeight: 500, color: isActive ? '#f5a623' : 'rgba(215,215,255,0.40)' }}>
+            <span style={{ fontSize: 10, fontWeight: 500, color: isActive ? '#f5a623' : DUSK.textMuted }}>
               {label}
             </span>
             {isActive && (

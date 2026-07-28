@@ -21,7 +21,7 @@ export const BUILDING_EXTRUSION_LAYER: LayerProps = {
   type: 'fill-extrusion',
   minzoom: 14,
   paint: {
-    'fill-extrusion-color': '#3a3a52',
+    'fill-extrusion-color': '#4a3145',
     'fill-extrusion-height': ['get', 'height'],
     'fill-extrusion-base': ['get', 'min_height'],
     'fill-extrusion-opacity': 0.75,

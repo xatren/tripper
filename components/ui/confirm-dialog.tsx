@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import { DUSK } from '@/components/design/tokens'
 
 // Inline-styled (not the Radix alert-dialog) so it matches the app's dark
 // glass screens without depending on the Tailwind theme variables.
@@ -74,8 +75,8 @@ export function ConfirmDialog({ open, title, message, confirmLabel = 'Delete', o
               boxShadow: '0 16px 48px rgba(0,0,0,.5)', backdropFilter: 'blur(24px)',
             }}
           >
-            <div id={titleId} style={{ fontSize: 16, fontWeight: 800, color: '#fff', letterSpacing: '-0.01em' }}>{title}</div>
-            <div id={messageId} style={{ fontSize: 13, color: 'rgba(215,215,255,.65)', marginTop: 6, lineHeight: 1.5 }}>{message}</div>
+            <div id={titleId} style={{ fontSize: 16, fontWeight: 800, color: DUSK.textPrimary, letterSpacing: '-0.01em' }}>{title}</div>
+            <div id={messageId} style={{ fontSize: 13, color: DUSK.textMuted, marginTop: 6, lineHeight: 1.5 }}>{message}</div>
             <div style={{ display: 'flex', gap: 10, marginTop: 18 }}>
               <button
                 ref={cancelRef}
@@ -94,7 +95,7 @@ export function ConfirmDialog({ open, title, message, confirmLabel = 'Delete', o
                 style={{
                   flex: 1, height: 44, borderRadius: 12,
                   background: 'linear-gradient(145deg, #ef4444, #b91c1c)',
-                  border: 'none', color: '#fff', fontSize: 14, fontWeight: 700,
+                  border: 'none', color: DUSK.textPrimary, fontSize: 14, fontWeight: 700,
                   cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 6px 20px rgba(239,68,68,.3)',
                 }}
               >

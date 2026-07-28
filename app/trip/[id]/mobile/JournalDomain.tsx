@@ -12,6 +12,7 @@ import { showToast } from '@/components/ui/toast'
 import { convertKm, useDistanceUnit } from '@/lib/settings'
 import { createRandomId } from '@/lib/random-id'
 import { ACCENT_GRADIENT, ACCENT_LIGHT, GLASS_BORDER, GLASS_FILL, RetryCard } from './domain-ui'
+import { DUSK } from '@/components/design/tokens'
 import { formatDateRange, totalNights, tripTitle } from './trip-domain-utils'
 import { allowlistedRecapPayload, buildRecapStats, type RecapShareField } from '@/lib/travel-mode'
 import { BottomSheet } from './components/BottomSheet'
@@ -518,7 +519,7 @@ export function JournalDomain({
     } finally { setSharing(false) }
   }
 
-  const inputStyle: CSSProperties = { background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 10, padding: '8px 12px', fontSize: 13, color: '#fff', outline: 'none', fontFamily: 'inherit' }
+  const inputStyle: CSSProperties = { background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 10, padding: '8px 12px', fontSize: 13, color: DUSK.textPrimary, outline: 'none', fontFamily: 'inherit' }
 
   return (
     <div style={{ paddingTop: 14, paddingBottom: 20 }}>
@@ -544,9 +545,9 @@ export function JournalDomain({
             onFocus={() => { if (navigator.onLine) void loadRecapImage().catch(() => undefined) }}
             disabled={sharing}
             aria-busy={sharing}
-            style={{ width: '100%', marginTop: 12, padding: '14px 16px', borderRadius: 16, background: ACCENT_GRADIENT, border: 'none', color: '#1a0800', fontWeight: 800, fontSize: 14.5, cursor: sharing ? 'default' : 'pointer', fontFamily: 'inherit', boxShadow: '0 0 24px rgba(245,140,0,.3)', opacity: sharing ? 0.6 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+            style={{ width: '100%', marginTop: 12, padding: '14px 16px', borderRadius: 16, background: ACCENT_GRADIENT, border: 'none', color: DUSK.onAmber, fontWeight: 800, fontSize: 14.5, cursor: sharing ? 'default' : 'pointer', fontFamily: 'inherit', boxShadow: '0 0 24px rgba(245,140,0,.3)', opacity: sharing ? 0.6 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a0800" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={DUSK.onAmber} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7" />
               <path d="M16 6l-4-4-4 4M12 2v13" />
             </svg>
@@ -555,7 +556,7 @@ export function JournalDomain({
         </>
       ) : (
         <div style={{ padding: '18px 16px', borderRadius: 16, background: 'rgba(255,255,255,.035)', border: '1px solid rgba(255,255,255,.08)', textAlign: 'center' }}>
-          <span style={{ color: 'rgba(215,215,255,.55)', fontSize: 12.5 }}>
+          <span style={{ color: DUSK.textMuted, fontSize: 12.5 }}>
             {stops.length < 2 ? 'Add at least 2 stops to see your trip recap' : 'Loading route recap…'}
           </span>
         </div>
@@ -563,7 +564,7 @@ export function JournalDomain({
 
       {/* ── Daily journal ── */}
       <div style={{ marginTop: 20 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,.85)', letterSpacing: '.02em', marginBottom: 10 }}>Daily journal</div>
+        <div style={{ fontSize: 13, fontWeight: 700, color: DUSK.textSecondary, letterSpacing: '.02em', marginBottom: 10 }}>Daily journal</div>
 
         {/* composer */}
         {canEdit && <div style={{ borderRadius: 16, background: 'rgba(255,255,255,.045)', border: '1px solid rgba(255,255,255,.1)', padding: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -607,7 +608,7 @@ export function JournalDomain({
                       </svg>
                     )}
                     {(p.status === 'uploading' || p.status === 'queued') && (
-                      <span style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10.5, fontWeight: 800, color: '#fff', textShadow: '0 1px 3px rgba(0,0,0,.6)' }}>
+                      <span style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10.5, fontWeight: 800, color: DUSK.textPrimary, textShadow: '0 1px 3px rgba(0,0,0,.6)' }}>
                         {p.progress}%
                       </span>
                     )}
@@ -638,7 +639,7 @@ export function JournalDomain({
                     <button
                       onClick={() => { void removeDraftPhoto(p) }}
                       aria-label="Remove photo"
-                      style={{ position: 'absolute', top: -6, right: -6, width: 18, height: 18, borderRadius: '50%', background: 'rgba(20,20,40,.9)', border: '1px solid rgba(255,255,255,.25)', color: '#fff', fontSize: 10, lineHeight: 1, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}
+                      style={{ position: 'absolute', top: -6, right: -6, width: 18, height: 18, borderRadius: '50%', background: 'rgba(20,20,40,.9)', border: '1px solid rgba(255,255,255,.25)', color: DUSK.textPrimary, fontSize: 10, lineHeight: 1, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}
                     >
                       ✕
                     </button>
@@ -675,7 +676,7 @@ export function JournalDomain({
             <button
               onClick={() => fileInputRef.current?.click()}
               aria-label="Add photos to journal entry"
-              style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 10, background: GLASS_FILL, border: `1px solid ${GLASS_BORDER}`, color: 'rgba(255,255,255,.85)', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}
+              style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 10, background: GLASS_FILL, border: `1px solid ${GLASS_BORDER}`, color: DUSK.textSecondary, fontSize: 12.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="3" y="5" width="18" height="14" rx="2" /><circle cx="12" cy="12" r="3.2" /><path d="M8 5l1.2-2h5.6L16 5" />
@@ -685,14 +686,14 @@ export function JournalDomain({
             <button
               onClick={() => { void discardDraft() }}
               disabled={saving || !hasContent}
-              style={{ padding: '8px 10px', borderRadius: 10, background: 'none', border: 'none', color: 'rgba(255,255,255,.55)', fontSize: 12, fontWeight: 700, cursor: saving ? 'default' : 'pointer', fontFamily: 'inherit' }}
+              style={{ padding: '8px 10px', borderRadius: 10, background: 'none', border: 'none', color: DUSK.textMuted, fontSize: 12, fontWeight: 700, cursor: saving ? 'default' : 'pointer', fontFamily: 'inherit' }}
             >
               Discard
             </button>
             <button
               onClick={submitEntry}
               disabled={saving || !hasContent}
-              style={{ marginLeft: 'auto', padding: '8px 18px', borderRadius: 10, background: ACCENT_GRADIENT, border: 'none', color: '#1a0800', fontSize: 12.5, fontWeight: 800, cursor: saving ? 'default' : 'pointer', fontFamily: 'inherit', opacity: saving || !hasContent ? 0.5 : 1 }}
+              style={{ marginLeft: 'auto', padding: '8px 18px', borderRadius: 10, background: ACCENT_GRADIENT, border: 'none', color: DUSK.onAmber, fontSize: 12.5, fontWeight: 800, cursor: saving ? 'default' : 'pointer', fontFamily: 'inherit', opacity: saving || !hasContent ? 0.5 : 1 }}
             >
               {saving ? 'Saving & uploading…' : draftEntryId ? 'Retry photos' : 'Save entry'}
             </button>
@@ -712,7 +713,7 @@ export function JournalDomain({
             />
           )}
           {entries?.length === 0 && !entriesError && (
-            <span style={{ color: 'rgba(215,215,255,.5)', fontSize: 12.5, textAlign: 'center', padding: '12px 0' }}>{canEdit ? 'No entries yet — write your first note above ✍️' : 'No journal entries yet. An editor can add the first memory.'}</span>
+            <span style={{ color: DUSK.textMuted, fontSize: 12.5, textAlign: 'center', padding: '12px 0' }}>{canEdit ? 'No entries yet — write your first note above ✍️' : 'No journal entries yet. An editor can add the first memory.'}</span>
           )}
           {entries?.map((entry) => (
             <div key={entry.id} style={{ borderRadius: 16, background: 'rgba(255,255,255,.035)', border: '1px solid rgba(255,255,255,.08)', padding: '12px 14px' }}>
@@ -721,13 +722,13 @@ export function JournalDomain({
                 {canEdit && entry.created_by === currentUserId && <button
                   onClick={() => setPendingDelete(entry)}
                   aria-label="Delete entry"
-                  style={{ marginLeft: 'auto', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(215,215,255,.35)' }}
+                  style={{ marginLeft: 'auto', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: DUSK.textMuted }}
                 >
                   <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 3L13 13M13 3L3 13" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
                 </button>}
               </div>
               {entry.note && (
-                <div style={{ marginTop: 6, fontSize: 13.5, color: 'rgba(255,255,255,.9)', lineHeight: 1.55, whiteSpace: 'pre-wrap' }}>{entry.note}</div>
+                <div style={{ marginTop: 6, fontSize: 13.5, color: DUSK.textPrimary, lineHeight: 1.55, whiteSpace: 'pre-wrap' }}>{entry.note}</div>
               )}
               {(entry.journal_photos?.length ?? 0) > 0 && (
                 <div style={{ marginTop: 10, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
@@ -779,7 +780,7 @@ export function JournalDomain({
             autoFocus
             onClick={() => setLightbox(null)}
             aria-label="Close photo"
-            style={{ position: 'absolute', top: 'max(16px, env(safe-area-inset-top))', right: 16, width: 38, height: 38, borderRadius: '50%', background: 'rgba(255,255,255,.1)', border: '1px solid rgba(255,255,255,.22)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+            style={{ position: 'absolute', top: 'max(16px, env(safe-area-inset-top))', right: 16, width: 38, height: 38, borderRadius: '50%', background: 'rgba(255,255,255,.1)', border: '1px solid rgba(255,255,255,.22)', color: DUSK.textPrimary, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
           >
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 3L13 13M13 3L3 13" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>
           </button>
@@ -797,7 +798,7 @@ export function JournalDomain({
       />}
       <BottomSheet open={recapPreviewOpen} onClose={() => !sharing && setRecapPreviewOpen(false)} titleId="recap-privacy-title" title="Choose what to share">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <div style={{ padding: 12, borderRadius: 14, background: 'rgba(255,255,255,.04)', color: 'rgba(255,255,255,.72)', fontSize: 12, lineHeight: 1.5 }}>
+          <div style={{ padding: 12, borderRadius: 14, background: 'rgba(255,255,255,.04)', color: DUSK.textSecondary, fontSize: 12, lineHeight: 1.5 }}>
             Private by default: confirmation numbers, private notes, member debt and precise locations are never included.
           </div>
           {([
@@ -809,14 +810,14 @@ export function JournalDomain({
             ['memoryText', firstShareableNote ? 'First journal note' : 'No note available', !!firstShareableNote],
             ['photoUrl', firstShareablePhoto ? 'First journal photo' : 'No photo available', !!firstShareablePhoto],
           ] as [RecapShareField, string, boolean][]).map(([field, label, available]) => (
-            <label key={field} style={{ minHeight: 48, display: 'flex', alignItems: 'center', gap: 10, opacity: available ? 1 : .45, color: '#fff', fontSize: 13 }}>
+            <label key={field} style={{ minHeight: 48, display: 'flex', alignItems: 'center', gap: 10, opacity: available ? 1 : .45, color: DUSK.textPrimary, fontSize: 13 }}>
               <input type="checkbox" disabled={!available} checked={recapFields.includes(field)} onChange={(event) => {
                 setRecapField(field, event.target.checked)
                 if (field === 'distance') setRecapField('durationHours', event.target.checked)
               }} /> {label}
             </label>
           ))}
-          <button type="button" onClick={() => void shareRecap()} disabled={sharing} style={{ minHeight: 48, borderRadius: 14, border: 0, background: ACCENT_GRADIENT, color: '#1a0800', fontWeight: 850 }}>{sharing ? 'Creating image…' : 'Share selected recap'}</button>
+          <button type="button" onClick={() => void shareRecap()} disabled={sharing} style={{ minHeight: 48, borderRadius: 14, border: 0, background: ACCENT_GRADIENT, color: DUSK.onAmber, fontWeight: 850 }}>{sharing ? 'Creating image…' : 'Share selected recap'}</button>
         </div>
       </BottomSheet>
     </div>

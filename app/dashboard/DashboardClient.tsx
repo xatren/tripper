@@ -21,15 +21,11 @@ import {
 import { showToast } from "@/components/ui/toast";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { AppBottomNav } from "@/components/ui/AppBottomNav";
+import { DUSK, FONT_INTER, SUNSET_GRADIENT } from "@/components/design/tokens";
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
-const BG         = "linear-gradient(145deg, #06061c 0%, #0a1020 55%, #071216 100%)";
-const AMBER_GRAD = "linear-gradient(135deg, #f5a623, #f8c04a)";
 const AMBER_GLOW = "0 0 24px rgba(245,140,0,0.32)";
 const AVATAR_GRAD = "linear-gradient(135deg, #7c3aed, #4f46e5)";
-const FONT: React.CSSProperties = {
-  fontFamily: "var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif",
-};
 
 const CARD_GRADIENTS = [
   "linear-gradient(135deg, #0d9488, #0284c7, #4338ca)",
@@ -132,7 +128,7 @@ export function DashboardClient({ profile, trips: initialTrips, capabilitiesByTr
 
   // ── render ────────────────────────────────────────────────────────────────
   return (
-    <div style={{ ...FONT, background: BG, minHeight: "100svh", position: "relative", overflow: "hidden" }}>
+    <div className="atmosphere" style={{ ...FONT_INTER, minHeight: "100svh", position: "relative", overflow: "hidden" }}>
 
       {/* Ambient orbs */}
       <div style={orb({ top: "2%",  left: "50%", translate: "-50% 0", w: 380, h: 380, color: "rgba(245,166,35,0.26)", blur: 90 })} />
@@ -150,10 +146,10 @@ export function DashboardClient({ profile, trips: initialTrips, capabilitiesByTr
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
           >
-            <div style={{ width: 46, height: 46, borderRadius: 13, background: AMBER_GRAD, boxShadow: AMBER_GLOW, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <MapPin style={{ width: 22, height: 22, color: "#1a0800" }} />
+            <div style={{ width: 46, height: 46, borderRadius: 13, background: SUNSET_GRADIENT, boxShadow: AMBER_GLOW, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <MapPin style={{ width: 22, height: 22, color: DUSK.onAmber }} />
             </div>
-            <span style={{ fontSize: 21, fontWeight: 700, color: "#fff", letterSpacing: -0.3 }}>Tripper</span>
+            <span style={{ fontSize: 21, fontWeight: 700, color: DUSK.textPrimary, letterSpacing: -0.3 }}>Tripper</span>
           </motion.div>
 
           <motion.div
@@ -167,7 +163,7 @@ export function DashboardClient({ profile, trips: initialTrips, capabilitiesByTr
               onClick={() => router.push("/profile")}
               title="Profile"
               aria-label="Open profile"
-              style={{ width: 40, height: 40, borderRadius: "50%", background: AVATAR_GRAD, border: "2px solid #f5a623", boxShadow: "0 0 16px rgba(245,140,0,0.38)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700, color: "#fff", cursor: "pointer", overflow: "hidden", padding: 0 }}
+              style={{ width: 40, height: 40, borderRadius: "50%", background: AVATAR_GRAD, border: `2px solid ${DUSK.amber}`, boxShadow: "0 0 16px rgba(245,140,0,0.38)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700, color: DUSK.textPrimary, cursor: "pointer", overflow: "hidden", padding: 0 }}
               whileTap={{ scale: 0.86 }}
               whileHover={{ scale: 1.06 }}
               transition={TAP_SPRING}
@@ -187,10 +183,10 @@ export function DashboardClient({ profile, trips: initialTrips, capabilitiesByTr
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.1, ease: "easeOut" }}
         >
-          <h1 style={{ fontSize: 24, fontWeight: 700, color: "#fff", margin: "0 0 4px", letterSpacing: -0.4 }}>
+          <h1 style={{ fontSize: 24, fontWeight: 700, color: DUSK.textPrimary, margin: "0 0 4px", letterSpacing: -0.4 }}>
             {getGreeting()}, {firstName} 👋
           </h1>
-          <p style={{ fontSize: 14, color: "rgba(215,215,255,0.60)", margin: 0 }}>
+          <p style={{ fontSize: 14, color: DUSK.textSecondary, margin: 0 }}>
             {upcomingCount > 0
               ? `You have ${upcomingCount} upcoming trip${upcomingCount > 1 ? "s" : ""}`
               : "No upcoming trips — let's plan one!"}
@@ -207,10 +203,10 @@ export function DashboardClient({ profile, trips: initialTrips, capabilitiesByTr
             animate={{ opacity: 1 }}
             transition={{ duration: 0.35, delay: 0.18 }}
           >
-            <span style={{ fontSize: 16, fontWeight: 600, color: "#fff" }}>Continue planning your trips</span>
+            <span style={{ fontSize: 16, fontWeight: 600, color: DUSK.textPrimary }}>Continue planning your trips</span>
             <motion.button
               onClick={() => router.push("/trips")}
-              style={{ fontSize: 14, color: "#f5a623", fontWeight: 500, background: "none", border: "none", cursor: "pointer", padding: "2px 0", ...FONT }}
+              style={{ fontSize: 14, color: DUSK.amber, fontWeight: 500, background: "none", border: "none", cursor: "pointer", padding: "2px 0", ...FONT_INTER }}
               whileTap={{ scale: 0.92, opacity: 0.7 }}
               transition={TAP_SPRING}
             >
@@ -255,11 +251,11 @@ export function DashboardClient({ profile, trips: initialTrips, capabilitiesByTr
                     whileHover={{ background: "rgba(255,255,255,0.065)", borderColor: "rgba(255,255,255,0.18)" }}
                     transition={TAP_SPRING}
                   >
-                    <div style={{ width: 54, height: 54, borderRadius: 16, flexShrink: 0, background: AMBER_GRAD, boxShadow: "0 0 22px rgba(245,140,0,0.22)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <Plus style={{ width: 24, height: 24, color: "#1a0800" }} />
+                    <div style={{ width: 54, height: 54, borderRadius: 16, flexShrink: 0, background: SUNSET_GRADIENT, boxShadow: "0 0 22px rgba(245,140,0,0.22)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <Plus style={{ width: 24, height: 24, color: DUSK.onAmber }} />
                     </div>
-                    <span style={{ fontSize: 16, fontWeight: 500, color: "rgba(215,215,255,0.88)" }}>Create new trip</span>
-                    <span style={{ marginLeft: "auto", color: "rgba(215,215,255,0.42)", fontSize: 20 }}>›</span>
+                    <span style={{ fontSize: 16, fontWeight: 500, color: DUSK.textSecondary }}>Create new trip</span>
+                    <span style={{ marginLeft: "auto", color: DUSK.textMuted, fontSize: 20 }}>›</span>
                   </motion.button>
                 </motion.div>
 
@@ -279,8 +275,8 @@ export function DashboardClient({ profile, trips: initialTrips, capabilitiesByTr
                     <div style={{ width: 54, height: 54, borderRadius: 16, flexShrink: 0, background: "rgba(124,58,237,0.18)", border: "1px solid rgba(124,58,237,0.35)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                       <Ticket style={{ width: 22, height: 22, color: "#a78bfa" }} />
                     </div>
-                    <span style={{ fontSize: 16, fontWeight: 500, color: "rgba(215,215,255,0.88)" }}>Join with invite code</span>
-                    <span style={{ marginLeft: "auto", color: "rgba(215,215,255,0.42)", fontSize: 20 }}>›</span>
+                    <span style={{ fontSize: 16, fontWeight: 500, color: DUSK.textSecondary }}>Join with invite code</span>
+                    <span style={{ marginLeft: "auto", color: DUSK.textMuted, fontSize: 20 }}>›</span>
                   </motion.button>
                 </motion.div>
               </div>
@@ -296,11 +292,11 @@ export function DashboardClient({ profile, trips: initialTrips, capabilitiesByTr
       <Dialog open={isJoinOpen} onOpenChange={setJoin}>
         <DialogContent
           className="w-[calc(100%-32px)] max-w-[340px] gap-0 rounded-[20px] border-white/[0.12] bg-[#0e0e22]/[0.97] p-5 shadow-[0_16px_48px_rgba(0,0,0,0.5)] backdrop-blur-2xl"
-          style={FONT}
+          style={FONT_INTER}
         >
           <DialogHeader className="pr-9 text-left">
             <DialogTitle className="text-[18px] font-extrabold leading-6 tracking-[-0.01em] text-white">Join a trip</DialogTitle>
-            <DialogDescription className="mt-1 text-[13px] leading-[1.5] text-[rgba(215,215,255,0.65)]">
+            <DialogDescription className="mt-1 text-[13px] leading-[1.5] text-[rgba(222,220,240,0.76)]">
               Enter the invite code shared by your travel buddy.
             </DialogDescription>
           </DialogHeader>
@@ -326,7 +322,7 @@ export function DashboardClient({ profile, trips: initialTrips, capabilitiesByTr
             <motion.button
               type="submit"
               disabled={loading || !joinCode.trim()}
-              style={{ width: "100%", height: 48, padding: "0 18px", borderRadius: 12, background: AMBER_GRAD, color: "#1a0800", fontWeight: 700, fontSize: 14, border: "none", cursor: loading || !joinCode.trim() ? "not-allowed" : "pointer", boxShadow: AMBER_GLOW, opacity: loading || !joinCode.trim() ? 0.55 : 1, ...FONT }}
+              style={{ width: "100%", height: 48, padding: "0 18px", borderRadius: 12, background: SUNSET_GRADIENT, color: DUSK.onAmber, fontWeight: 700, fontSize: 14, border: "none", cursor: loading || !joinCode.trim() ? "not-allowed" : "pointer", boxShadow: AMBER_GLOW, opacity: loading || !joinCode.trim() ? 0.55 : 1, ...FONT_INTER }}
               whileTap={loading || !joinCode.trim() ? undefined : { scale: 0.97 }}
               transition={TAP_SPRING}
             >
@@ -365,7 +361,7 @@ function TripCard({ trip, index, capabilities, onOpen, onDelete, onCopyCode }: {
     if (daysUntil === null) return null;
     if (daysUntil === 0)  return { label: "Today!",    color: "rgb(52,211,153)", bg: "rgba(52,211,153,0.10)", border: "rgba(52,211,153,0.22)" };
     if (daysUntil > 0)    return { label: `In ${daysUntil} day${daysUntil !== 1 ? "s" : ""}`, color: "rgb(52,211,153)", bg: "rgba(52,211,153,0.10)", border: "rgba(52,211,153,0.22)" };
-    return { label: "Completed", color: "#f5a623", bg: "rgba(245,166,35,0.18)", border: "rgba(245,166,35,0.32)" };
+    return { label: "Completed", color: DUSK.amber, bg: "rgba(245,166,35,0.18)", border: "rgba(245,166,35,0.32)" };
   })();
 
   return (
@@ -388,10 +384,10 @@ function TripCard({ trip, index, capabilities, onOpen, onDelete, onCopyCode }: {
             {badge.label}
           </span>
         )}
-        <p style={{ fontSize: 16, fontWeight: 700, color: "#fff", margin: "0 0 3px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+        <p style={{ fontSize: 16, fontWeight: 700, color: DUSK.textPrimary, margin: "0 0 3px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
           {trip.title}
         </p>
-        <p style={{ fontSize: 13, color: "rgba(215,215,255,0.60)", margin: 0 }}>
+        <p style={{ fontSize: 13, color: DUSK.textSecondary, margin: 0 }}>
           {trip.start_date
             ? `${formatDate(trip.start_date)}${trip.end_date ? ` – ${formatDate(trip.end_date)}` : ""}`
             : "Dates not set"}
@@ -406,7 +402,7 @@ function TripCard({ trip, index, capabilities, onOpen, onDelete, onCopyCode }: {
           <motion.button
             type="button"
             aria-label={`Open actions for ${trip.title}`}
-            style={{ width: 44, height: 44, padding: 0, border: 0, background: "transparent", borderRadius: 8, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(215,215,255,0.42)", cursor: "pointer" }}
+            style={{ width: 44, height: 44, padding: 0, border: 0, background: "transparent", borderRadius: 8, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", color: DUSK.textMuted, cursor: "pointer" }}
             whileTap={{ scale: 0.84 }}
             transition={TAP_SPRING}
           >
@@ -441,16 +437,16 @@ function EmptyState({ onCreateClick }: { onCreateClick: () => void }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
     >
-      <div style={{ width: 64, height: 64, borderRadius: 18, background: AMBER_GRAD, boxShadow: AMBER_GLOW, margin: "0 auto 20px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <MapPin style={{ width: 30, height: 30, color: "#1a0800" }} />
+      <div style={{ width: 64, height: 64, borderRadius: 18, background: SUNSET_GRADIENT, boxShadow: AMBER_GLOW, margin: "0 auto 20px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <MapPin style={{ width: 30, height: 30, color: DUSK.onAmber }} />
       </div>
-      <p style={{ color: "#fff", fontWeight: 600, fontSize: 17, margin: "0 0 8px" }}>No active or upcoming trips</p>
-      <p style={{ color: "rgba(215,215,255,0.60)", fontSize: 14, margin: "0 0 28px" }}>
+      <p style={{ color: DUSK.textPrimary, fontWeight: 600, fontSize: 17, margin: "0 0 8px" }}>No active or upcoming trips</p>
+      <p style={{ color: DUSK.textSecondary, fontSize: 14, margin: "0 0 28px" }}>
         Start planning a new trip. Your completed trips are still available in Trips.
       </p>
       <motion.button
         onClick={onCreateClick}
-        style={{ background: AMBER_GRAD, color: "#1a0800", fontWeight: 700, fontSize: 15, border: "none", borderRadius: 14, padding: "13px 32px", boxShadow: AMBER_GLOW, cursor: "pointer", ...FONT }}
+        style={{ background: SUNSET_GRADIENT, color: DUSK.onAmber, fontWeight: 700, fontSize: 15, border: "none", borderRadius: 14, padding: "13px 32px", boxShadow: AMBER_GLOW, cursor: "pointer", ...FONT_INTER }}
         whileTap={{ scale: 0.94 }}
         whileHover={{ scale: 1.03 }}
         transition={TAP_SPRING}
