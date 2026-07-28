@@ -4,60 +4,29 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { MapPin, Plus, MoreVertical, Ticket, Trash2 } from "lucide-react";
+import { MapPin, Plus, Ticket } from "lucide-react";
 import type { Profile, Trip, TripCapabilities } from "@/types";
 import { createClient } from "@/lib/supabase/client";
 import { removeTripStorageObjects } from "@/lib/trip-storage-cleanup";
-import { formatDate, getInitials } from "@/lib/utils";
+import { getInitials } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
-  DropdownMenuSeparator, DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { showToast } from "@/components/ui/toast";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { AppBottomNav } from "@/components/ui/AppBottomNav";
 import { DUSK, FONT_INTER, SUNSET_GRADIENT } from "@/components/design/tokens";
+import { TripCard } from "@/components/dashboard/TripCard";
+import { EmptyState } from "@/components/dashboard/EmptyState";
+import { TAP_SPRING, getDaysUntil } from "@/components/dashboard/dashboard-ui";
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
 const AMBER_GLOW = "0 0 24px rgba(245,140,0,0.32)";
 const AVATAR_GRAD = "linear-gradient(135deg, #7c3aed, #4f46e5)";
 
-const CARD_GRADIENTS = [
-  "linear-gradient(135deg, #0d9488, #0284c7, #4338ca)",
-  "linear-gradient(135deg, #b45309, #f59e0b, #e11d48)",
-  "linear-gradient(135deg, #374151, #1e293b, #0f766e)",
-  "linear-gradient(135deg, #7c3aed, #4f46e5, #0284c7)",
-  "linear-gradient(135deg, #065f46, #0d9488, #0369a1)",
-];
-const CARD_EMOJIS = ["🗺️", "🌊", "🏰", "🏔️", "🏝️", "🎭", "🌄", "🏛️"];
-// Vibe picked in the New Trip wizard (trips.vibe, migration 008).
-const VIBE_EMOJIS: Record<string, string> = {
-  Road: "🚗", Fly: "✈️", Camp: "⛺", Beach: "🏖️", Mountain: "🏔️", Backpack: "🎒",
-};
-
-// shared spring for all tap animations
-const TAP_SPRING = { type: "spring" as const, stiffness: 420, damping: 22 };
-
 // ── Helpers ───────────────────────────────────────────────────────────────────
-function getDaysUntil(dateStr?: string | null): number | null {
-  if (!dateStr) return null;
-  const target = new Date(dateStr);
-  const now = new Date();
-  now.setHours(0, 0, 0, 0);
-  target.setHours(0, 0, 0, 0);
-  return Math.ceil((target.getTime() - now.getTime()) / 86_400_000);
-}
-
-function getNights(start?: string | null, end?: string | null): number | null {
-  if (!start || !end) return null;
-  return Math.round((new Date(end).getTime() - new Date(start).getTime()) / 86_400_000);
-}
-
 function isTripCompleted(trip: Trip): boolean {
   const completionDate = trip.end_date ?? trip.start_date;
   if (!completionDate) return false;
@@ -343,116 +312,5 @@ export function DashboardClient({ profile, trips: initialTrips, capabilitiesByTr
         onCancel={() => setDeleteTarget(null)}
       />
     </div>
-  );
-}
-
-// ── TripCard ──────────────────────────────────────────────────────────────────
-function TripCard({ trip, index, capabilities, onOpen, onDelete, onCopyCode }: {
-  trip: Trip; index: number; capabilities?: TripCapabilities;
-  onOpen: () => void; onDelete: () => void; onCopyCode: () => void;
-}) {
-  const gradient  = CARD_GRADIENTS[index % CARD_GRADIENTS.length];
-  const emoji     = (trip.vibe && VIBE_EMOJIS[trip.vibe]) || CARD_EMOJIS[index % CARD_EMOJIS.length];
-  const daysUntil = getDaysUntil(trip.start_date);
-  const nights    = getNights(trip.start_date, trip.end_date);
-  const elevated  = index === 0;
-
-  const badge = (() => {
-    if (daysUntil === null) return null;
-    if (daysUntil === 0)  return { label: "Today!",    color: "rgb(52,211,153)", bg: "rgba(52,211,153,0.10)", border: "rgba(52,211,153,0.22)" };
-    if (daysUntil > 0)    return { label: `In ${daysUntil} day${daysUntil !== 1 ? "s" : ""}`, color: "rgb(52,211,153)", bg: "rgba(52,211,153,0.10)", border: "rgba(52,211,153,0.22)" };
-    return { label: "Completed", color: DUSK.amber, bg: "rgba(245,166,35,0.18)", border: "rgba(245,166,35,0.32)" };
-  })();
-
-  return (
-    <motion.div
-      style={{ width: "100%", display: "flex", alignItems: "center", gap: 14, background: elevated ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.055)", border: `1px solid ${elevated ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.11)"}`, borderRadius: 20, backdropFilter: "blur(16px)", padding: "14px 16px", cursor: "pointer", textAlign: "left" }}
-      whileTap={{ scale: 0.97 }}
-      whileHover={{ background: "rgba(255,255,255,0.085)", borderColor: "rgba(255,255,255,0.17)" }}
-      transition={TAP_SPRING}
-    >
-      <button type="button" onClick={onOpen} style={{ minWidth: 0, flex: 1, display: "flex", alignItems: "center", gap: 14, padding: 0, border: 0, background: "transparent", color: "inherit", cursor: "pointer", textAlign: "left", fontFamily: "inherit" }}>
-      {/* Gradient icon */}
-      <div style={{ width: 56, height: 56, borderRadius: 16, flexShrink: 0, background: gradient, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26 }}>
-        {emoji}
-      </div>
-
-      {/* Text */}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        {badge && (
-          <span style={{ display: "inline-block", fontSize: 11, fontWeight: 600, color: badge.color, background: badge.bg, border: `1px solid ${badge.border}`, borderRadius: 20, padding: "2px 8px", marginBottom: 4 }}>
-            {badge.label}
-          </span>
-        )}
-        <p style={{ fontSize: 16, fontWeight: 700, color: DUSK.textPrimary, margin: "0 0 3px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-          {trip.title}
-        </p>
-        <p style={{ fontSize: 13, color: DUSK.textSecondary, margin: 0 }}>
-          {trip.start_date
-            ? `${formatDate(trip.start_date)}${trip.end_date ? ` – ${formatDate(trip.end_date)}` : ""}`
-            : "Dates not set"}
-          {nights !== null && nights > 0 ? ` · ${nights} Night${nights > 1 ? "s" : ""}` : ""}
-        </p>
-      </div>
-      </button>
-
-      {/* Context menu */}
-      {capabilities?.canManageTrip && <DropdownMenu>
-        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-          <motion.button
-            type="button"
-            aria-label={`Open actions for ${trip.title}`}
-            style={{ width: 44, height: 44, padding: 0, border: 0, background: "transparent", borderRadius: 8, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", color: DUSK.textMuted, cursor: "pointer" }}
-            whileTap={{ scale: 0.84 }}
-            transition={TAP_SPRING}
-          >
-            <MoreVertical style={{ width: 18, height: 18 }} />
-          </motion.button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
-          <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onCopyCode(); }}>
-            <Ticket style={{ width: 14, height: 14, marginRight: 8 }} />
-            Copy Invite Code
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="text-destructive focus:text-destructive"
-                onClick={(e) => { e.stopPropagation(); onDelete(); }}
-              >
-                <Trash2 style={{ width: 14, height: 14, marginRight: 8 }} />
-                Delete Trip
-              </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>}
-    </motion.div>
-  );
-}
-
-// ── EmptyState ────────────────────────────────────────────────────────────────
-function EmptyState({ onCreateClick }: { onCreateClick: () => void }) {
-  return (
-    <motion.div
-      style={{ background: "rgba(255,255,255,0.055)", border: "1px solid rgba(255,255,255,0.11)", borderRadius: 20, backdropFilter: "blur(16px)", padding: "48px 24px", textAlign: "center" }}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
-    >
-      <div style={{ width: 64, height: 64, borderRadius: 18, background: SUNSET_GRADIENT, boxShadow: AMBER_GLOW, margin: "0 auto 20px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <MapPin style={{ width: 30, height: 30, color: DUSK.onAmber }} />
-      </div>
-      <p style={{ color: DUSK.textPrimary, fontWeight: 600, fontSize: 17, margin: "0 0 8px" }}>No active or upcoming trips</p>
-      <p style={{ color: DUSK.textSecondary, fontSize: 14, margin: "0 0 28px" }}>
-        Start planning a new trip. Your completed trips are still available in Trips.
-      </p>
-      <motion.button
-        onClick={onCreateClick}
-        style={{ background: SUNSET_GRADIENT, color: DUSK.onAmber, fontWeight: 700, fontSize: 15, border: "none", borderRadius: 14, padding: "13px 32px", boxShadow: AMBER_GLOW, cursor: "pointer", ...FONT_INTER }}
-        whileTap={{ scale: 0.94 }}
-        whileHover={{ scale: 1.03 }}
-        transition={TAP_SPRING}
-      >
-        Create a New Trip
-      </motion.button>
-    </motion.div>
   );
 }

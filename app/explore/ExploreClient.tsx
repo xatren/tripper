@@ -7,7 +7,7 @@ import { useReducedMotionPreference } from "@/components/motion/ReducedMotionPro
 import { DeferredBoundary, DeferredFailure } from "@/components/ui/deferred-boundary";
 import type { ExploreCamera } from "@/components/explore/ExploreMapbox";
 import {
-  Compass, Globe2,
+  Globe2,
   MapPin, Moon, Clock, Ruler, Sun, ChevronRight, ArrowLeft,
 } from "lucide-react";
 import { AppBottomNav } from "@/components/ui/AppBottomNav";
@@ -17,150 +17,12 @@ import type { Profile, Trip, TripCountry } from "@/types";
 import { getInitials } from "@/lib/utils";
 import { getDrivingRoute } from "@/lib/mapbox/directions";
 import { DUSK, FONT_INTER, SUNSET_GRADIENT } from "@/components/design/tokens";
-
-function ExploreMapPlaceholder() {
-  return (
-    <div
-      role="status"
-      aria-label="Loading interactive globe"
-      style={{
-        width: "100%",
-        height: "100%",
-        background: "radial-gradient(120% 90% at 50% 20%, #0a0a30 0%, #050518 60%, #000010 100%)",
-      }}
-    />
-  );
-}
-
-// ── Tokens ────────────────────────────────────────────────────────────────────
-const AMBER_GLOW  = "0 0 20px rgba(245,140,0,0.30)";
-const AVATAR_GRAD = "linear-gradient(135deg, #7c3aed, #4f46e5)";
-const TAP = { type: "spring" as const, stiffness: 420, damping: 22 };
-
-const COUNTRY_COLORS = [
-  "linear-gradient(135deg,#0d9488,#0284c7)",
-  "linear-gradient(135deg,#b45309,#f59e0b)",
-  "linear-gradient(135deg,#374151,#0f766e)",
-  "linear-gradient(135deg,#7c3aed,#4f46e5)",
-  "linear-gradient(135deg,#065f46,#0369a1)",
-  "linear-gradient(135deg,#be185d,#7c3aed)",
-];
-
-// ── Data ──────────────────────────────────────────────────────────────────────
-const COUNTRY_COORDS: Record<string, [number, number]> = {
-  "Turkey": [39.9, 32.9], "Türkiye": [39.9, 32.9],
-  "Italy": [41.9, 12.5], "France": [46.2, 2.2], "Spain": [40.4, -3.7],
-  "Germany": [51.2, 10.4], "UK": [55.4, -3.4], "United Kingdom": [55.4, -3.4],
-  "Portugal": [39.4, -8.2], "Greece": [39.1, 21.8], "Netherlands": [52.1, 5.3],
-  "Belgium": [50.5, 4.5], "Switzerland": [46.8, 8.2], "Austria": [47.5, 14.6],
-  "Poland": [51.9, 19.1], "Czech Republic": [49.8, 15.5], "Hungary": [47.2, 19.5],
-  "Croatia": [45.1, 15.2], "Romania": [45.9, 24.9], "Bulgaria": [42.7, 25.5],
-  "Serbia": [44.0, 21.0], "Sweden": [60.1, 18.6], "Norway": [60.5, 8.5],
-  "Denmark": [56.3, 9.5], "Finland": [61.9, 25.7], "Iceland": [64.9, -18.2],
-  "USA": [37.1, -95.7], "United States": [37.1, -95.7], "Canada": [56.1, -106.3],
-  "Mexico": [23.6, -102.6], "Brazil": [-14.2, -51.9], "Argentina": [-38.4, -63.6],
-  "Japan": [36.2, 138.3], "South Korea": [35.9, 127.8], "China": [35.9, 104.2],
-  "Thailand": [15.9, 100.9], "Vietnam": [14.1, 108.3], "Indonesia": [-0.8, 113.9],
-  "Singapore": [1.4, 103.8], "India": [20.6, 78.9], "Nepal": [28.4, 84.1],
-  "UAE": [23.4, 53.8], "Morocco": [31.8, -7.1], "Egypt": [26.8, 30.8],
-  "South Africa": [-30.6, 22.9], "Kenya": [0.0, 37.9],
-  "Australia": [-25.3, 133.8], "New Zealand": [-40.9, 174.9],
-  "Russia": [61.5, 105.3], "Georgia": [42.3, 43.4],
-};
-
-interface Waypoint {
-  name: string;
-  lat: number;
-  lng: number;
-}
-
-interface Destination {
-  name: string; country: string; lat: number; lng: number;
-  emoji: string; tag: string; distance: string; duration: string;
-  bestSeason: string; description: string;
-  highlights: string[]; waypoints: Waypoint[];
-}
-
-const ROUTES: Destination[] = [
-  {
-    name: "Amalfi Coast", country: "Italy", lat: 40.6, lng: 14.6, emoji: "🏛️", tag: "Coastal Drive",
-    distance: "50 km", duration: "2–3 days", bestSeason: "May – Oct",
-    description: "A winding clifftop road above turquoise waters, connecting pastel villages and hidden sea grottos.",
-    highlights: ["Positano cliffside village", "Ravello garden terraces", "Path of the Gods trail", "Grotta dello Smeraldo"],
-    waypoints: [
-      { name: "Sorrento", lat: 40.626, lng: 14.375 },
-      { name: "Positano", lat: 40.628, lng: 14.485 },
-      { name: "Amalfi", lat: 40.634, lng: 14.603 },
-      { name: "Ravello", lat: 40.649, lng: 14.612 },
-      { name: "Salerno", lat: 40.683, lng: 14.768 },
-    ],
-  },
-  {
-    name: "Ring Road", country: "Iceland", lat: 65.0, lng: -18.0, emoji: "🌋", tag: "Epic Route",
-    distance: "1.332 km", duration: "7–14 days", bestSeason: "Jun – Aug",
-    description: "Iceland's Route 1 circles the entire island, passing glaciers, volcanoes, waterfalls, and Northern Lights.",
-    highlights: ["Jökulsárlón glacier lagoon", "Skaftafell ice caves", "Mývatn geothermal lakes", "Dettifoss waterfall"],
-    waypoints: [
-      { name: "Reykjavík", lat: 64.146, lng: -21.942 },
-      { name: "Vík", lat: 63.419, lng: -19.007 },
-      { name: "Höfn", lat: 64.253, lng: -15.212 },
-      { name: "Egilsstaðir", lat: 65.263, lng: -14.394 },
-      { name: "Akureyri", lat: 65.684, lng: -18.088 },
-      { name: "Borgarnes", lat: 64.537, lng: -21.921 },
-    ],
-  },
-  {
-    name: "Route 66", country: "USA", lat: 35.5, lng: -96.0, emoji: "🛣️", tag: "Legendary Road",
-    distance: "3.940 km", duration: "14–21 days", bestSeason: "Apr – Oct",
-    description: "The Mother Road stretches from Chicago to LA through neon diners, vast deserts, and Americana.",
-    highlights: ["Cadillac Ranch, Amarillo", "Petrified Forest NP", "Grand Canyon detour", "Santa Monica Pier"],
-    waypoints: [
-      { name: "Chicago", lat: 41.878, lng: -87.630 },
-      { name: "St. Louis", lat: 38.627, lng: -90.199 },
-      { name: "Oklahoma City", lat: 35.468, lng: -97.516 },
-      { name: "Albuquerque", lat: 35.085, lng: -106.651 },
-      { name: "Flagstaff", lat: 35.199, lng: -111.651 },
-      { name: "Los Angeles", lat: 34.052, lng: -118.244 },
-    ],
-  },
-  {
-    name: "Milford Sound", country: "New Zealand", lat: -44.7, lng: 167.9, emoji: "🏔️", tag: "Scenic Wonder",
-    distance: "120 km", duration: "2–3 days", bestSeason: "Nov – Mar",
-    description: "A dramatic fjord carved by glaciers, surrounded by sheer peaks and thundering waterfalls.",
-    highlights: ["Mitre Peak reflection", "Stirling & Lady Bowen Falls", "Milford Track hike", "Underwater Observatory"],
-    waypoints: [
-      { name: "Queenstown", lat: -45.031, lng: 168.663 },
-      { name: "Te Anau", lat: -45.415, lng: 167.719 },
-      { name: "Cascade Creek", lat: -44.833, lng: 168.117 },
-      { name: "Milford Sound", lat: -44.617, lng: 167.897 },
-    ],
-  },
-  {
-    name: "Trollstigen", country: "Norway", lat: 62.5, lng: 7.7, emoji: "🌊", tag: "Mountain Pass",
-    distance: "106 km", duration: "1–2 days", bestSeason: "Jun – Sep",
-    description: "Eleven hairpin bends climb a sheer wall with views of cascading waterfalls and deep Norwegian valleys.",
-    highlights: ["11 hairpin bends", "Stigfossen 320 m waterfall", "Eagle Road viewpoint", "Geirangerfjord detour"],
-    waypoints: [
-      { name: "Åndalsnes", lat: 62.567, lng: 7.687 },
-      { name: "Trollstigen Pass", lat: 62.472, lng: 7.662 },
-      { name: "Valldal", lat: 62.299, lng: 7.357 },
-      { name: "Geiranger", lat: 62.101, lng: 7.206 },
-    ],
-  },
-  {
-    name: "Cappadocia", country: "Turkey", lat: 38.6, lng: 34.8, emoji: "🎈", tag: "Hidden Gem",
-    distance: "180 km", duration: "3–4 days", bestSeason: "Apr – Jun",
-    description: "Fairy chimneys, underground cities, and sunrise hot-air balloons over a surreal volcanic landscape.",
-    highlights: ["Hot-air balloon at sunrise", "Göreme Open-Air Museum", "Derinkuyu underground city", "Rose Valley hike"],
-    waypoints: [
-      { name: "Nevşehir", lat: 38.624, lng: 34.715 },
-      { name: "Göreme", lat: 38.644, lng: 34.829 },
-      { name: "Ürgüp", lat: 38.628, lng: 34.911 },
-      { name: "Avanos", lat: 38.716, lng: 34.847 },
-      { name: "Derinkuyu", lat: 38.374, lng: 34.734 },
-    ],
-  },
-];
+import { COUNTRY_COORDS, ROUTES, type Destination, type Waypoint } from "@/components/explore/explore-routes-data";
+import { AMBER_GLOW, AVATAR_GRAD, ExploreMapPlaceholder, TAP, usePageVisible } from "@/components/explore/explore-ui";
+import { CountryCard } from "@/components/explore/CountryCard";
+import { DiscoverCard } from "@/components/explore/DiscoverCard";
+import { EmptyCountries } from "@/components/explore/EmptyCountries";
+import { StarField } from "@/components/explore/StarField";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function parseCountries(d?: string | null) {
@@ -248,18 +110,6 @@ function collectVisitedPlaces(
     }
   }
   return out;
-}
-
-/** True while the tab is in the foreground; flips off on visibilitychange. */
-function usePageVisible() {
-  const [visible, setVisible] = useState(true);
-  useEffect(() => {
-    const onChange = () => setVisible(document.visibilityState === "visible");
-    onChange();
-    document.addEventListener("visibilitychange", onChange);
-    return () => document.removeEventListener("visibilitychange", onChange);
-  }, []);
-  return visible;
 }
 
 export function ExploreClient({ profile, trips }: Props) {
@@ -669,83 +519,6 @@ export function ExploreClient({ profile, trips }: Props) {
 
       {/* Bottom Nav */}
       <AppBottomNav active="explore" profile={profile} />
-    </div>
-  );
-}
-
-// ── Sub-components ────────────────────────────────────────────────────────────
-function CountryCard({ name, lat, lng, index }: { name: string; lat: number; lng: number; index: number }) {
-  return (
-    <motion.div
-      style={{ background:COUNTRY_COLORS[index%COUNTRY_COLORS.length], borderRadius:16, padding:"16px 12px", position:"relative", overflow:"hidden", minHeight:90, display:"flex", flexDirection:"column", justifyContent:"flex-end" }}
-      whileTap={{ scale:0.96 }} transition={TAP}
-    >
-      <div style={{ position:"absolute", top:8, right:8, fontSize:9, fontWeight:700, background:"rgba(0,0,0,0.32)", color: DUSK.amber, borderRadius:20, padding:"2px 7px", letterSpacing:"0.06em" }}>VISITED</div>
-      <MapPin style={{ width:14, height:14, color:"rgba(255,255,255,0.65)", marginBottom:5 }} />
-      <p style={{ fontSize:14, fontWeight:700, color: DUSK.textPrimary, margin:0 }}>{name}</p>
-      <p style={{ fontSize:9, color:"rgba(255,255,255,0.40)", margin:"2px 0 0", fontFamily:"monospace" }}>{lat.toFixed(1)}° {lng.toFixed(1)}°</p>
-    </motion.div>
-  );
-}
-
-function DiscoverCard({ dest, index, onPress }: { dest: Destination; index: number; onPress: () => void }) {
-  return (
-    <motion.button onClick={onPress}
-      style={{ width:"100%", display:"flex", alignItems:"center", gap:12, background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.09)", borderRadius:16, backdropFilter:"blur(16px)", padding:"12px 14px", cursor:"pointer", textAlign:"left" }}
-      initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} transition={{ delay:index*0.05 }}
-      whileTap={{ scale:0.97 }} whileHover={{ background:"rgba(255,255,255,0.08)" }}
-    >
-      <div style={{ width:46, height:46, borderRadius:12, background:COUNTRY_COLORS[index%COUNTRY_COLORS.length], display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, flexShrink:0 }}>{dest.emoji}</div>
-      <div style={{ flex:1, minWidth:0 }}>
-        <p style={{ fontSize:14, fontWeight:700, color: DUSK.textPrimary, margin:"0 0 1px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{dest.name}</p>
-        <p style={{ fontSize:11, color:"rgba(200,210,255,0.45)", margin:"0 0 5px" }}>{dest.country}</p>
-        <span style={{ fontSize:10, fontWeight:600, color: DUSK.amber, background:"rgba(245,166,35,0.12)", border:"1px solid rgba(245,166,35,0.25)", borderRadius:20, padding:"2px 8px" }}>{dest.tag}</span>
-      </div>
-      <Compass style={{ width:16, height:16, color:"rgba(200,210,255,0.25)", flexShrink:0 }} />
-    </motion.button>
-  );
-}
-
-function EmptyCountries({ onDiscover }: { onDiscover: () => void }) {
-  return (
-    <motion.div style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:18, padding:"36px 20px", textAlign:"center" }}
-      initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }}
-    >
-      <p style={{ fontSize:36, margin:"0 0 12px" }}>🌍</p>
-      <p style={{ color: DUSK.textPrimary, fontWeight:600, fontSize:15, margin:"0 0 6px" }}>No countries yet</p>
-      <p style={{ color:"rgba(200,210,255,0.50)", fontSize:12, margin:"0 0 20px", lineHeight:1.6 }}>Add countries to your trips and they&apos;ll appear on the map.</p>
-      <motion.button onClick={onDiscover}
-        style={{ background:SUNSET_GRADIENT, color: DUSK.onAmber, fontWeight:700, fontSize:13, border:"none", borderRadius:12, padding:"10px 22px", boxShadow:AMBER_GLOW, cursor:"pointer", fontFamily:"var(--font-inter),'Inter',system-ui" }}
-        whileTap={{ scale:0.94 }} transition={TAP}
-      >Discover Routes</motion.button>
-    </motion.div>
-  );
-}
-
-function StarField() {
-  // Generated after mount only: Math.random() during SSR would produce values
-  // that never match the client render and trigger hydration warnings.
-  const [stars, setStars] = useState<{ id:number; x:number; y:number; size:number; delay:number; duration:number }[]>([]);
-  useEffect(() => {
-    setStars(Array.from({ length:60 }, (_, i) => ({
-      id: i, x: Math.random()*100, y: Math.random()*100,
-      size: Math.random()*1.5+0.4, delay: Math.random()*5, duration: Math.random()*3+2,
-    })));
-  }, []);
-  // Twinkling pauses when the tab is hidden or the user prefers reduced motion;
-  // stars then hold a static mid opacity instead of running 60 infinite tweens.
-  const reducedMotion = useReducedMotionPreference();
-  const pageVisible   = usePageVisible();
-  const twinkle = pageVisible && !reducedMotion;
-  return (
-    <div style={{ position:"absolute", inset:0, overflow:"hidden", pointerEvents:"none" }}>
-      {stars.map(s => (
-        <motion.div key={s.id}
-          style={{ position:"absolute", left:`${s.x}%`, top:`${s.y}%`, width:s.size, height:s.size, borderRadius:"50%", background:"#fff" }}
-          animate={twinkle ? { opacity:[0.08,0.85,0.08] } : { opacity:0.3 }}
-          transition={twinkle ? { duration:s.duration, delay:s.delay, repeat:Infinity, ease:"easeInOut" } : { duration:0.3 }}
-        />
-      ))}
     </div>
   );
 }
