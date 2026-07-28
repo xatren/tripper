@@ -1,436 +1,420 @@
 'use client'
 
-import { useState, useEffect, CSSProperties } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
 import Link from 'next/link'
-import { MapPin, Map, Users, DollarSign } from 'lucide-react'
+import { motion, AnimatePresence, type PanInfo } from 'framer-motion'
 import { createClient } from '@/lib/supabase/client'
 import { getSafeRedirectPath } from '@/lib/safe-redirect'
+import { useReducedMotionPreference } from '@/components/motion/ReducedMotionProvider'
+import { JourneyScene } from './dusk/JourneyScene'
+import {
+  AuthBrand, FilmGrain, GoogleGlyph, JourneyBackButton, JourneyControls, JourneyCopy, JourneyCounter,
+  Press, SkipButton, type JourneyCopyContent,
+} from './dusk/JourneyChrome'
+import {
+  DUSK, EASE_STANDARD, FINALE_DURATION, FONT_INTER,
+  GROUND_GRADIENT, INTRO_DURATION, ONBOARDING_STORAGE_KEY,
+  pillGhost, pillPrimary,
+} from './dusk/tokens'
 
 /* ─────────────────────────────────────────────────────────────────────
-   DESIGN TOKENS — exact color palette from spec
+   MobileEntryFlow — Tripper "Dusk Journey" onboarding.
+
+   One continuous 2.5D landscape. Four journey steps move the camera
+   down a single mountain route, a location beat parks at a viewpoint,
+   then a cinematic finale hands off to the auth choice — all without
+   the scene ever unmounting or going to black.
+
+   Authoring spec: docs/onboarding-dusk-journey-prompts.md
 ───────────────────────────────────────────────────────────────────── */
-const C = {
-  /* Backgrounds */
-  screenBg:      'linear-gradient(145deg, #06061c, #0a1020, #071216)',
-  canvasBg:      'linear-gradient(145deg, #05050f, #07101a, #050d0d)',
 
-  /* Amber scale */
-  amberBase:     '#f5a623',   // buttons, active dot, route pins, icon bg end
-  amberLight:    '#f8c04a',   // button gradient start, icon gradient start
-  amberDark:     '#e8821a',   // icon gradient end, inner pin circle
+type Stage = 'journey' | 'permission' | 'finale' | 'auth'
 
-  /* Typography */
-  white:         '#ffffff',   // headings
-  offWhite:      'rgba(215,215,255,.88)', // Kayıt Ol button text
-  lavender:      'rgba(210,210,255,.8)',  // pill labels
-  graySubSplash: '#484868',   // "Road trip planner" subtitle
-  graySubLand:   '#4a4a68',   // "Birlikte road trip planla"
-  grayBody:      '#3e3e5c',   // onboarding description
-  grayAtla:      '#363650',   // "Atla" skip button
-  btnText:       '#0f0f1a',   // text on amber buttons
+const JOURNEY_COPY: JourneyCopyContent[] = [
+  {
+    titleBefore: 'The road is ', accent: 'calling.', titleAfter: '',
+    body: 'Plan your route, stops, crew, and budget—all in one place.',
+  },
+  {
+    titleBefore: 'Map the ', accent: 'road', titleAfter: ' ahead.',
+    body: 'Build your route, add stops, and drag to reorder the trip.',
+  },
+  {
+    titleBefore: 'Turn every stop into a ', accent: 'story.', titleAfter: '',
+    body: 'Keep stays, plans, and photos attached to the stop where they belong.',
+  },
+  {
+    titleBefore: 'The best roads are ', accent: 'shared.', titleAfter: '',
+    body: 'Invite your crew once and plan the same trip together, live.',
+  },
+]
 
-  /* Glass & Orbs */
-  glassFill:     'rgba(255,255,255,.055)',
-  glassBorder:   'rgba(255,255,255,.13)',
-  orbAmber:      'rgba(245,140,0,.22)',
-  orbPurple:     'rgba(90,0,210,.20)',
-  orbTeal:       'rgba(0,100,160,.14)',
-  glassInner:    'rgba(20,20,70,.18)',
-
-  /* Route / Map */
-  routePath:     '#8888e4',   // dashed SVG line
-  routeMid:      '#7070d8',   // midpoint dot
-  dotGrid:       'rgba(100,100,220,.28)', // dot grid inside card
-
-  /* Progress */
-  dotInactive:   '#1c1c34',
+const PERMISSION_COPY: JourneyCopyContent = {
+  titleBefore: "Find what's ", accent: 'nearby.', titleAfter: '',
+  body: 'Use your location to surface fuel, food, views, and stays along the way.',
 }
 
-const FONT: CSSProperties = {
-  fontFamily: "var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif",
+const JOURNEY_CTA = ['Start the journey', 'Continue', 'Continue', 'Continue'] as const
+const LAST_STEP = JOURNEY_COPY.length - 1
+const TOTAL_BEATS = JOURNEY_COPY.length
+
+const ROOT: CSSProperties = {
+  ...FONT_INTER,
+  position: 'fixed',
+  inset: 0,
+  zIndex: 10,
+  background: GROUND_GRADIENT,
+  overflow: 'hidden',
 }
 
-/* ── Helpers ───────────────────────────────────────────────────────── */
-const glassCard = (radius = 20): CSSProperties => ({
-  background: C.glassFill,
-  backdropFilter: 'blur(20px)',
-  WebkitBackdropFilter: 'blur(20px)',
-  border: `1px solid ${C.glassBorder}`,
-  borderRadius: radius,
-})
-
-/* ── Luminous orb ──────────────────────────────────────────────────── */
-function Orb({ color, top, left, bottom, right, size = 360, cx }: {
-  color: string; size?: number; cx?: boolean
-  top?: string|number; left?: string|number; bottom?: string|number; right?: string|number
-}) {
-  return (
-    <div style={{
-      position: 'absolute', width: size, height: size, borderRadius: '50%',
-      top, left, bottom, right,
-      transform: cx ? 'translateX(-50%)' : undefined,
-      background: `radial-gradient(circle, ${color} 0%, transparent 68%)`,
-      filter: 'blur(28px)', pointerEvents: 'none',
-    }} />
-  )
+const COLUMN: CSSProperties = {
+  position: 'relative',
+  zIndex: 2,
+  width: '100%',
+  maxWidth: 480,
+  height: '100%',
+  margin: '0 auto',
+  display: 'flex',
+  flexDirection: 'column',
 }
 
-/* ── App icon ──────────────────────────────────────────────────────── */
-function AppIcon({ size = 88 }: { size?: number }) {
-  return (
-    <div style={{
-      width: size, height: size,
-      borderRadius: Math.round(size * 0.245),
-      background: `linear-gradient(145deg, ${C.amberLight}, ${C.amberDark})`,
-      boxShadow: `0 0 40px ${C.orbAmber}, 0 0 80px rgba(245,140,0,.10)`,
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      flexShrink: 0,
-    }}>
-      <MapPin size={size * 0.46} color={C.amberDark} strokeWidth={2.5} fill={C.white} />
-    </div>
-  )
-}
-
-/* ── Shared wrapper ────────────────────────────────────────────────── */
-const WRAPPER: CSSProperties = {
-  ...FONT, position: 'fixed', inset: 0, zIndex: 10,
-  display: 'flex', flexDirection: 'column',
-  background: C.screenBg, overflow: 'hidden',
-}
-
-/* ── Amber primary button ──────────────────────────────────────────── */
-const BTN_PRIMARY: CSSProperties = {
-  ...FONT, width: '100%', padding: '17px 24px',
-  background: `linear-gradient(135deg, ${C.amberLight}, ${C.amberBase})`,
-  boxShadow: `0 0 24px ${C.orbAmber}, 0 4px 16px rgba(245,140,0,.22)`,
-  borderRadius: 14, border: 'none',
-  color: C.btnText, fontSize: 17, fontWeight: 700,
-  letterSpacing: '-0.01em', cursor: 'pointer',
-  display: 'flex', alignItems: 'center', justifyContent: 'center',
-}
-
-/* ── Pressable wrapper — scale + dim on tap ────────────────────────── */
-function Press({ children, style }: { children: React.ReactNode; style?: CSSProperties }) {
-  return (
-    <motion.div
-      style={{ width: '100%', ...style }}
-      whileTap={{ scale: 0.96, opacity: 0.82 }}
-      transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-    >
-      {children}
-    </motion.div>
-  )
-}
-
-/* ── HomeBar ───────────────────────────────────────────────────────── */
-function HomeBar() {
-  return (
-    <div style={{ display: 'flex', justifyContent: 'center', paddingBottom: 10, flexShrink: 0 }}>
-      <div style={{ width: 134, height: 5, background: 'rgba(255,255,255,.18)', borderRadius: 3 }} />
-    </div>
-  )
-}
-
-function GoogleIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-    </svg>
-  )
-}
-
-/* ── Onboarding screens ────────────────────────────────────────────── */
-const SCREENS = [
-  { emoji: '🗺️', title: 'Draw your route',    subtitle: 'Set your route, add stops, and get ready for your adventure.' },
-  { emoji: '📍', title: 'Plan every stop',  subtitle: 'Organize lodging, activities, and photos for each stop.' },
-  { emoji: '👥', title: 'Plan with friends', subtitle: 'Share an invite code and edit together in real time.' },
-  { emoji: '📍', title: 'Allow your location',  subtitle: 'We need your location to find nearby places and build your route.', isPermission: true as const },
-] as const
-
-const STORAGE_KEY = 'tripper_onboarding_done'
-
-/* ═══════════════════════════════════════════════════════════════════
-   MAIN COMPONENT
-═══════════════════════════════════════════════════════════════════ */
 export function MobileEntryFlow() {
-  const [stage, setStage] = useState<'splash' | 'onboarding' | 'landing'>('splash')
-  const [idx, setIdx]     = useState(0)
+  const reduced = useReducedMotionPreference()
+
+  const [stage, setStage] = useState<Stage>('journey')
+  const [step, setStep] = useState(0)
+  const [direction, setDirection] = useState(1)
+  const [intro, setIntro] = useState(true)
+  const [chromeReady, setChromeReady] = useState(false)
+  const [requestingGeo, setRequestingGeo] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
+  const [authError, setAuthError] = useState<string | null>(null)
+  const [compactViewport, setCompactViewport] = useState(false)
+  const geoResolved = useRef(false)
 
   useEffect(() => {
-    const t = setTimeout(() => {
-      // DEV: her seferinde onboarding gösterir
-      // PROD'a geçince: const done = localStorage.getItem(STORAGE_KEY); setStage(done ? 'landing' : 'onboarding')
-      setStage('onboarding')
-    }, 1500)
-    return () => clearTimeout(t)
+    const query = window.matchMedia('(max-height: 640px)')
+    const sync = () => setCompactViewport(query.matches)
+    sync()
+    query.addEventListener('change', sync)
+    return () => query.removeEventListener('change', sync)
   }, [])
 
-  const finish = () => { localStorage.setItem(STORAGE_KEY, '1'); setStage('landing') }
-  const next   = () => idx < SCREENS.length - 1 ? setIdx(i => i + 1) : finish()
-  const askGeo = () => {
-    if ('geolocation' in navigator) navigator.geolocation.getCurrentPosition(next, next)
-    else next()
-  }
+  /* A returning user lands straight on the settled auth scene. */
+  useEffect(() => {
+    const done = window.localStorage.getItem(ONBOARDING_STORAGE_KEY)
+    if (done) {
+      setStage('auth')
+      setIntro(false)
+      setChromeReady(true)
+      return
+    }
+    if (reduced) {
+      setIntro(false)
+      setChromeReady(true)
+      return
+    }
+    const chrome = setTimeout(() => setChromeReady(true), 1700)
+    const beat = setTimeout(() => setIntro(false), INTRO_DURATION * 1000)
+    return () => { clearTimeout(chrome); clearTimeout(beat) }
+  }, [reduced])
 
-  const handleGoogle = async () => {
+  /* The finale plays once, then the auth layer settles over the world. */
+  useEffect(() => {
+    if (stage !== 'finale') return
+    const t = setTimeout(() => setStage('auth'), reduced ? 200 : FINALE_DURATION * 1000)
+    return () => clearTimeout(t)
+  }, [stage, reduced])
+
+  const enterFinale = useCallback(() => {
+    geoResolved.current = true
+    setRequestingGeo(false)
+    window.localStorage.setItem(ONBOARDING_STORAGE_KEY, '1')
+    setDirection(1)
+    setStage('finale')
+  }, [])
+
+  const goNext = useCallback(() => {
+    if (stage !== 'journey') return
+    setDirection(1)
+    if (step < LAST_STEP) setStep(s => s + 1)
+    else setStage('permission')
+  }, [stage, step])
+
+  const goBack = useCallback(() => {
+    setDirection(-1)
+    if (stage === 'permission') { setStage('journey'); setStep(LAST_STEP); return }
+    if (stage === 'journey' && step > 0) setStep(s => s - 1)
+  }, [stage, step])
+
+  /* Location is requested ONLY by the CTA — never on mount or on swipe. */
+  const allowLocation = useCallback(() => {
+    if (requestingGeo) return
+    geoResolved.current = false
+    const fallbackTimer: { id?: number } = {}
+    const settle = () => {
+      if (geoResolved.current) return
+      geoResolved.current = true
+      if (fallbackTimer.id !== undefined) window.clearTimeout(fallbackTimer.id)
+      setRequestingGeo(false)
+      enterFinale()
+    }
+    if (!('geolocation' in navigator)) {
+      settle()
+      return
+    }
+    setRequestingGeo(true)
+    fallbackTimer.id = window.setTimeout(settle, 9000)
+    try {
+      navigator.geolocation.getCurrentPosition(
+        settle,
+        settle,
+        { timeout: 8000, maximumAge: 300000 },
+      )
+    } catch {
+      settle()
+    }
+  }, [requestingGeo, enterFinale])
+
+  const handleGoogle = useCallback(async () => {
     setGoogleLoading(true)
-    const rawNext = new URLSearchParams(window.location.search).get('next')
-    const safeNext = getSafeRedirectPath(rawNext, window.location.origin)
-    const callbackUrl = new URL('/auth/callback', window.location.origin)
-    callbackUrl.searchParams.set('next', safeNext)
-    const { error } = await createClient().auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: callbackUrl.toString() },
-    })
-    if (error) setGoogleLoading(false)
+    setAuthError(null)
+    try {
+      const rawNext = new URLSearchParams(window.location.search).get('next')
+      const safeNext = getSafeRedirectPath(rawNext, window.location.origin)
+      const callbackUrl = new URL('/auth/callback', window.location.origin)
+      callbackUrl.searchParams.set('next', safeNext)
+      const { error } = await createClient().auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: callbackUrl.toString() },
+      })
+      if (error) {
+        setAuthError(error.message || 'Google sign-in could not be started. Please try again.')
+        setGoogleLoading(false)
+      }
+    } catch {
+      setAuthError('Google sign-in could not be started. Check your connection and try again.')
+      setGoogleLoading(false)
+    }
+  }, [])
+
+  const swipeEnabled = stage === 'journey' || stage === 'permission'
+  /* Pan rather than drag: `drag` captures the pointer and eats taps on the CTA. */
+  const onPanEnd = (_e: unknown, info: PanInfo) => {
+    if (!swipeEnabled) return
+    if (Math.abs(info.offset.x) < 60 || Math.abs(info.offset.y) > Math.abs(info.offset.x)) return
+    if (info.offset.x < 0) goNext()
+    else goBack()
   }
 
-  const sc  = SCREENS[idx]
-  const isP = 'isPermission' in sc && sc.isPermission
+  const inJourney = stage === 'journey'
+  const inPermission = stage === 'permission'
+  const inAuth = stage === 'auth'
+  const showJourneyChrome = (inJourney || inPermission) && chromeReady
 
   return (
-    <AnimatePresence mode="wait">
+    <div
+      style={{
+        ...ROOT,
+        overflowY: inAuth ? 'auto' : 'hidden',
+        WebkitOverflowScrolling: inAuth ? 'touch' : undefined,
+      }}
+    >
+      {process.env.NODE_ENV === 'development' && (
+        <button
+          type="button"
+          onClick={() => {
+            window.localStorage.removeItem(ONBOARDING_STORAGE_KEY)
+            window.location.reload()
+          }}
+          style={{
+            ...FONT_INTER,
+            position: 'fixed', top: 'calc(58px + env(safe-area-inset-top))', left: 8, zIndex: 50,
+            width: 116, height: 44, padding: 0,
+            background: 'none', border: 'none', color: 'rgba(255,255,255,.52)',
+            fontSize: 9, fontWeight: 600, cursor: 'pointer',
+            display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start',
+          }}
+        >
+          <span
+            style={{
+              padding: '3px 7px',
+              borderRadius: 7,
+              border: '1px solid rgba(255,255,255,.12)',
+              background: 'rgba(0,0,0,.34)',
+            }}
+          >
+            ↺ Restart onboarding
+          </span>
+        </button>
+      )}
+      {/* The world stays locked to the same 375-wide column as the content
+          below, so the background scene aligns with it at any window width. */}
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', justifyContent: 'center' }}>
+        <div style={{ position: 'relative', width: '100%', maxWidth: 480, height: '100%' }}>
+          <JourneyScene
+            stage={inJourney && intro ? 'intro' : stage}
+            step={step}
+            reduced={reduced}
+            intro={intro}
+            compact={compactViewport}
+            showPin={!inAuth}
+          />
+          {/* Keeps the copy legible over the world without hiding it. */}
+          <div
+            aria-hidden="true"
+            style={{
+              position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none',
+              background: inAuth
+                ? 'linear-gradient(180deg, rgba(6,6,22,0) 48%, rgba(6,6,22,.12) 58%, rgba(6,6,22,.76) 78%, rgba(6,6,22,.98) 100%)'
+                : 'linear-gradient(180deg, rgba(6,6,22,0) 52%, rgba(6,6,22,.52) 70%, rgba(6,6,22,.88) 100%)',
+            }}
+          />
+          <FilmGrain />
+        </div>
+      </div>
 
-      {/* ═══════════════════════ SPLASH ══════════════════════════════ */}
-      {stage === 'splash' && (
-        <motion.div key="splash" style={WRAPPER}
-          initial={{ opacity: 1 }} exit={{ opacity: 0, scale: 0.97 }}
-          transition={{ duration: 0.4 }}>
-
-          <Orb color={C.orbAmber}  top="-80px" left="50%" size={440} cx />
-          <Orb color={C.orbPurple} bottom="-60px" left="-80px" size={300} />
-          <Orb color={C.orbTeal}   top="55%" right="-70px" size={260} />
-
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative', zIndex: 1 }}>
+      <motion.div
+        style={{
+          ...COLUMN,
+          height: inAuth ? 'auto' : '100%',
+          minHeight: '100%',
+        }}
+        onPanEnd={swipeEnabled ? onPanEnd : undefined}
+      >
+        <AnimatePresence mode="wait">
+          {showJourneyChrome && (
             <motion.div
-              initial={{ scale: 0.72, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.15, duration: 0.55, ease: [0.34, 1.56, 0.64, 1] }}
-              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}
+              key="journey-chrome"
+              style={{ display: 'contents' }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: reduced ? 0.16 : 0.3, ease: EASE_STANDARD }}
             >
-              <AppIcon size={96} />
-              <div style={{ textAlign: 'center' }}>
-                <h1 style={{ ...FONT, color: C.white, fontSize: 40, fontWeight: 800, letterSpacing: '-1.5px', margin: 0, lineHeight: 1 }}>
-                  Tripper
-                </h1>
-                <p style={{ ...FONT, color: C.graySubSplash, fontSize: 14, fontWeight: 400, marginTop: 8, letterSpacing: '-0.01em' }}>
-                  Road trip planner
-                </p>
-              </div>
-            </motion.div>
-          </div>
-          <HomeBar />
-        </motion.div>
-      )}
-
-      {/* ══════════════════════ ONBOARDING ═══════════════════════════ */}
-      {stage === 'onboarding' && (
-        <motion.div key="onboarding" style={WRAPPER}
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}>
-
-          <Orb color={C.orbAmber}  top="-80px" left="50%" size={440} cx />
-          <Orb color={C.orbPurple} bottom="-60px" left="-80px" size={300} />
-          <Orb color={C.orbTeal}   top="55%" right="-70px" size={240} />
-
-          {/* Skip */}
-          <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'flex-end', padding: '52px 24px 0' }}>
-            <button onClick={finish} style={{ ...FONT, background: 'none', border: 'none', color: C.grayAtla, fontSize: 14, fontWeight: 500, cursor: 'pointer', letterSpacing: '-0.01em' }}>
-              Skip
-            </button>
-          </div>
-
-          {/* Slide */}
-          <AnimatePresence mode="wait">
-            <motion.div key={idx}
-              initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }}
-              transition={{ duration: 0.26, ease: 'easeInOut' }}
-              style={{ position: 'relative', zIndex: 1, flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px 26px 0', gap: 28 }}
-            >
-              {/* Illustration card */}
-              <div style={{
-                width: '100%', maxWidth: 312, height: 208,
-                borderRadius: 20, position: 'relative', overflow: 'hidden',
-                /* layered bg: glass tint + dot grid */
-                background: `${C.glassInner}`,
-                backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
-                border: `1px solid ${C.glassBorder}`,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                {/* Dot grid overlay */}
-                <div style={{
-                  position: 'absolute', inset: 0, borderRadius: 20,
-                  backgroundImage: `radial-gradient(circle, ${C.dotGrid} 1px, transparent 1px)`,
-                  backgroundSize: '22px 22px',
-                }} />
-                {/* Route SVG */}
-                <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} viewBox="0 0 312 208" fill="none">
-                  {/* dashed path */}
-                  <path d="M 42 170 C 88 138 158 92 178 68 Q 218 42 274 34"
-                    stroke={C.routePath} strokeWidth="1.8" strokeDasharray="6 5" strokeLinecap="round" />
-                  {/* start pin */}
-                  <circle cx="42" cy="170" r="6"  fill={C.amberBase} />
-                  <circle cx="42" cy="170" r="11" stroke={C.amberBase} strokeWidth="1.4" fill="none" opacity=".35" />
-                  {/* midpoint */}
-                  <circle cx="178" cy="68" r="4" fill={C.routeMid} />
-                  {/* end pin */}
-                  <circle cx="274" cy="34" r="6"  fill={C.amberBase} />
-                  <circle cx="274" cy="34" r="11" stroke={C.amberBase} strokeWidth="1.4" fill="none" opacity=".35" />
-                </svg>
-                {/* Emoji */}
-                <span style={{ fontSize: 74, lineHeight: 1, userSelect: 'none', position: 'relative', zIndex: 1 }}>
-                  {sc.emoji}
-                </span>
-              </div>
-
-              {/* Text */}
-              <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <h2 style={{ ...FONT, color: C.white, fontSize: 27, fontWeight: 800, letterSpacing: '-0.5px', margin: 0, lineHeight: 1.2 }}>
-                  {sc.title}
-                </h2>
-                <p style={{ ...FONT, color: C.grayBody, fontSize: 14, fontWeight: 400, lineHeight: 1.65, margin: '0 auto', maxWidth: 272 }}>
-                  {sc.subtitle}
-                </p>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-
-          {/* Dots + CTA */}
-          <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, padding: '24px 24px 44px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-              {SCREENS.map((_, i) => (
-                <motion.div key={i}
-                  animate={{ width: i === idx ? 28 : 8 }}
-                  transition={{ duration: 0.22 }}
-                  style={{
-                    height: 8, borderRadius: 4,
-                    background: i === idx ? `linear-gradient(90deg, ${C.amberLight}, ${C.amberBase})` : C.dotInactive,
-                    boxShadow: i === idx ? `0 0 10px ${C.orbAmber}` : 'none',
-                  }}
-                />
-              ))}
-            </div>
-
-            {isP ? (
-              <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <Press><button onClick={askGeo} style={{ ...BTN_PRIMARY, width: '100%' }}>📍 Allow Location</button></Press>
-                <Press style={{ width: 'auto' }}>
-                  <button onClick={next} style={{ ...FONT, background: 'none', border: 'none', color: C.grayAtla, fontSize: 13, cursor: 'pointer', paddingTop: 4, width: '100%' }}>
-                    Not now
-                  </button>
-                </Press>
-              </div>
-            ) : (
-              <Press><button onClick={next} style={{ ...BTN_PRIMARY, width: '100%' }}>Continue →</button></Press>
-            )}
-          </div>
-          <HomeBar />
-        </motion.div>
-      )}
-
-      {/* ════════════════════════ LANDING ════════════════════════════ */}
-      {stage === 'landing' && (
-        <motion.div key="landing" style={WRAPPER}
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-          transition={{ duration: 0.4 }}>
-
-          <Orb color={C.orbAmber}  top="-60px" left="50%" size={460} cx />
-          <Orb color={C.orbPurple} bottom="-60px" left="-80px" size={320} />
-          <Orb color={C.orbTeal}   top="48%" right="-70px" size={260} />
-
-          {/* Hero — no glass card, content floats on bg */}
-          <motion.div
-            initial={{ y: 24, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.1, duration: 0.45, ease: 'easeOut' }}
-            style={{ position: 'relative', zIndex: 1, flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 28px', gap: 16 }}
-          >
-            <AppIcon size={88} />
-
-            <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 7 }}>
-              <h1 style={{ ...FONT, color: C.white, fontSize: 38, fontWeight: 800, letterSpacing: '-1.5px', margin: 0, lineHeight: 1 }}>
-                Tripper
-              </h1>
-              <p style={{ ...FONT, color: C.graySubLand, fontSize: 14, fontWeight: 400, margin: 0, letterSpacing: '-0.01em' }}>
-                Plan road trips together
-              </p>
-            </div>
-
-            {/* Badge pills */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 8, marginTop: 4 }}>
-              {[
-                { icon: Map,        label: 'Map'        },
-                { icon: Users,      label: 'Collaborate' },
-                { icon: DollarSign, label: 'Budget'      },
-                { icon: MapPin,     label: 'Stops'       },
-              ].map(({ icon: Icon, label }) => (
-                <span key={label} style={{
-                  ...FONT,
-                  ...glassCard(50),
-                  display: 'inline-flex', alignItems: 'center', gap: 5,
-                  padding: '7px 13px',
-                  color: C.lavender,
-                  fontSize: 12, fontWeight: 500,
-                }}>
-                  <Icon size={12} strokeWidth={2} />
-                  {label}
-                </span>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Buttons */}
-          <motion.div
-            initial={{ y: 24, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.18, duration: 0.42, ease: 'easeOut' }}
-            style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', gap: 11, padding: '16px 24px 44px' }}
-          >
-            <Press>
-              <Link href="/login" style={{ textDecoration: 'none' }}>
-                <button style={{ ...BTN_PRIMARY, width: '100%' }}>Log In</button>
-              </Link>
-            </Press>
-
-            <Press>
-              <Link href="/sign-up" style={{ textDecoration: 'none' }}>
-                <div style={{
-                  ...FONT, ...glassCard(14),
-                  padding: '17px 24px', textAlign: 'center',
-                  color: C.offWhite, fontSize: 17, fontWeight: 700,
-                  letterSpacing: '-0.01em', cursor: 'pointer',
-                }}>
-                  Sign Up
-                </div>
-              </Link>
-            </Press>
-
-            <Press>
-              <button
-                type="button"
-                onClick={handleGoogle}
-                disabled={googleLoading}
+              <header
                 style={{
-                  ...FONT, ...glassCard(14), width: '100%', padding: '15px 24px',
-                  color: C.offWhite, fontSize: 15, fontWeight: 600, cursor: 'pointer',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-                  opacity: googleLoading ? 0.7 : 1,
+                  height: 'calc(56px + env(safe-area-inset-top))',
+                  padding: 'env(safe-area-inset-top) 24px 0',
+                  display: 'flex', position: 'relative',
+                  alignItems: 'flex-end', justifyContent: 'space-between', flexShrink: 0,
                 }}
               >
-                <GoogleIcon />
-                {googleLoading ? 'Signing in...' : 'Continue with Google'}
-              </button>
-            </Press>
+                {inPermission || step > 0
+                  ? <JourneyBackButton onClick={goBack} />
+                  : <span aria-hidden="true" style={{ width: 64 }} />}
+                {!inPermission && (
+                  <span style={{ position: 'absolute', left: '50%', bottom: 14, transform: 'translateX(-50%)' }}>
+                    <JourneyCounter step={step} total={TOTAL_BEATS} />
+                  </span>
+                )}
+                <SkipButton onClick={enterFinale} />
+              </header>
 
-          </motion.div>
+              <div style={{ flex: 1 }} />
 
-          <HomeBar />
-        </motion.div>
-      )}
+              <JourneyCopy
+                copyKey={inPermission ? 'permission' : `step-${step}`}
+                content={inPermission ? PERMISSION_COPY : JOURNEY_COPY[step]}
+                direction={direction}
+                reduced={reduced}
+              />
 
-    </AnimatePresence>
+              <div style={{ height: 'clamp(8px, 3vh, 24px)', flexShrink: 0 }} />
+
+              <JourneyControls>
+                {inPermission ? (
+                  <>
+                    <Press>
+                      <button
+                        type="button"
+                        onClick={allowLocation}
+                        disabled={requestingGeo}
+                        style={{ ...pillPrimary, opacity: requestingGeo ? 0.7 : 1 }}
+                      >
+                        {requestingGeo ? 'Requesting…' : 'Allow Location'}
+                      </button>
+                    </Press>
+                    <button
+                      type="button"
+                      onClick={enterFinale}
+                      style={{
+                        ...FONT_INTER, background: 'none', border: 'none', cursor: 'pointer',
+                        color: DUSK.textSecondary, fontSize: 14, fontWeight: 500, height: 44,
+                      }}
+                    >
+                      Not now
+                    </button>
+                  </>
+                ) : (
+                  <Press>
+                    <button type="button" onClick={goNext} style={pillPrimary}>
+                      {JOURNEY_CTA[step]}
+                    </button>
+                  </Press>
+                )}
+              </JourneyControls>
+
+              <div style={{ height: 'calc(20px + env(safe-area-inset-bottom))', flexShrink: 0 }} />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* ── Auth choice — the visual finale of the onboarding ──── */}
+        {inAuth && (
+          <div style={{ display: 'contents' }}>
+            <AuthBrand reduced={reduced} />
+            <div style={{ flex: 1 }} />
+
+            <div style={{ padding: '0 24px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {authError && (
+                <p
+                  role="alert"
+                  style={{
+                    ...FONT_INTER,
+                    color: '#ffb08f',
+                    fontSize: 13,
+                    lineHeight: '18px',
+                    textAlign: 'center',
+                    margin: 0,
+                  }}
+                >
+                  {authError}
+                </p>
+              )}
+              {[
+                <Link key="login" href="/login" style={{ textDecoration: 'none', display: 'block' }}>
+                  <span style={{ ...pillPrimary, display: 'flex' }}>Log In</span>
+                </Link>,
+                <Link key="signup" href="/sign-up" style={{ textDecoration: 'none', display: 'block' }}>
+                  <span style={{ ...pillGhost, display: 'flex' }}>Sign Up</span>
+                </Link>,
+                <button
+                  key="google"
+                  type="button"
+                  onClick={handleGoogle}
+                  disabled={googleLoading}
+                  style={{ ...pillGhost, opacity: googleLoading ? 0.6 : 1 }}
+                >
+                  <GoogleGlyph />
+                  {googleLoading ? 'Signing in…' : 'Continue with Google'}
+                </button>,
+              ].map((node, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: reduced ? 0.16 : 0.4, delay: reduced ? 0 : 0.1 + i * 0.09, ease: EASE_STANDARD }}
+                >
+                  <Press>{node}</Press>
+                </motion.div>
+              ))}
+            </div>
+
+            <div style={{ height: 'calc(28px + env(safe-area-inset-bottom))', flexShrink: 0 }} />
+          </div>
+        )}
+      </motion.div>
+    </div>
   )
 }

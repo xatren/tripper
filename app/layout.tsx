@@ -1,9 +1,9 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, Fraunces } from 'next/font/google';
-import { Analytics } from '@vercel/analytics/next';
 import { RegisterSW } from '@/components/pwa/RegisterSW';
 import { Toaster } from '@/components/ui/toast';
 import { ReducedMotionProvider } from '@/components/motion/ReducedMotionProvider';
+import { ProductionAnalytics } from '@/components/analytics/ProductionAnalytics';
 import './globals.css';
 
 const inter = Inter({
@@ -47,7 +47,7 @@ export default function RootLayout({
           {children}
           <Toaster />
           <RegisterSW />
-          <Analytics />
+          <ProductionAnalytics />
         </ReducedMotionProvider>
       </body>
     </html>

@@ -1,5 +1,9 @@
 # Tripper — Onboarding Design Brief
 
+> **GEÇERSİZ (2026-07-23).** Bu brief'teki Splash → 4 kart carousel → Landing yapısı kaldırıldı.
+> Güncel akış tek kesintisiz "Dusk Journey" sahnesidir: [onboarding-dusk-journey-prompts.md](onboarding-dusk-journey-prompts.md).
+> Bu dosya yalnızca tarihsel referans olarak duruyor.
+
 Mobil-öncelikli (375×812), tam ekran karanlık bir giriş akışı. Amaç: kullanıcıyı 15 saniyede yola çıkmaya hazır hissettiren, premium ve sinematik bir onboarding. Akış üç aşama: **Splash → Onboarding (4 slayt) → Landing**.
 
 ---

@@ -3,7 +3,7 @@
 // in Cache Storage, so it cannot be shown to a different local user.
 
 const CACHE_PREFIX = 'tripper-'
-const STATIC_CACHE = 'tripper-static-v3'
+const STATIC_CACHE = 'tripper-static-v4'
 const OFFLINE_SHELL = '/offline.html'
 
 function isTripperCache(name) {
@@ -23,6 +23,10 @@ function isSafeStaticAsset(url) {
     url.pathname === '/icon.svg' ||
     url.pathname === '/manifest.webmanifest'
   )
+}
+
+function isNextStaticAsset(url) {
+  return url.pathname.startsWith('/_next/static/')
 }
 
 self.addEventListener('install', (event) => {
@@ -61,6 +65,26 @@ self.addEventListener('fetch', (event) => {
   }
 
   if (!isSafeStaticAsset(url)) return
+
+  // A production deploy can replace a Next chunk while a tab still has the
+  // previous cache. Prefer the network so new HTML never hydrates with stale
+  // JavaScript; retain the cached response strictly as an offline fallback.
+  if (isNextStaticAsset(url)) {
+    event.respondWith(
+      fetch(req)
+        .then((res) => {
+          if (res.ok) {
+            const copy = res.clone()
+            event.waitUntil(caches.open(STATIC_CACHE).then((cache) => cache.put(req, copy)))
+          }
+          return res
+        })
+        .catch(() => caches.open(STATIC_CACHE).then((cache) => cache.match(req)).then(
+          (hit) => hit || new Response('You are offline.', { status: 503 })
+        ))
+    )
+    return
+  }
 
   event.respondWith(
     caches.open(STATIC_CACHE).then((cache) =>

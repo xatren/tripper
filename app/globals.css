@@ -299,12 +299,16 @@
 }
 
 /* Auth form inputs */
+/* Dusk Edition glass field — see docs/onboarding-dusk-journey-prompts.md */
 .auth-input {
   width: 100%;
-  padding: 14px 16px;
-  background: rgba(255, 255, 255, 0.06);
+  height: 54px;
+  padding: 0 16px;
+  background: rgba(255, 255, 255, 0.055);
   border: 1px solid rgba(255, 255, 255, 0.13);
-  border-radius: 12px;
+  border-radius: 16px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   color: #ffffff;
   font-size: 15px;
   font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
@@ -314,9 +318,12 @@
   box-sizing: border-box;
 }
 .auth-input:focus {
-  border-color: #f5a623;
-  box-shadow: 0 0 0 3px rgba(245, 140, 0, 0.14);
+  border-color: rgba(245, 166, 35, 0.55);
+  box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.12);
+}
+.auth-input[aria-invalid='true'] {
+  border-color: rgba(255, 90, 46, 0.55);
 }
 .auth-input::placeholder {
-  color: #363650;
+  color: rgba(222, 220, 240, 0.58);
 }
