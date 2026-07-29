@@ -10,8 +10,25 @@
 -- external client (mobile app, integration, etc.) still depends on these
 -- tables or the /api/pins, /api/budget, /api/trips REST endpoints.
 
-alter publication supabase_realtime drop table if exists public.pins;
-alter publication supabase_realtime drop table if exists public.budget_items;
+-- ALTER PUBLICATION ... DROP TABLE has no IF EXISTS clause in Postgres, so
+-- membership is checked explicitly first (same idempotency idiom the ADD
+-- side already uses elsewhere in this repo).
+do $$
+begin
+  if exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'pins'
+  ) then
+    alter publication supabase_realtime drop table public.pins;
+  end if;
+
+  if exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'budget_items'
+  ) then
+    alter publication supabase_realtime drop table public.budget_items;
+  end if;
+end $$;
 
 drop table if exists public.pin_photos;
 drop table if exists public.budget_items;

@@ -1,6 +1,21 @@
 -- ============================================================
 -- RoadTrip26 – Full Schema (run this in Supabase SQL Editor)
 -- ============================================================
+--
+-- Historical reference only — NOT part of supabase/migrations/. This isn't a
+-- "before 001" baseline: its `stops` table already carries place_category/
+-- rating/estimated_cost/day_number/is_favorite (only added later, by
+-- 004_stops_place_fields.sql / 005_activities.sql), while it has no
+-- trip_members/pins/pin_photos/budget_items at all (001_initial_schema.sql's
+-- original model). It's a simplified fresh-start snapshot for manual SQL
+-- Editor setup, not a real point in the applied migration history — applying
+-- it before/alongside supabase/migrations/ recreates tables and policies
+-- those files already own and breaks "apply migrations from scratch"
+-- (`supabase start`/`db reset`, and supabase/tests/functional's disposable
+-- stack). Moved here from supabase/migrations/000_full_schema.sql on
+-- 2026-07-28; the one real gap it was masking (trips.collaborator_id never
+-- added by any numbered migration before 003 starts relying on it) is now
+-- fixed directly in 003_add_stops_expenses_photos.sql instead.
 
 -- Profiles (extends Supabase auth.users)
 create table if not exists public.profiles (

@@ -1,3 +1,12 @@
+-- 001_initial_schema.sql's collaboration model is trip_members-only; this
+-- migration's stops/expenses/photos policies (below) also allow a trip's
+-- single designated collaborator, so that column needs to exist first. No
+-- earlier migration adds it — it was previously only ever created by
+-- legacy-full-schema.sql's fresh-start snapshot, which real installs weren't
+-- guaranteed to have run.
+alter table public.trips
+  add column if not exists collaborator_id uuid references public.profiles(id) on delete set null;
+
 -- Stops table
 create table if not exists public.stops (
   id uuid default gen_random_uuid() primary key,
