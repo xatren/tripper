@@ -1,6 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
+import { OFFLINE_STATIC_CACHE_NAME } from '../lib/offline/cache-contract.ts'
 import {
   OFFLINE_SNAPSHOT_SCHEMA_VERSION,
   offlineSnapshotKey,
@@ -49,8 +50,24 @@ test('service worker keeps authenticated navigations network-only and caches onl
   assert.match(sw, /req\.mode === 'navigate'/)
   assert.match(sw, /fetch\(req\)\.catch\(\(\) => caches\.open\(STATIC_CACHE\)/)
   assert.doesNotMatch(sw, /cache\.put\(req[\s\S]*?req\.mode === 'navigate'/)
-  assert.match(sw, /tripper-static-v3/)
+  assert.match(sw, /importScripts\('\/sw-cache-version\.generated\.js'\)/)
+  assert.match(sw, /STATIC_CACHE = self\.OFFLINE_STATIC_CACHE_NAME/)
   assert.match(sw, /TRIPPER_SYNC_REQUESTED/)
+})
+
+test('static cache name is a single contract shared by the service worker and app code', () => {
+  // Root cause of the historical break: public/sw.js and lib/offline/snapshot.ts
+  // each hardcoded their own cache-name literal and drifted apart (v4 vs v3).
+  // Everything must now derive from lib/offline/cache-contract.ts.
+  const generated = read('public/sw-cache-version.generated.js')
+  const snapshot = read('lib/offline/snapshot.ts')
+
+  assert.match(
+    generated,
+    new RegExp(`self\\.OFFLINE_STATIC_CACHE_NAME = '${OFFLINE_STATIC_CACHE_NAME}'`)
+  )
+  assert.match(snapshot, /import \{ OFFLINE_STATIC_CACHE_NAME \} from '\.\/cache-contract'/)
+  assert.doesNotMatch(snapshot, /caches\.open\('tripper-static-v\d+'\)/)
 })
 
 test('logout, account deletion, auth user change and retry policy are wired', () => {

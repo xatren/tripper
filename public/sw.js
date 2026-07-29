@@ -2,8 +2,12 @@
 // Account-specific HTML is always fetched from the network and is never kept
 // in Cache Storage, so it cannot be shown to a different local user.
 
+// The cache name is the single contract shared with lib/offline/snapshot.ts,
+// generated from lib/offline/cache-contract.ts. Do not hardcode it here.
+importScripts('/sw-cache-version.generated.js')
+
 const CACHE_PREFIX = 'tripper-'
-const STATIC_CACHE = 'tripper-static-v4'
+const STATIC_CACHE = self.OFFLINE_STATIC_CACHE_NAME
 const OFFLINE_SHELL = '/offline.html'
 
 function isTripperCache(name) {

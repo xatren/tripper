@@ -39,6 +39,7 @@ export async function updateSession(request: NextRequest) {
   const isPublicRoute = request.nextUrl.pathname === '/';
   const isPublicAsset =
     request.nextUrl.pathname === '/sw.js' ||
+    request.nextUrl.pathname === '/sw-cache-version.generated.js' ||
     request.nextUrl.pathname === '/manifest.webmanifest';
 
   if (

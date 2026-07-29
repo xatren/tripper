@@ -1,8 +1,24 @@
 import assert from 'node:assert/strict'
-import { readFileSync } from 'node:fs'
+import { readdirSync, readFileSync, statSync } from 'node:fs'
+import path from 'node:path'
 import test from 'node:test'
 
 const read = (path: string) => readFileSync(path, 'utf8')
+
+// Reads every .ts/.tsx file under a directory tree and concatenates it. Used
+// where the contract belongs to a *feature* (e.g. the trip-creation wizard)
+// rather than one specific file, so the assertion survives a refactor that
+// moves the markup to a different file within that feature.
+function readFeature(dir: string): string {
+  let content = ''
+  for (const entry of readdirSync(dir)) {
+    const full = path.join(dir, entry)
+    const stat = statSync(full)
+    if (stat.isDirectory()) content += readFeature(full)
+    else if (/\.tsx?$/.test(entry)) content += readFileSync(full, 'utf8') + '\n'
+  }
+  return content
+}
 
 test('auth fields keep explicit labels, named password toggles, and associated errors', () => {
   const login = read('app/(auth)/login/page.tsx')
@@ -22,7 +38,7 @@ test('auth fields keep explicit labels, named password toggles, and associated e
 })
 
 test('trip country autocomplete exposes the keyboard listbox contract', () => {
-  const wizard = read('app/trips/new/NewTripClient.tsx')
+  const wizard = readFeature('app/trips/new') + readFeature('components/trips/new')
 
   assert.match(wizard, /role="combobox"/)
   assert.match(wizard, /aria-controls="country-options"/)

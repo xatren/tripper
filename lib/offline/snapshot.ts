@@ -2,6 +2,7 @@
 
 import type { ItineraryItem, Stop, Trip, TripMember } from '@/types'
 import { createClient } from '@/lib/supabase/client'
+import { OFFLINE_STATIC_CACHE_NAME } from './cache-contract'
 import { getSnapshot, saveSnapshot } from './db'
 import type { TripOfflineSnapshot } from './types'
 
@@ -66,7 +67,7 @@ export async function downloadTripSnapshot(seed: SnapshotSeed): Promise<TripOffl
   if (!verified) throw new Error('The downloaded data did not pass integrity validation. Please retry.')
   // The shell is public and contains no user data; authenticated SSR/API
   // responses remain excluded from Cache Storage.
-  if ('caches' in window) await caches.open('tripper-static-v3').then((cache) => cache.add('/offline.html')).catch(() => undefined)
+  if ('caches' in window) await caches.open(OFFLINE_STATIC_CACHE_NAME).then((cache) => cache.add('/offline.html')).catch(() => undefined)
   return snapshot
 }
 
