@@ -4,12 +4,14 @@ export class GooglePlacesError extends Error {
   readonly code: GooglePlaceErrorCode
   readonly status: number
   readonly retryable: boolean
+  readonly retryAfterSeconds?: number
 
-  constructor(code: GooglePlaceErrorCode, status: number, retryable: boolean) {
+  constructor(code: GooglePlaceErrorCode, status: number, retryable: boolean, retryAfterSeconds?: number) {
     super(code)
     this.code = code
     this.status = status
     this.retryable = retryable
+    this.retryAfterSeconds = retryAfterSeconds
   }
 }
 
@@ -24,7 +26,8 @@ export function errorResponse(error: GooglePlacesError): Response {
     network: 'Could not reach Google Places.',
   }
   const body: PlacesErrorResponse = { error: { code: error.code, message: messages[error.code], retryable: error.retryable } }
-  return Response.json(body, { status: error.status })
+  const headers = error.retryAfterSeconds ? { 'Retry-After': String(error.retryAfterSeconds) } : undefined
+  return Response.json(body, { status: error.status, headers })
 }
 
 export function mapUpstreamStatus(status: number): GooglePlacesError {

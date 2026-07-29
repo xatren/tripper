@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
+import { getTrustedClientIp } from '@/lib/request-ip';
 
 interface JoinPageProps {
   params: Promise<{ code: string }>;
@@ -15,9 +16,7 @@ export default async function JoinPage({ params }: JoinPageProps) {
     redirect(`/login?next=/join/${code}`);
   }
 
-  const requestHeaders = await headers();
-  const forwardedFor = requestHeaders.get('x-forwarded-for');
-  const clientIp = forwardedFor ? forwardedFor.split(',')[0].trim() : null;
+  const clientIp = getTrustedClientIp(await headers());
 
   const { data, error: joinError } = await supabase.rpc('join_trip_by_invite', {
     p_invite_code: code,

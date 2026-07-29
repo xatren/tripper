@@ -1,15 +1,15 @@
 import { requirePlacesUser } from '@/lib/google-places/auth'
 import { autocompleteGooglePlaces } from '@/lib/google-places/client'
 import { errorResponse, GooglePlacesError } from '@/lib/google-places/errors'
-import { enforcePlacesRateLimit } from '@/lib/google-places/rate-limit'
+import { checkPlacesRateLimit } from '@/lib/google-places/rate-limit'
 import { validateSearchParams, validateSessionToken } from '@/lib/google-places/validation'
 
 export const runtime = 'nodejs'
 
 export async function GET(request: Request): Promise<Response> {
   try {
-    const { rateKey } = await requirePlacesUser(request)
-    enforcePlacesRateLimit(`autocomplete:${rateKey}`, 60)
+    const { supabase, userId, clientIp } = await requirePlacesUser(request)
+    await checkPlacesRateLimit(supabase, 'places_autocomplete_user', userId, clientIp)
     const params = new URL(request.url).searchParams
     const input = validateSearchParams(params)
     if (!input.query) throw new GooglePlacesError('invalid_request', 400, false)

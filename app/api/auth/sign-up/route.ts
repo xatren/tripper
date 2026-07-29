@@ -1,8 +1,31 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { USERNAME_PATTERN, usernameToEmail } from '@/lib/auth/username'
+import { getTrustedClientIp } from '@/lib/request-ip'
+import { rateLimitedResponse } from '@/lib/rate-limit/response'
 
 export async function POST(request: Request) {
+  const clientIp = getTrustedClientIp(request.headers)
+
+  let admin: ReturnType<typeof createAdminClient>
+  try {
+    admin = createAdminClient()
+  } catch {
+    return NextResponse.json({ error: 'Account registration is not configured' }, { status: 503 })
+  }
+
+  const { data: rateLimit, error: rateLimitError } = await admin.rpc('check_rate_limit', {
+    p_scope: 'signup_ip',
+    p_identity_key: clientIp ?? 'unknown',
+    p_client_ip: clientIp,
+    p_user_id: null,
+  })
+  // Fail open on RPC errors: an abuse-prevention outage must not block signup.
+  if (rateLimitError) console.error('sign-up rate limit check failed, failing open', rateLimitError)
+  if (!rateLimitError && !rateLimit?.allowed) {
+    return rateLimitedResponse(Number(rateLimit?.retry_after_seconds) || 3600, 'Too many signup attempts. Please try again later.')
+  }
+
   let body: { username?: unknown; password?: unknown }
 
   try {
@@ -25,7 +48,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { error } = await createAdminClient().auth.admin.createUser({
+    const { error } = await admin.auth.admin.createUser({
       email: usernameToEmail(username),
       password,
       email_confirm: true,

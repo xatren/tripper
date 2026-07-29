@@ -1,15 +1,15 @@
 import { requirePlacesUser } from '@/lib/google-places/auth'
 import { getGooglePlaceDetails, reviewsFeatureEnabled } from '@/lib/google-places/client'
 import { errorResponse, GooglePlacesError } from '@/lib/google-places/errors'
-import { enforcePlacesRateLimit } from '@/lib/google-places/rate-limit'
+import { checkPlacesRateLimit } from '@/lib/google-places/rate-limit'
 import { validatePlaceId, validateSessionToken } from '@/lib/google-places/validation'
 
 export const runtime = 'nodejs'
 
 export async function GET(request: Request, context: { params: Promise<{ placeId: string }> }): Promise<Response> {
   try {
-    const { rateKey } = await requirePlacesUser(request)
-    enforcePlacesRateLimit(`details:${rateKey}`, 60)
+    const { supabase, userId, clientIp } = await requirePlacesUser(request)
+    await checkPlacesRateLimit(supabase, 'places_details_user', userId, clientIp)
     const { placeId: rawPlaceId } = await context.params
     const placeId = validatePlaceId(rawPlaceId)
     const sessionToken = validateSessionToken(new URL(request.url).searchParams.get('sessionToken'))
