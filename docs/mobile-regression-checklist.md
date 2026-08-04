@@ -44,8 +44,8 @@ Target viewports (test all four, in both light content and long content states):
 ## 5. Offline / network-failure banner
 
 - [ ] Simulate offline (devtools network throttling → offline) while on `/trip/[id]/mobile` — verify user gets a visible signal, not a silent stall
-- [ ] Plan tab: with directions/optimize calls failing (offline or 5xx), confirm `routeLoading` does not spin forever with no failure indication — **known bug, see baseline doc §9 Plan** — verify whether a fix has landed or the checklist item should stay red
-- [ ] Weather fetch failure in Days tab — confirm this is either fixed to show a distinguishable "couldn't load weather" state, or explicitly accepted as silent-by-design (don't let this regress further without a decision)
+- [ ] Plan tab: with directions calls failing (offline or 5xx), confirm the route settles into the `unavailable` state with a "Route unavailable" message and a working Retry — **fixed 2026-08-03 (UX-07)**, `routeStatus` replaced the old never-clearing `routeLoading` spinner; verify Retry re-runs the request instead of no-opping, and that Optimize stays hidden while offline
+- [ ] Weather fetch failure on active Overview — confirm the forecast chip shows a distinguishable state rather than vanishing silently: "Loading weather…", "Forecast not available yet" (no data for that day), or "Weather unavailable" (request failed) — **fixed 2026-08-03 (UX-05)**
 - [ ] Realtime subscription drop (kill network mid-session, restore) — confirm `stops`/`packing_items`/`expenses`/`journal_entries` reconcile back to server state rather than showing stale optimistic data indefinitely
 - [ ] Retry buttons (`RetryCard`, `RouteError`) actually work — `RouteError`'s retry bug (`unstable_retry` prop always `undefined`) was **fixed 2026-07-22** (now uses `reset`); verify "Try again" still works on dashboard/trips/profile/settings each release rather than assuming this stays fixed.
 

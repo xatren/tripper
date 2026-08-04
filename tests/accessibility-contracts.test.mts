@@ -20,6 +20,21 @@ function readFeature(dir: string): string {
   return content
 }
 
+// Returns the body of a top-level `function <name>(` declaration, up to the next
+// top-level declaration. Used where a contract is "this screen has exactly one X"
+// and counting across the whole file would pick up unrelated screens.
+function readTopLevelFunction(source: string, name: string): string {
+  const start = source.indexOf(`function ${name}(`)
+  assert.ok(start >= 0, `expected a top-level function ${name}`)
+  const end = source.indexOf('\nfunction ', start + 1)
+  return end < 0 ? source.slice(start) : source.slice(start, end)
+}
+
+/** Drops `//` and block comments so a user-copy assertion can't be tripped by prose. */
+function stripComments(source: string): string {
+  return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1')
+}
+
 test('auth fields keep explicit labels, named password toggles, and associated errors', () => {
   const login = read('app/(auth)/login/page.tsx')
   const signup = read('app/(auth)/sign-up/page.tsx')
@@ -104,4 +119,76 @@ test('plan tabs expose exactly one primary action and a recoverable route error'
   assert.match(plan, /\}, \[routeKey, routeRetryToken\]\)/)
   // Optimize stays hidden unless it can actually run.
   assert.match(plan, /canEdit && isOnline && stops\.length >= 2/)
+})
+
+test('the onboarding restart shortcut never reaches production', () => {
+  const entry = read('components/onboarding/mobile-entry-flow.tsx')
+
+  // The dev-only reset is the single caller that clears the onboarding key from
+  // the UI; behind a NODE_ENV gate it cannot render for real users.
+  assert.match(entry, /process\.env\.NODE_ENV === 'development' && \([\s\S]*?removeItem\(ONBOARDING_STORAGE_KEY\)/)
+  const unguarded = stripComments(entry)
+    .split(/process\.env\.NODE_ENV === 'development'/)[0]
+  assert.doesNotMatch(unguarded, /removeItem\(ONBOARDING_STORAGE_KEY\)/)
+})
+
+test('the More sheet exposes labelled groups and a named row per destination', () => {
+  const more = read('app/trip/[id]/mobile/components/TripMoreSheet.tsx')
+
+  // Two <section>s, each named by its own visible heading.
+  assert.match(more, /<section aria-labelledby="trip-more-essentials-heading">/)
+  assert.match(more, /id="trip-more-essentials-heading"[\s\S]*?Trip essentials/)
+  assert.match(more, /<section aria-labelledby="trip-more-manage-heading"/)
+  assert.match(more, /id="trip-more-manage-heading"[\s\S]*?Manage &amp; share/)
+
+  for (const label of ['Budget', 'Packing', 'Journal', 'Members', 'Activity', 'Export', 'Offline access']) {
+    assert.match(more, new RegExp(`<SheetOptionRow[^>]*label="${label}"`))
+  }
+  // The dead "Soon" row is gone; every remaining row is available.
+  assert.doesNotMatch(more, /label="Trip settings"/)
+  assert.doesNotMatch(more, /available=\{false\}/)
+})
+
+test('the trip primary nav marks its active section with aria-current', () => {
+  const nav = read('app/trip/[id]/mobile/components/TripPrimaryNav.tsx')
+
+  assert.match(nav, /aria-current=\{isActive \? 'page' : undefined\}/)
+  assert.match(nav, /aria-label="Trip sections"/)
+  // Tab bar entries stay at or above the 44px touch floor.
+  assert.match(nav, /minHeight: 48/)
+})
+
+test('active Overview keeps exactly one primary amber action', () => {
+  const overview = read('app/trip/[id]/mobile/TripOverviewDomain.tsx')
+  const active = readTopLevelFunction(overview, 'ActiveContent')
+
+  const primaries = active.match(/<PrimaryButton\b/g) ?? []
+  assert.equal(primaries.length, 1, 'active Overview must have one primary CTA')
+  assert.match(active, /<PrimaryButton onClick=\{onTravelMode\}>Open Travel Mode<\/PrimaryButton>/)
+  // The old amber "Navigate to …" deep link is gone; secondary actions are ghosts.
+  assert.doesNotMatch(active, /ACCENT_GRADIENT/)
+  assert.match(active, /<GhostButton onClick=\{onViewPlan\}>View day<\/GhostButton>/)
+})
+
+test('user-facing trip copy never names a migration number', () => {
+  const mobile = stripComments(readFeature('app/trip/[id]/mobile'))
+
+  assert.doesNotMatch(mobile, /migration \d/i)
+  assert.doesNotMatch(mobile, /is coming soon\./)
+})
+
+test('the offline flow renders one owned sheet instead of a stacked pair', () => {
+  const shell = read('app/trip/[id]/mobile/TripMobileClient.tsx')
+  const more = read('app/trip/[id]/mobile/components/TripMoreSheet.tsx')
+  const overview = read('app/trip/[id]/mobile/TripOverviewDomain.tsx')
+
+  // The shell owns the only instance; both entry points ask it to open.
+  assert.equal((shell.match(/<OfflineAccessSheet\b/g) ?? []).length, 1)
+  assert.match(shell, /open=\{isOfflineSheetOpen\}/)
+  assert.doesNotMatch(more, /OfflineAccessSheet/)
+  // More closes itself before handing off, so the two never render together.
+  assert.match(more, /label="Offline access"[\s\S]*?onSelect=\{\(\) => \{ onClose\(\); onOpenOffline\(\) \}\}/)
+  assert.match(overview, /title="Offline access"[\s\S]*?onSelect=\{onOpenOffline\}/)
+  // Members/Activity keep the same one-sheet-at-a-time guard.
+  assert.match(more, /open=\{open && !membersOpen && !activityOpen\}/)
 })
