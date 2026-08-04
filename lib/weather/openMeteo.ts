@@ -44,7 +44,12 @@ export async function fetchDayWeather(
       `https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(3)}&longitude=${lng.toFixed(3)}` +
       `&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&start_date=${date}&end_date=${date}`
     const res = await fetch(url)
-    if (!res.ok) return null
+    // A provider outage is a failed request, not "no forecast for that day" — the
+    // two render differently, so callers that asked to see errors must get one.
+    if (!res.ok) {
+      if (options.throwOnError) throw new Error(`Open-Meteo responded ${res.status}`)
+      return null
+    }
     const data = await res.json()
     const code = data?.daily?.weather_code?.[0]
     const high = data?.daily?.temperature_2m_max?.[0]

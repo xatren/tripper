@@ -198,6 +198,16 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
     settleTo(points[next], next)
   }, [settleTo, sheetHeight, snapPoints])
 
+  // A cancelled pointer never produces the click that would clear dragMoved, so
+  // clear it here — otherwise the next keyboard activation is swallowed.
+  const handlePointerCancel = useCallback(
+    (e: React.PointerEvent<HTMLElement>) => {
+      handlePointerUp(e)
+      dragMoved.current = false
+    },
+    [handlePointerUp]
+  )
+
   // Keyboard activation and taps share the cycle; a pointer drag must not fire it again.
   const handleHandleClick = useCallback(() => {
     if (dragMoved.current) {
@@ -443,6 +453,9 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
   )
 
   const routeLoading = routeStatus === 'loading'
+  // "Add activity" opens the itinerary sheet, which the timeline ignores until the
+  // itinerary tables exist — so on Days the CTA only appears when it can act.
+  const showStickyAction = canEdit && (activeTab === 'route' || itineraryEnabled)
   const summaryDistanceText = formatDistanceValue(routeLegs.reduce((sum, l) => sum + l.distanceMeters, 0), distanceUnit)
   const summaryMin = Math.round(routeLegs.reduce((sum, l) => sum + l.durationSeconds, 0) / 60)
   const summaryDuration = `${Math.floor(summaryMin / 60)}h ${String(summaryMin % 60).padStart(2, '0')}m`
@@ -583,7 +596,7 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
               onPointerDown={handlePointerDown}
               onPointerMove={handlePointerMove}
               onPointerUp={handlePointerUp}
-              onPointerCancel={handlePointerUp}
+              onPointerCancel={handlePointerCancel}
               onClick={handleHandleClick}
               style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -653,7 +666,10 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
           </div>
 
           {/* content */}
-          <div style={{ flex: 1, minHeight: 0, padding: '4px 20px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, overflowY: 'auto' }}>
+          {/* The primary nav floats over the sheet's bottom edge. The sticky CTA
+              carries that clearance for editors; without a CTA the scroll area has
+              to reserve it itself or the last card can never be scrolled clear. */}
+          <div style={{ flex: 1, minHeight: 0, padding: `4px 20px ${showStickyAction ? '12px' : 'calc(90px + env(safe-area-inset-bottom, 0px))'}`, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, overflowY: 'auto' }}>
 
             {activeTab === 'route' && (
               <>
@@ -895,7 +911,7 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
 
           {/* Sticky primary action — one per tab, outside the scroll container so it
               never disappears under the list, and padded clear of the bottom nav. */}
-          {canEdit && (
+          {showStickyAction && (
             <div style={{ flex: 'none', padding: '0 20px calc(90px + env(safe-area-inset-bottom, 0px))' }}>
               <button
                 type="button"

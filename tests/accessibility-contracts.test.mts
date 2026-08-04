@@ -121,6 +121,19 @@ test('plan tabs expose exactly one primary action and a recoverable route error'
   assert.match(plan, /canEdit && isOnline && stops\.length >= 2/)
 })
 
+test('the plan sticky CTA only renders when it can act, and never eats the nav clearance', () => {
+  const plan = read('app/trip/[id]/mobile/PlanRouteDomain.tsx')
+
+  // "Add activity" is a no-op until the itinerary tables exist.
+  assert.match(plan, /const showStickyAction = canEdit && \(activeTab === 'route' \|\| itineraryEnabled\)/)
+  assert.match(plan, /\{showStickyAction && \(/)
+  // Whoever lacks the CTA still needs room to scroll past the floating nav.
+  assert.match(plan, /showStickyAction \? '12px' : 'calc\(90px \+ env\(safe-area-inset-bottom, 0px\)\)'/)
+  // A cancelled drag must not swallow the next keyboard activation.
+  assert.match(plan, /onPointerCancel=\{handlePointerCancel\}/)
+  assert.match(plan, /handlePointerUp\(e\)\s*\n\s*dragMoved\.current = false/)
+})
+
 test('the onboarding restart shortcut never reaches production', () => {
   const entry = read('components/onboarding/mobile-entry-flow.tsx')
 
