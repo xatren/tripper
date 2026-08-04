@@ -10,7 +10,7 @@ import type { RouteLeg } from '@/lib/mapbox/directions'
 import { fetchDayWeather, type DayWeather } from '@/lib/weather/openMeteo'
 import { useDistanceUnit, formatDistanceValue, type DistanceUnit } from '@/lib/settings'
 import { tokens, InlineError, SkeletonBlock, StatusChip } from '@/components/mobile'
-import { ACCENT_GRADIENT, SoonBadge } from './domain-ui'
+import { ACCENT_GRADIENT } from './domain-ui'
 import { DUSK } from '@/components/design/tokens'
 import { computeStopSchedule, formatDateRange, formatHeaderDate, formatMoney, totalNights, type StopSchedule } from './trip-domain-utils'
 import { tripLifecycle, currentTripDay, daysBetween, localDateISO, type TripLifecycle } from './trip-lifecycle'
@@ -41,7 +41,15 @@ export interface TripOverviewDomainProps {
   visible: boolean
   onSelectSection: (section: PrimaryNavSection) => void
   onOpenDestination: (destination: 'budget' | 'packing' | 'journal' | 'travel') => void
+  onOpenOffline: () => void
 }
+
+type ActiveWeatherState =
+  | { status: 'idle' }
+  | { status: 'loading' }
+  | { status: 'ready'; weather: DayWeather }
+  | { status: 'unavailable' }
+  | { status: 'error' }
 
 // ─── Section data (server-seeded, client-retryable) ─────────────────────────
 
@@ -246,7 +254,7 @@ const icons = {
 
 // ─── Screen ──────────────────────────────────────────────────────────────────
 
-export function TripOverviewDomain({ trip, stops, members, capabilities, initialData, routeLegs, visible, onSelectSection, onOpenDestination }: TripOverviewDomainProps) {
+export function TripOverviewDomain({ trip, stops, members, capabilities, initialData, routeLegs, visible, onSelectSection, onOpenDestination, onOpenOffline }: TripOverviewDomainProps) {
   const { canEdit, canManageTrip } = capabilities
   const distanceUnit = useDistanceUnit()
 
@@ -326,14 +334,22 @@ export function TripOverviewDomain({ trip, stops, members, capabilities, initial
     return null
   }, [lifecycle, todayISO, nextStop, nextStopIndex, currentStop, schedule])
 
-  const [weather, setWeather] = useState<DayWeather | null>(null)
+  const [weatherState, setWeatherState] = useState<ActiveWeatherState>({ status: 'idle' })
   useEffect(() => {
-    setWeather(null)
-    if (!weatherTarget) return
+    if (!weatherTarget) {
+      setWeatherState({ status: 'idle' })
+      return
+    }
     let cancelled = false
-    fetchDayWeather(weatherTarget.lat, weatherTarget.lng, weatherTarget.date).then((w) => {
-      if (!cancelled) setWeather(w)
-    })
+    setWeatherState({ status: 'loading' })
+    fetchDayWeather(weatherTarget.lat, weatherTarget.lng, weatherTarget.date, { throwOnError: true })
+      .then((weather) => {
+        if (cancelled) return
+        setWeatherState(weather ? { status: 'ready', weather } : { status: 'unavailable' })
+      })
+      .catch(() => {
+        if (!cancelled) setWeatherState({ status: 'error' })
+      })
     return () => { cancelled = true }
   }, [weatherTarget])
 
@@ -449,7 +465,7 @@ export function TripOverviewDomain({ trip, stops, members, capabilities, initial
           nextArrival={nextStopIndex >= 0 ? schedule[nextStopIndex]?.arrival ?? null : null}
           nextLeg={nextLeg}
           distanceUnit={distanceUnit}
-          weather={weather}
+          weatherState={weatherState}
           weatherPlace={weatherTarget?.name ?? null}
           canEdit={canEdit}
           hasStops={stops.length > 0}
@@ -493,6 +509,7 @@ export function TripOverviewDomain({ trip, stops, members, capabilities, initial
             onOpenPlan={() => onSelectSection('plan')}
             onOpenPacking={() => onOpenDestination('packing')}
             onInvite={copyInviteLink}
+            onOpenOffline={onOpenOffline}
           />
         </div>
       )}
@@ -531,7 +548,7 @@ function UndatedContent({ canEdit, hasStops, onAddDates, onOpenPlan }: {
 
 // ─── Upcoming readiness rows ─────────────────────────────────────────────────
 
-function UpcomingReadiness({ hasStops, hasDates, totalDays, coveredDays, packingReady, packingTotal, packingChecked, uncheckedDocs, canEdit, showInvite, onOpenPlan, onOpenPacking, onInvite }: {
+function UpcomingReadiness({ hasStops, hasDates, totalDays, coveredDays, packingReady, packingTotal, packingChecked, uncheckedDocs, canEdit, showInvite, onOpenPlan, onOpenPacking, onInvite, onOpenOffline }: {
   hasStops: boolean
   hasDates: boolean
   totalDays: number
@@ -545,6 +562,7 @@ function UpcomingReadiness({ hasStops, hasDates, totalDays, coveredDays, packing
   onOpenPlan: () => void
   onOpenPacking: () => void
   onInvite: () => void
+  onOpenOffline: () => void
 }) {
   const unplanned = hasDates ? totalDays - coveredDays : 0
   const packingPct = packingTotal > 0 ? Math.round((packingChecked / packingTotal) * 100) : 0
@@ -604,20 +622,15 @@ function UpcomingReadiness({ hasStops, hasDates, totalDays, coveredDays, packing
         <OverviewRow icon={icons.invite} title="Invite friends" hint="Copy a join link to share" onSelect={onInvite} />
       )}
 
-      <OverviewRow
-        icon={icons.offline}
-        title="Download for offline"
-        hint="Take the plan off-grid"
-        trailing={<SoonBadge />}
-        onSelect={() => showToast('Offline access is coming soon.', 'info')}
-      />
+      <OverviewRow icon={icons.offline} title="Offline access" hint="Download this trip" onSelect={onOpenOffline} />
+
     </div>
   )
 }
 
 // ─── Active ──────────────────────────────────────────────────────────────────
 
-function ActiveContent({ dayNumber, totalDays, todayISO, currentStop, nextStop, nextArrival, nextLeg, distanceUnit, weather, weatherPlace, canEdit, hasStops, onViewPlan, onAddMemory, onTravelMode }: {
+function ActiveContent({ dayNumber, totalDays, todayISO, currentStop, nextStop, nextArrival, nextLeg, distanceUnit, weatherState, weatherPlace, canEdit, hasStops, onViewPlan, onAddMemory, onTravelMode }: {
   dayNumber: number
   totalDays: number
   todayISO: string | null
@@ -626,7 +639,7 @@ function ActiveContent({ dayNumber, totalDays, todayISO, currentStop, nextStop, 
   nextArrival: string | null
   nextLeg: RouteLeg | null
   distanceUnit: DistanceUnit
-  weather: DayWeather | null
+  weatherState: ActiveWeatherState
   weatherPlace: string | null
   canEdit: boolean
   hasStops: boolean
@@ -642,14 +655,13 @@ function ActiveContent({ dayNumber, totalDays, todayISO, currentStop, nextStop, 
           No stops are planned yet — add where you’re headed.
         </div>
         <div style={{ marginTop: 14 }}>
-          <PrimaryButton onClick={onViewPlan}>Open plan</PrimaryButton>
+          <GhostButton onClick={onViewPlan}>Open plan</GhostButton>
         </div>
       </section>
     )
   }
 
-  const navTarget = nextStop ?? currentStop
-  const navUrl = navTarget ? `https://www.google.com/maps/dir/?api=1&destination=${navTarget.lat},${navTarget.lng}` : null
+  const weather = weatherState.status === 'ready' ? weatherState.weather : null
   const badWeather = weather && (weather.kind === 'rainy' || weather.kind === 'snowy')
 
   return (
@@ -677,13 +689,21 @@ function ActiveContent({ dayNumber, totalDays, todayISO, currentStop, nextStop, 
         </div>
       )}
 
-      {weather && weatherPlace && (
-        <div style={{ marginTop: 10 }}>
-          <StatusChip tone={badWeather ? 'warning' : 'neutral'}>
-            {badWeather
-              ? `${weather.kind === 'snowy' ? 'Snow' : 'Rain'} expected in ${weatherPlace}`
-              : `${weatherPlace} forecast`} · {weather.high}°/{weather.low}°
-          </StatusChip>
+      {weatherState.status !== 'idle' && (
+        <div style={{ display: 'flex', alignItems: 'center', minHeight: 24, marginTop: 10 }}>
+          {weatherState.status === 'loading' ? (
+            <span style={{ color: tokens.textMuted, fontSize: 12, fontWeight: 600 }}>Loading weather…</span>
+          ) : weatherState.status === 'unavailable' ? (
+            <StatusChip tone="neutral">Forecast not available yet</StatusChip>
+          ) : weatherState.status === 'error' ? (
+            <StatusChip tone="neutral">Weather unavailable</StatusChip>
+          ) : weatherPlace ? (
+            <StatusChip tone={badWeather ? 'warning' : 'neutral'}>
+              {badWeather
+                ? `${weatherState.weather.kind === 'snowy' ? 'Snow' : 'Rain'} expected in ${weatherPlace}`
+                : `${weatherPlace} forecast`} · {weatherState.weather.high}°/{weatherState.weather.low}°
+            </StatusChip>
+          ) : null}
         </div>
       )}
 
@@ -692,20 +712,6 @@ function ActiveContent({ dayNumber, totalDays, todayISO, currentStop, nextStop, 
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 14 }}>
-        {navUrl && navTarget && (
-          <a
-            href={navUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 48,
-              padding: '13px 20px', borderRadius: 14, background: ACCENT_GRADIENT, color: DUSK.onAmber,
-              fontWeight: 800, fontSize: 14, textDecoration: 'none', boxShadow: '0 0 20px rgba(245,140,0,.25)',
-            }}
-          >
-            Navigate to {navTarget.name}
-          </a>
-        )}
         <div style={{ display: 'flex', gap: 8 }}>
           <GhostButton onClick={onViewPlan}>View day</GhostButton>
           {canEdit && <GhostButton onClick={onAddMemory}>Add memory</GhostButton>}

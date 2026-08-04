@@ -42,12 +42,13 @@ export interface SheetOptionRowProps {
   icon: ReactNode
   label: string
   hint?: string
+  trailing?: ReactNode
   available: boolean
   onSelect: () => void
 }
 
 /** One row inside a sheet-style option list (More sheet, Add sheet) — enabled or "Soon". */
-export function SheetOptionRow({ icon, label, hint, available, onSelect }: SheetOptionRowProps) {
+export function SheetOptionRow({ icon, label, hint, trailing, available, onSelect }: SheetOptionRowProps) {
   return (
     <button
       type="button"
@@ -65,7 +66,9 @@ export function SheetOptionRow({ icon, label, hint, available, onSelect }: Sheet
         <span style={{ display: 'block', color: tokens.textPrimary, fontWeight: 700, fontSize: 14 }}>{label}</span>
         {hint && <span style={{ display: 'block', color: tokens.textMuted, fontSize: 12, marginTop: 1 }}>{hint}</span>}
       </span>
-      {!available && <SoonBadge />}
+      {trailing !== undefined
+        ? <span style={{ maxWidth: '42%', flex: 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: tokens.textMuted, fontSize: 12, fontWeight: 700 }}>{trailing}</span>
+        : !available && <SoonBadge />}
     </button>
   )
 }

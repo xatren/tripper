@@ -28,9 +28,15 @@ function daysFromToday(iso: string): number {
 
 /**
  * Forecast for one location on one date. Returns null when the date is in the
- * past, beyond the forecast horizon, or the request fails.
+ * past, beyond the forecast horizon, or the provider has no usable forecast.
+ * Callers that need a distinct network-error state can opt into rejection.
  */
-export async function fetchDayWeather(lat: number, lng: number, date: string): Promise<DayWeather | null> {
+export async function fetchDayWeather(
+  lat: number,
+  lng: number,
+  date: string,
+  options: { throwOnError?: boolean } = {},
+): Promise<DayWeather | null> {
   const offset = daysFromToday(date)
   if (offset < 0 || offset > MAX_FORECAST_DAYS) return null
   try {
@@ -45,7 +51,8 @@ export async function fetchDayWeather(lat: number, lng: number, date: string): P
     const low = data?.daily?.temperature_2m_min?.[0]
     if (typeof code !== 'number' || typeof high !== 'number' || typeof low !== 'number') return null
     return { kind: kindFromWmoCode(code), high: Math.round(high), low: Math.round(low) }
-  } catch {
+  } catch (error) {
+    if (options.throwOnError) throw error
     return null
   }
 }

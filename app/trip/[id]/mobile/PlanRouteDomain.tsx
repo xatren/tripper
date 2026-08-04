@@ -251,7 +251,7 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
         if (error) {
           setNights((prev) => ({ ...prev, [id]: current }))
           setStops((prev) => prev.map((stop) => stop.id === id && stop.nights === next ? { ...stop, nights: current } : stop))
-          showToast("Couldn't save nights. Run migration 008 if you haven't yet.", 'error', { label: 'Retry', onClick: () => changeNights(id, delta) })
+          showToast("Couldn't save this change. Check your connection and try again.", 'error', { label: 'Retry', onClick: () => changeNights(id, delta) })
         }
       })
   }

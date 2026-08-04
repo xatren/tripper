@@ -424,7 +424,7 @@ export function PrepDomain({ tripId, vibe, userId, canEdit, members }: PrepDomai
       <div style={{ paddingTop: 14 }}>
         <RetryCard
           title="Couldn't load your packing list"
-          hint="Check your connection — or run migration 010 if you haven't yet."
+          hint="Check your connection and try again."
           onRetry={() => setReloadToken((token) => token + 1)}
         />
       </div>

@@ -2,13 +2,13 @@
 
 import type { ReactNode } from 'react'
 import { useState } from 'react'
-import type { ItineraryItem, Stop, Trip, TripCapabilities, TripMember } from '@/types'
+import { CURRENCY_SYMBOLS, type Stop, type Trip, type TripCapabilities, type TripMember } from '@/types'
 import { showToast } from '@/components/ui/toast'
 import { downloadTripIcs } from '@/lib/ics'
-import { computeStopSchedule, tripTitle } from '../trip-domain-utils'
+import { computeStopSchedule, formatMoney, tripTitle } from '../trip-domain-utils'
+import type { TripOverviewData } from '../overview-data'
 import { SheetOptionRow, type MoreDestination } from '../domain-ui'
 import { BottomSheet } from './BottomSheet'
-import { OfflineAccessSheet } from './OfflineAccessSheet'
 import { ActivityFeedSheet, MembersSheet } from './CollaborationSheets'
 
 export interface TripMoreSheetProps {
@@ -19,9 +19,9 @@ export interface TripMoreSheetProps {
   stops: Stop[]
   userId: string
   members: TripMember[]
-  itinerary: ItineraryItem[]
-  routeGeometry: { lat: number; lng: number }[]
   capabilities: TripCapabilities
+  overview: TripOverviewData
+  onOpenOffline: () => void
   onMembersChanged: () => void
 }
 
@@ -37,10 +37,27 @@ const ICONS: Record<MoreDestination, ReactNode> = {
 }
 
 /** Bottom sheet listing every trip destination not on the primary nav bar. */
-export function TripMoreSheet({ open, onClose, onNavigate, trip, stops, userId, members, itinerary, routeGeometry, capabilities, onMembersChanged }: TripMoreSheetProps) {
-  const [offlineOpen, setOfflineOpen] = useState(false)
+export function TripMoreSheet({ open, onClose, onNavigate, trip, stops, userId, members, capabilities, overview, onOpenOffline, onMembersChanged }: TripMoreSheetProps) {
   const [membersOpen, setMembersOpen] = useState(false)
   const [activityOpen, setActivityOpen] = useState(false)
+  const currencySymbol = CURRENCY_SYMBOLS[trip.currency ?? 'USD'] ?? '$'
+  const expenseTotal = overview.expenses.rows.reduce((total, expense) => {
+    const amount = Number(expense.amount)
+    return Number.isFinite(amount) ? total + amount : total
+  }, 0)
+  const budgetSummary = overview.expenses.status === 'error'
+    ? 'Unavailable'
+    : overview.expenses.rows.length === 0 ? 'No expenses' : `${currencySymbol}${formatMoney(expenseTotal)}`
+  const packingSummary = overview.packing.status === 'error'
+    ? 'Unavailable'
+    : overview.packing.rows.length === 0
+      ? 'Not started'
+      : `${overview.packing.rows.filter((item) => item.checked).length}/${overview.packing.rows.length}`
+  const journalSummary = overview.journal.status === 'error'
+    ? 'Unavailable'
+    : overview.journal.rows.length === 0
+      ? 'No entries'
+      : `${overview.journal.rows.length} ${overview.journal.rows.length === 1 ? 'entry' : 'entries'}`
   const handleExport = () => {
     const nights = Object.fromEntries(stops.map((s) => [s.id, s.nights ?? 1]))
     const schedule = computeStopSchedule(trip.start_date, stops, nights)
@@ -56,21 +73,27 @@ export function TripMoreSheet({ open, onClose, onNavigate, trip, stops, userId, 
     onClose()
   }
 
-  const soon = (label: string) => () => showToast(`${label} is coming soon.`, 'info')
-
   return (
     <>
-    <BottomSheet open={open && !offlineOpen && !membersOpen && !activityOpen} onClose={onClose} titleId="trip-more-sheet-title" title="More">
-      <SheetOptionRow icon={ICONS.budget} label="Budget" available onSelect={() => onNavigate('budget')} />
-      <SheetOptionRow icon={ICONS.packing} label="Packing" available onSelect={() => onNavigate('packing')} />
-      <SheetOptionRow icon={ICONS.journal} label="Journal" available onSelect={() => onNavigate('journal')} />
-      <SheetOptionRow icon={ICONS.members} label="Members" available onSelect={() => setMembersOpen(true)} />
-      <SheetOptionRow icon={ICONS.activity} label="Activity" hint="Meaningful trip changes" available onSelect={() => setActivityOpen(true)} />
-      <SheetOptionRow icon={ICONS.settings} label="Trip settings" available={false} onSelect={soon('Trip settings')} />
-      <SheetOptionRow icon={ICONS.export} label="Export" hint="Download calendar (.ics)" available onSelect={handleExport} />
-      <SheetOptionRow icon={ICONS.offline} label="Offline access" hint="Download this trip" available onSelect={() => setOfflineOpen(true)} />
+    <BottomSheet open={open && !membersOpen && !activityOpen} onClose={onClose} titleId="trip-more-sheet-title" title="More">
+      <section aria-labelledby="trip-more-essentials-heading">
+        <h3 id="trip-more-essentials-heading" style={{ margin: '0 10px 4px', fontSize: 12, fontWeight: 800, letterSpacing: '.04em', opacity: 0.65 }}>
+          Trip essentials
+        </h3>
+        <SheetOptionRow icon={ICONS.budget} label="Budget" trailing={budgetSummary} available onSelect={() => onNavigate('budget')} />
+        <SheetOptionRow icon={ICONS.packing} label="Packing" trailing={packingSummary} available onSelect={() => onNavigate('packing')} />
+        <SheetOptionRow icon={ICONS.journal} label="Journal" trailing={journalSummary} available onSelect={() => onNavigate('journal')} />
+      </section>
+      <section aria-labelledby="trip-more-manage-heading" style={{ marginTop: 18 }}>
+        <h3 id="trip-more-manage-heading" style={{ margin: '0 10px 4px', fontSize: 12, fontWeight: 800, letterSpacing: '.04em', opacity: 0.65 }}>
+          Manage &amp; share
+        </h3>
+        <SheetOptionRow icon={ICONS.members} label="Members" available onSelect={() => setMembersOpen(true)} />
+        <SheetOptionRow icon={ICONS.activity} label="Activity" hint="Meaningful trip changes" available onSelect={() => setActivityOpen(true)} />
+        <SheetOptionRow icon={ICONS.export} label="Export" hint="Download calendar (.ics)" available onSelect={handleExport} />
+        <SheetOptionRow icon={ICONS.offline} label="Offline access" hint="Download this trip" available onSelect={() => { onClose(); onOpenOffline() }} />
+      </section>
     </BottomSheet>
-    <OfflineAccessSheet open={offlineOpen} onClose={() => setOfflineOpen(false)} userId={userId} trip={trip} members={members} stops={stops} itinerary={itinerary} routeGeometry={routeGeometry} />
     <MembersSheet open={membersOpen} onClose={() => setMembersOpen(false)} trip={trip} members={members} currentUserId={userId} capabilities={capabilities} onChanged={onMembersChanged} />
     <ActivityFeedSheet open={activityOpen} onClose={() => setActivityOpen(false)} tripId={trip.id} members={members} currentUserId={userId} />
     </>

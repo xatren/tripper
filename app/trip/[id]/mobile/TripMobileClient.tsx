@@ -14,6 +14,7 @@ import type { PrimaryNavSection } from './components/TripPrimaryNav'
 import { TripPrimaryNav } from './components/TripPrimaryNav'
 import { TripMobileHeader } from './components/TripMobileHeader'
 import { TripMoreSheet } from './components/TripMoreSheet'
+import { OfflineAccessSheet } from './components/OfflineAccessSheet'
 import { OfflineStatus } from './components/OfflineStatus'
 import { DeferredBoundary } from '@/components/ui/deferred-boundary'
 import { showToast } from '@/components/ui/toast'
@@ -116,6 +117,7 @@ function TripMobileContent({ trip, stops: initialStops, items: initialItems, iti
   const router = useRouter()
   const [activeSection, setActiveSection] = useState<PrimaryNavSection>(initialSection)
   const [isMoreSheetOpen, setIsMoreSheetOpen] = useState(false)
+  const [isOfflineSheetOpen, setIsOfflineSheetOpen] = useState(false)
   const [activeMoreDestination, setActiveMoreDestination] = useState<MoreDestination | null>(null)
   const [visitedLazy, setVisitedLazy] = useState<Set<LazySection | MoreDestination>>(() => {
     const visited = new Set<LazySection | MoreDestination>()
@@ -417,6 +419,7 @@ function TripMobileContent({ trip, stops: initialStops, items: initialItems, iti
               visible={visibleScreen === 'overview'}
               onSelectSection={selectSection}
               onOpenDestination={openMoreDestination}
+              onOpenOffline={() => setIsOfflineSheetOpen(true)}
             />
           </div>
           {visitedLazy.has('explore') && (
@@ -511,10 +514,20 @@ function TripMobileContent({ trip, stops: initialStops, items: initialItems, iti
         stops={stops}
         userId={currentUserId}
         members={members}
+        capabilities={capabilities}
+        overview={overview}
+        onOpenOffline={() => setIsOfflineSheetOpen(true)}
+        onMembersChanged={() => void refreshMembership()}
+      />
+      <OfflineAccessSheet
+        open={isOfflineSheetOpen}
+        onClose={() => setIsOfflineSheetOpen(false)}
+        userId={currentUserId}
+        trip={trip}
+        members={members}
+        stops={stops}
         itinerary={items}
         routeGeometry={routePath}
-        capabilities={capabilities}
-        onMembersChanged={() => void refreshMembership()}
       />
     </div>
   )
