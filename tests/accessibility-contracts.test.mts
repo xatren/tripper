@@ -79,3 +79,29 @@ test('packing and budget row actions keep mobile-sized hit targets', () => {
   assert.match(prepSheets, /aria-label="Decrease quantity"[\s\S]*?width: 44, height: 44/)
   assert.match(budgetDetail, /onClick=\{\(\) => onDelete\(expense\)\}[\s\S]*?minHeight: 44/)
 })
+
+test('plan sheet handle is an operable, labelled control and not a bare drag surface', () => {
+  const plan = read('app/trip/[id]/mobile/PlanRouteDomain.tsx')
+
+  // Pointer drag, tap, and keyboard activation all go through one <button>.
+  assert.match(plan, /aria-label=\{snapLevel === 'max' \? 'Collapse plan' : 'Expand plan'\}/)
+  assert.match(plan, /aria-expanded=\{snapLevel !== 'min'\}/)
+  assert.match(plan, /onClick=\{handleHandleClick\}[\s\S]*?minHeight: 44/)
+  // A drag must not also fire the tap cycle.
+  assert.match(plan, /if \(dragMoved\.current\)[\s\S]*?return/)
+  // Snap animation still collapses to zero duration under reduced motion.
+  assert.match(plan, /reducedMotion \? \{ duration: 0 \}/)
+})
+
+test('plan tabs expose exactly one primary action and a recoverable route error', () => {
+  const plan = read('app/trip/[id]/mobile/PlanRouteDomain.tsx')
+
+  // One sticky CTA whose label follows the active tab, editors only.
+  assert.match(plan, /\{activeTab === 'route' \? 'Add destination' : 'Add activity'\}/)
+  assert.doesNotMatch(plan, /aria-label="Add to trip"/)
+  // Retry re-runs the existing route effect instead of calling Directions directly.
+  assert.match(plan, /Route unavailable[\s\S]*?setRouteRetryToken\(\(token\) => token \+ 1\)/)
+  assert.match(plan, /\}, \[routeKey, routeRetryToken\]\)/)
+  // Optimize stays hidden unless it can actually run.
+  assert.match(plan, /canEdit && isOnline && stops\.length >= 2/)
+})

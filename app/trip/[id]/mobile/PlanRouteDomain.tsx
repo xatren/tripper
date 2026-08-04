@@ -7,7 +7,7 @@ import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-ki
 import { SegmentedTabs } from '@/components/ui/segmented-tabs'
 import { createClient } from '@/lib/supabase/client'
 import { getFullRoute, LatestRouteRequestController, type RouteLeg } from '@/lib/mapbox/directions'
-import type { ItineraryItem, ItineraryItemType, Trip, Stop, TripCapabilities, TripMember } from '@/types'
+import type { ItineraryItem, Trip, Stop, TripCapabilities, TripMember } from '@/types'
 import { showToast } from '@/components/ui/toast'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { getOptimizedOrder } from '@/lib/mapbox/optimize'
@@ -17,7 +17,6 @@ import { ACCENT, ACCENT_DARK, ACCENT_LIGHT, GLASS_BORDER, GLASS_FILL } from './d
 import { DUSK } from '@/components/design/tokens'
 import { totalNights } from './trip-domain-utils'
 import { TripPrimaryNav, type PrimaryNavSection } from './components/TripPrimaryNav'
-import { TripAddSheet } from './components/TripAddSheet'
 import { ItineraryTimeline, type ItineraryCreateRequest } from './itinerary/ItineraryTimeline'
 import { useReducedMotionPreference } from '@/components/motion/ReducedMotionProvider'
 import { buildTimeline } from './itinerary-projection'
@@ -31,6 +30,11 @@ import { SortableStopItem } from './plan/SortableStopItem'
 const SHEET_MIN_PX = 190
 const SHEET_DEFAULT_RATIO = 0.54
 const SHEET_MAX_RATIO = 0.88
+/** Snap heights, collapsed → expanded. The handle cycles through them in order. */
+const SNAP_LEVELS = ['min', 'mid', 'max'] as const
+type SnapLevel = (typeof SNAP_LEVELS)[number]
+/** Vertical travel below which a press on the handle still reads as a tap. */
+const TAP_SLOP_PX = 4
 
 export interface PlanRouteDomainProps {
   trip: Trip
@@ -60,12 +64,16 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
   const reducedMotion = useReducedMotionPreference()
   const distanceUnit = useDistanceUnit()
   const [activeTab, setActiveTab] = useState<'route' | 'days'>('route')
-  const [isAddSheetOpen, setIsAddSheetOpen] = useState(false)
   const [itineraryCreateRequest, setItineraryCreateRequest] = useState<ItineraryCreateRequest | null>(null)
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
   const [selectedDayId, setSelectedDayId] = useState<string | null>(null)
   const [otherDays, setOtherDays] = useState<OtherDayVisibility>('hidden')
   const [routeStatus, setRouteStatus] = useState<'idle' | 'loading' | 'ready' | 'unavailable'>('idle')
+  // Bumped by Retry so the route effect re-runs through the same stale-request
+  // controller instead of calling the Directions API behind its back.
+  const [routeRetryToken, setRouteRetryToken] = useState(0)
+  // Optimize needs the network; assume online until the browser says otherwise.
+  const [isOnline, setIsOnline] = useState(true)
   const [isAddOpen, setIsAddOpen] = useState(false)
   const [addInitialQuery, setAddInitialQuery] = useState('')
   const [aiHint, setAiHint] = useState(false)
@@ -82,6 +90,7 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
 
   const stageRef = useRef<HTMLDivElement>(null)
   const sheetHeight = useMotionValue(420)
+  const [snapLevel, setSnapLevel] = useState<SnapLevel>('mid')
   const routeRequests = useRef(new LatestRouteRequestController())
 
   useEffect(() => {
@@ -125,50 +134,78 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
     }
   }, [])
 
+  // The handle's accessible name and aria-expanded need the snap level in React
+  // state; sheetHeight itself is a MotionValue and never re-renders the tree.
+  const settleTo = useCallback(
+    (target: number, level: SnapLevel) => {
+      setSnapLevel(level)
+      animate(sheetHeight, target, reducedMotion ? { duration: 0 } : { duration: .22, ease: [0.22, 1, 0.36, 1] })
+    },
+    [reducedMotion, sheetHeight]
+  )
+
   // Native Pointer Events (not Framer's onPan) so dragging works reliably with
   // mouse, touch, and pen alike, and pointer capture keeps tracking even if the
   // finger/cursor drifts outside the handle's small hit area mid-drag.
   const dragStart = useRef<{ pointerId: number; clientY: number; height: number } | null>(null)
+  // A pointer drag ends with a click event too, so only a near-motionless press
+  // counts as a tap; otherwise dragging would also cycle the snap level.
+  const dragMoved = useRef(false)
 
   const handlePointerDown = useCallback(
-    (e: React.PointerEvent<HTMLDivElement>) => {
+    (e: React.PointerEvent<HTMLElement>) => {
       e.currentTarget.setPointerCapture(e.pointerId)
       dragStart.current = { pointerId: e.pointerId, clientY: e.clientY, height: sheetHeight.get() }
+      dragMoved.current = false
       setIsDragging(true)
     },
     [sheetHeight]
   )
 
   const handlePointerMove = useCallback(
-    (e: React.PointerEvent<HTMLDivElement>) => {
+    (e: React.PointerEvent<HTMLElement>) => {
       const drag = dragStart.current
       if (!drag || e.pointerId !== drag.pointerId) return
       const { min, max } = snapPoints()
-      const next = drag.height - (e.clientY - drag.clientY)
-      sheetHeight.set(Math.min(max, Math.max(min, next)))
+      const delta = e.clientY - drag.clientY
+      if (Math.abs(delta) > TAP_SLOP_PX) dragMoved.current = true
+      sheetHeight.set(Math.min(max, Math.max(min, drag.height - delta)))
     },
     [sheetHeight, snapPoints]
   )
 
   const handlePointerUp = useCallback(
-    (e: React.PointerEvent<HTMLDivElement>) => {
+    (e: React.PointerEvent<HTMLElement>) => {
       if (!dragStart.current || e.pointerId !== dragStart.current.pointerId) return
       dragStart.current = null
       setIsDragging(false)
-      const { min, mid, max } = snapPoints()
+      const points = snapPoints()
       const current = sheetHeight.get()
-      const nearest = [min, mid, max].reduce((a, b) => (Math.abs(b - current) < Math.abs(a - current) ? b : a))
-      animate(sheetHeight, nearest, reducedMotion ? { duration: 0 } : { duration: .22, ease: [0.22, 1, 0.36, 1] })
+      const nearest = SNAP_LEVELS.reduce((a, b) =>
+        Math.abs(points[b] - current) < Math.abs(points[a] - current) ? b : a
+      )
+      settleTo(points[nearest], nearest)
     },
-    [reducedMotion, sheetHeight, snapPoints]
+    [settleTo, sheetHeight, snapPoints]
   )
 
   const cycleSheetHeight = useCallback(() => {
-    const { min, mid, max } = snapPoints()
+    const points = snapPoints()
     const current = sheetHeight.get()
-    const next = current < (min + mid) / 2 ? mid : current < (mid + max) / 2 ? max : min
-    animate(sheetHeight, next, reducedMotion ? { duration: 0 } : { duration: .22, ease: [0.22, 1, 0.36, 1] })
-  }, [reducedMotion, sheetHeight, snapPoints])
+    const next: SnapLevel = current < (points.min + points.mid) / 2
+      ? 'mid'
+      : current < (points.mid + points.max) / 2 ? 'max' : 'min'
+    settleTo(points[next], next)
+  }, [settleTo, sheetHeight, snapPoints])
+
+  // Keyboard activation and taps share the cycle; a pointer drag must not fire it again.
+  const handleHandleClick = useCallback(() => {
+    if (dragMoved.current) {
+      dragMoved.current = false
+      return
+    }
+    cycleSheetHeight()
+  }, [cycleSheetHeight])
 
   // One debounced Directions request per actual route change. Keying on the
   // coordinate signature means renames, nights, and failed-reorder reverts to a
@@ -203,7 +240,18 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
       requests.cancel(controller)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [routeKey])
+  }, [routeKey, routeRetryToken])
+
+  useEffect(() => {
+    setIsOnline(navigator.onLine)
+    const update = () => setIsOnline(navigator.onLine)
+    window.addEventListener('online', update)
+    window.addEventListener('offline', update)
+    return () => {
+      window.removeEventListener('online', update)
+      window.removeEventListener('offline', update)
+    }
+  }, [])
 
   // Just-added stop: its marker drops in on the map and its list card glows
   // briefly; cleared after the highlight has had time to register.
@@ -460,8 +508,8 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
     const point = timelineMapPoints.find((candidate) => candidate.id === id)
     if (point) setSelectedDayId(point.dayId)
     const { mid } = snapPoints()
-    if (sheetHeight.get() < mid - 8) animate(sheetHeight, mid, reducedMotion ? { duration: 0 } : { duration: .22, ease: [0.22, 1, 0.36, 1] })
-  }, [reducedMotion, sheetHeight, snapPoints, timelineMapPoints])
+    if (sheetHeight.get() < mid - 8) settleTo(mid, 'mid')
+  }, [settleTo, sheetHeight, snapPoints, timelineMapPoints])
 
   return (
     <div
@@ -527,14 +575,24 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
           }}
           transition={isDragging ? { duration: 0 } : { type: 'spring', stiffness: 320, damping: 34 }}
         >
-          <div
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={handlePointerUp}
-            onPointerCancel={handlePointerUp}
-            style={{ display: 'flex', justifyContent: 'center', padding: '14px 0 12px', cursor: isDragging ? 'grabbing' : 'grab', touchAction: 'none', userSelect: 'none', flex: 'none' }}
-          >
-            <div style={{ width: 36, height: 5, borderRadius: 3, background: 'rgba(255,255,255,.22)' }} />
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '2px 0 4px', flex: 'none' }}>
+            <button
+              type="button"
+              aria-label={snapLevel === 'max' ? 'Collapse plan' : 'Expand plan'}
+              aria-expanded={snapLevel !== 'min'}
+              onPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerUp}
+              onPointerCancel={handlePointerUp}
+              onClick={handleHandleClick}
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                width: 72, minHeight: 44, padding: 0, border: 'none', background: 'transparent',
+                cursor: isDragging ? 'grabbing' : 'grab', touchAction: 'none', userSelect: 'none',
+              }}
+            >
+              <span aria-hidden="true" style={{ width: 36, height: 5, borderRadius: 3, background: 'rgba(255,255,255,.22)' }} />
+            </button>
           </div>
 
           {/* pinned route summary — stays visible above Route/Days/Bookings so the
@@ -549,7 +607,20 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
                 routeLoading ? (
                   <>
                     <span aria-hidden="true" style={{ width: 3, height: 3, borderRadius: '50%', background: DUSK.textMuted }} />
+                    <span>Calculating route…</span>
                     <span aria-hidden="true" style={{ width: 96, height: 9, borderRadius: 999, background: 'rgba(255,255,255,.12)', animation: 'pulseglow 1.6s ease-in-out infinite' }} />
+                  </>
+                ) : routeStatus === 'unavailable' ? (
+                  <>
+                    <span aria-hidden="true" style={{ width: 3, height: 3, borderRadius: '50%', background: DUSK.textMuted }} />
+                    <span>Route unavailable</span>
+                    <button
+                      type="button"
+                      onClick={() => setRouteRetryToken((token) => token + 1)}
+                      style={{ minHeight: 32, padding: '4px 12px', borderRadius: 999, background: 'rgba(255,255,255,.07)', border: '1px solid rgba(255,255,255,.15)', color: DUSK.textPrimary, fontFamily: 'inherit', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
+                    >
+                      Retry
+                    </button>
                   </>
                 ) : (
                   <>
@@ -582,7 +653,7 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
           </div>
 
           {/* content */}
-          <div style={{ flex: 1, minHeight: 0, padding: '4px 20px calc(86px + env(safe-area-inset-bottom, 0px))', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, overflowY: 'auto' }}>
+          <div style={{ flex: 1, minHeight: 0, padding: '4px 20px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, overflowY: 'auto' }}>
 
             {activeTab === 'route' && (
               <>
@@ -604,7 +675,8 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
                         <div style={{ fontSize: 12, color: DUSK.textSecondary, fontWeight: 500, marginTop: 2 }}>Nights Planned</div>
                       </div>
                     </div>
-                    {canEdit && <button
+                    {canEdit && isOnline && stops.length >= 2 && <button
+                      type="button"
                       onClick={handleOptimize}
                       disabled={optimizing}
                       style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,.07)', border: '1px solid rgba(255,255,255,.15)', borderRadius: 999, padding: '10px 14px', flex: 'none', cursor: optimizing ? 'default' : 'pointer', fontFamily: 'inherit', opacity: optimizing ? 0.6 : 1 }}
@@ -622,13 +694,8 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
                     </div>
                     <div style={{ color: DUSK.textPrimary, fontWeight: 600, fontSize: 16, textAlign: 'center' }}>{canEdit ? 'Add your first destination' : 'No destinations yet'}</div>
                     <div style={{ color: DUSK.textMuted, fontWeight: 400, fontSize: 13, textAlign: 'center' }}>{canEdit ? 'Search any city or place to start your route' : 'An editor can add the first stop to this shared route.'}</div>
-                    {canEdit && <button
-                      onClick={() => { setAddInitialQuery(''); setIsAddOpen(true) }}
-                      style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 7, padding: '12px 22px', borderRadius: 13, background: `linear-gradient(145deg, ${ACCENT_LIGHT}, ${ACCENT_DARK})`, border: 'none', color: DUSK.onAmber, fontWeight: 800, fontSize: 13.5, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 0 22px rgba(245,140,0,.3)' }}
-                    >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
-                      Add your first stop
-                    </button>}
+                    {/* No amber CTA here — the sticky "Add destination" action below
+                        is this tab's single primary action. */}
                     {canEdit && emptyStateSuggestions.length > 0 && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', justifyContent: 'center', marginTop: 6 }}>
                         <span style={{ fontSize: 11.5, color: DUSK.textMuted, fontWeight: 600 }}>Try:</span>
@@ -825,6 +892,28 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
               />
             )}
           </div>
+
+          {/* Sticky primary action — one per tab, outside the scroll container so it
+              never disappears under the list, and padded clear of the bottom nav. */}
+          {canEdit && (
+            <div style={{ flex: 'none', padding: '0 20px calc(90px + env(safe-area-inset-bottom, 0px))' }}>
+              <button
+                type="button"
+                onClick={() => {
+                  if (activeTab === 'route') {
+                    setAddInitialQuery('')
+                    setIsAddOpen(true)
+                  } else {
+                    setItineraryCreateRequest({ type: 'activity', nonce: Date.now() })
+                  }
+                }}
+                style={{ width: '100%', minHeight: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, padding: '12px 22px', borderRadius: 14, background: `linear-gradient(145deg, ${ACCENT_LIGHT}, ${ACCENT_DARK})`, border: 'none', color: DUSK.onAmber, fontWeight: 800, fontSize: 14, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 0 22px rgba(245,140,0,.3)' }}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
+                {activeTab === 'route' ? 'Add destination' : 'Add activity'}
+              </button>
+            </div>
+          )}
         </motion.div>
 
         {/* Keep the primary navigation independent from the draggable sheet.
@@ -834,27 +923,6 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
         </div>
         </>
       </div>
-
-      {/* FAB */}
-      {canEdit && <button
-          onClick={() => setIsAddSheetOpen(true)}
-          title="Add to trip"
-          aria-label="Add to trip"
-          style={{ position: 'fixed', right: 18, bottom: 96, width: 56, height: 56, borderRadius: '50%', background: `linear-gradient(145deg, ${ACCENT_LIGHT}, ${ACCENT_DARK})`, boxShadow: '0 0 32px rgba(245,140,0,.45), 0 8px 20px rgba(0,0,0,.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 5, border: 'none', cursor: 'pointer' }}
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={DUSK.textPrimary} strokeWidth="2.6" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
-        </button>}
-
-      {canEdit && <TripAddSheet
-        open={isAddSheetOpen}
-        onClose={() => setIsAddSheetOpen(false)}
-        onAddPlace={() => { setAddInitialQuery(''); setIsAddOpen(true) }}
-        onAddItem={(type: ItineraryItemType) => {
-          // The item form lives on the Days timeline; land there before opening it.
-          setActiveTab('days')
-          setItineraryCreateRequest({ type, nonce: Date.now() })
-        }}
-      />}
 
       {canEdit && isAddOpen && (
         <DestinationDialog
