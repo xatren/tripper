@@ -85,7 +85,7 @@ const cardStyle: CSSProperties = {
 
 function SectionLabel({ children }: { children: ReactNode }) {
   return (
-    <div style={{ fontSize: 11.5, fontWeight: 700, color: tokens.textMuted, textTransform: 'uppercase', letterSpacing: '.06em' }}>
+    <div style={{ fontSize: 12, fontWeight: 700, color: tokens.textMuted, textTransform: 'uppercase', letterSpacing: '.06em' }}>
       {children}
     </div>
   )
@@ -95,8 +95,8 @@ function StatTile({ label, value, hint }: { label: string; value: ReactNode; hin
   return (
     <div style={{ padding: '12px 10px', borderRadius: 14, background: 'rgba(255,255,255,.04)', border: `1px solid ${tokens.glassSubtleBorder}`, textAlign: 'center', minWidth: 0 }}>
       <div style={{ fontSize: 17, fontWeight: 800, color: tokens.textPrimary, letterSpacing: '-0.02em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{value}</div>
-      <div style={{ fontSize: 10, fontWeight: 700, color: tokens.textMuted, letterSpacing: '.05em', textTransform: 'uppercase', marginTop: 3 }}>{label}</div>
-      {hint && <div style={{ fontSize: 11, fontWeight: 500, color: tokens.textMuted, marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{hint}</div>}
+      <div style={{ fontSize: 12, fontWeight: 700, color: tokens.textMuted, letterSpacing: '.04em', textTransform: 'uppercase', marginTop: 3 }}>{label}</div>
+      {hint && <div style={{ fontSize: 12, fontWeight: 500, color: tokens.textMuted, marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{hint}</div>}
     </div>
   )
 }
@@ -160,7 +160,7 @@ function OverviewRow({ icon, title, hint, tone = 'neutral', onSelect, trailing }
       </span>
       <span style={{ flex: 1, minWidth: 0 }}>
         <span style={{ display: 'block', color: tokens.textPrimary, fontWeight: 700, fontSize: 13.5 }}>{title}</span>
-        {hint && <span style={{ display: 'block', color: tokens.textMuted, fontSize: 11.5, marginTop: 1 }}>{hint}</span>}
+        {hint && <span style={{ display: 'block', color: tokens.textMuted, fontSize: 12, marginTop: 1 }}>{hint}</span>}
       </span>
       {trailing}
       {onSelect && (
@@ -668,7 +668,7 @@ function ActiveContent({ dayNumber, totalDays, todayISO, currentStop, nextStop, 
     <section aria-label="Today" className="glass-standard" style={{ borderRadius: 20, padding: 16 }}>
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 }}>
         <SectionLabel>{totalDays > 0 ? `Day ${dayNumber} of ${totalDays}` : `Day ${dayNumber}`}</SectionLabel>
-        {todayISO && <span style={{ fontSize: 11.5, fontWeight: 600, color: tokens.textMuted }}>{formatHeaderDate(todayISO)}</span>}
+        {todayISO && <span style={{ fontSize: 12, fontWeight: 600, color: tokens.textMuted }}>{formatHeaderDate(todayISO)}</span>}
       </div>
 
       {currentStop && (
@@ -752,7 +752,7 @@ function CompletedContent({ dateRange, journalReady, journalEntries, journalPhot
         <div style={{ marginTop: 14 }}>
           <PrimaryButton onClick={onOpenJournal}>Open recap &amp; journal</PrimaryButton>
         </div>
-        <div style={{ fontSize: 11.5, color: tokens.textMuted, marginTop: 10, lineHeight: 1.5 }}>
+        <div style={{ fontSize: 12, color: tokens.textMuted, marginTop: 10, lineHeight: 1.5 }}>
           Your recap, journal and photos stay private to trip members until you choose to share them.
         </div>
       </section>

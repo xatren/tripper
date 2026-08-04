@@ -40,9 +40,11 @@ const ITEMS: { key: Section; label: string; icon: (color: string) => ReactNode }
 /** Trip workspace's primary nav bar — Plan / Explore / Bookings / More. */
 export function TripPrimaryNav({ active, onSelect, onOpenMore, onPrefetch }: TripPrimaryNavProps) {
   return (
+    // Tighter gap and side padding than the other bars: five 12px labels have to
+    // fit a 320px viewport without shrinking the type back below the legible floor.
     <nav
       aria-label="Trip sections"
-      style={{ display: 'flex', gap: 4, borderTop: `1px solid ${tokens.glassStandardBorder}`, background: tokens.glassSubtleFill, backdropFilter: 'blur(var(--glass-standard-blur))', WebkitBackdropFilter: 'blur(var(--glass-standard-blur))', padding: '10px 10px 12px', paddingBottom: 'max(12px, env(safe-area-inset-bottom))', flex: 'none' }}
+      style={{ display: 'flex', gap: 3, borderTop: `1px solid ${tokens.glassStandardBorder}`, background: tokens.glassSubtleFill, backdropFilter: 'blur(var(--glass-standard-blur))', WebkitBackdropFilter: 'blur(var(--glass-standard-blur))', padding: '10px 8px 12px', paddingBottom: 'max(12px, env(safe-area-inset-bottom))', flex: 'none' }}
     >
       {ITEMS.map((item) => {
         const isActive = item.key === active
@@ -63,13 +65,13 @@ export function TripPrimaryNav({ active, onSelect, onOpenMore, onPrefetch }: Tri
             onFocus={handlePrefetch}
             aria-current={isActive ? 'page' : undefined}
             style={{
-              flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4,
+              flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4,
               minHeight: 48, padding: '7px 0 6px', borderRadius: 14, border: 'none', cursor: 'pointer', fontFamily: 'inherit',
               background: isActive ? 'rgba(245,166,35,.12)' : 'transparent',
             }}
           >
             {item.icon(color)}
-            <span style={{ color, fontWeight: 600, fontSize: 11 }}>{item.label}</span>
+            <span style={{ color, fontWeight: 600, fontSize: 12, whiteSpace: 'nowrap' }}>{item.label}</span>
           </button>
         )
       })}

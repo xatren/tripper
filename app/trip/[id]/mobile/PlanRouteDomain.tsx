@@ -632,7 +632,7 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
                 )
               )}
               {savingOrder && (
-                <span style={{ display: 'flex', alignItems: 'center', gap: 5, marginLeft: 4, padding: '3px 10px', borderRadius: 999, background: 'rgba(245,166,35,.14)', border: '1px solid rgba(245,166,35,.35)', color: ACCENT_LIGHT, fontSize: 11 }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 5, marginLeft: 4, padding: '3px 10px', borderRadius: 999, background: 'rgba(245,166,35,.14)', border: '1px solid rgba(245,166,35,.35)', color: ACCENT_LIGHT, fontSize: 12 }}>
                   <span aria-hidden="true" style={{ width: 6, height: 6, borderRadius: '50%', background: ACCENT_LIGHT, animation: 'pulseglow 1s ease-in-out infinite' }} />
                   Saving route…
                 </span>
@@ -698,7 +698,7 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
                         is this tab's single primary action. */}
                     {canEdit && emptyStateSuggestions.length > 0 && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', justifyContent: 'center', marginTop: 6 }}>
-                        <span style={{ fontSize: 11.5, color: DUSK.textMuted, fontWeight: 600 }}>Try:</span>
+                        <span style={{ fontSize: 12, color: DUSK.textMuted, fontWeight: 600 }}>Try:</span>
                         {emptyStateSuggestions.map((q) => (
                           <button
                             key={q}
@@ -776,7 +776,7 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
                               <div style={{ color: DUSK.textPrimary, fontWeight: 600, fontSize: 14, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{stop.name}</div>
                             )}
                             {stop.address && (
-                              <div style={{ color: DUSK.textMuted, fontSize: 11.5, marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{stop.address}</div>
+                              <div style={{ color: DUSK.textMuted, fontSize: 12, marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{stop.address}</div>
                             )}
                           </div>
                           {canEdit ? <div style={{ display: 'flex', alignItems: 'center', gap: 2, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 999, padding: 4, flex: 'none' }}>

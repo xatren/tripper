@@ -234,7 +234,7 @@ export function PrepDomain({ tripId, vibe, userId, canEdit, members }: PrepDomai
       .single()
     if (error || !data) {
       showToast(
-        isMissingSchemaError(error) ? 'Run migration 20260717040000 to edit item details.' : "Couldn't save the item.",
+        isMissingSchemaError(error) ? "Editing item details isn't available for this trip yet." : "Couldn't save the item.",
         'error',
       )
       return false
@@ -272,7 +272,7 @@ export function PrepDomain({ tripId, vibe, userId, canEdit, members }: PrepDomai
         setItems((prev) => prev.map((item) => (previousOrder.has(item.id) ? { ...item, order_index: previousOrder.get(item.id) } : item)))
         showToast(
           results.some((result) => isMissingSchemaError(result.error))
-            ? 'Run migration 20260717040000 to reorder items.'
+            ? "Reordering isn't available for this trip yet."
             : "Couldn't save the new order.",
           'error',
         )
@@ -348,7 +348,7 @@ export function PrepDomain({ tripId, vibe, userId, canEdit, members }: PrepDomai
       setTasks((prev) => (prev.some((task) => task.id === row.id) ? prev.map((task) => (task.id === row.id ? row : task)) : [...prev, row]))
     } else {
       showToast(
-        isMissingSchemaError(error) ? 'Run migration 20260717040000 to use prep tasks.' : "Couldn't add the task.",
+        isMissingSchemaError(error) ? "Prep tasks aren't available for this trip yet." : "Couldn't add the task.",
         'error',
       )
     }
@@ -457,7 +457,7 @@ export function PrepDomain({ tripId, vibe, userId, canEdit, members }: PrepDomai
                 key={key}
                 style={{
                   display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 10px',
-                  borderRadius: 999, fontSize: 11, fontWeight: 700,
+                  borderRadius: 999, fontSize: 12, fontWeight: 700,
                   background: section ? 'rgba(245,166,35,.1)' : 'rgba(255,255,255,.04)',
                   border: `1px solid ${section ? 'rgba(245,166,35,.3)' : 'rgba(255,255,255,.09)'}`,
                   color: section ? tokens.textSecondary : tokens.textMuted,
@@ -547,7 +547,7 @@ export function PrepDomain({ tripId, vibe, userId, canEdit, members }: PrepDomai
         <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: '-0.01em' }}>Before you go</div>
         {tasksUnavailable ? (
           <div style={{ background: tokens.surfaceSolid, border: `1px solid ${tokens.glassSubtleBorder}`, borderRadius: 20, padding: 16, fontSize: 12.5, color: tokens.textMuted, fontWeight: 500, lineHeight: 1.5 }}>
-            Prep tasks need migration <code style={{ fontSize: 11.5 }}>20260717040000_trip_readiness</code>. Run it in the Supabase SQL Editor to unlock reservations, documents, payments, and vehicle checklists.
+            Prep tasks aren&apos;t available for this trip yet. Reservations, documents, payments, and vehicle checklists will show up here once they are.
           </div>
         ) : (
           <TaskSection

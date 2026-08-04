@@ -708,7 +708,7 @@ export function JournalDomain({
           {entriesError && (
             <RetryCard
               title="Couldn't load the journal"
-              hint="Check your connection — or run migration 011 if you haven't yet."
+              hint="Check your connection and try again."
               onRetry={() => setReloadToken((t) => t + 1)}
             />
           )}

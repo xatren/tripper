@@ -492,7 +492,7 @@ export function ItineraryTimeline({
     <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 16 }}>
       {!itineraryEnabled && (
         <InlineError>
-          Itinerary editing needs migration 20260716120000_itinerary_items — showing the route plan read-only.
+          Itinerary editing isn&apos;t available for this trip yet — showing the route plan read-only.
         </InlineError>
       )}
 
