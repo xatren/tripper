@@ -13,6 +13,7 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { getOptimizedOrder } from '@/lib/mapbox/optimize'
 import { useDistanceUnit, formatDistanceValue } from '@/lib/settings'
 import { DestinationDialog } from './DestinationDialog'
+import { LostWithMapArt } from './empty-state-art'
 import { ACCENT, ACCENT_DARK, ACCENT_LIGHT, GLASS_BORDER, GLASS_FILL } from './domain-ui'
 import { DUSK } from '@/components/design/tokens'
 import { totalNights } from './trip-domain-utils'
@@ -705,9 +706,7 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
 
                 {stops.length === 0 ? (
                   <div style={{ width: '100%', flex: 1, minHeight: 200, border: '1.5px dashed rgba(255,255,255,.15)', borderRadius: 16, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, padding: 18 }}>
-                    <div style={{ width: 46, height: 46, borderRadius: '50%', background: 'rgba(136,136,228,.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 2 }}>
-                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(136,136,228,.85)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M9 20l-5.5-2V4l5.5 2 6-2 5.5 2v14l-5.5-2-6 2z" /><path d="M9 6v14M15 4v14" /></svg>
-                    </div>
+                    <LostWithMapArt />
                     <div style={{ color: DUSK.textPrimary, fontWeight: 600, fontSize: 16, textAlign: 'center' }}>{canEdit ? 'Add your first destination' : 'No destinations yet'}</div>
                     <div style={{ color: DUSK.textMuted, fontWeight: 400, fontSize: 13, textAlign: 'center' }}>{canEdit ? 'Search any city or place to start your route' : 'An editor can add the first stop to this shared route.'}</div>
                     {/* No amber CTA here — the sticky "Add destination" action below

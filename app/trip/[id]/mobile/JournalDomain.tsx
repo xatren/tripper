@@ -12,6 +12,7 @@ import { showToast } from '@/components/ui/toast'
 import { convertKm, useDistanceUnit } from '@/lib/settings'
 import { createRandomId } from '@/lib/random-id'
 import { ACCENT_GRADIENT, ACCENT_LIGHT, GLASS_BORDER, GLASS_FILL, RetryCard } from './domain-ui'
+import { FirstNoteArt } from './empty-state-art'
 import { DUSK } from '@/components/design/tokens'
 import { formatDateRange, totalNights, tripTitle } from './trip-domain-utils'
 import { allowlistedRecapPayload, buildRecapStats, type RecapShareField } from '@/lib/travel-mode'
@@ -713,7 +714,10 @@ export function JournalDomain({
             />
           )}
           {entries?.length === 0 && !entriesError && (
-            <span style={{ color: DUSK.textMuted, fontSize: 12.5, textAlign: 'center', padding: '12px 0' }}>{canEdit ? 'No entries yet — write your first note above ✍️' : 'No journal entries yet. An editor can add the first memory.'}</span>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '12px 0' }}>
+              <FirstNoteArt />
+              <span style={{ color: DUSK.textMuted, fontSize: 12.5, textAlign: 'center' }}>{canEdit ? 'No entries yet — write your first note above ✍️' : 'No journal entries yet. An editor can add the first memory.'}</span>
+            </div>
           )}
           {entries?.map((entry) => (
             <div key={entry.id} style={{ borderRadius: 16, background: 'rgba(255,255,255,.035)', border: '1px solid rgba(255,255,255,.08)', padding: '12px 14px' }}>

@@ -8,6 +8,7 @@ import { useTripRealtimeTable } from '@/lib/supabase/trip-realtime'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { showToast } from '@/components/ui/toast'
 import { RetryCard } from '../domain-ui'
+import { TicketsArt } from '../empty-state-art'
 import { DUSK } from '@/components/design/tokens'
 import { DOCUMENTS_BUCKET, filterReservations, splitReservations } from '../bookings/bookings-logic'
 import { RESERVATION_TYPE_META } from '../bookings/bookings-ui'
@@ -233,17 +234,16 @@ export function BookingsDomain({ trip, stops, items, setItems, itineraryEnabled,
           )}
 
           {reservations !== null && !loadError && reservations.length === 0 && (
-            <EmptyState
-              icon={
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="7" width="18" height="12" rx="2" /><path d="M3 11h18M16 7V5a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v2" />
-                </svg>
-              }
-              title="No bookings yet"
-              description={canEdit
-                ? 'Add your flights, stays, and tickets so every confirmation lives in one place.'
-                : 'Reservations added by trip editors will appear here.'}
-            />
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 28 }}>
+              <TicketsArt />
+              <EmptyState
+                title="No bookings yet"
+                description={canEdit
+                  ? 'Add your flights, stays, and tickets so every confirmation lives in one place.'
+                  : 'Reservations added by trip editors will appear here.'}
+                style={{ minHeight: 0, padding: '10px 16px 24px' }}
+              />
+            </div>
           )}
 
           {reservations !== null && !loadError && reservations.length > 0 && filtered.length === 0 && (
