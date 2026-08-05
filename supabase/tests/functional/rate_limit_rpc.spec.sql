@@ -46,6 +46,10 @@ begin
     end if;
   end loop;
 end $$;
+-- Audit-log assertions read rate_limit_events directly, which `authenticated`
+-- is deliberately denied (section 7) — so drop back to the owning login role
+-- before every such check, then re-impersonate for the next RPC call.
+select tests.clear_authentication();
 do $$ begin
   if (
     select count(*) from public.rate_limit_events
@@ -57,6 +61,7 @@ end $$;
 
 -- 4. Over the limit (enforced scope): the 4th call is rejected and logged as
 --    'blocked', with a positive retry_after_seconds.
+select tests.authenticate_as('outsider');
 do $$
 declare
   v_result jsonb;
@@ -69,6 +74,7 @@ begin
     raise exception 'a rejected call must report a positive retry_after_seconds, got %', v_result;
   end if;
 end $$;
+select tests.clear_authentication();
 do $$ begin
   if not exists (
     select 1 from public.rate_limit_events
@@ -82,6 +88,7 @@ end $$;
 --    still returns allowed=true (the caller is never actually blocked) but
 --    records outcome='shadow_blocked' — this is what makes shadow mode
 --    measurable without affecting real traffic.
+select tests.authenticate_as('outsider');
 do $$
 declare
   i int;
@@ -99,6 +106,7 @@ begin
     raise exception 'a shadow-mode scope over its limit must report shadow_blocked=true, got %', v_result;
   end if;
 end $$;
+select tests.clear_authentication();
 do $$ begin
   if not exists (
     select 1 from public.rate_limit_events
@@ -110,6 +118,7 @@ end $$;
 
 -- 6. A different identity_key under the same scope has its own independent
 --    counter (no cross-identity bleed).
+select tests.authenticate_as('outsider');
 do $$
 declare
   v_result jsonb;
