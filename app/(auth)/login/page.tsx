@@ -6,7 +6,8 @@ import { useRouter } from 'next/navigation'
 import { Eye, EyeOff } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { getSafeRedirectPath } from '@/lib/safe-redirect'
-import { isValidLoginIdentifier, loginIdentifierToEmail } from '@/lib/auth/username'
+import { isValidLoginIdentifier, loginIdentifierToEmail, usernameToEmail } from '@/lib/auth/username'
+import { GUEST_LOGIN_ENABLED } from '@/lib/auth/guest'
 import { DuskAuthShell } from '@/components/auth/DuskAuthShell'
 import { GoogleGlyph, Press } from '@/components/onboarding/dusk/JourneyChrome'
 import { DUSK, FONT_INTER, pillGhost, pillPrimary } from '@/components/onboarding/dusk/tokens'
@@ -20,6 +21,7 @@ export default function LoginPage() {
   const [showPass, setShowPass]           = useState(false)
   const [loading, setLoading]             = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
+  const [guestLoading, setGuestLoading]   = useState(false)
   const [error, setError]                 = useState<string | null>(null)
   const router = useRouter()
   const supabase = createClient()
@@ -39,6 +41,30 @@ export default function LoginPage() {
     else {
       const rawNext = new URLSearchParams(window.location.search).get('next')
       router.push(getSafeRedirectPath(rawNext, window.location.origin))
+    }
+  }
+
+  /** Testing shortcut: mint a throwaway account and sign straight into it. */
+  async function handleGuest() {
+    setGuestLoading(true); setError(null)
+    try {
+      const response = await fetch('/api/auth/guest', { method: 'POST' })
+      const result = await response.json() as { username?: string; password?: string; error?: string }
+      if (!response.ok || !result.username || !result.password) {
+        setError(result.error ?? 'Could not start a guest session')
+        setGuestLoading(false)
+        return
+      }
+      const { error } = await supabase.auth.signInWithPassword({
+        email: usernameToEmail(result.username),
+        password: result.password,
+      })
+      if (error) { setError(error.message); setGuestLoading(false); return }
+      const rawNext = new URLSearchParams(window.location.search).get('next')
+      router.push(getSafeRedirectPath(rawNext, window.location.origin))
+    } catch {
+      setError('Could not start a guest session')
+      setGuestLoading(false)
     }
   }
 
@@ -135,6 +161,15 @@ export default function LoginPage() {
           {googleLoading ? 'Signing in…' : 'Continue with Google'}
         </button>
       </Press>
+
+      {GUEST_LOGIN_ENABLED && (
+        <Press>
+          <button type="button" onClick={handleGuest} disabled={guestLoading}
+            style={{ ...pillGhost, opacity: guestLoading ? 0.6 : 1 }}>
+            {guestLoading ? 'Starting guest session…' : 'Continue as guest (test)'}
+          </button>
+        </Press>
+      )}
 
       <p style={{ ...FONT_INTER, textAlign: 'center', color: DUSK.textSecondary, fontSize: 14, margin: 0 }}>
         New here?{' '}
