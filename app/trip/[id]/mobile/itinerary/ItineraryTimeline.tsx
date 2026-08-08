@@ -15,7 +15,7 @@ import {
   type TimelineDay, type TimelineEntry,
 } from '../itinerary-projection'
 import { formatDayChip, tripTitle } from '../trip-domain-utils'
-import { localDateISO } from '../trip-lifecycle'
+import { localDateISO, tripLifecycle } from '../trip-lifecycle'
 import { ItineraryDaySection } from './ItineraryDaySection'
 import { UnscheduledDrawer } from './UnscheduledDrawer'
 import { ItineraryItemSheet, type DayOption, type ItineraryItemDraft } from './ItineraryItemSheet'
@@ -25,6 +25,8 @@ import { planDayOptimization, type DayItem, type DayOptimizationPreview } from '
 import { DayOptimizePreviewSheet } from './DayOptimizePreviewSheet'
 import { canTransitionStatus } from '@/lib/travel-mode'
 import { DUSK } from '@/components/design/tokens'
+import { DailyItineraryView } from './DailyItineraryView'
+import { dailyDayId, overnightBaseByDay, resolveInitialDailyDayId, shouldShowCurrentTime } from './daily-itinerary'
 
 export interface ItineraryCreateRequest {
   type: ItineraryItemType
@@ -49,7 +51,11 @@ export interface ItineraryTimelineProps {
   selectedDayId?: string | null
   onSelectedDayIdChange?: (id: string | null) => void
   selectedItemId?: string | null
-  onSelectItem?: (id: string) => void
+  onSelectItem?: (id: string | null) => void
+  variant?: 'plan' | 'daily'
+  requestedDayId?: string | null
+  onBackToOverview?: () => void
+  onOpenMap?: () => void
 }
 
 const deviceZone = () => {
@@ -103,7 +109,8 @@ export function ItineraryTimeline({
   trip, stops, items, setItems, onItemSyncPaused,
   canEdit, currentUserId, members, itineraryEnabled, createRequest,
   selectedDayId: controlledSelectedDayId, onSelectedDayIdChange,
-  selectedItemId, onSelectItem,
+  selectedItemId, onSelectItem, variant = 'plan', requestedDayId,
+  onBackToOverview, onOpenMap,
 }: ItineraryTimelineProps) {
   const timeline = useMemo(
     () => buildTimeline({
@@ -115,8 +122,13 @@ export function ItineraryTimeline({
     [trip.start_date, trip.end_date, stops, items],
   )
 
-  const dayId = (day: TimelineDay) => day.date ?? `n${day.dayNumber ?? 0}`
+  const timelineDays = useMemo<TimelineDay[]>(() => (
+    variant === 'daily' && timeline.days.length === 0
+      ? [{ date: trip.start_date ?? null, dayNumber: 1, entries: [] }]
+      : timeline.days
+  ), [timeline.days, trip.start_date, variant])
   const today = localDateISO()
+  const lifecycle = tripLifecycle(trip, today)
 
   const [internalSelectedDayId, setInternalSelectedDayId] = useState<string | null>(null)
   const selectedDayId = controlledSelectedDayId === undefined ? internalSelectedDayId : controlledSelectedDayId
@@ -125,35 +137,45 @@ export function ItineraryTimeline({
     onSelectedDayIdChange?.(id)
   }, [controlledSelectedDayId, onSelectedDayIdChange])
   useEffect(() => {
-    if (timeline.days.length === 0) {
+    if (timelineDays.length === 0) {
       setSelectedDayId(null)
       return
     }
-    if (selectedDayId && timeline.days.some((day) => dayId(day) === selectedDayId)) return
-    const todayCell = timeline.days.find((day) => day.date === today)
-    setSelectedDayId(dayId(todayCell ?? timeline.days[0]))
-  }, [selectedDayId, setSelectedDayId, timeline.days, today])
+    if (selectedDayId && timelineDays.some((day) => dailyDayId(day) === selectedDayId)) return
+    setSelectedDayId(resolveInitialDailyDayId(timelineDays, { requestedDay: requestedDayId, today, lifecycle }))
+  }, [lifecycle, requestedDayId, selectedDayId, setSelectedDayId, timelineDays, today])
 
-  const selectedDay = timeline.days.find((day) => dayId(day) === selectedDayId) ?? null
+  const selectedDay = timelineDays.find((day) => dailyDayId(day) === selectedDayId) ?? null
 
-  // Stop names give the day strip its sublabels ("Day 3 · Florence").
-  const stopNameByDate = useMemo(() => {
+  useEffect(() => {
+    if (!selectedItemId || !selectedDay || selectedDay.entries.some((entry) => entry.key === selectedItemId)) return
+    onSelectItem?.(null)
+  }, [onSelectItem, selectedDay, selectedItemId])
+
+  // Where the traveler sleeps on each trip day. A multi-night stay names every
+  // one of its nights, so night 3 of 4 in Florence still reads "Florence" even
+  // though the stop projection itself only lands on the arrival day.
+  const overnightBase = useMemo(() => {
     const schedule = projectStopSchedule(trip.start_date ?? null, stops)
-    const map = new Map<string, string>()
-    schedule.forEach((slot, index) => {
-      if (slot.arrival) map.set(slot.arrival, stops[index].name)
-    })
-    return map
+    return overnightBaseByDay(schedule.map((slot, index) => ({
+      dayStart: slot.dayStart,
+      nights: slot.nights,
+      name: stops[index].name,
+    })))
   }, [trip.start_date, stops])
 
-  const stripDays: DayStripDay[] = timeline.days.map((day) => ({
-    id: dayId(day),
+  const stripDays: DayStripDay[] = timelineDays.map((day) => ({
+    id: dailyDayId(day),
     label: day.dayNumber != null ? `Day ${day.dayNumber}` : (day.date ? formatDayChip(day.date).split(',')[0] : 'Day'),
-    sublabel: day.date ? formatDayChip(day.date).replace(/^[^,]*,\s*/, '') : stopNameByDate.get(day.date ?? ''),
+    // A dated chip shows its date; an undated one has only a day number, so it
+    // borrows the base's name to say something ("Day 3 · Florence").
+    sublabel: day.date
+      ? formatDayChip(day.date).replace(/^[^,]*,\s*/, '')
+      : (day.dayNumber != null ? overnightBase.get(day.dayNumber) : undefined),
     isToday: day.date === today,
   }))
 
-  const dayOptions: DayOption[] = timeline.days
+  const dayOptions: DayOption[] = timelineDays
     .filter((day) => day.date !== null)
     .map((day) => ({
       value: day.date as string,
@@ -167,6 +189,13 @@ export function ItineraryTimeline({
   const [saving, setSaving] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<TimelineEntry | null>(null)
   const [moveTarget, setMoveTarget] = useState<TimelineEntry | null>(null)
+  const [currentTime, setCurrentTime] = useState<Date | null>(null)
+  useEffect(() => {
+    if (variant !== 'daily') return
+    setCurrentTime(new Date())
+    const timer = window.setInterval(() => setCurrentTime(new Date()), 60_000)
+    return () => window.clearInterval(timer)
+  }, [variant])
 
   // ── Day route optimization (preview, never moves items without Apply) ──
   const [optimizingDayId, setOptimizingDayId] = useState<string | null>(null)
@@ -392,7 +421,7 @@ export function ItineraryTimeline({
    */
   const handleOptimizeDay = useCallback(async (day: TimelineDay) => {
     if (!canEdit || !itineraryEnabled) return
-    const id = dayId(day)
+    const id = dailyDayId(day)
     if (optimizingDayId) return
 
     const dayItemEntries = day.entries.filter((entry) => entry.source === 'item')
@@ -480,7 +509,7 @@ export function ItineraryTimeline({
     showToast('Calendar file downloaded.', 'success')
   }
 
-  if (timeline.days.length === 0 && timeline.unscheduled.length === 0) {
+  if (variant === 'plan' && timeline.days.length === 0 && timeline.unscheduled.length === 0) {
     return (
       <div style={{ width: '100%', padding: '32px 0', textAlign: 'center', color: tokens.textMuted, fontSize: 13 }}>
         Add a destination or trip dates to start planning days.
@@ -488,21 +517,83 @@ export function ItineraryTimeline({
     )
   }
 
+  const editable = canEdit && itineraryEnabled
+  const openSelectedDayDraft = selectedDay
+    ? () => setSheetDraft(emptyDraft('activity', selectedDay.date ?? '', (trip.currency ?? 'USD') as TripCurrency))
+    : () => setSheetDraft(emptyDraft('activity', '', (trip.currency ?? 'USD') as TripCurrency))
+  const selectedDaySection = selectedDay ? (
+    <ItineraryDaySection
+      day={selectedDay}
+      canEdit={editable}
+      onEdit={(entry) => {
+        const item = items.find((candidate) => candidate.id === entry.id)
+        if (item) setSheetDraft(draftFromItem(item))
+      }}
+      onToggleComplete={(entry) => void toggleComplete(entry)}
+      onMove={setMoveTarget}
+      onDelete={setDeleteTarget}
+      onReorder={reorderDay}
+      onAddToDay={editable ? openSelectedDayDraft : undefined}
+      onSyncPaused={onItemSyncPaused}
+      selectedItemId={selectedItemId}
+      onSelectItem={(id) => onSelectItem?.(id)}
+      onOptimize={() => void handleOptimizeDay(selectedDay)}
+      isOptimizing={optimizingDayId === dailyDayId(selectedDay)}
+      variant={variant}
+      showCurrentTime={variant === 'daily' && currentTime !== null && shouldShowCurrentTime(lifecycle, selectedDay, today)}
+      currentTime={currentTime ?? undefined}
+    />
+  ) : null
+
+  // A route can plan more nights than the trip's dates hold. Those stops are
+  // deliberately kept out of the day list — a 13-day trip must not render as 22
+  // days — so they are named here instead of vanishing without explanation.
+  const overflowNotice = timeline.overflow.length > 0 ? (
+    <section
+      aria-label="Stops past the return date"
+      style={{ display: 'flex', gap: 10, padding: '12px 14px', borderRadius: tokens.radius16, background: 'rgba(255,255,255,.045)', border: '1px dashed rgba(255,255,255,.16)' }}
+    >
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={tokens.accentLight} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ flex: 'none', marginTop: 1 }}>
+        <circle cx="12" cy="12" r="9" /><path d="M12 8v4.5M12 16h.01" />
+      </svg>
+      <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.5, color: tokens.textSecondary }}>
+        <strong style={{ color: tokens.textPrimary, fontWeight: 700 }}>
+          {timeline.overflow.length} {timeline.overflow.length === 1 ? 'stop falls' : 'stops fall'} past your return date.
+        </strong>{' '}
+        This route plans more nights than your dates hold. In Plan, turn the pass-through stops into day stops (0 nights) or extend the trip dates.
+      </p>
+    </section>
+  ) : null
+
+  const unscheduledDrawer = (
+    <UnscheduledDrawer
+      entries={timeline.unscheduled}
+      canEdit={editable}
+      onEdit={(entry) => {
+        const item = items.find((candidate) => candidate.id === entry.id)
+        if (item) setSheetDraft(draftFromItem(item))
+      }}
+      onToggleComplete={(entry) => void toggleComplete(entry)}
+      onMove={setMoveTarget}
+      onDelete={setDeleteTarget}
+    />
+  )
+
   return (
-    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: variant === 'daily' ? 0 : 16 }}>
       {!itineraryEnabled && (
         <InlineError>
           Itinerary editing isn&apos;t available for this trip yet — showing the route plan read-only.
         </InlineError>
       )}
 
-      {timeline.days.length > 0 && (
+      {variant === 'plan' && timeline.days.length > 0 && (
         <div style={{ margin: '0 -20px' }}>
           <DayStrip days={stripDays} selectedId={selectedDayId ?? ''} onSelect={setSelectedDayId} />
         </div>
       )}
 
-      {trip.start_date && (
+      {variant === 'plan' && trip.start_date && (
         <button
           onClick={exportIcs}
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, width: '100%', minHeight: 44, padding: '10px 16px', borderRadius: tokens.radius16, background: tokens.glassStandardFill, border: `1px solid ${tokens.glassStandardBorder}`, cursor: 'pointer', fontFamily: 'inherit' }}
@@ -515,40 +606,36 @@ export function ItineraryTimeline({
         </button>
       )}
 
-      {selectedDay && (
+      {variant === 'plan' && selectedDay && (
         <section aria-label={selectedDay.date ? `Plan for ${selectedDay.date}` : `Plan for day ${selectedDay.dayNumber}`}>
-          <ItineraryDaySection
-            day={selectedDay}
-            canEdit={canEdit && itineraryEnabled}
-            onEdit={(entry) => {
-              const item = items.find((candidate) => candidate.id === entry.id)
-              if (item) setSheetDraft(draftFromItem(item))
-            }}
-            onToggleComplete={(entry) => void toggleComplete(entry)}
-            onMove={setMoveTarget}
-            onDelete={setDeleteTarget}
-            onReorder={reorderDay}
-            onAddToDay={canEdit && itineraryEnabled ? () => setSheetDraft(emptyDraft('activity', selectedDay.date ?? '', (trip.currency ?? 'USD') as TripCurrency)) : undefined}
-            onSyncPaused={onItemSyncPaused}
-            selectedItemId={selectedItemId}
-            onSelectItem={onSelectItem}
-            onOptimize={() => void handleOptimizeDay(selectedDay)}
-            isOptimizing={optimizingDayId === dayId(selectedDay)}
-          />
+          {selectedDaySection}
         </section>
       )}
 
-      <UnscheduledDrawer
-        entries={timeline.unscheduled}
-        canEdit={canEdit && itineraryEnabled}
-        onEdit={(entry) => {
-          const item = items.find((candidate) => candidate.id === entry.id)
-          if (item) setSheetDraft(draftFromItem(item))
-        }}
-        onToggleComplete={(entry) => void toggleComplete(entry)}
-        onMove={setMoveTarget}
-        onDelete={setDeleteTarget}
-      />
+      {variant === 'plan' && overflowNotice}
+
+      {variant === 'plan' && unscheduledDrawer}
+
+      {variant === 'daily' && selectedDay && onBackToOverview && onOpenMap && (
+        <DailyItineraryView
+          days={timelineDays}
+          day={selectedDay}
+          selectedDayId={selectedDayId ?? dailyDayId(selectedDay)}
+          overnightBase={selectedDay.dayNumber != null ? overnightBase.get(selectedDay.dayNumber) ?? null : null}
+          lifecycle={lifecycle}
+          today={today}
+          canEdit={editable}
+          selectedItemId={selectedItemId}
+          onSelectItem={onSelectItem}
+          onSelectDay={setSelectedDayId}
+          onBack={onBackToOverview}
+          onAdd={openSelectedDayDraft}
+          onOpenMap={onOpenMap}
+          afterRoute={<>{overflowNotice}{unscheduledDrawer}</>}
+        >
+          {selectedDaySection}
+        </DailyItineraryView>
+      )}
 
       <ItineraryItemSheet
         draft={sheetDraft}

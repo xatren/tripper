@@ -14,7 +14,7 @@ import {
 
 interface TripMobilePageProps {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ section?: string }>;
+  searchParams: Promise<{ section?: string; view?: string; day?: string }>;
 }
 
 const VALID_DEEP_LINK_SECTIONS = ['overview', 'plan', 'explore', 'bookings', 'more'] as const;
@@ -44,7 +44,7 @@ function overviewSection<T>(
 
 export default async function TripMobilePage({ params, searchParams }: TripMobilePageProps) {
   const { id } = await params;
-  const { section } = await searchParams;
+  const { section, view, day } = await searchParams;
   const initialSection = resolveInitialSection(section);
   const supabase = await createClient();
 
@@ -146,6 +146,8 @@ export default async function TripMobilePage({ params, searchParams }: TripMobil
       capabilities={capabilities}
       initialSection={initialSection}
       overview={overview}
+      initialDailyItinerary={view === 'itinerary'}
+      initialDailyDayId={view === 'itinerary' ? (day ?? null) : null}
     />
   );
 }

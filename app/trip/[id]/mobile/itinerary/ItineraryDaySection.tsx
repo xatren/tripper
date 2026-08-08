@@ -14,6 +14,7 @@ import { tokens, EmptyState } from '@/components/mobile'
 import type { TimelineDay, TimelineEntry } from '../itinerary-projection'
 import { ItineraryItemRow } from './ItineraryItemRow'
 import { TravelSegmentRow } from './TravelSegmentRow'
+import { currentTimeInsertIndex } from './daily-itinerary'
 
 export interface ItineraryDaySectionProps {
   day: TimelineDay
@@ -32,6 +33,9 @@ export interface ItineraryDaySectionProps {
   /** Computes a route-optimization preview for this day (never mutates anything itself). */
   onOptimize?: () => void
   isOptimizing?: boolean
+  variant?: 'plan' | 'daily'
+  showCurrentTime?: boolean
+  currentTime?: Date
 }
 
 function SortableRow({ entry, children }: {
@@ -47,7 +51,7 @@ function SortableRow({ entry, children }: {
 }
 
 /** One day's timeline: pinned route arrivals, then the reorderable item list. */
-export function ItineraryDaySection({ day, canEdit, onEdit, onToggleComplete, onMove, onDelete, onReorder, onAddToDay, onSyncPaused, selectedItemId, onSelectItem, onOptimize, isOptimizing }: ItineraryDaySectionProps) {
+export function ItineraryDaySection({ day, canEdit, onEdit, onToggleComplete, onMove, onDelete, onReorder, onAddToDay, onSyncPaused, selectedItemId, onSelectItem, onOptimize, isOptimizing, variant = 'plan', showCurrentTime = false, currentTime = new Date() }: ItineraryDaySectionProps) {
   const sensors = useSensors(
     // Small pointer distance / touch long-press so buttons inside rows keep
     // working as taps; keyboard sensor preserves non-pointer reordering.
@@ -58,6 +62,16 @@ export function ItineraryDaySection({ day, canEdit, onEdit, onToggleComplete, on
 
   const pinned = useMemo(() => day.entries.filter((entry) => entry.source === 'stop'), [day.entries])
   const sortable = useMemo(() => day.entries.filter((entry) => entry.source === 'item'), [day.entries])
+  const nowInsertIndex = showCurrentTime ? currentTimeInsertIndex(day.entries, currentTime) : -1
+  const nowBeforeKey = nowInsertIndex >= 0 && nowInsertIndex < day.entries.length ? day.entries[nowInsertIndex].key : null
+
+  const nowMarker = (
+    <div role="separator" aria-label="Current time" style={{ position: 'relative', minHeight: 30, marginLeft: variant === 'daily' ? 0 : 40, display: 'flex', alignItems: 'center', gap: 9, color: '#f5a623' }}>
+      <span aria-hidden="true" style={{ position: 'absolute', left: variant === 'daily' ? 20 : 0, width: 12, height: 12, borderRadius: '50%', background: '#f5a623', border: '3px solid #3b2a17', boxShadow: '0 0 12px rgba(245,166,35,.55)' }} />
+      <span aria-hidden="true" style={{ marginLeft: variant === 'daily' ? 47 : 18, height: 1, flex: 1, background: 'linear-gradient(90deg, rgba(245,166,35,.7), rgba(245,166,35,.12))' }} />
+      <span style={{ flex: 'none', fontSize: 11.5, fontWeight: 850, letterSpacing: '.035em', textTransform: 'uppercase' }}>Now · {currentTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</span>
+    </div>
+  )
 
   const handleDragEnd = (event: DragEndEvent) => {
     onSyncPaused(false)
@@ -72,8 +86,9 @@ export function ItineraryDaySection({ day, canEdit, onEdit, onToggleComplete, on
 
   const renderRow = (entry: TimelineEntry, previous: TimelineEntry | null, handleProps?: Record<string, unknown>, isDragging?: boolean) => (
     <>
+      {showCurrentTime && nowBeforeKey === entry.key && nowMarker}
       {previous && previous.lat != null && previous.lng != null && entry.lat != null && entry.lng != null && (
-        <TravelSegmentRow fromLat={previous.lat} fromLng={previous.lng} toLat={entry.lat} toLng={entry.lng} />
+        <TravelSegmentRow fromLat={previous.lat} fromLng={previous.lng} toLat={entry.lat} toLng={entry.lng} variant={variant} />
       )}
       <ItineraryItemRow
         entry={entry}
@@ -86,6 +101,7 @@ export function ItineraryDaySection({ day, canEdit, onEdit, onToggleComplete, on
         isDragging={isDragging}
         selected={selectedItemId === entry.key}
         onSelect={() => onSelectItem?.(entry.key)}
+        variant={variant}
       />
     </>
   )
@@ -114,7 +130,7 @@ export function ItineraryDaySection({ day, canEdit, onEdit, onToggleComplete, on
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+    <div role="list" aria-label="Itinerary activities" style={{ display: 'flex', flexDirection: 'column', gap: variant === 'daily' ? 10 : 12 }}>
       {canEdit && onOptimize && (
         <button
           type="button"
@@ -137,11 +153,12 @@ export function ItineraryDaySection({ day, canEdit, onEdit, onToggleComplete, on
         </button>
       )}
       {pinned.map((entry, index) => (
-        <div key={entry.key}>
+        <div key={entry.key} role="listitem">
           {renderRow(entry, index > 0 ? pinned[index - 1] : null)}
         </div>
       ))}
       <DndContext
+        id={`itinerary-day-${day.date ?? day.dayNumber ?? 'undated'}`}
         sensors={sensors}
         collisionDetection={closestCenter}
         onDragStart={() => onSyncPaused(true)}
@@ -149,20 +166,23 @@ export function ItineraryDaySection({ day, canEdit, onEdit, onToggleComplete, on
         onDragEnd={handleDragEnd}
       >
         <SortableContext items={sortable.map((entry) => entry.id)} strategy={verticalListSortingStrategy}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: variant === 'daily' ? 10 : 12 }}>
             {sortable.map((entry, index) => (
-              <SortableRow key={entry.key} entry={entry}>
-                {({ handleProps, isDragging }) => renderRow(
-                  entry,
-                  index > 0 ? sortable[index - 1] : pinned.length > 0 ? pinned[pinned.length - 1] : null,
-                  handleProps,
-                  isDragging,
-                )}
-              </SortableRow>
+              <div key={entry.key} role="listitem">
+                <SortableRow entry={entry}>
+                  {({ handleProps, isDragging }) => renderRow(
+                    entry,
+                    index > 0 ? sortable[index - 1] : pinned.length > 0 ? pinned[pinned.length - 1] : null,
+                    handleProps,
+                    isDragging,
+                  )}
+                </SortableRow>
+              </div>
             ))}
           </div>
         </SortableContext>
       </DndContext>
+      {showCurrentTime && nowInsertIndex === day.entries.length && nowMarker}
     </div>
   )
 }

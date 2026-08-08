@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback, useEffect, useMemo, useRef, type Dispatch, type SetStateAction } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion, useMotionValue, animate } from 'framer-motion'
 import { DndContext, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable'
@@ -16,11 +17,12 @@ import { DestinationDialog } from './DestinationDialog'
 import { LostWithMapArt } from './empty-state-art'
 import { ACCENT, ACCENT_DARK, ACCENT_LIGHT, GLASS_BORDER, GLASS_FILL } from './domain-ui'
 import { DUSK } from '@/components/design/tokens'
-import { totalNights } from './trip-domain-utils'
+import { addDays, formatHeaderDate, totalNights } from './trip-domain-utils'
 import { TripPrimaryNav, type PrimaryNavSection } from './components/TripPrimaryNav'
 import { ItineraryTimeline, type ItineraryCreateRequest } from './itinerary/ItineraryTimeline'
 import { useReducedMotionPreference } from '@/components/motion/ReducedMotionProvider'
-import { buildTimeline } from './itinerary-projection'
+import { buildTimeline, projectStopSchedule } from './itinerary-projection'
+import { buildRouteMapPins, tripDayCountFromDates } from '@/lib/map-pins'
 import { TripMapDomain } from './TripMapDomain'
 import { buildTimelineMapPoints, cleanSelectedItemId, timelineDayId, type OtherDayVisibility } from './trip-map-model'
 import { OptimizePreviewSheet } from './plan/OptimizePreviewSheet'
@@ -56,12 +58,15 @@ export interface PlanRouteDomainProps {
   onOpenMore: () => void
   capabilities: TripCapabilities
   onStopSyncPaused: (paused: boolean) => void
+  /** Daily Itinerary owns the shared controller while its standalone screen is visible. */
+  suppressItinerary?: boolean
 }
 
 // ─── Main content ────────────────────────────────────────────────────────────
 
-export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itineraryEnabled, onItemSyncPaused, currentUserId, members, routePath, setRoutePath, routeLegs, setRouteLegs, onSelectSection, onPrefetchSection, onOpenMore, capabilities, onStopSyncPaused }: PlanRouteDomainProps) {
+export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itineraryEnabled, onItemSyncPaused, currentUserId, members, routePath, setRoutePath, routeLegs, setRouteLegs, onSelectSection, onPrefetchSection, onOpenMore, capabilities, onStopSyncPaused, suppressItinerary = false }: PlanRouteDomainProps) {
   const { canEdit } = capabilities
+  const router = useRouter()
   const reducedMotion = useReducedMotionPreference()
   const distanceUnit = useDistanceUnit()
   const [activeTab, setActiveTab] = useState<'route' | 'days'>('route')
@@ -82,6 +87,7 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
   const [nights, setNights] = useState<Record<string, number>>(() =>
     Object.fromEntries(stops.map((s) => [s.id, s.nights ?? 1]))
   )
+  const [savingDates, setSavingDates] = useState(false)
   const [optimizing, setOptimizing] = useState(false)
   const [optimizePreview, setOptimizePreview] = useState<{
     order: number[]
@@ -294,10 +300,9 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
   }, [routeLegs])
 
   // Optimistic update; reverts to the previous value if the write fails.
-  const changeNights = (id: string, delta: number) => {
+  const setStopNights = (id: string, next: number) => {
     if (!canEdit) return
     const current = nights[id] ?? 1
-    const next = Math.max(1, current + delta)
     if (next === current) return
     setNights((prev) => ({ ...prev, [id]: next }))
     setStops((prev) => prev.map((stop) => stop.id === id ? { ...stop, nights: next } : stop))
@@ -310,9 +315,46 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
         if (error) {
           setNights((prev) => ({ ...prev, [id]: current }))
           setStops((prev) => prev.map((stop) => stop.id === id && stop.nights === next ? { ...stop, nights: current } : stop))
-          showToast("Couldn't save this change. Check your connection and try again.", 'error', { label: 'Retry', onClick: () => changeNights(id, delta) })
+          showToast("Couldn't save this change. Check your connection and try again.", 'error', { label: 'Retry', onClick: () => setStopNights(id, next) })
         }
       })
+  }
+
+  // The stepper only walks between overnight lengths. Leaving the last night —
+  // which deletes a trip day — is the overnight/day-stop toggle's job, so a
+  // mistap on "−" can't quietly shorten the trip.
+  const changeNights = (id: string, delta: number) => setStopNights(id, Math.max(1, (nights[id] ?? 1) + delta))
+
+  // 0 nights makes it a day stop: it stays on the route and on the map but adds
+  // no day, so a long route no longer inflates the trip's length.
+  const setStopIsOvernight = (id: string, overnight: boolean) => setStopNights(id, overnight ? 1 : 0)
+
+  // Same optimistic/rollback contract as the stepper, for the whole-plan actions.
+  // A partial failure only rolls back the rows that actually failed, so what's on
+  // screen never drifts from what the server accepted.
+  const writeNightsBatch = async (targets: Record<string, number>, message: string, undoable = true) => {
+    if (!canEdit) return
+    const ids = Object.keys(targets)
+    if (ids.length === 0) return
+    const previous = Object.fromEntries(ids.map((id) => [id, nights[id] ?? 1]))
+    const apply = (values: Record<string, number>) => {
+      setNights((prev) => ({ ...prev, ...values }))
+      setStops((prev) => prev.map((stop) => stop.id in values ? { ...stop, nights: values[stop.id] } : stop))
+    }
+    apply(targets)
+    const supabase = createClient()
+    const results = await Promise.all(
+      ids.map(async (id) => ({ id, error: (await supabase.from('stops').update({ nights: targets[id] }).eq('id', id)).error }))
+    )
+    const failed = results.filter((result) => result.error).map((result) => result.id)
+    if (failed.length === 0) {
+      showToast(message, 'success', undoable
+        ? { label: 'Undo', onClick: () => { void writeNightsBatch(previous, 'Nights restored.', false) } }
+        : undefined)
+      return
+    }
+    apply(Object.fromEntries(failed.map((id) => [id, previous[id]])))
+    showToast("Couldn't update every stop. Check your connection and try again.", 'error', { label: 'Retry', onClick: () => { void writeNightsBatch(targets, message, undoable) } })
   }
 
   const [editingStopId, setEditingStopId] = useState<string | null>(null)
@@ -466,6 +508,65 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
   const ringCircumference = 150.8
   const ringPct = Math.min(1, nightsPlanned / nightsTarget)
   const ringOffset = ringCircumference * (1 - ringPct)
+  // The ring only means something once the trip has dates to measure against;
+  // when the plan and the dates disagree, say so and offer both ways out.
+  const overnightStops = stops.filter((stop) => (nights[stop.id] ?? 1) > 0)
+  const nightsMismatch = nightsTotal > 0 && nightsPlanned !== nightsTotal
+  const canSpreadNights = overnightStops.length > 0 && nightsTotal >= overnightStops.length
+  // Routes built before the overnight/day-stop split hold a night on every stop
+  // because that was the only option, so a long one overshoots the dates
+  // wholesale. That needs a different answer from a plan the traveler actually
+  // curated — "pick where you sleep", not "add or drop a night" — so this one
+  // status region escalates its copy and gains an action, rather than a second
+  // card appearing beside it with its own Update dates / Spread nights buttons.
+  const uncuratedRoute = stops.length >= 3 && overnightStops.length === stops.length
+  const needsBackfill = canEdit && nightsMismatch && nightsPlanned > nightsTotal && uncuratedRoute
+  // What "Make all day stops" leaves behind, and where a stop added after
+  // migration 20260808120000 starts. An instruction, not a warning — and no
+  // "Update dates" here, since matching dates to a nightless plan would
+  // silently collapse the trip to a single day.
+  // Editors only: it tells the reader to tap a toggle a viewer never gets. A
+  // viewer whose trip has dates still falls through to the plain warning, which
+  // states the same fact without asking them to act on it.
+  const noOvernightStops = canEdit && stops.length > 0 && nightsPlanned === 0
+
+  // Ends the trip where the plan ends. `trip` is a server prop, so refresh the
+  // route rather than mutating it locally.
+  const matchDatesToPlan = async () => {
+    if (!canEdit || !trip.start_date || savingDates) return
+    const end = addDays(trip.start_date, nightsPlanned)
+    setSavingDates(true)
+    const { error } = await createClient().from('trips').update({ end_date: end }).eq('id', trip.id)
+    setSavingDates(false)
+    if (error) {
+      showToast("Couldn't update the trip dates. Please try again.", 'error', { label: 'Retry', onClick: () => { void matchDatesToPlan() } })
+      return
+    }
+    showToast(`Trip now ends ${formatHeaderDate(end)}.`, 'success')
+    router.refresh()
+  }
+
+  // Keeps the same stops overnight and re-splits the trip's nights across them
+  // as evenly as possible, so the plan fits the dates without dropping a stay.
+  const spreadNights = () => {
+    if (!canEdit || !canSpreadNights) return
+    const base = Math.floor(nightsTotal / overnightStops.length)
+    const extra = nightsTotal % overnightStops.length
+    const targets = Object.fromEntries(overnightStops.map((stop, index) => [stop.id, base + (index < extra ? 1 : 0)]))
+    void writeNightsBatch(targets, `${nightsTotal} ${nightsTotal === 1 ? 'night' : 'nights'} spread across ${overnightStops.length} stops.`)
+  }
+
+  // The backfill for a legacy route: drop every night in one write so the
+  // traveler can mark the handful of places they actually sleep with the 🌙
+  // toggle. Guessing for them (say, from place_category) would quietly get it
+  // wrong, so nothing here is automatic. Undo restores each stop's own previous
+  // count rather than a blanket 1, and stops already at 0 are left out of the
+  // batch so a partial failure can't be reported over a no-op row.
+  const makeAllDayStops = () => {
+    if (!canEdit) return
+    const targets = Object.fromEntries(overnightStops.map((stop) => [stop.id, 0]))
+    void writeNightsBatch(targets, 'Every stop is a day stop now — tap 🌙 where you sleep.')
+  }
   const defaultCenter =
     trip.focus_lat != null && trip.focus_lng != null ? { lat: trip.focus_lat, lng: trip.focus_lng } : undefined
   // Example searches for the empty state: the wizard's destination countries
@@ -487,15 +588,28 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
     () => buildTimelineMapPoints(timeline.days, selectedDayId, otherDays),
     [otherDays, selectedDayId, timeline.days],
   )
+  // Pins carry the trip day the stay starts on, not the stop's position in the
+  // route — the same `dayStart` the itinerary buckets by, so a 22-stop route
+  // over 13 days reads D1…D13 instead of 1…22. `nights` is the live optimistic
+  // value so a toggle re-labels the map without waiting for the server.
+  const routeMapStops = useMemo(() => {
+    const scheduleInput = stops.map((stop) => ({ ...stop, nights: nights[stop.id] ?? stop.nights }))
+    const schedule = projectStopSchedule(trip.start_date ?? null, scheduleInput)
+    return scheduleInput.map((stop, index) => ({
+      id: `stop:${stop.id}`,
+      lat: stop.lat,
+      lng: stop.lng,
+      name: stop.name,
+      address: stop.address,
+      nights: stop.nights,
+      dayStart: schedule[index].dayStart,
+    }))
+  }, [nights, stops, trip.start_date])
   const mapPoints = useMemo(() => activeTab === 'route'
-    ? stops.map((stop, index) => ({
-        id: `stop:${stop.id}`, lat: stop.lat, lng: stop.lng, label: index + 1,
-        title: stop.name, subtitle: stop.address ?? undefined, itemType: 'place',
-        emphasis: 'strong' as const,
-        role: index === 0 ? 'start' as const : index === stops.length - 1 ? 'end' as const : 'waypoint' as const,
-      }))
+    ? buildRouteMapPins(routeMapStops, tripDayCountFromDates(trip.start_date, trip.end_date))
+        .map((pin) => ({ ...pin, itemType: 'place', emphasis: 'strong' as const }))
     : timelineMapPoints.map((point) => ({ ...point, label: point.order })),
-    [activeTab, stops, timelineMapPoints],
+    [activeTab, routeMapStops, timelineMapPoints, trip.end_date, trip.start_date],
   )
 
   useEffect(() => {
@@ -704,6 +818,60 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
                   </div>
                 )}
 
+                {/* One region for every way the plan and the dates can disagree:
+                    the nights warning, the backfill prompt an uncurated route
+                    needs, and the "nothing is overnight yet" hint. Each action
+                    exists exactly once, whichever wording is showing. */}
+                {stops.length > 0 && (nightsMismatch || noOvernightStops) && (
+                  <div
+                    role="status"
+                    style={{ width: '100%', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 8, padding: '12px 14px', borderRadius: 16, background: 'rgba(245,166,35,.12)', border: '1px solid rgba(245,166,35,.35)' }}
+                  >
+                    <span style={{ flex: '1 1 180px', minWidth: 0, fontSize: 12.5, fontWeight: 600, lineHeight: 1.45, color: ACCENT_LIGHT }}>
+                      {noOvernightStops ? (
+                        'No overnight stops yet. Tap 🌙 on the places you sleep — day stops ride along without adding a day.'
+                      ) : (
+                        <>
+                          You planned {nightsPlanned} {nightsPlanned === 1 ? 'night' : 'nights'}; your dates cover {nightsTotal}.
+                          {needsBackfill && (
+                            <span style={{ display: 'block', marginTop: 4, fontWeight: 500, color: DUSK.textSecondary }}>
+                              Every stop still holds a night. Clear them all, then tap 🌙 on the places you actually sleep.
+                            </span>
+                          )}
+                        </>
+                      )}
+                    </span>
+                    {needsBackfill && (
+                      <button
+                        type="button"
+                        onClick={makeAllDayStops}
+                        style={{ minHeight: 44, padding: '8px 14px', borderRadius: 999, background: 'rgba(245,166,35,.2)', border: '1px solid rgba(245,166,35,.5)', color: ACCENT_LIGHT, fontFamily: 'inherit', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}
+                      >
+                        Make all day stops
+                      </button>
+                    )}
+                    {canEdit && trip.start_date && nightsPlanned > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => { void matchDatesToPlan() }}
+                        disabled={savingDates}
+                        style={{ minHeight: 44, padding: '8px 14px', borderRadius: 999, background: 'rgba(255,255,255,.07)', border: '1px solid rgba(255,255,255,.15)', color: DUSK.textPrimary, fontFamily: 'inherit', fontSize: 12.5, fontWeight: 700, cursor: savingDates ? 'default' : 'pointer', opacity: savingDates ? 0.6 : 1 }}
+                      >
+                        {savingDates ? 'Updating…' : 'Update dates'}
+                      </button>
+                    )}
+                    {canEdit && canSpreadNights && (
+                      <button
+                        type="button"
+                        onClick={spreadNights}
+                        style={{ minHeight: 44, padding: '8px 14px', borderRadius: 999, background: 'rgba(255,255,255,.07)', border: '1px solid rgba(255,255,255,.15)', color: DUSK.textPrimary, fontFamily: 'inherit', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}
+                      >
+                        Spread nights
+                      </button>
+                    )}
+                  </div>
+                )}
+
                 {stops.length === 0 ? (
                   <div style={{ width: '100%', flex: 1, minHeight: 200, border: '1.5px dashed rgba(255,255,255,.15)', borderRadius: 16, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, padding: 18 }}>
                     <LostWithMapArt />
@@ -737,7 +905,10 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
                   >
                   <SortableContext items={stops.map((s) => s.id)} strategy={verticalListSortingStrategy}>
                   <div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
-                    {stops.map((stop, idx) => (
+                    {stops.map((stop, idx) => {
+                      const stopNightCount = nights[stop.id] ?? 1
+                      const isOvernight = stopNightCount > 0
+                      return (
                       <SortableStopItem key={stop.id} id={stop.id} disabled={!canEdit}>
                         {({ attributes, listeners, isDragging }) => (
                           <>
@@ -794,15 +965,20 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
                               <div style={{ color: DUSK.textMuted, fontSize: 12, marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{stop.address}</div>
                             )}
                           </div>
-                          {canEdit ? <div style={{ display: 'flex', alignItems: 'center', gap: 2, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 999, padding: 4, flex: 'none' }}>
+                          {/* The stepper belongs to overnight stops only; a day stop shows why
+                              it carries no nights and is switched back with the toggle below. */}
+                          {canEdit ? (isOvernight ? <div style={{ display: 'flex', alignItems: 'center', gap: 2, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 999, padding: 4, flex: 'none' }}>
                             <button
                               aria-label={`Remove a night in ${stop.name}`}
                               onClick={() => changeNights(stop.id, -1)}
-                              style={{ width: 26, height: 26, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: DUSK.textSecondary, background: 'none', border: 'none' }}
+                              disabled={stopNightCount <= 1}
+                              style={{ width: 26, height: 26, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: stopNightCount <= 1 ? 'default' : 'pointer', color: DUSK.textSecondary, background: 'none', border: 'none', opacity: stopNightCount <= 1 ? 0.35 : 1 }}
                             >
                               <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M2.5 8H13.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>
                             </button>
-                            <span style={{ fontSize: 13, fontWeight: 700, width: 20, textAlign: 'center' }}>{nights[stop.id] ?? 1}</span>
+                            <span style={{ fontSize: 13, fontWeight: 700, width: 44, textAlign: 'center' }}>
+                              {stopNightCount}
+                            </span>
                             <button
                               aria-label={`Add a night in ${stop.name}`}
                               onClick={() => changeNights(stop.id, 1)}
@@ -810,10 +986,23 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
                             >
                               <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M8 2.5V13.5M2.5 8H13.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>
                             </button>
-                          </div> : <span style={{ fontSize: 12, color: DUSK.textMuted, fontWeight: 600, flex: 'none' }}>{nights[stop.id] ?? 1} {(nights[stop.id] ?? 1) === 1 ? 'night' : 'nights'}</span>}
+                          </div> : <span style={{ fontSize: 11, fontWeight: 700, color: DUSK.textMuted, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 999, padding: '6px 10px', flex: 'none' }}>Adds no day</span>)
+                            : <span style={{ fontSize: 12, color: DUSK.textMuted, fontWeight: 600, flex: 'none' }}>{isOvernight ? `${stopNightCount} ${stopNightCount === 1 ? 'night' : 'nights'}` : 'Day stop'}</span>}
                         </div>
 
-                        {canEdit && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6, padding: '6px 4px 0' }}>
+                        {canEdit && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6, padding: '6px 4px 0' }}>
+                          <button
+                            type="button"
+                            role="switch"
+                            aria-checked={isOvernight}
+                            aria-label={`Stay overnight in ${stop.name}`}
+                            onClick={() => setStopIsOvernight(stop.id, !isOvernight)}
+                            style={{ display: 'flex', alignItems: 'center', gap: 6, minHeight: 34, padding: '6px 12px', borderRadius: 999, background: isOvernight ? 'rgba(245,166,35,.16)' : 'rgba(255,255,255,.05)', border: `1px solid ${isOvernight ? 'rgba(245,166,35,.45)' : 'rgba(255,255,255,.1)'}`, color: isOvernight ? ACCENT_LIGHT : DUSK.textMuted, fontFamily: 'inherit', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
+                          >
+                            <span aria-hidden="true">{isOvernight ? '🌙' : '📍'}</span>
+                            {isOvernight ? 'Overnight' : 'Day stop'}
+                          </button>
+                          <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                           <button
                             onClick={() => {
                               setEditingStopId(stop.id)
@@ -833,6 +1022,7 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
                           >
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18" /><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6" /></svg>
                           </button>
+                          </span>
                         </div>}
 
                         {idx < stops.length - 1 && (
@@ -865,7 +1055,8 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
                           </>
                         )}
                       </SortableStopItem>
-                    ))}
+                      )
+                    })}
                   </div>
                   </SortableContext>
                   </DndContext>
@@ -888,7 +1079,7 @@ export function PlanRouteDomain({ trip, stops, setStops, items, setItems, itiner
               </>
             )}
 
-            {activeTab === 'days' && (
+            {activeTab === 'days' && !suppressItinerary && (
               <ItineraryTimeline
                 trip={trip}
                 stops={stops}

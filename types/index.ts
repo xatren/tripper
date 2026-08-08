@@ -127,7 +127,12 @@ export interface Stop {
   estimated_cost?: number | null;
   day_number?: number | null;
   is_favorite?: boolean | null;
-  /** Present after migration `008_trip_persistence`. */
+  /**
+   * Nights spent here — the only thing separating the two kinds of stop
+   * (migration `20260808120000_stop_overnight_semantics`): `>= 1` is an
+   * overnight stop, which defines trip days; `0` is a day stop, passed through
+   * without adding a day. Present after `008_trip_persistence`.
+   */
   nights?: number;
 }
 

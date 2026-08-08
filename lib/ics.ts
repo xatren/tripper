@@ -5,11 +5,25 @@ interface IcsStop {
   name: string
   address?: string | null
   arrival: string // YYYY-MM-DD
-  departure: string // YYYY-MM-DD (checkout day; DTEND is exclusive so used as-is)
+  departure: string // YYYY-MM-DD (checkout day; DTEND is exclusive so used as-is, except when equal to arrival)
 }
 
 function icsDate(iso: string): string {
   return iso.replaceAll('-', '')
+}
+
+/**
+ * DTEND is exclusive, so a day stop (0 nights, departure === arrival) would
+ * otherwise emit a zero-length event that calendars reject or hide. Such a stop
+ * becomes a single all-day event instead.
+ */
+function icsEndDate(arrival: string, departure: string): string {
+  if (departure > arrival) return icsDate(departure)
+  const next = new Date(`${arrival}T00:00:00`)
+  next.setDate(next.getDate() + 1)
+  const month = String(next.getMonth() + 1).padStart(2, '0')
+  const day = String(next.getDate()).padStart(2, '0')
+  return icsDate(`${next.getFullYear()}-${month}-${day}`)
 }
 
 function escapeText(s: string): string {
@@ -25,7 +39,7 @@ export function buildTripIcs(tripTitle: string, stops: IcsStop[]): string {
         `UID:tripper-${now}-${i}@tripper.app`,
         `DTSTAMP:${now}`,
         `DTSTART;VALUE=DATE:${icsDate(s.arrival)}`,
-        `DTEND;VALUE=DATE:${icsDate(s.departure)}`,
+        `DTEND;VALUE=DATE:${icsEndDate(s.arrival, s.departure)}`,
         `SUMMARY:${escapeText(`${tripTitle}: ${s.name}`)}`,
         s.address ? `LOCATION:${escapeText(s.address)}` : null,
         'END:VEVENT',

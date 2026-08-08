@@ -1,0 +1,76 @@
+.searchRow { flex: none; margin-bottom: 12px; }
+
+.search {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-16);
+  background: rgba(255, 255, 255, 0.055);
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: 14px;
+}
+.search::placeholder { color: var(--color-text-muted); }
+.search:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+.groupLabel {
+  margin: 0 0 8px;
+  color: var(--color-accent);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.suggestions { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.suggestion {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 13px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.055);
+  color: var(--color-text-primary);
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+}
+.suggestion[aria-pressed='true'] {
+  border-color: rgba(245, 166, 35, 0.42);
+  background: rgba(245, 166, 35, 0.12);
+  color: var(--color-accent-light);
+}
+
+.results { max-height: 46svh; overflow-y: auto; overscroll-behavior: contain; }
+
+.option {
+  width: 100%;
+  min-height: 48px;
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 11px;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-12);
+  background: transparent;
+  color: var(--color-text-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.option:hover { background: rgba(255, 255, 255, 0.05); }
+.optionSelected { border-color: rgba(245, 166, 35, 0.4); background: rgba(245, 166, 35, 0.1); }
+.flag { font-size: 21px; }
+.name { min-width: 0; overflow: hidden; font-size: 14px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.code { color: var(--color-text-muted); font-size: 11px; font-weight: 700; }
+.optionSelected .code { color: var(--color-accent-light); }
+
+.empty { margin: 0; padding: 18px 4px; color: var(--color-text-muted); font-size: 13px; }
+
+@media (forced-colors: active) {
+  .option, .suggestion, .search { border: 1px solid CanvasText; }
+}

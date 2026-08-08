@@ -8,9 +8,26 @@ interface FailureContext {
   operation: string
 }
 
-interface QueryResult<T> {
+export interface QueryResult<T> {
   data: T | null
   error: SupabaseFailure | null
+}
+
+/** Retry only transport/service failures; policy and schema errors must surface. */
+export async function retryTransientQueryOnce<T>(
+  query: () => PromiseLike<QueryResult<T>>,
+): Promise<QueryResult<T>> {
+  const firstResult = await query()
+  if (!isTransientFailure(firstResult.error)) return firstResult
+  return query()
+}
+
+function isTransientFailure(failure?: SupabaseFailure | null): boolean {
+  if (!failure) return false
+  if (typeof failure.status === 'number' && failure.status >= 500) return true
+
+  const code = failure.code?.trim() ?? ''
+  return code === '' || /^PGRST00[0-3]$/.test(code)
 }
 
 /** Empty collections are successful data; errors and unexpected nulls are not. */

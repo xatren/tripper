@@ -111,6 +111,25 @@ export function searchCountries(countries: CountryOption[], query: string) {
     })
 }
 
+/**
+ * Recovers an ISO alpha-2 code from a country name. `TripCountry.code` is
+ * optional — trips created before the country-picker redesign carry a name and
+ * flag only — so any surface that needs a code for a Mapbox boundary filter has
+ * to be able to work backwards from the stored name.
+ *
+ * Matching is exact against the normalized search names (including aliases),
+ * never a prefix: "Guinea" must not resolve to Papua New Guinea.
+ */
+export function resolveCountryCode(name: string, countries: CountryOption[] = getCountryOptions()): string | null {
+  const needle = normalizeCountrySearch(name)
+  if (!needle) return null
+
+  const match = countries.find((country) =>
+    country.searchNames.some((searchName) => normalizeCountrySearch(searchName) === needle),
+  )
+  return match?.code ?? null
+}
+
 export function selectCountry(state: CountrySelectionState, country: CountryOption): CountrySelectionState {
   const existingIndex = state.countries.findIndex((selected) => selected.code === country.code)
 

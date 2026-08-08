@@ -14,42 +14,51 @@ function strokeIcon(paths: ReactNode, size = 16) {
   )
 }
 
-export const ITEM_TYPE_META: Record<ItineraryItemType, { label: string; icon: ReactNode }> = {
+export const ITEM_TYPE_META: Record<ItineraryItemType, { label: string; icon: ReactNode; color: string; softColor: string }> = {
   place: {
     label: 'Place',
     icon: strokeIcon(<><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></>),
+    color: '#67e8f9', softColor: 'rgba(103,232,249,.14)',
   },
   activity: {
     label: 'Activity',
     icon: strokeIcon(<path d="M12 2L13.9 8.1L20 10L13.9 11.9L12 18L10.1 11.9L4 10L10.1 8.1L12 2Z" />),
+    color: '#f5a623', softColor: 'rgba(245,166,35,.16)',
   },
   stay: {
     label: 'Stay',
     icon: strokeIcon(<><path d="M3 21V9l9-6 9 6v12" /><path d="M9 21v-8h6v8" /></>),
+    color: '#60a5fa', softColor: 'rgba(96,165,250,.16)',
   },
   flight: {
     label: 'Flight',
     icon: strokeIcon(<path d="M10.5 13.5L3 11l1.5-1.5L10 10l4.5-4.5a1.6 1.6 0 0 1 2.3 2.3L12.3 12.3l.5 5.5L11.3 19l-2.5-6.5" />),
+    color: '#a78bfa', softColor: 'rgba(167,139,250,.16)',
   },
   transport: {
     label: 'Transport',
     icon: strokeIcon(<><path d="M3 12l2-6a2 2 0 0 1 2-1.4h10a2 2 0 0 1 2 1.4l2 6" /><rect x="2" y="12" width="20" height="6" rx="2" /><circle cx="7" cy="19" r="1.5" /><circle cx="17" cy="19" r="1.5" /></>),
+    color: '#38bdf8', softColor: 'rgba(56,189,248,.16)',
   },
   restaurant: {
     label: 'Restaurant',
     icon: strokeIcon(<><path d="M7 3v8M4.5 3v4a2.5 2.5 0 0 0 5 0V3" /><path d="M7 11v10" /><path d="M17 3c-2 1.5-3 4-3 6.5 0 1.5 1 2.5 3 2.5v9" /></>),
+    color: '#fb7185', softColor: 'rgba(251,113,133,.16)',
   },
   reservation: {
     label: 'Reservation',
     icon: strokeIcon(<><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 10h18M8 5v14" strokeDasharray="2 2" /></>),
+    color: '#fbbf24', softColor: 'rgba(251,191,36,.16)',
   },
   note: {
     label: 'Note',
     icon: strokeIcon(<><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z" /><path d="M9 13h6M9 17h6" /></>),
+    color: '#c4b5fd', softColor: 'rgba(196,181,253,.16)',
   },
   free_time: {
     label: 'Free time',
     icon: strokeIcon(<><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3.5 2" /></>),
+    color: '#6ee7b7', softColor: 'rgba(110,231,183,.16)',
   },
 }
 

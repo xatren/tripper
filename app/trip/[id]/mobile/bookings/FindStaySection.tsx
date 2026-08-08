@@ -34,14 +34,35 @@ export function FindStaySection({ trip, stops }: FindStaySectionProps) {
 
   const nights = Object.fromEntries(stops.map((s) => [s.id, s.nights ?? 1]))
   const schedule = computeStopSchedule(trip.start_date, stops, nights)
+  // Day stops (0 nights) are passed through, not slept at, so there is no stay
+  // to search for. The schedule stays indexed by the full route so the remaining
+  // stops keep their real check-in dates.
+  const stayStops = stops
+    .map((stop, idx) => ({ stop, slot: schedule[idx] }))
+    .filter(({ stop }) => (nights[stop.id] ?? 1) > 0)
+
+  if (stayStops.length === 0) {
+    return (
+      <EmptyState
+        icon={
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="5" width="18" height="14" rx="2" />
+            <path d="M3 10h18M8 5v14" strokeDasharray="2 2" />
+          </svg>
+        }
+        title="No overnight stops yet"
+        description="Every stop on this route is a day stop. Add a night to one in Plan to see booking links here."
+      />
+    )
+  }
 
   return (
     <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 14 }}>
-      {stops.map((stop, idx) => {
+      {stayStops.map(({ stop, slot }) => {
         const moreOpen = !!expanded[stop.id]
         const shown = moreOpen ? BOOKING_PARTNERS : BOOKING_PARTNERS.slice(0, 3)
-        const arrival = schedule[idx]?.arrival ?? stop.arrival_date
-        const departure = schedule[idx]?.departure ?? stop.departure_date
+        const arrival = slot?.arrival ?? stop.arrival_date
+        const departure = slot?.departure ?? stop.departure_date
         const hasDates = !!(arrival && departure)
         const dateRange = formatDateRange(arrival, departure)
         return (

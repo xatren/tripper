@@ -233,6 +233,12 @@ export function ExploreClient({ profile, trips }: Props) {
       p_countries: [{ name: d.country, flag: d.emoji, lat: d.lat, lng: d.lng }],
       p_focus_lat: d.waypoints[0]?.lat ?? d.lat,
       p_focus_lng: d.waypoints[0]?.lng ?? d.lng,
+      // No `nights` key: a template's waypoints are the cities the route sleeps
+      // in, and create_trip_with_stops reads an omitted count as one night
+      // (20260808120000_stop_overnight_semantics.sql). Sending an explicit 1
+      // would restate that contract in a second place without changing anything,
+      // and would then have to be kept in step with it. Turning a stop into a day
+      // stop is a decision the traveler makes later, with Plan's 🌙 toggle.
       p_stops: d.waypoints.map((wp, i) => ({
         name: wp.name,
         lat: wp.lat,

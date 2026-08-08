@@ -2,30 +2,22 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Map, { Layer, Source, type MapRef } from 'react-map-gl/mapbox'
-import type { FilterSpecification, StyleSpecification } from 'mapbox-gl'
+import type { StyleSpecification } from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { useReducedMotionPreference } from '@/components/motion/ReducedMotionProvider'
 import { MAPBOX_TOKEN } from '@/lib/mapbox/client'
+import {
+  COUNTRY_BOUNDARIES_SOURCE_LAYER,
+  COUNTRY_BOUNDARIES_SOURCE_URL,
+  WORLDVIEW_FILTER,
+  countryFilter,
+} from '@/lib/mapbox/country-layers'
 import { cameraForCountries, type SelectedTripCountry } from '@/lib/trip-country-selection'
 
 const MAP_STYLE: StyleSpecification = {
   version: 8,
   sources: {},
   layers: [{ id: 'space', type: 'background', paint: { 'background-color': '#08021A' } }],
-}
-
-const WORLDVIEW_FILTER: FilterSpecification = [
-  'all',
-  ['==', ['get', 'disputed'], 'false'],
-  ['any', ['==', ['get', 'worldview'], 'all'], ['in', 'TR', ['get', 'worldview']]],
-]
-
-function countryFilter(codes: string[]): FilterSpecification {
-  return [
-    'all',
-    ...WORLDVIEW_FILTER.slice(1),
-    ['in', ['get', 'iso_3166_1'], ['literal', codes]],
-  ] as FilterSpecification
 }
 
 function MapFallback({ missingToken = false }: { missingToken?: boolean }) {
@@ -100,7 +92,7 @@ export function CountryGlobe({ countries, activeCountryCode }: {
     const check = setTimeout(() => {
       try {
         const features = map.querySourceFeatures('trip-country-boundaries', {
-          sourceLayer: 'country_boundaries',
+          sourceLayer: COUNTRY_BOUNDARIES_SOURCE_LAYER,
           filter: countryFilter(selectedCodes),
         })
         setOutlineMissing(features.length === 0)
@@ -189,45 +181,45 @@ export function CountryGlobe({ countries, activeCountryCode }: {
         onZoomEnd={resumeInteraction}
         style={{ width: '100%', height: '100%' }}
       >
-        <Source id="trip-country-boundaries" type="vector" url="mapbox://mapbox.country-boundaries-v1">
+        <Source id="trip-country-boundaries" type="vector" url={COUNTRY_BOUNDARIES_SOURCE_URL}>
           <Layer
             id="trip-country-land"
-            source-layer="country_boundaries"
+            source-layer={COUNTRY_BOUNDARIES_SOURCE_LAYER}
             type="fill"
             filter={WORLDVIEW_FILTER}
             paint={{ 'fill-color': '#150A35', 'fill-opacity': 0.94 }}
           />
           <Layer
             id="trip-country-borders"
-            source-layer="country_boundaries"
+            source-layer={COUNTRY_BOUNDARIES_SOURCE_LAYER}
             type="line"
             filter={WORLDVIEW_FILTER}
             paint={{ 'line-color': '#6F4BB0', 'line-width': 0.55, 'line-opacity': 0.34 }}
           />
           <Layer
             id="trip-country-selected-fill"
-            source-layer="country_boundaries"
+            source-layer={COUNTRY_BOUNDARIES_SOURCE_LAYER}
             type="fill"
             filter={countryFilter(selectedCodes)}
             paint={{ 'fill-color': '#D16830', 'fill-opacity': 0.5 }}
           />
           <Layer
             id="trip-country-selected-glow"
-            source-layer="country_boundaries"
+            source-layer={COUNTRY_BOUNDARIES_SOURCE_LAYER}
             type="line"
             filter={countryFilter(selectedCodes)}
             paint={{ 'line-color': '#F59E0B', 'line-width': 4.5, 'line-opacity': 0.2, 'line-blur': 2.5 }}
           />
           <Layer
             id="trip-country-selected-border"
-            source-layer="country_boundaries"
+            source-layer={COUNTRY_BOUNDARIES_SOURCE_LAYER}
             type="line"
             filter={countryFilter(selectedCodes)}
             paint={{ 'line-color': '#FFB21C', 'line-width': 1.8, 'line-opacity': 0.88 }}
           />
           <Layer
             id="trip-country-active-border"
-            source-layer="country_boundaries"
+            source-layer={COUNTRY_BOUNDARIES_SOURCE_LAYER}
             type="line"
             filter={activeFilter}
             paint={{ 'line-color': '#FFD166', 'line-width': 2.8, 'line-opacity': 1 }}

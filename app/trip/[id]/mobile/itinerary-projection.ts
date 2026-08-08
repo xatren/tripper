@@ -83,6 +83,12 @@ export interface Timeline {
   days: TimelineDay[]
   /** Items without any date — surfaced in the Unscheduled drawer. */
   unscheduled: TimelineEntry[]
+  /**
+   * Entries dated outside the trip's visible day range — typically a route that
+   * plans more nights than the dates hold. Kept separate so an over-planned
+   * route can be reported instead of silently extending the trip's length.
+   */
+  overflow: TimelineEntry[]
 }
 
 const DAY_MS = 86_400_000
@@ -134,7 +140,20 @@ export interface StopProjectionSchedule {
   nights: number
 }
 
-/** Sequential stay schedule: each stop starts where the previous one ends. */
+/**
+ * Nights a stop contributes to the trip length. `0` marks a day stop — visited
+ * on the way through, adding no day. A missing value means the caller predates
+ * migration 20260808120000 and is read as the old implicit single night.
+ */
+export function stopNights(stop: Pick<ProjectionStop, 'nights'>): number {
+  return Math.max(0, stop.nights ?? 1)
+}
+
+/**
+ * Sequential stay schedule: each stop starts where the previous one ends. Day
+ * stops (0 nights) don't advance the cursor, so they land on the day of the leg
+ * they sit on — the day the traveler leaves the previous overnight stop.
+ */
 export function projectStopSchedule(
   tripStartDate: string | null | undefined,
   stops: ProjectionStop[],
@@ -142,7 +161,7 @@ export function projectStopSchedule(
   let cursor = tripStartDate ?? null
   let day = 1
   return stops.map((stop) => {
-    const nights = Math.max(1, stop.nights ?? 1)
+    const nights = stopNights(stop)
     const entry: StopProjectionSchedule = { stopId: stop.id, arrival: cursor, dayStart: day, nights }
     if (cursor) cursor = addDaysISO(cursor, nights)
     day += nights
@@ -201,7 +220,8 @@ function itemToEntry(item: ProjectionItem): TimelineEntry {
 }
 
 /**
- * Stable within-day order: projected stop arrivals lead (orderIndex -1), then
+ * Stable within-day order: projected stop arrivals lead (negative orderIndex,
+ * ordered among themselves by route position), then
  * saved order, then start time, then creation time, then key — so equal-order
  * rows never swap between renders.
  */
@@ -257,6 +277,8 @@ export interface BuildTimelineInput {
  *
  * - Days come from the trip date range when set; item dates outside the range
  *   (and item dates on undated trips) add extra day cells rather than hiding.
+ * - Stop projections never widen a trip that has both dates: a route planning
+ *   more nights than the range holds lands in `overflow`, not in extra days.
  * - A stop with at least one linked item is represented by its items only.
  * - Items without any date land in `unscheduled`.
  */
@@ -274,7 +296,9 @@ export function buildTimeline({ tripStartDate, tripEndDate, stops, items }: Buil
 
   stops.forEach((stop, index) => {
     if (linkedStopIds.has(stop.id)) return
-    const entry = stopToEntry(stop, -1)
+    // Negative so projections lead the day, offset by route position so several
+    // day stops sharing one day appear in the order they're driven through.
+    const entry = stopToEntry(stop, index - stops.length)
     const slot = schedule[index]
     if (slot.arrival) {
       const bucket = dated.get(slot.arrival) ?? []
@@ -287,6 +311,8 @@ export function buildTimeline({ tripStartDate, tripEndDate, stops, items }: Buil
     }
   })
 
+  // Dates the traveler set explicitly, as opposed to the ones the route implies.
+  const itemDates: string[] = []
   for (const item of items) {
     const entry = itemToEntry(item)
     const date = effectiveLocalDate(item)
@@ -294,34 +320,53 @@ export function buildTimeline({ tripStartDate, tripEndDate, stops, items }: Buil
       const bucket = dated.get(date) ?? []
       bucket.push(entry)
       dated.set(date, bucket)
+      itemDates.push(date)
     } else {
       unscheduled.push(entry)
     }
   }
 
-  // The visible day range: the trip's own dates, widened by any item dates
-  // that fall outside them.
-  const datedKeys = [...dated.keys()].sort()
+  // The visible day range: the trip's own dates, widened by dates the traveler
+  // set explicitly on an item. Stop projections deliberately do NOT widen a trip
+  // that has both dates — an over-planned route (more nights than the range
+  // holds) must not silently stretch a 13-day trip into a 22-day one. Without a
+  // return date there is no length to respect, so projections still reach.
+  const projectionsMayExtend = !(tripStartDate && tripEndDate)
+  const widenKeys = [...itemDates]
+  if (projectionsMayExtend) {
+    for (const slot of schedule) if (slot.arrival) widenKeys.push(slot.arrival)
+  }
+  widenKeys.sort()
   let rangeStart = tripStartDate ?? null
   let rangeEnd = tripEndDate ?? tripStartDate ?? null
-  if (datedKeys.length > 0) {
-    if (!rangeStart || datedKeys[0] < rangeStart) rangeStart = datedKeys[0]
-    const last = datedKeys[datedKeys.length - 1]
+  if (widenKeys.length > 0) {
+    if (!rangeStart || widenKeys[0] < rangeStart) rangeStart = widenKeys[0]
+    const last = widenKeys[widenKeys.length - 1]
     if (!rangeEnd || last > rangeEnd) rangeEnd = last
   }
 
   const days: TimelineDay[] = []
+  const renderedDates = new Set<string>()
 
   if (rangeStart && rangeEnd) {
     const span = Math.min(daysBetweenISO(rangeStart, rangeEnd), MAX_TRIP_DAYS - 1)
     for (let offset = 0; offset <= span; offset += 1) {
       const date = addDaysISO(rangeStart, offset)
+      renderedDates.add(date)
       const entries = dated.get(date) ?? []
       entries.sort((a, b) => compareEntries(a, b, createdAt))
       markConflicts(entries)
       const dayNumber = tripStartDate ? daysBetweenISO(tripStartDate, date) + 1 : null
       days.push({ date, dayNumber, entries })
     }
+  }
+
+  // Whatever landed on a date the range doesn't cover — a route planning more
+  // nights than the trip's dates hold, or a date past MAX_TRIP_DAYS. Surfaced
+  // rather than dropped, so nothing disappears without a trace.
+  const overflow: TimelineEntry[] = []
+  for (const [date, entries] of dated) {
+    if (!renderedDates.has(date)) overflow.push(...entries)
   }
 
   // Undated trips: day cells numbered from the stop schedule.
@@ -334,6 +379,7 @@ export function buildTimeline({ tripStartDate, tripEndDate, stops, items }: Buil
   }
 
   unscheduled.sort((a, b) => compareEntries(a, b, createdAt))
+  overflow.sort((a, b) => compareEntries(a, b, createdAt))
 
-  return { days, unscheduled }
+  return { days, unscheduled, overflow }
 }

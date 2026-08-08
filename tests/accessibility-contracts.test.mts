@@ -134,6 +134,49 @@ test('the plan sticky CTA only renders when it can act, and never eats the nav c
   assert.match(plan, /handlePointerUp\(e\)\s*\n\s*dragMoved\.current = false/)
 })
 
+test('each stop names its overnight/day-stop switch and keeps the stepper above zero', () => {
+  const plan = read('app/trip/[id]/mobile/PlanRouteDomain.tsx')
+
+  // Two-state control, named after the stop it belongs to.
+  assert.match(plan, /role="switch"\s*\n\s*aria-checked=\{isOvernight\}\s*\n\s*aria-label=\{`Stay overnight in \$\{stop\.name\}`\}/)
+  assert.match(plan, /onClick=\{\(\) => setStopIsOvernight\(stop\.id, !isOvernight\)\}/)
+  // Losing the last night is the switch's job; "−" stops at one so a mistap
+  // can't silently delete a trip day.
+  assert.match(plan, /aria-label=\{`Remove a night in \$\{stop\.name\}`\}[\s\S]*?disabled=\{stopNightCount <= 1\}/)
+  assert.match(plan, /const changeNights = \(id: string, delta: number\) => setStopNights\(id, Math\.max\(1, \(nights\[id\] \?\? 1\) \+ delta\)\)/)
+  // The stepper is hidden for a day stop, which says why it carries no nights.
+  assert.match(plan, /canEdit \? \(isOvernight \?/)
+  assert.match(plan, /Adds no day<\/span>\)/)
+  // Plan/date disagreement is announced, with both ways out.
+  assert.match(plan, /role="status"[\s\S]*?You planned \{nightsPlanned\}[\s\S]*?your dates cover \{nightsTotal\}/)
+  assert.match(plan, /\{savingDates \? 'Updating…' : 'Update dates'\}/)
+  assert.match(plan, /onClick=\{spreadNights\}[\s\S]*?Spread nights/)
+})
+
+test('an uncurated route escalates the one status region instead of adding a second card', () => {
+  const plan = read('app/trip/[id]/mobile/PlanRouteDomain.tsx')
+
+  // One region, three wordings. A separate backfill card would have meant a
+  // second "Update dates" button writing the same column from another place.
+  assert.equal(
+    plan.match(/role="status"/g)?.length,
+    1,
+    'Plan must announce the nights/dates disagreement from exactly one region',
+  )
+  assert.match(plan, /\{stops\.length > 0 && \(nightsMismatch \|\| noOvernightStops\) && \(/)
+  // Only a genuine over-plan, only on a route nobody has curated, and only for a
+  // member who can actually write the fix.
+  assert.match(plan, /const uncuratedRoute = stops\.length >= 3 && overnightStops\.length === stops\.length/)
+  assert.match(plan, /const needsBackfill = canEdit && nightsMismatch && nightsPlanned > nightsTotal && uncuratedRoute/)
+  // Same writer as Spread nights: optimistic, per-row rollback, Undo toast — not
+  // a ConfirmDialog, whose confirm button is styled for destruction.
+  assert.match(plan, /const makeAllDayStops = \(\) => \{[\s\S]*?void writeNightsBatch\(targets, 'Every stop is a day stop now/)
+  assert.match(plan, /onClick=\{makeAllDayStops\}[\s\S]*?Make all day stops/)
+  // Matching dates to a plan holding no nights would collapse the trip to one day.
+  assert.match(plan, /canEdit && trip\.start_date && nightsPlanned > 0 &&/)
+  assert.match(plan, /No overnight stops yet\. Tap 🌙 on the places you sleep/)
+})
+
 test('the onboarding restart shortcut never reaches production', () => {
   const entry = read('components/onboarding/mobile-entry-flow.tsx')
 
@@ -171,16 +214,13 @@ test('the trip primary nav marks its active section with aria-current', () => {
   assert.match(nav, /minHeight: 48/)
 })
 
-test('active Overview keeps exactly one primary amber action', () => {
+test('active Overview gives Travel Mode the only lifecycle-controlled accent', () => {
   const overview = read('app/trip/[id]/mobile/TripOverviewDomain.tsx')
-  const active = readTopLevelFunction(overview, 'ActiveContent')
+  const quickActions = readTopLevelFunction(overview, 'QuickActions')
 
-  const primaries = active.match(/<PrimaryButton\b/g) ?? []
-  assert.equal(primaries.length, 1, 'active Overview must have one primary CTA')
-  assert.match(active, /<PrimaryButton onClick=\{onTravelMode\}>Open Travel Mode<\/PrimaryButton>/)
-  // The old amber "Navigate to …" deep link is gone; secondary actions are ghosts.
-  assert.doesNotMatch(active, /ACCENT_GRADIENT/)
-  assert.match(active, /<GhostButton onClick=\{onViewPlan\}>View day<\/GhostButton>/)
+  assert.equal((quickActions.match(/accented:/g) ?? []).length, 1)
+  assert.match(quickActions, /label: 'Travel Mode'[\s\S]*?accented: travelModeIsAccented\(lifecycle\)/)
+  assert.doesNotMatch(quickActions, /label: 'Go Live'/)
 })
 
 test('user-facing trip copy never names a migration number', () => {
@@ -188,6 +228,67 @@ test('user-facing trip copy never names a migration number', () => {
 
   assert.doesNotMatch(mobile, /migration \d/i)
   assert.doesNotMatch(mobile, /is coming soon\./)
+})
+
+test('the trips library keeps a visible heading, honest filter semantics and 44px targets', () => {
+  const client = read('app/trips/TripsClient.tsx')
+  const css = read('app/trips/Trips.module.css')
+
+  // One visible <h1>; the sr-only title it replaced is gone.
+  assert.match(client, /<h1 className=\{styles\.title\}>My Trips<\/h1>/)
+  assert.doesNotMatch(client, /<h1 className=\{styles\.srOnly\}>/)
+
+  // A single filtered list is a segmented group, not a real tab/panel relationship.
+  assert.match(client, /role="group" aria-label="Filter trips"/)
+  assert.match(client, /aria-pressed=\{filter === id\}/)
+  assert.match(client, /aria-controls="trips-list"/)
+  assert.doesNotMatch(client, /role="tablist"/)
+  assert.doesNotMatch(client, /role="tab"/)
+  // Filter and search results are announced rather than silently swapped.
+  assert.match(client, /aria-live="polite"/)
+
+  // Both card controls are named; the cover art stays decorative.
+  assert.match(client, /aria-label=\{`Open \$\{trip\.title\}`\}/)
+  assert.match(client, /aria-label=\{`Open actions for \$\{trip\.title\}`\}/)
+  assert.match(client, /alt=""/)
+  assert.match(client, /type="search"/)
+  assert.match(client, /aria-label="Search trips"/)
+
+  const cardMenu = css.match(/\.cardMenu \{[\s\S]*?\n\}/)?.[0] ?? ''
+  assert.match(cardMenu, /width: 44px/)
+  assert.match(cardMenu, /height: 44px/)
+  const tripMain = css.match(/\.tripMain \{[\s\S]*?\n\}/)?.[0] ?? ''
+  const tripMainMinHeight = Number(tripMain.match(/min-height: (\d+)px/)?.[1] ?? 0)
+  assert.ok(tripMainMinHeight >= 44, `expected .tripMain min-height >= 44px, got ${tripMainMinHeight}`)
+})
+
+test('the discover category rail is a segmented group, not a tablist, and its results are announced', () => {
+  const rail = read('components/discover/DiscoverCategoryRail.tsx')
+  const railCss = read('components/discover/DiscoverCategoryRail.module.css')
+  const client = read('app/explore/DiscoverClient.tsx')
+
+  // Switching layers swaps a map source; there is no tab/panel pair to model.
+  assert.match(rail, /role="group"/)
+  assert.match(rail, /aria-label="Filter places by category"/)
+  assert.match(rail, /aria-pressed=\{isActive\}/)
+  assert.match(rail, /aria-controls="discover-results"/)
+  assert.doesNotMatch(rail, /role="tablist"/)
+  assert.doesNotMatch(rail, /role="tab"/)
+  assert.match(client, /id="discover-results"/)
+
+  const chip = railCss.match(/\.chip \{[\s\S]*?\n\}/)?.[0] ?? ''
+  const chipMinHeight = Number(chip.match(/min-height: (\d+)px/)?.[1] ?? 0)
+  assert.ok(chipMinHeight >= 44, `expected .chip min-height >= 44px, got ${chipMinHeight}`)
+
+  // The count changes on every layer switch and must not be a silent swap.
+  assert.match(client, /aria-live="polite"/)
+  // The row is the selection control; its thumbnail stays decorative.
+  assert.match(client, /aria-pressed=\{isSelected\}/)
+  assert.match(client, /className=\{styles\.thumb\} src=\{image\} alt=""/)
+
+  const row = read('app/explore/Discover.module.css').match(/\.row \{[\s\S]*?\n\}/)?.[0] ?? ''
+  const rowMinHeight = Number(row.match(/min-height: (\d+)px/)?.[1] ?? 0)
+  assert.ok(rowMinHeight >= 44, `expected .row min-height >= 44px, got ${rowMinHeight}`)
 })
 
 test('the offline flow renders one owned sheet instead of a stacked pair', () => {
@@ -201,7 +302,7 @@ test('the offline flow renders one owned sheet instead of a stacked pair', () =>
   assert.doesNotMatch(more, /OfflineAccessSheet/)
   // More closes itself before handing off, so the two never render together.
   assert.match(more, /label="Offline access"[\s\S]*?onSelect=\{\(\) => \{ onClose\(\); onOpenOffline\(\) \}\}/)
-  assert.match(overview, /title="Offline access"[\s\S]*?onSelect=\{onOpenOffline\}/)
+  assert.match(overview, /onClick=\{onOpenOffline\}[\s\S]*?Offline access<\/button>/)
   // Members/Activity keep the same one-sheet-at-a-time guard.
   assert.match(more, /open=\{open && !membersOpen && !activityOpen\}/)
 })

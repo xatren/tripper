@@ -40,6 +40,11 @@ export function addDays(iso: string, days: number): string {
   return `${year}-${month}-${day}`
 }
 
+/**
+ * Sequential stay schedule. A stop with 0 nights is a day stop: it adds no day,
+ * and its arrival/departure collapse onto the single day it's visited on — the
+ * day the traveler leaves the previous overnight stop.
+ */
 export function computeStopSchedule(
   startDate: string | null | undefined,
   stops: Stop[],
@@ -48,10 +53,10 @@ export function computeStopSchedule(
   let cursor = startDate ?? null
   let day = 1
   return stops.map((stop) => {
-    const stopNights = Math.max(1, nights[stop.id] ?? 1)
+    const stopNights = Math.max(0, nights[stop.id] ?? 1)
     const arrival = cursor
     const departure = cursor ? addDays(cursor, stopNights) : null
-    const entry = { arrival, departure, dayStart: day, dayEnd: day + stopNights - 1 }
+    const entry = { arrival, departure, dayStart: day, dayEnd: day + Math.max(0, stopNights - 1) }
     cursor = departure
     day += stopNights
     return entry

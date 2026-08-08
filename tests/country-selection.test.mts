@@ -8,6 +8,7 @@ import {
   getCountryOptions,
   parseCountrySelection,
   removeCountry,
+  resolveCountryCode,
   searchCountries,
   selectCountry,
   serializeCountrySelection,
@@ -24,6 +25,16 @@ test('country search is case- and accent-insensitive and supports common aliases
   assert.equal(searchCountries(options, 'jAPAn')[0]?.code, 'JP')
   assert.equal(searchCountries(options, 'cote divoire')[0]?.code, 'CI')
   assert.equal(searchCountries(options, 'USA')[0]?.code, 'US')
+})
+
+test('resolveCountryCode recovers a code from a legacy country name without matching prefixes', () => {
+  assert.equal(resolveCountryCode('Turkey', options), 'TR')
+  assert.equal(resolveCountryCode('Türkiye', options), 'TR')
+  assert.equal(resolveCountryCode('  united states of america ', options), 'US')
+  // Exact match only: a shorter name must not be absorbed by a longer one.
+  assert.equal(resolveCountryCode('Guinea', options), 'GN')
+  assert.equal(resolveCountryCode('Atlantis', options), null)
+  assert.equal(resolveCountryCode('', options), null)
 })
 
 test('single-country selection replaces the previous country', () => {

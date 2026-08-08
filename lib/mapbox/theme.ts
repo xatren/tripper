@@ -40,3 +40,22 @@ export function applyAppTheme(map: mapboxgl.Map) {
     }
   }
 }
+
+/**
+ * Removes stock Mapbox text/icon labels while keeping roads, terrain, the app
+ * route layer and React markers intact. Intended for decorative backdrops
+ * where map labels would compete with foreground UI copy.
+ */
+export function hideBaseMapLabels(map: mapboxgl.Map) {
+  const style = map.getStyle()
+  if (!style?.layers) return
+
+  for (const layer of style.layers) {
+    if (layer.type !== 'symbol') continue
+    try {
+      map.setLayoutProperty(layer.id, 'visibility', 'none')
+    } catch {
+      // Custom styles can expose immutable layers; leave those untouched.
+    }
+  }
+}

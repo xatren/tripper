@@ -9,10 +9,11 @@ import { tripCapabilitiesForRole } from '@/lib/trip-capabilities'
 import { PlanRouteDomain } from './PlanRouteDomain'
 import { TripOverviewDomain } from './TripOverviewDomain'
 import type { TripOverviewData } from './overview-data'
-import { formatDateRange, tripTitle } from './trip-domain-utils'
 import type { PrimaryNavSection } from './components/TripPrimaryNav'
 import { TripPrimaryNav } from './components/TripPrimaryNav'
 import { TripMobileHeader } from './components/TripMobileHeader'
+import { ItineraryTimeline } from './itinerary/ItineraryTimeline'
+import { OverviewRouteBackdrop } from './components/OverviewRouteBackdrop'
 import { TripMoreSheet } from './components/TripMoreSheet'
 import { OfflineAccessSheet } from './components/OfflineAccessSheet'
 import { OfflineStatus } from './components/OfflineStatus'
@@ -23,7 +24,7 @@ import { useRouter } from 'next/navigation'
 type LazySection = 'explore' | 'bookings'
 type MoreDestination = 'budget' | 'packing' | 'journal' | 'travel'
 /** What's actually on screen — Plan's own section, or a More destination layered over it. */
-type VisibleScreen = PrimaryNavSection | MoreDestination
+type VisibleScreen = PrimaryNavSection | MoreDestination | 'itinerary'
 
 const VALID_SECTIONS: PrimaryNavSection[] = ['overview', 'plan', 'explore', 'bookings']
 
@@ -59,6 +60,8 @@ export interface TripMobileClientProps {
   initialSection: PrimaryNavSection
   /** Server-batched summary sections for the Overview screen. */
   overview: TripOverviewData
+  initialDailyItinerary?: boolean
+  initialDailyDayId?: string | null
 }
 
 function DomainLoading({ label }: { label: string }) {
@@ -96,13 +99,14 @@ const SCREEN_LABEL: Record<VisibleScreen, string> = {
   packing: 'Packing',
   journal: 'Journal',
   travel: 'Travel Mode',
+  itinerary: 'Daily itinerary',
 }
 
 /** Coordinates navigation and the small amount of state shared by Plan and Journal. */
-export function TripMobileClient({ trip, stops: initialStops, items: initialItems, itineraryEnabled, currentUserId, members, capabilities, initialSection, overview }: TripMobileClientProps) {
+export function TripMobileClient({ trip, stops: initialStops, items: initialItems, itineraryEnabled, currentUserId, members, capabilities, initialSection, overview, initialDailyItinerary, initialDailyDayId }: TripMobileClientProps) {
   return (
     <TripRealtimeProvider tripId={trip.id} currentUserId={currentUserId} members={members}>
-      <TripMobileContent trip={trip} stops={initialStops} items={initialItems} itineraryEnabled={itineraryEnabled} currentUserId={currentUserId} members={members} capabilities={capabilities} initialSection={initialSection} overview={overview} />
+      <TripMobileContent trip={trip} stops={initialStops} items={initialItems} itineraryEnabled={itineraryEnabled} currentUserId={currentUserId} members={members} capabilities={capabilities} initialSection={initialSection} overview={overview} initialDailyItinerary={initialDailyItinerary} initialDailyDayId={initialDailyDayId} />
     </TripRealtimeProvider>
   )
 }
@@ -111,14 +115,19 @@ interface HistoryState {
   section?: PrimaryNavSection
   moreSheet?: boolean
   moreDestination?: MoreDestination
+  itinerary?: boolean
+  day?: string | null
 }
 
-function TripMobileContent({ trip, stops: initialStops, items: initialItems, itineraryEnabled, currentUserId, members: initialMembers, capabilities: initialCapabilities, initialSection, overview }: TripMobileClientProps) {
+function TripMobileContent({ trip, stops: initialStops, items: initialItems, itineraryEnabled, currentUserId, members: initialMembers, capabilities: initialCapabilities, initialSection, overview, initialDailyItinerary = false, initialDailyDayId = null }: TripMobileClientProps) {
   const router = useRouter()
   const [activeSection, setActiveSection] = useState<PrimaryNavSection>(initialSection)
   const [isMoreSheetOpen, setIsMoreSheetOpen] = useState(false)
   const [isOfflineSheetOpen, setIsOfflineSheetOpen] = useState(false)
   const [activeMoreDestination, setActiveMoreDestination] = useState<MoreDestination | null>(null)
+  const [dailyItineraryOpen, setDailyItineraryOpen] = useState(initialDailyItinerary)
+  const [dailyDayId, setDailyDayId] = useState<string | null>(initialDailyDayId)
+  const [dailySelectedItemId, setDailySelectedItemId] = useState<string | null>(null)
   const [visitedLazy, setVisitedLazy] = useState<Set<LazySection | MoreDestination>>(() => {
     const visited = new Set<LazySection | MoreDestination>()
     if (initialSection === 'explore' || initialSection === 'bookings') visited.add(initialSection)
@@ -292,16 +301,20 @@ function TripMobileContent({ trip, stops: initialStops, items: initialItems, iti
 
   // Deep-link sync: reflect nav state in the URL via the native History API so
   // sheet/section toggles never trigger a server re-fetch of this route.
-  const urlFor = useCallback((section: 'overview' | 'plan' | 'explore' | 'bookings' | 'more') => {
+  const urlFor = useCallback((section: 'overview' | 'plan' | 'explore' | 'bookings' | 'more', itinerary = false, day?: string | null) => {
     if (typeof window === 'undefined') return ''
     const url = new URL(window.location.href)
     url.searchParams.set('section', section)
+    if (itinerary) url.searchParams.set('view', 'itinerary')
+    else url.searchParams.delete('view')
+    if (itinerary && day) url.searchParams.set('day', day)
+    else url.searchParams.delete('day')
     return `${url.pathname}${url.search}`
   }, [])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
-    window.history.replaceState({ section: initialSection } satisfies HistoryState, '', urlFor(initialSection))
+    window.history.replaceState({ section: initialSection, itinerary: initialDailyItinerary, day: initialDailyDayId } satisfies HistoryState, '', urlFor(initialSection, initialDailyItinerary, initialDailyDayId))
     // Only the initial history entry needs the starting section attached; deps intentionally omitted.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -312,6 +325,8 @@ function TripMobileContent({ trip, stops: initialStops, items: initialItems, iti
       const state = (event.state ?? null) as HistoryState | null
       setIsMoreSheetOpen(!!state?.moreSheet)
       setActiveMoreDestination(state?.moreDestination ?? null)
+      setDailyItineraryOpen(!!state?.itinerary)
+      setDailyDayId(state?.day ?? null)
       if (state?.section && isPrimaryNavSection(state.section)) setActiveSection(state.section)
     }
     window.addEventListener('popstate', onPopState)
@@ -323,6 +338,7 @@ function TripMobileContent({ trip, stops: initialStops, items: initialItems, iti
     if (section === 'explore' || section === 'bookings') markVisited(section)
     setIsMoreSheetOpen(false)
     setActiveMoreDestination(null)
+    setDailyItineraryOpen(false)
     setActiveSection(section)
     if (typeof window !== 'undefined') {
       window.history.pushState({ section } satisfies HistoryState, '', urlFor(section))
@@ -330,6 +346,7 @@ function TripMobileContent({ trip, stops: initialStops, items: initialItems, iti
   }, [markVisited, urlFor])
 
   const openMoreSheet = useCallback(() => {
+    setDailyItineraryOpen(false)
     setIsMoreSheetOpen(true)
     if (typeof window !== 'undefined') {
       window.history.pushState({ section: activeSection, moreSheet: true } satisfies HistoryState, '', urlFor('more'))
@@ -342,6 +359,7 @@ function TripMobileContent({ trip, stops: initialStops, items: initialItems, iti
     markVisited(destination)
     setIsMoreSheetOpen(false)
     setActiveMoreDestination(destination)
+    setDailyItineraryOpen(false)
     if (typeof window !== 'undefined') {
       window.history.pushState({ section: activeSection, moreDestination: destination } satisfies HistoryState, '', urlFor('more'))
     }
@@ -349,17 +367,45 @@ function TripMobileContent({ trip, stops: initialStops, items: initialItems, iti
 
   const closeMoreDestination = useCallback(() => setActiveMoreDestination(null), [])
 
+  const openDailyItinerary = useCallback(() => {
+    setIsMoreSheetOpen(false)
+    setActiveMoreDestination(null)
+    setActiveSection('overview')
+    setDailyItineraryOpen(true)
+    if (typeof window !== 'undefined') {
+      window.history.pushState({ section: 'overview', itinerary: true, day: dailyDayId } satisfies HistoryState, '', urlFor('overview', true, dailyDayId))
+    }
+  }, [dailyDayId, urlFor])
+
+  const closeDailyItinerary = useCallback(() => {
+    setDailyItineraryOpen(false)
+    setDailySelectedItemId(null)
+    setActiveSection('overview')
+    if (typeof window !== 'undefined') {
+      window.history.replaceState({ section: 'overview' } satisfies HistoryState, '', urlFor('overview'))
+    }
+  }, [urlFor])
+
+  const selectDailyDay = useCallback((id: string | null) => {
+    setDailyDayId(id)
+    setDailySelectedItemId(null)
+    if (typeof window !== 'undefined' && dailyItineraryOpen) {
+      window.history.replaceState({ section: 'overview', itinerary: true, day: id } satisfies HistoryState, '', urlFor('overview', true, id))
+    }
+  }, [dailyItineraryOpen, urlFor])
+
   const prefetchSection = useCallback((section: PrimaryNavSection) => {
     if (typeof navigator !== 'undefined' && !navigator.onLine) return
     if (section === 'explore') void loadExploreDomain().catch(() => undefined)
     else if (section === 'bookings') void loadBookingsDomain().catch(() => undefined)
   }, [])
 
-  const visibleScreen: VisibleScreen = activeMoreDestination ?? activeSection
-  const navActive = isMoreSheetOpen || activeMoreDestination ? 'more' : activeSection
+  const visibleScreen: VisibleScreen = dailyItineraryOpen ? 'itinerary' : activeMoreDestination ?? activeSection
+  const navActive = dailyItineraryOpen ? 'plan' : isMoreSheetOpen || activeMoreDestination ? 'more' : activeSection
 
   return (
-    <div className="atmosphere" style={{ width: '100%', minHeight: '100svh', position: 'relative', color: 'var(--color-text-primary)', fontFamily: "var(--font-inter),'Inter',system-ui,-apple-system,sans-serif" }}>
+    <div className="atmosphere" style={{ width: '100%', minHeight: '100svh', height: '100svh', overflow: 'hidden', position: 'relative', color: 'var(--color-text-primary)', fontFamily: "var(--font-inter),'Inter',system-ui,-apple-system,sans-serif" }}>
+      {visibleScreen === 'overview' && <OverviewRouteBackdrop trip={trip} stops={stops} routePath={routePath} />}
       <div style={orb({ top: '2%', left: '50%', translate: '-50% 0', w: 380, h: 380, color: 'rgba(245,166,35,0.22)', blur: 90 })} />
       <div style={orb({ bottom: '22%', left: '-12%', w: 280, h: 280, color: 'rgba(120,50,220,0.18)', blur: 80 })} />
       <div style={orb({ top: '48%', right: '-10%', w: 240, h: 240, color: 'rgba(20,210,190,0.14)', blur: 80 })} />
@@ -385,6 +431,7 @@ function TripMobileContent({ trip, stops: initialStops, items: initialItems, iti
           onOpenMore={openMoreSheet}
           capabilities={capabilities}
           onStopSyncPaused={setStopSyncPaused}
+          suppressItinerary={dailyItineraryOpen}
         />
       </div>
 
@@ -392,22 +439,22 @@ function TripMobileContent({ trip, stops: initialStops, items: initialItems, iti
         aria-hidden={visibleScreen === 'plan'}
         style={{ position: 'relative', zIndex: 10, height: '100svh', maxWidth: 480, margin: '0 auto', display: visibleScreen === 'plan' ? 'none' : 'flex', flexDirection: 'column' }}
       >
-        <TripMobileHeader
-          variant="solid"
-          title={visibleScreen === 'overview' ? tripTitle(trip, stops) : SCREEN_LABEL[visibleScreen === 'plan' ? 'explore' : visibleScreen]}
-          subtitle={visibleScreen === 'overview' ? (formatDateRange(trip.start_date, trip.end_date) || 'No dates set') : undefined}
-          readOnly={!capabilities.canEdit}
-          members={members}
-          tripId={trip.id}
-          onBack={() => {
-            if (activeMoreDestination) closeMoreDestination()
-            else if (visibleScreen === 'overview') router.push('/trips')
-            else selectSection('overview')
-          }}
-          onOpenMore={openMoreSheet}
-          backLabel={activeMoreDestination ? `Back to ${SCREEN_LABEL[activeSection]}` : visibleScreen === 'overview' ? 'Back to trips' : 'Back to overview'}
-        />
-        <main style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '0 16px 16px' }}>
+        {visibleScreen !== 'overview' && visibleScreen !== 'itinerary' && (
+          <TripMobileHeader
+            variant="solid"
+            title={SCREEN_LABEL[visibleScreen === 'plan' ? 'explore' : visibleScreen]}
+            readOnly={!capabilities.canEdit}
+            members={members}
+            tripId={trip.id}
+            onBack={() => {
+              if (activeMoreDestination) closeMoreDestination()
+              else selectSection('overview')
+            }}
+            onOpenMore={openMoreSheet}
+            backLabel={activeMoreDestination ? `Back to ${SCREEN_LABEL[activeSection]}` : 'Back to overview'}
+          />
+        )}
+        <main id="trip-mobile-scroll" style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: visibleScreen === 'overview' || visibleScreen === 'itinerary' ? 0 : '0 16px 16px' }}>
           <div style={{ display: visibleScreen === 'overview' ? 'block' : 'none' }} aria-hidden={visibleScreen !== 'overview'}>
             <TripOverviewDomain
               trip={trip}
@@ -417,11 +464,38 @@ function TripMobileContent({ trip, stops: initialStops, items: initialItems, iti
               initialData={overview}
               routeLegs={routeLegs}
               visible={visibleScreen === 'overview'}
+              onBack={() => router.push('/dashboard')}
+              onOpenMore={openMoreSheet}
+              onOpenItinerary={openDailyItinerary}
               onSelectSection={selectSection}
               onOpenDestination={openMoreDestination}
               onOpenOffline={() => setIsOfflineSheetOpen(true)}
             />
           </div>
+          {dailyItineraryOpen && (
+            <div style={{ display: visibleScreen === 'itinerary' ? 'block' : 'none' }} aria-hidden={visibleScreen !== 'itinerary'}>
+              <ItineraryTimeline
+                trip={trip}
+                stops={stops}
+                items={items}
+                setItems={setItems}
+                onItemSyncPaused={setItemSyncPaused}
+                canEdit={capabilities.canEdit}
+                currentUserId={currentUserId}
+                members={members}
+                itineraryEnabled={itineraryEnabled}
+                createRequest={null}
+                selectedDayId={dailyDayId}
+                onSelectedDayIdChange={selectDailyDay}
+                selectedItemId={dailySelectedItemId}
+                onSelectItem={setDailySelectedItemId}
+                variant="daily"
+                requestedDayId={initialDailyDayId}
+                onBackToOverview={closeDailyItinerary}
+                onOpenMap={() => selectSection('plan')}
+              />
+            </div>
+          )}
           {visitedLazy.has('explore') && (
             <div style={{ display: visibleScreen === 'explore' ? 'block' : 'none' }} aria-hidden={visibleScreen !== 'explore'}>
               <DeferredBoundary label="the explore section" style={{ minHeight: 180 }}>

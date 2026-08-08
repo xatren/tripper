@@ -4,8 +4,14 @@
 --   table         -> exists(information_schema.tables)
 --   table_absent  -> migration DROPS this table; applied = it's gone
 --   column        -> exists(information_schema.columns), 'table.column'
+--   column_default-> column exists AND its default matches, 'table.column=default'
 --   bucket        -> exists(storage.buckets)
 --   function      -> exists(pg_proc) by name in public schema
+--   function_source -> function exists AND its body contains a marker string,
+--                      'function|marker'. The sharp signal for a migration that
+--                      only CREATE OR REPLACEs a function another migration
+--                      already created, where a bare 'function' check cannot
+--                      tell the two versions apart.
 --   function_search_path -> function exists AND has a search_path set in
 --                            proconfig (hardening migrations only add config,
 --                            they don't rename/create the function)
@@ -35,12 +41,26 @@ select
       select 1 from information_schema.columns
       where table_schema='public' and table_name = split_part(m.check_name, '.', 1) and column_name = split_part(m.check_name, '.', 2)
     )
+  when m.check_kind = 'column_default' then
+    exists (
+      select 1 from information_schema.columns
+      where table_schema='public'
+        and table_name = split_part(split_part(m.check_name, '=', 1), '.', 1)
+        and column_name = split_part(split_part(m.check_name, '=', 1), '.', 2)
+        and column_default = split_part(m.check_name, '=', 2)
+    )
   when m.check_kind = 'bucket' then
     exists (select 1 from storage.buckets where id = m.check_name)
   when m.check_kind = 'function' then
     exists (
       select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace
       where n.nspname = 'public' and p.proname = m.check_name
+    )
+  when m.check_kind = 'function_source' then
+    exists (
+      select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+      where n.nspname = 'public' and p.proname = split_part(m.check_name, '|', 1)
+        and p.prosrc like '%' || split_part(m.check_name, '|', 2) || '%'
     )
   when m.check_kind = 'function_search_path' then
     exists (
@@ -90,6 +110,15 @@ from (values
   ('20260717233029_travel_mode_events.sql',         'table',  'trip_events'),
   ('20260717233029_travel_mode_events.sql (col)',   'column', 'trip_events.visibility'),
   ('20260728000000_settlement_finance_invariants.sql',        'function', 'validate_settlement_invariants'),
-  ('20260728010000_invite_rate_limiting.sql',                  'table',   'invite_join_attempts')
+  ('20260728010000_invite_rate_limiting.sql',                  'table',   'invite_join_attempts'),
+  ('20260728020000_shared_rate_limiting.sql',                  'table',   'rate_limit_events'),
+  ('20260728020000_shared_rate_limiting.sql (config)',         'table',   'rate_limit_scope_config'),
+  ('20260728020000_shared_rate_limiting.sql (fn)',             'function','check_rate_limit'),
+  -- Two halves, two checks. The ALTER makes a stop added from Plan a day stop;
+  -- the CREATE OR REPLACE keeps the creation RPC at one night per stop. If the
+  -- first reads TRUE and the second FALSE, every trip made from the wizard or an
+  -- Explore route template is being born with zero-night stops.
+  ('20260808120000_stop_overnight_semantics.sql (nights default)', 'column_default',  'stops.nights=0'),
+  ('20260808120000_stop_overnight_semantics.sql (RPC nights)',     'function_source', 'create_trip_with_stops|nights')
 ) as m(migration, check_kind, check_name)
 order by 1;

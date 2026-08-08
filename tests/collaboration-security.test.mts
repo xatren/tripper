@@ -5,6 +5,7 @@ import { tripCapabilitiesForRole } from '../lib/trip-capabilities.ts'
 import { isPresenceFresh } from '../lib/presence.ts'
 
 const migration = readFileSync(new URL('../supabase/migrations/20260717230803_trip_collaboration.sql', import.meta.url), 'utf8')
+const cascadeFix = readFileSync(new URL('../supabase/migrations/20260805232514_skip_activity_during_trip_cascade.sql', import.meta.url), 'utf8')
 const realtime = readFileSync(new URL('../lib/supabase/trip-realtime.tsx', import.meta.url), 'utf8')
 const client = readFileSync(new URL('../app/trip/[id]/mobile/TripMobileClient.tsx', import.meta.url), 'utf8')
 
@@ -56,4 +57,10 @@ test('permission revocation clears member state and routes away', () => {
   assert.match(client, /permission_revoked/)
   assert.match(client, /setCapabilities\(tripCapabilitiesForRole\('viewer'\)\)/)
   assert.match(client, /setInterval\(\(\) => void refreshMembership\(\), 30_000\)/)
+})
+
+test('trip deletion does not recreate child activity during membership cascades', () => {
+  assert.match(cascadeFix, /tg_op = 'DELETE'[\s\S]*not exists \(select 1 from public\.trips where id = old\.trip_id\)/i)
+  assert.match(cascadeFix, /create or replace function public\.signal_trip_member_delete/i)
+  assert.match(cascadeFix, /revoke all on function public\.record_trip_activity\(\) from public, anon, authenticated/i)
 })

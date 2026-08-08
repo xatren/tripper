@@ -38,3 +38,7 @@ next-env.d.ts
 # supabase CLI local dev artifacts
 supabase/.branches/
 supabase/.temp/
+.env*
+
+# Resumable cache for scripts/generate-discover-places.mjs (build-time seeder)
+scripts/.discover-cache/

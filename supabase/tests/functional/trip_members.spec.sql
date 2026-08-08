@@ -178,4 +178,21 @@ do $$ begin
   end if;
 end $$;
 
+-- 8. Deleting a trip must not let cascading trip_members triggers recreate
+--    child activity rows for the parent that is being removed.
+do $$
+declare
+  disposable_trip_id uuid;
+begin
+  insert into public.trips (owner_id, title)
+  values (tests.user_id('owner'), 'Cascade deletion probe')
+  returning id into disposable_trip_id;
+
+  delete from public.trips where id = disposable_trip_id;
+
+  if exists (select 1 from public.trips where id = disposable_trip_id) then
+    raise exception 'owner must be able to delete a trip with membership activity triggers enabled';
+  end if;
+end $$;
+
 select 'trip membership RLS/RPC contract holds' as result;

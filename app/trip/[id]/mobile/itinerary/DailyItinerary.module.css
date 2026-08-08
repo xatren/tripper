@@ -1,0 +1,244 @@
+/* Screen 03 — Daily Itinerary.
+   Presentation for DailyItineraryView. Values reference the globals.css token
+   layer so this screen shares one source of truth with the rest of the app;
+   only genuinely per-instance values (pin coordinates) stay inline. */
+
+.screen {
+  min-height: 100%;
+  padding-bottom: calc(var(--space-24) + 4px + env(safe-area-inset-bottom, 0px));
+  background:
+    radial-gradient(circle at 85% 8%, rgba(245, 166, 35, .10), transparent 30%),
+    linear-gradient(180deg, #06061c 0%, #100d27 45%, #17102d 100%);
+}
+
+/* ── Header ─────────────────────────────────────────────────────────── */
+
+.header {
+  position: sticky;
+  z-index: 8;
+  top: 0;
+  padding: max(var(--space-12), env(safe-area-inset-top)) var(--space-16) 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, .06);
+  background: linear-gradient(180deg, rgba(7, 6, 23, .98) 68%, rgba(7, 6, 23, .88) 100%);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+}
+
+.backButton {
+  min-height: 44px;
+  padding: 0 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, .035);
+  color: var(--color-text-primary);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background var(--motion-fast) var(--ease-standard);
+}
+
+.backButton:hover { background: rgba(255, 255, 255, .09); }
+
+.viewOnly {
+  min-width: 44px;
+  color: var(--color-text-muted);
+  font-size: 11px;
+  font-weight: 750;
+  text-align: right;
+}
+
+.circleButton {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: 50%;
+  background: rgba(20, 18, 44, .78);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: background var(--motion-fast) var(--ease-standard);
+}
+
+.circleButton:hover:not(:disabled) { background: rgba(38, 34, 72, .9); }
+.circleButton:disabled { opacity: .35; cursor: default; }
+
+.addButton {
+  border: 0;
+  background: linear-gradient(145deg, #ffc766, #f58c00);
+  color: var(--color-text-on-accent);
+  box-shadow: 0 0 24px rgba(245, 140, 0, .35);
+}
+
+.addButton:hover:not(:disabled) { background: linear-gradient(145deg, #ffd489, #ff9a1a); }
+
+.dayNav {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  align-items: center;
+  gap: 9px;
+  margin-top: var(--space-12);
+}
+
+.dayLabel { min-width: 0; text-align: center; }
+
+.dayTitle {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 20px;
+  line-height: 1.18;
+  font-weight: 850;
+  letter-spacing: -.02em;
+}
+
+.dayTitle span { color: var(--color-text-muted); font-weight: 650; }
+
+.dayDate {
+  margin-top: 3px;
+  color: var(--color-text-muted);
+  font-size: 12.5px;
+  line-height: 1.25;
+  font-weight: 650;
+}
+
+/* Where tonight is spent. Accent-coloured because it belongs to the same
+   "nights" idea as Plan's 🌙 toggle, not to the neutral date line above it. */
+.dayBase {
+  margin-top: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-accent-light);
+  font-size: 12px;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+/* ── Body ───────────────────────────────────────────────────────────── */
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  padding: var(--space-20) 18px 10px;
+}
+
+/* ── Route preview ──────────────────────────────────────────────────── */
+
+.routeHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-12);
+}
+
+.routeTitle {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.routeStatus { color: var(--color-text-muted); font-size: 12px; }
+
+.routeEmpty {
+  min-height: 112px;
+  margin-top: 10px;
+  padding: var(--space-20);
+  display: grid;
+  place-items: center;
+  border: 1px dashed rgba(255, 255, 255, .13);
+  border-radius: var(--radius-20);
+  background: rgba(255, 255, 255, .035);
+  color: var(--color-text-muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+.mapFrame {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  height: clamp(145px, 43vw, 185px);
+  margin-top: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, .13);
+  border-radius: 21px;
+  background: #0c0b22;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, .22);
+  cursor: pointer;
+}
+
+.mapFrame:hover .mapBadge { background: rgba(245, 166, 35, .18); color: var(--color-accent-light); }
+
+.mapCanvas { position: absolute; inset: 0; pointer-events: none; }
+
+.mapBadge {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  padding: 5px 8px;
+  border: 1px solid rgba(255, 255, 255, .13);
+  border-radius: var(--radius-full);
+  background: rgba(8, 7, 25, .76);
+  color: rgba(255, 255, 255, .72);
+  font-size: 10.5px;
+  font-weight: 750;
+  transition: background var(--motion-fast) var(--ease-standard), color var(--motion-fast) var(--ease-standard);
+}
+
+/* Static stand-in when Mapbox itself fails; keeps the day's shape legible. */
+.mapFallback {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 75% 25%, rgba(92, 64, 134, .5), transparent 24%),
+    linear-gradient(145deg, #0e1730, #201331);
+}
+
+.fallbackGridA,
+.fallbackGridB { position: absolute; left: -8%; right: -8%; height: 1px; }
+.fallbackGridA { top: 54%; rotate: -8deg; background: rgba(255, 255, 255, .08); }
+.fallbackGridB { top: 68%; rotate: 10deg; background: rgba(255, 255, 255, .06); }
+
+.fallbackPin {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  translate: -50% -50%;
+  display: grid;
+  place-items: center;
+  border: 3px solid #0a1020;
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: #1b1203;
+  font-size: 10px;
+  font-weight: 850;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backButton,
+  .circleButton,
+  .mapBadge { transition: none; }
+}
+
+@media (forced-colors: active) {
+  .backButton,
+  .circleButton,
+  .mapFrame,
+  .routeEmpty { border: 1px solid CanvasText; }
+}

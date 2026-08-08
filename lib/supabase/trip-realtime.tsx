@@ -254,9 +254,9 @@ export function useTripRealtimeTable<Row extends Record<string, unknown>>(
 
 export function TripRealtimeStatusBadge() {
   const realtime = useContext(TripRealtimeContext)
-  if (!realtime || realtime.status === 'connected') return null
-
-  const disconnected = realtime.status === 'disconnected'
+  // Brief reconnects should not cover the trip hero. Only surface the state
+  // that needs the user's attention.
+  if (!realtime || realtime.status !== 'disconnected') return null
   return (
     <div
       role="status"
@@ -279,7 +279,7 @@ export function TripRealtimeStatusBadge() {
         pointerEvents: 'none',
       }}
     >
-      {disconnected ? 'Live updates paused' : 'Syncing trip changes…'}
+      Live updates paused
     </div>
   )
 }
