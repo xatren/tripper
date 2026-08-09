@@ -1,14 +1,17 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import type { DiscoverPlace } from '../lib/discover/discover-places.generated.ts'
+import type { DiscoverRoute } from '../lib/discover/discover-routes.generated.ts'
 import {
   boundsContain,
   boundsForPlaces,
   filterDiscoverPlaces,
+  filterDiscoverRoutes,
   hasCuratedCoverage,
   normalizeLongitude,
   placesToFeatureCollection,
   rankedSlice,
+  routesToLineFeatureCollection,
   shouldRefitCamera,
   sliceByPage,
 } from '../lib/discover/discover-query.ts'
@@ -141,4 +144,73 @@ test('curated coverage distinguishes an unmapped country from an empty category'
   assert.ok(hasCuratedCoverage(' it ', ['IT', 'TR']))
   assert.equal(hasCuratedCoverage('JP', ['IT', 'TR']), false)
   assert.equal(hasCuratedCoverage(null, ['IT', 'TR']), false)
+})
+
+function route(overrides: Partial<DiscoverRoute> & { id: string }): DiscoverRoute {
+  return {
+    name: overrides.id,
+    country: 'Turkey',
+    countryCode: 'TR',
+    lat: 38.6,
+    lng: 34.8,
+    emoji: '🎈',
+    tag: 'Hidden Gem',
+    distance: '180 km',
+    duration: '3–4 days',
+    bestSeason: 'Apr – Jun',
+    description: 'A test route.',
+    highlights: [],
+    waypoints: [
+      { name: 'A', lat: 38.6, lng: 34.8 },
+      { name: 'B', lat: 38.7, lng: 34.9 },
+    ],
+    ...overrides,
+  }
+}
+
+const ROUTE_FIXTURE: DiscoverRoute[] = [
+  route({ id: 'tr-b-route', name: 'Bravo Route' }),
+  route({ id: 'tr-a-route', name: 'Alpha Route' }),
+  route({ id: 'it-route', name: 'Italy Route', country: 'Italy', countryCode: 'IT' }),
+]
+
+test('filterDiscoverRoutes scopes to a country and orders alphabetically', () => {
+  const tr = filterDiscoverRoutes(ROUTE_FIXTURE, 'TR')
+  assert.deepEqual(tr.map((r) => r.id), ['tr-a-route', 'tr-b-route'])
+
+  const all = filterDiscoverRoutes(ROUTE_FIXTURE, null)
+  assert.deepEqual(all.map((r) => r.id), ['tr-a-route', 'tr-b-route', 'it-route'])
+})
+
+test('filterDiscoverRoutes is case-insensitive and tolerates blank input like filterDiscoverPlaces', () => {
+  assert.equal(filterDiscoverRoutes(ROUTE_FIXTURE, 'tr').length, 2)
+  assert.equal(filterDiscoverRoutes(ROUTE_FIXTURE, '  ').length, 3)
+  assert.equal(filterDiscoverRoutes(ROUTE_FIXTURE, undefined).length, 3)
+  assert.equal(filterDiscoverRoutes(ROUTE_FIXTURE, 'ZZ').length, 0)
+})
+
+test('routesToLineFeatureCollection produces one LineString per route, waypoints in order', () => {
+  const routes = filterDiscoverRoutes(ROUTE_FIXTURE, 'TR')
+  const collection = routesToLineFeatureCollection(routes)
+  assert.equal(collection.type, 'FeatureCollection')
+  assert.equal(collection.features.length, 2)
+
+  const first = collection.features[0]
+  assert.equal(first.id, 0)
+  assert.equal(first.geometry.type, 'LineString')
+  assert.deepEqual(first.geometry.coordinates, [[34.8, 38.6], [34.9, 38.7]])
+  assert.deepEqual(first.properties, { id: 'tr-a-route', name: 'Alpha Route' })
+})
+
+test('routesToLineFeatureCollection over no routes is an empty FeatureCollection, not a throw', () => {
+  assert.deepEqual(routesToLineFeatureCollection([]), { type: 'FeatureCollection', features: [] })
+})
+
+test('boundsForPlaces and shouldRefitCamera work over route waypoints too, not just DiscoverPlace', () => {
+  const waypoints = ROUTE_FIXTURE[0].waypoints
+  const bounds = boundsForPlaces(waypoints)
+  assert.ok(bounds)
+  assert.deepEqual(bounds, { west: 34.8, south: 38.6, east: 34.9, north: 38.7 })
+  assert.equal(shouldRefitCamera(waypoints, null), true)
+  assert.equal(shouldRefitCamera(waypoints, bounds), false)
 })

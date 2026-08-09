@@ -21,10 +21,18 @@ test('every category id is unique and resolvable', () => {
 })
 
 test('an unknown or missing category degrades to the default rather than throwing', () => {
-  for (const value of ['hidden_gems', 'routes', '', null, undefined]) {
+  // `routes` shipped in Phase 7 and is no longer unknown — see the dedicated
+  // `hidden_gems`-only deferred-category test below.
+  for (const value of ['hidden_gems', '', null, undefined]) {
     assert.equal(discoverCategory(value).id, DEFAULT_DISCOVER_CATEGORY)
     assert.equal(isDiscoverCategory(value), false)
   }
+})
+
+test('hidden_gems is still deferred, unlike routes which shipped in Phase 7', () => {
+  assert.equal(isDiscoverCategory('hidden_gems'), false)
+  assert.ok(isDiscoverCategory('routes'))
+  assert.equal(discoverCategory('routes').source, 'curated')
 })
 
 test('the default category is curated, so a cold open never costs a billed call', () => {
@@ -50,8 +58,12 @@ test('the two layer kinds together account for every category', () => {
 test('only overnight-shaped categories default to a night, so a stop never silently adds a trip day', () => {
   // `nights: 1` creates a trip day (20260808120000_stop_overnight_semantics.sql).
   // Getting this wrong on a viewpoint would lengthen the trip behind the user's back.
+  // `routes` also defaults to 1, but §9's own rule for it is documented as
+  // unread — a route becomes several stops (its waypoints), never one, via
+  // lib/discover/add-to-route.ts's route-specific builders (each explicit
+  // `nights: 1`), not this field.
   const overnight = DISCOVER_CATEGORIES.filter((category) => category.defaultStopNights === 1).map((c) => c.id)
-  assert.deepEqual([...overnight].sort(), ['cities', 'stays'])
+  assert.deepEqual([...overnight].sort(), ['cities', 'routes', 'stays'])
   for (const category of DISCOVER_CATEGORIES) {
     assert.ok([0, 1].includes(category.defaultStopNights), `${category.id} has a non-boolean night default`)
   }

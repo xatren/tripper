@@ -119,15 +119,9 @@
   box-shadow: 0 18px 48px rgba(0,0,0,.46);
   transition: height .32s cubic-bezier(.22,.9,.3,1), transform .18s ease;
 }
-.routeSheet.collapsed { height: 132px; }
-.routeSheet.half { height: 47svh; min-height: 340px; }
-.routeSheet.expanded { height: calc(100svh - max(190px, env(safe-area-inset-top) + 174px)); min-height: 390px; }
-
-.sheetHandle { width: 100%; min-height: 44px; display: grid; place-items: center; padding: 0; border: 0; background: transparent; cursor: ns-resize; touch-action: none; }
-.sheetHandle span { width: 38px; height: 4px; border-radius: 99px; background: rgba(255,255,255,.34); }
-.sheetHandle:focus-visible { outline: none !important; }
-.sheetHandle:focus-visible span { outline: 3px solid var(--amber); outline-offset: 4px; }
-.routeSheet.collapsed .sheetHandle { position: absolute; inset: 0 0 auto; z-index: 2; }
+/* Level heights and the drag handle now live in components/mobile/DraggableSheet.module.css,
+   shared with Discover — .routeSheet stays only as the shell for the static
+   no-trip card below, which never mounts DraggableSheet. */
 .collapsedCard { height: 100%; display: grid; grid-template-columns: minmax(0, 1fr) 40px; align-items: center; gap: 10px; padding: 27px 14px 12px 16px; }
 .cardMain { min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 0; border: 0; background: transparent; color: #fff; cursor: pointer; text-align: left; }
 .cardTitleRow { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; }
@@ -150,7 +144,11 @@
 .routeStats button { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; padding: 4px 7px; border: 0; border-radius: 8px; background: rgba(245,166,35,.12); color: #ffc56f; font-size: 10px; cursor: pointer; }
 .routeLoading::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--amber); animation: routePulse 1.2s ease-in-out infinite; }
 
-.stopList { min-height: 0; height: calc(100% - 180px); overflow-y: auto; overscroll-behavior: contain; padding: 0 12px 12px; scrollbar-width: thin; }
+/* Sits inside a flex-column wrapper (.expandedBody) with .sheetActions, so it
+   grows to fill whatever space the sticky heading/stats/actions leave behind
+   instead of guessing their combined height as a fixed pixel budget. */
+.expandedBody { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+.stopList { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0 12px 12px; scrollbar-width: thin; }
 .stopRow { width: 100%; min-height: 72px; display: grid; grid-template-columns: 25px 42px minmax(0,1fr) 20px; align-items: center; gap: 9px; padding: 9px 8px; border: 1px solid transparent; border-radius: 15px; background: transparent; color: #fff; cursor: pointer; text-align: left; }
 .stopRow + .stopRow { margin-top: 3px; }
 .stopRow:hover { background: rgba(255,255,255,.045); }
@@ -167,7 +165,10 @@
 .noStops { min-height: 150px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; color: rgba(255,255,255,.48); }
 .noStops strong { color: #fff; font-size: 14px; }
 .noStops span { font-size: 11px; }
-.sheetActions { position: absolute; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 10px 14px max(12px, env(safe-area-inset-bottom)); background: linear-gradient(to top, rgba(12,12,32,1) 72%, rgba(12,12,32,.1)); }
+/* Flowed as the last flex item in .expandedBody, not absolutely pinned — a
+   solid footer rather than a gradient fade, since there is no scrolling list
+   underneath it to blend with anymore. */
+.sheetActions { flex: none; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 10px 14px max(12px, env(safe-area-inset-bottom)); border-top: 1px solid rgba(255,255,255,.08); background: rgba(12,12,32,1); }
 .sheetActions button, .primaryAction, .joinAction { min-height: 44px; border: 1px solid rgba(255,255,255,.13); border-radius: 13px; background: rgba(255,255,255,.055); color: #fff; font-size: 12px; font-weight: 750; cursor: pointer; }
 .sheetActions .primaryAction, .primaryAction { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 0; background: linear-gradient(135deg, #f5a623, #ff8a1f); color: #231402; box-shadow: 0 8px 22px rgba(245,140,0,.22); }
 

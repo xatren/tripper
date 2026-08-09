@@ -1,0 +1,12 @@
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  /* Skips layout and paint for rows scrolled out of view. Cheaper than a
+     virtualizer and free of its scroll-restoration problems (§6.3). */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 60px;
+}

@@ -21,10 +21,10 @@
   border: 0;
 }
 
-.mapLayer { position: absolute; inset: 0; z-index: 1; background: #08081e; }
+.mapLayer { position: absolute; inset: 0; z-index: 1; background: var(--color-bg-base); }
 .topScrim, .bottomScrim { position: absolute; left: 0; right: 0; z-index: 2; pointer-events: none; }
-.topScrim { top: 0; height: 150px; background: linear-gradient(to bottom, rgba(5, 5, 20, 0.76), rgba(5, 5, 20, 0.18) 62%, transparent); }
-.bottomScrim { bottom: 0; height: 320px; background: linear-gradient(to top, rgba(5, 5, 20, 0.88), rgba(5, 5, 20, 0.22) 64%, transparent); }
+.topScrim { top: 0; height: 150px; background: var(--scrim-map-top); }
+.bottomScrim { bottom: 0; height: 320px; background: var(--scrim-map-bottom); }
 
 .mapFallback {
   position: absolute;
@@ -35,13 +35,15 @@
   justify-content: center;
   gap: 10px;
   color: var(--color-text-secondary);
-  background:
-    radial-gradient(circle at 68% 30%, rgba(60, 80, 155, 0.3), transparent 32%),
-    radial-gradient(circle at 22% 68%, rgba(99, 48, 140, 0.22), transparent 34%),
-    linear-gradient(160deg, #111334, #070718 70%);
+  background: var(--gradient-map-fallback);
 }
 .mapFallback p { margin: 0; max-width: 260px; text-align: center; font-size: 13px; }
 
+/* Fill/border/blur match --glass-elevated-* (the design system names sheets
+   as an elevated-tier surface). box-shadow stays bespoke: elevated's own
+   shadow assumes a bottom-pinned element (negative y-offset, shadow only
+   above it) but this sheet floats with a gap below it, so it needs a normal
+   shadow on every side instead. */
 .sheet {
   position: fixed;
   z-index: 30;
@@ -54,11 +56,26 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid var(--glass-elevated-border);
   border-radius: var(--radius-24);
-  background: rgba(12, 12, 32, 0.94);
-  -webkit-backdrop-filter: blur(16px);
-  backdrop-filter: blur(16px);
+  background: var(--glass-elevated-fill);
+  -webkit-backdrop-filter: blur(var(--glass-elevated-blur));
+  backdrop-filter: blur(var(--glass-elevated-blur));
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.46);
+}
+
+/* §13 desktop rail: same decorative shell as .sheet, but no position/size
+   rules — DraggableSheet's own .rail class (co-located with .sheet, so its
+   cascade order is guaranteed) owns the fixed left-column geometry. */
+.sheetRail {
+  padding: 12px 14px 10px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--glass-elevated-border);
+  background: var(--glass-elevated-fill);
+  -webkit-backdrop-filter: blur(var(--glass-elevated-blur));
+  backdrop-filter: blur(var(--glass-elevated-blur));
   box-shadow: 0 18px 48px rgba(0, 0, 0, 0.46);
 }
 
@@ -72,6 +89,36 @@
   letter-spacing: 0.02em;
 }
 
+/* §4.3/§15 case 17: the manual live-search control, never an automatic refetch. */
+.liveSearchBar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 8px;
+}
+.searchAreaButton {
+  flex: 0 0 auto;
+  min-height: 40px;
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 0;
+  border-radius: var(--radius-12);
+  background: var(--gradient-accent-cta);
+  color: var(--color-text-on-accent);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.searchAreaButton:disabled { opacity: 0.6; cursor: default; }
+.liveError {
+  color: var(--color-text-muted);
+  font-size: 11.5px;
+}
+
 /* The list is the only scrolling region; the rail and credit line stay put. */
 .results {
   flex: 1 1 auto;
@@ -80,64 +127,8 @@
   overscroll-behavior-y: contain;
 }
 
-.list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  /* Skips layout and paint for rows scrolled out of view. Cheaper than a
-     virtualizer and free of its scroll-restoration problems (§6.3). */
-  content-visibility: auto;
-  contain-intrinsic-size: auto 60px;
-}
-
-.row {
-  width: 100%;
-  min-height: 56px;
-  padding: 6px 8px;
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  border: 1px solid transparent;
-  border-radius: var(--radius-12);
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-.row:hover { background: rgba(255, 255, 255, 0.05); }
-.rowSelected {
-  border-color: rgba(245, 166, 35, 0.45);
-  background: rgba(245, 166, 35, 0.1);
-}
-
-.thumb, .thumbFallback {
-  flex: 0 0 auto;
-  width: 56px;
-  height: 44px;
-  border-radius: 9px;
-  object-fit: cover;
-  background: linear-gradient(140deg, rgba(80, 96, 180, 0.4), rgba(99, 48, 140, 0.32));
-}
-
-.rowText { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.rowName {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 13.5px;
-  font-weight: 700;
-}
-.rowMeta {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: var(--color-text-muted);
-  font-size: 11.5px;
-}
+/* Row/list styling moved to components/discover/DiscoverResultsList.module.css
+   and DiscoverPlaceCard.module.css when those were extracted in Phase 3. */
 
 .empty {
   margin: 10px 6px;
@@ -153,7 +144,7 @@
   gap: 10px;
   padding-top: 8px;
   margin-top: 2px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid var(--glass-subtle-border);
 }
 .creditText {
   min-width: 0;
@@ -171,9 +162,9 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.13);
+  border: 1px solid var(--glass-standard-border);
   border-radius: var(--radius-12);
-  background: rgba(255, 255, 255, 0.055);
+  background: var(--glass-standard-fill);
   color: var(--color-text-primary);
   font: inherit;
   font-size: 11.5px;
@@ -181,13 +172,13 @@
   white-space: nowrap;
   cursor: pointer;
 }
-.creditAction:hover { border-color: rgba(245, 166, 35, 0.34); }
+.creditAction:hover { border-color: var(--color-accent-border-hover); }
 .creditActionPrimary {
   composes: creditAction;
   border: 0;
-  background: linear-gradient(135deg, var(--color-accent), #ff8a1f);
+  background: var(--gradient-accent-cta);
   color: var(--color-text-on-accent);
-  box-shadow: 0 8px 22px rgba(245, 140, 0, 0.22);
+  box-shadow: var(--shadow-accent-cta);
 }
 
 @media (forced-colors: active) {

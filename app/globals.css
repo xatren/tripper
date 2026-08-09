@@ -126,6 +126,48 @@
   --scrim-top: linear-gradient(to bottom, rgba(6, 6, 20, 0.8) 0%, rgba(6, 6, 20, 0.45) 55%, transparent 100%);
   --scrim-bottom: linear-gradient(to bottom, transparent 0%, rgba(6, 6, 28, 0.6) 100%);
 
+  /* Full-bleed map scrims (Discover, Phase 9) — taller, softer-stop variants of
+     scrim-top/bottom sized for a viewport-height map canvas rather than a card
+     header/footer; same base color, kept separate so the card-scrim shape stays
+     untouched. */
+  --scrim-map-top: linear-gradient(to bottom, rgba(6, 6, 20, 0.76), rgba(6, 6, 20, 0.18) 62%, transparent);
+  --scrim-map-bottom: linear-gradient(to top, rgba(6, 6, 20, 0.88), rgba(6, 6, 20, 0.22) 64%, transparent);
+
+  /* Accent-tinted selection/hover washes (Phase 9) — the repeated "this chip/
+     card/row is selected or active" treatment used across Discover's chips,
+     cards and pickers. Consolidated from several near-identical alpha values
+     (.4/.42/.45 border, .1/.12 fill) that had drifted apart across files. */
+  --color-accent-wash: rgba(245, 166, 35, 0.1);
+  --color-accent-border-hover: rgba(245, 166, 35, 0.34);
+  --color-accent-border-selected: rgba(245, 166, 35, 0.42);
+
+  /* Success wash for "added" badges/pills (Phase 9). */
+  --color-success-wash: rgba(52, 211, 153, 0.14);
+  --color-success-wash-text: #6ee7b7;
+
+  /* Primary-CTA drop shadow paired with --gradient-accent-cta (Phase 9). */
+  --shadow-accent-cta: 0 8px 22px rgba(245, 140, 0, 0.22);
+
+  /* Shared placeholder gradient for a photo/thumb that hasn't loaded or has no
+     image (Phase 9) — identical value was duplicated 3x across Discover cards. */
+  --gradient-image-placeholder: linear-gradient(140deg, rgba(80, 96, 180, 0.4), rgba(99, 48, 140, 0.32));
+
+  /* Neutral hover wash for transparent icon/row buttons nested inside an
+     already-blurred glass surface (Phase 9) — deliberately not another glass
+     tier, since stacking backdrop-filter on a child of a blurred sheet is
+     wasted paint cost for a 1-2px visual difference. */
+  --overlay-hover-fill: rgba(255, 255, 255, 0.06);
+  --overlay-border-hover: rgba(255, 255, 255, 0.26);
+
+  /* Map-failed empty-state art (Phase 9) — the two radial highlights were
+     already chosen to echo --color-info (blue) and --color-ai (violet); made
+     that explicit with color-mix() instead of re-deriving a third pair of
+     literal rgba() values. */
+  --gradient-map-fallback:
+    radial-gradient(circle at 68% 30%, color-mix(in srgb, var(--color-info) 34%, transparent), transparent 32%),
+    radial-gradient(circle at 22% 68%, color-mix(in srgb, var(--color-ai) 26%, transparent), transparent 34%),
+    linear-gradient(160deg, var(--color-surface-raised), var(--color-bg-deep) 70%);
+
   /* Radii */
   --radius-8: 8px;
   --radius-12: 12px;

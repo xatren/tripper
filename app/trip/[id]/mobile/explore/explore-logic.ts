@@ -29,18 +29,6 @@ export interface CategoryChip {
   defaultDurationMin: number
 }
 
-export const CATEGORY_CHIPS: CategoryChip[] = [
-  { id: 'all', label: 'All', searchTerm: '', defaultItemType: 'place', defaultDurationMin: 60 },
-  { id: 'restaurants', label: 'Restaurants', searchTerm: 'restaurants', defaultItemType: 'restaurant', defaultDurationMin: 75 },
-  { id: 'cafes', label: 'Cafes', searchTerm: 'cafe', defaultItemType: 'restaurant', defaultDurationMin: 45 },
-  { id: 'hotels', label: 'Hotels', searchTerm: 'hotel', defaultItemType: 'stay', defaultDurationMin: 0 },
-  { id: 'attractions', label: 'Attractions', searchTerm: 'attractions', defaultItemType: 'activity', defaultDurationMin: 90 },
-  { id: 'museums', label: 'Museums', searchTerm: 'museum', defaultItemType: 'activity', defaultDurationMin: 120 },
-  { id: 'parks', label: 'Parks', searchTerm: 'park', defaultItemType: 'activity', defaultDurationMin: 60 },
-  { id: 'shopping', label: 'Shopping', searchTerm: 'shopping', defaultItemType: 'activity', defaultDurationMin: 60 },
-  { id: 'nightlife', label: 'Nightlife', searchTerm: 'nightlife', defaultItemType: 'activity', defaultDurationMin: 120 },
-]
-
 export const DURATION_STEPS_MIN = [30, 45, 60, 90, 120, 180, 240, 360, 480]
 
 /** Compact duration label from raw minutes, e.g. 90 -> "1h 30m". 0 -> "Flexible". */

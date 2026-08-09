@@ -1,0 +1,88 @@
+.body { display: flex; flex-direction: column; gap: 12px; }
+
+.meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.metaRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--color-text-secondary);
+  font-size: 12.5px;
+}
+/* See DiscoverPlaceSheet.module.css's .categoryPill: same photo-overlay pill
+   pattern, same --glass-elevated-border approximation. */
+.tagPill {
+  padding: 3px 9px;
+  border: 1px solid var(--glass-elevated-border);
+  border-radius: var(--radius-full);
+  color: var(--color-text-primary);
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.description { margin: 0; color: var(--color-text-secondary); font-size: 13.5px; line-height: 1.55; }
+
+.highlights { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.highlights li {
+  padding-left: 16px;
+  position: relative;
+  color: var(--color-text-secondary);
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+.highlights li::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 7px;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--color-accent);
+}
+
+.actions { display: flex; flex-direction: column; gap: 8px; }
+
+.primaryButton {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 0;
+  border-radius: var(--radius-12);
+  background: var(--gradient-accent-cta);
+  color: var(--color-text-on-accent);
+  box-shadow: var(--shadow-accent-cta);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 750;
+  cursor: pointer;
+}
+.primaryButton:disabled { cursor: default; opacity: 0.75; }
+
+.secondaryButton {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid var(--glass-standard-border);
+  border-radius: var(--radius-12);
+  background: var(--glass-standard-fill);
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.secondaryButton:disabled { cursor: default; opacity: 0.6; }
+.secondaryButton:hover:not(:disabled) { border-color: var(--color-accent-border-hover); }
+
+@media (forced-colors: active) {
+  .primaryButton, .secondaryButton { border: 1px solid CanvasText; }
+}

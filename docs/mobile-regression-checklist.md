@@ -76,3 +76,28 @@ Test as both an `editor`/`owner` member and a `viewer` member of the same trip:
 - [ ] At 430px: verify content doesn't stretch awkwardly wide — check that text line lengths and card widths stay readable, per the mobile-only (not desktop) design intent
 - [ ] Focus-visible outlines are present and visible (not suppressed) when navigating by keyboard/switch control at any viewport, on all primary actions (FAB, tab bar, form submit buttons)
 - [ ] Screen reader labels: bottom nav icons, FAB, and icon-only buttons (delete/rename on stop rows, journal photo actions) all have accessible names — spot check with a screen reader or the accessibility tree in devtools
+
+## 9. Discover (`/explore`) live layers and desktop rail
+
+Added for Phase 5 — see `docs/discover-explore-map-plan.md` §16.
+
+- [ ] At each of the 4 mobile viewports: `Food` / `Museums` / `Stays` chips render disabled (with a "zoom in" tooltip on long-press/hover) at the default country zoom, and become tappable once the map is zoomed in past the `LIVE_LAYER_MIN_ZOOM` threshold
+- [ ] Selecting a live category never auto-fetches — a "Search this area" button must be tapped; panning the map afterward flips the button to "Search again" rather than firing a request on its own
+- [ ] A live category at a too-far-out zoom shows the country's Must Visit set with a "Zoom in to search…" note, never a blank map or a silent empty list
+- [ ] Tapping a live result opens the "Save to trip" sheet (not the curated `DiscoverPlaceSheet`/Add to Route flow); saving navigates to Plan with a "View in Plan" toast action
+- [ ] At ≥1024px viewport width: the results sheet becomes a fixed left rail (no drag handle, always expanded) and the map fills the remainder; resizing across the 1024px boundary swaps layouts without a reload
+- [ ] At ≥1024px: hovering a result card visibly enlarges its map pin, and the enlargement clears on mouse-leave
+
+## 10. Discover Phase 6 — states, cleanup regressions
+
+Added for Phase 6 — see `docs/discover-explore-map-plan.md` §16 Phase 6 and §15.
+
+- [ ] Adding a stop to the active trip from a second tab/device, then switching back to a backgrounded Discover tab, refreshes the "already added" set (`✓ In your route`) without a manual reload — confirms the `visibilitychange` stops refetch (§15 case 13)
+- [ ] Double-tapping "Add to Route" / "Save to itinerary" quickly cannot create two rows — the button disables on the first tap and the in-flight guard blocks a second insert from another card (§15 case 12)
+- [ ] Two curated places at (near-)identical coordinates render as one cluster at every zoom level; opening the results sheet still lists both individually (§15 case 9)
+- [ ] A dateline-crossing country (e.g. Fiji, Russia, or the US) frames correctly with no antimeridian-wrap artifact in the pin bounding box (§15 case 10)
+- [ ] A large country (e.g. Russia, Canada) keeps pin density legible — rank-capped, not thousands of overlapping pins (§15 case 11)
+- [ ] The country search sheet's text input remains visible above the on-screen keyboard, and the sheet itself doesn't jump when the keyboard opens/closes (§15 case 14)
+- [ ] `/trip/[id]/mobile` → Explore tab still works end-to-end after `GooglePlacesExplorer`'s `mode` prop removal: search, category chips, "near [stop]" chips, detail sheet, add-to-trip sheet, duplicate banner, and the "View in itinerary" toast action all behave exactly as before
+- [ ] `/profile` shows the "Trips / Countries / Nights" stat block (relocated from the old `/explore` globe view) and the Countries count matches trips that used the country picker (`trips.countries`) as well as older trips using the free-text `description` fallback
+- [ ] `/explore` (Discover) no longer has a "My Countries" tab, globe, or road-trip template list anywhere — confirm `ExploreClient.tsx`, `ExploreMapbox.tsx`, `CountryCard.tsx`, `EmptyCountries.tsx`, `StarField.tsx`, `explore-ui.tsx`, `DiscoverCard.tsx`, and `explore-routes-data.ts` are gone and nothing 404s or blank-renders in their place

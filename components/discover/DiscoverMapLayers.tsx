@@ -6,7 +6,7 @@ import {
   COUNTRY_BOUNDARIES_SOURCE_URL,
   countryFilter,
 } from '@/lib/mapbox/country-layers'
-import type { DiscoverFeatureCollection } from '@/lib/discover/discover-query'
+import type { DiscoverFeatureCollection, DiscoverRouteLineFeatureCollection } from '@/lib/discover/discover-query'
 
 /** Literal because Mapbox paint expressions are evaluated off the document — a CSS custom property can't reach them. Mirrors `--color-accent`. */
 const ACCENT = '#f5a623'
@@ -17,6 +17,11 @@ export const DISCOVER_CLUSTER_LAYER = 'discover-clusters'
 /** Layers the map hit-tests on click. Pins are listed first so an overlapping pin wins over its cluster. */
 export const DISCOVER_INTERACTIVE_LAYERS = [DISCOVER_PIN_LAYER, DISCOVER_CLUSTER_LAYER]
 
+export const DISCOVER_ROUTES_SOURCE = 'discover-routes'
+export const DISCOVER_ROUTE_LINE_LAYER = 'discover-route-line'
+/** The `routes` category's own interactive layer set — no clustering exists for polylines. */
+export const DISCOVER_ROUTE_INTERACTIVE_LAYERS = [DISCOVER_ROUTE_LINE_LAYER]
+
 export interface DiscoverMapLayersProps {
   /** ISO alpha-2 codes to tint. Empty renders nothing, which is the world view. */
   highlightCodes: string[]
@@ -24,17 +29,28 @@ export interface DiscoverMapLayersProps {
   beforeId?: string
   /** Pins for the active category. One category renders at a time, so one source is enough. */
   places: DiscoverFeatureCollection
+  /**
+   * Route polylines for the `routes` category (§5.2 Phase 7 — a parallel
+   * source rather than the points source, since a route is a LineString, not
+   * a Point). Empty in every other category, mirroring how `places` is empty
+   * outside its own category.
+   */
+  routes: DiscoverRouteLineFeatureCollection
   /** The active category's colour, applied to every pin in the layer. */
   markerColor: string
   selectedPlaceId: string | null
+  /** Desktop-only (§13): the card under the pointer gets a larger pin, a mobile-impossible affordance worth having on the rail layout. */
+  hoveredPlaceId?: string | null
 }
 
 export function DiscoverMapLayers({
   highlightCodes,
   beforeId,
   places,
+  routes,
   markerColor,
   selectedPlaceId,
+  hoveredPlaceId,
 }: DiscoverMapLayersProps) {
   const filter = countryFilter(highlightCodes)
 
@@ -119,8 +135,19 @@ export function DiscoverMapLayers({
           filter={['!', ['has', 'point_count']]}
           paint={{
             'circle-color': markerColor,
-            // Stays at or above the 9 px tap floor from §12 once the user is in.
-            'circle-radius': ['interpolate', ['linear'], ['zoom'], 3, 5.5, 6, 7, 12, 9],
+            // A zoom expression (interpolate) must be the top-level
+            // expression itself — Mapbox GL rejects one nested inside a
+            // `case` output ("zoom expression may only be used as input to a
+            // top-level step or interpolate expression"). So `interpolate`
+            // stays outermost and the hover bump (§13) lives inside each
+            // stop's output instead; everything else keeps the 9 px tap
+            // floor from §12.
+            'circle-radius': [
+              'interpolate', ['linear'], ['zoom'],
+              3, ['case', ['==', ['get', 'id'], hoveredPlaceId ?? ''], 9, 5.5],
+              6, ['case', ['==', ['get', 'id'], hoveredPlaceId ?? ''], 11, 7],
+              12, ['case', ['==', ['get', 'id'], hoveredPlaceId ?? ''], 15, 9],
+            ],
             'circle-stroke-color': '#0b0b22',
             'circle-stroke-width': 1.5,
             'circle-opacity': 0.95,
@@ -157,6 +184,30 @@ export function DiscoverMapLayers({
             'text-color': 'rgba(255,255,255,0.92)',
             'text-halo-color': 'rgba(6,6,28,0.9)',
             'text-halo-width': 1.2,
+          }}
+        />
+      </Source>
+
+      {/*
+        Routes (§5.2/§9 Phase 7): one LineString feature per road-trip template.
+        No clustering — a handful of routes per country never needs it — so this
+        is a plain GeoJSON source rather than DISCOVER_PLACES_SOURCE's clustered
+        one. Selection is still a filter-expression swap, the same contract as
+        the place pins.
+      */}
+      <Source id={DISCOVER_ROUTES_SOURCE} type="geojson" data={routes}>
+        <Layer
+          id={DISCOVER_ROUTE_LINE_LAYER}
+          type="line"
+          layout={{ 'line-cap': 'round', 'line-join': 'round' }}
+          paint={{
+            'line-color': markerColor,
+            // The selected route reads as the foreground line; every other
+            // route dims rather than disappears, so the whole layer still
+            // orients the user even with one route picked out (§4.3's
+            // marker-selection contract, adapted for a line rather than a point).
+            'line-width': ['case', ['==', ['get', 'id'], selectedPlaceId ?? ''], 4.5, 2.5],
+            'line-opacity': ['case', ['==', ['get', 'id'], selectedPlaceId ?? ''], 0.95, 0.55],
           }}
         />
       </Source>

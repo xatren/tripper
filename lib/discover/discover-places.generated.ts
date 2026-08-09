@@ -2,10 +2,11 @@
 // curation overlay in scripts/discover-curation.json. Do not edit by hand — edit
 // the overlay and re-run the script.
 //
-// Countries seeded: TR, IT, ES, FR, GR, JP, PT, NO
-// Places: 1050
-// Images are Wikimedia Commons files, each under its own licence, so
-// `imageAttribution` must be surfaced wherever the image is shown.
+// Countries seeded: TR, IT, ES, FR, GR, JP, PT, NO, US
+// Places: 1352
+// Images are Wikimedia Commons files, each under its own licence (author/license
+// fetched from the Commons API), so `imageAttribution` must be surfaced
+// wherever the image is shown.
 
 import type { DiscoverCategoryId } from './categories.ts'
 
@@ -44,7 +45,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 100,
     "blurb": "city in Catalonia, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Aerial%20view%20of%20La%20Sagrada%20Familia%2C%20Barcelona%2C%20Spain%20%2851227006134%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Aerial view of La Sagrada Familia, Barcelona, Spain (51227006134).jpg",
+    "imageAttribution": "dronepicr · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": null
   },
   {
@@ -61,7 +62,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 90,
     "blurb": "municipality and capital of the province of Málaga, in Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Malaga%202023.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Malaga 2023.jpg",
+    "imageAttribution": "Viktar Palstsiuk · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": null
   },
   {
@@ -78,7 +79,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 87,
     "blurb": "city in Mallorca and capital of the Balearic Islands, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Palma%20von%20Castell%20de%20Bellver.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Palma von Castell de Bellver.jpg",
+    "imageAttribution": "Thomas Wolf, www.foto-tw.de · Wikimedia Commons · CC BY-SA 3.0 de",
     "suggestedHours": null
   },
   {
@@ -95,7 +96,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 85,
     "blurb": "city in Valencian Community, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Vista%20de%20Alicante%2C%20Espa%C3%B1a%2C%202014-07-04%2C%20DD%2049.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Vista de Alicante, España, 2014-07-04, DD 49.JPG",
+    "imageAttribution": "Diego Delso · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -112,7 +113,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 84,
     "blurb": "Spanish municipality, in Castilla y León, capital of the province of the same name",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Segovia%20-%2002%20edited.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Segovia - 02 edited.jpg",
+    "imageAttribution": "Carlos Delgado · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -131,7 +132,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 84,
     "blurb": "volcano on Tenerife in the Canary Islands",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Teide%20von%20Nordosten%20%28Zuschnitt%202%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Teide von Nordosten (Zuschnitt 2).jpg",
+    "imageAttribution": "Thomas Wolf, www.foto-tw.de · Wikimedia Commons · CC BY-SA 3.0 de",
     "suggestedHours": 2
   },
   {
@@ -148,7 +149,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 83,
     "blurb": "palace and fortress complex in Granada, Andalusia, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Alhambra%20detail.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Alhambra detail.jpg",
+    "imageAttribution": "Jebulon · Wikimedia Commons · CC0",
     "suggestedHours": 2
   },
   {
@@ -164,7 +165,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 83,
     "blurb": "municipality in Castile and León, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Avila%20001.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Avila 001.jpg",
+    "imageAttribution": "Anual · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": null
   },
   {
@@ -180,7 +181,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 82,
     "blurb": "municipality in Extremadura, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Vista%20de%20Badajoz%20desde%20la%20Torre%20Espantaperros.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Vista de Badajoz desde la Torre Espantaperros.jpg",
+    "imageAttribution": "Marsupisupilami · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": null
   },
   {
@@ -196,7 +197,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 82,
     "blurb": "city in Catalonia, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Egara.%20Conjunt%20episcopal.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Egara. Conjunt episcopal.jpg",
+    "imageAttribution": "Oliver-Bonjoch · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -212,7 +213,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 81,
     "blurb": "municipality in Tenerife",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/San%20Crist%C3%B3bal%20de%20La%20Laguna%2C%20en%20Santa%20Cruz%20de%20Tenerife%20%28Espa%C3%B1a%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · San Cristóbal de La Laguna, en Santa Cruz de Tenerife (España).jpg",
+    "imageAttribution": "Thomas Wolf, www.foto-tw.de · Wikimedia Commons · CC BY-SA 3.0 de",
     "suggestedHours": null
   },
   {
@@ -228,7 +229,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 80,
     "blurb": "town in the Community of Madrid, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Aranjuez%20PalacioReal%20PlazaToros.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Aranjuez PalacioReal PlazaToros.jpg",
+    "imageAttribution": "Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -244,7 +245,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 80,
     "blurb": "municipality in the Province of Alicante, Valencian Community, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Vista%20de%20Benidorm%2C%20Espa%C3%B1a%2C%202014-07-02%2C%20DD%2067.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Vista de Benidorm, España, 2014-07-02, DD 67.JPG",
+    "imageAttribution": "Diego Delso · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -260,7 +261,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 80,
     "blurb": "city in the Valencian Community, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Castell%C3%B3n%20a%C3%A9reo%202%20%2836985918570%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Castellón aéreo 2 (36985918570).jpg",
+    "imageAttribution": "Martin Cox from Benicasim, España · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": null
   },
   {
@@ -277,7 +278,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 80,
     "blurb": "monastery and historical residence of the King of Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Monasterio%20de%20El%20Escorial%20en%20Madrid.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Monasterio de El Escorial en Madrid.jpg",
+    "imageAttribution": "Zvonimir Stamenov · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -295,7 +296,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 78,
     "blurb": "cave with prehistoric paintings in Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Techo%20de%20Altamira%20%28replica%29-Museo%20Arqueol%C3%B3gico%20Nacional.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Techo de Altamira (replica)-Museo Arqueológico Nacional.jpg",
+    "imageAttribution": "José-Manuel Benito · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -311,7 +312,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 78,
     "blurb": "municipality of Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Leganes-panoramica-040711.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Leganes-panoramica-040711.jpg",
+    "imageAttribution": "FDV · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -327,7 +328,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 77,
     "blurb": "town of Spain in the Madrid metropolitan area",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/SanseYAlcobendasDesdeAvi%C3%B3n.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · SanseYAlcobendasDesdeAvión.jpg",
+    "imageAttribution": "Carlos Delgado · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -343,7 +344,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 77,
     "blurb": "city in the province of Castellón, in the Valencian Community, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Basilica%20s.%20pascual.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Basilica s. pascual.JPG",
+    "imageAttribution": "Trewert · Wikimedia Commons · Public domain",
     "suggestedHours": null
   },
   {
@@ -359,7 +360,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 76,
     "blurb": "city in southern Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Antequera%20Gesamtansicht2004.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Antequera Gesamtansicht2004.jpg",
+    "imageAttribution": "Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -375,7 +376,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 76,
     "blurb": "city in Basque Country, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Done%20Bidendiko%20Dorreak.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Done Bidendiko Dorreak.jpg",
+    "imageAttribution": "User:Theklan · Wikimedia Commons · CC BY-SA 2.5",
     "suggestedHours": null
   },
   {
@@ -391,7 +392,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 76,
     "blurb": "municipality and capital of Ibiza, Balearic Islands, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ibiza%20City%20from%20Mirador%20asv2023-04%20img1.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Ibiza City from Mirador asv2023-04 img1.jpg",
+    "imageAttribution": "A.Savin · Wikimedia Commons · FAL",
     "suggestedHours": null
   },
   {
@@ -407,7 +408,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 76,
     "blurb": "Spanish city",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Plasencia-view-1.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Plasencia-view-1.jpg",
+    "imageAttribution": "Jose Antonio Cotallo López from Plasencia, España · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": null
   },
   {
@@ -423,7 +424,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 75,
     "blurb": "municipality in the Canary Islands, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Arrecife%2C%20en%20Lanzarote%20%28Las%20Palmas%2C%20Espa%C3%B1a%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Arrecife, en Lanzarote (Las Palmas, España).jpg",
+    "imageAttribution": "Holger Uwe Schmitt · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": null
   },
   {
@@ -440,7 +441,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 75,
     "blurb": "Roman Catholic cathedral of the archdiocese of Santiago de Compostela in Galicia, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Santiago%20cathedral%202021.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Santiago cathedral 2021.jpg",
+    "imageAttribution": "Fernando · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -456,7 +457,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 75,
     "blurb": "city in Castile and León, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Puente%20Carlos%20III%20Miranda.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Puente Carlos III Miranda.JPG",
+    "imageAttribution": "DBP - Mr. Benq · Wikimedia Commons · CC BY 2.5",
     "suggestedHours": null
   },
   {
@@ -473,7 +474,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 74,
     "blurb": "National Park in Tenerife, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Roque%20Cinchado%20und%20Teide%20%28Zuschnitt%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Roque Cinchado und Teide (Zuschnitt).jpg",
+    "imageAttribution": "Thomas Wolf, www.foto-tw.de · Wikimedia Commons · CC BY-SA 3.0 de",
     "suggestedHours": 5
   },
   {
@@ -489,7 +490,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 74,
     "blurb": "town and municipality in Cantabria, northern Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Vista%20de%20Torrelavega%20desde%20el%20parque%20empresarial%20Besaya.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Vista de Torrelavega desde el parque empresarial Besaya.JPG",
+    "imageAttribution": "Dolmanrg · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": null
   },
   {
@@ -505,7 +506,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 74,
     "blurb": "municipality in Navarre, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Tudela%20%28Navarra%29%20Espa%C3%B1a%20-%2045635173261.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Tudela (Navarra) España - 45635173261.jpg",
+    "imageAttribution": "Txemari (Argazki). · Wikimedia Commons · CC0",
     "suggestedHours": null
   },
   {
@@ -521,7 +522,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 73,
     "blurb": "aqueduct bridge in Segovia, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Aqueduct%20of%20Segovia%2008.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Aqueduct of Segovia 08.jpg",
+    "imageAttribution": "Bernard Gagnon · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -537,7 +538,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 73,
     "blurb": "municipality in the Basque Country, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Eibar%202.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Eibar 2.jpg",
+    "imageAttribution": "Asier Sarasua Garmendia, Assar, based on File:Eibar.jpg · Wikimedia Commons · Public domain",
     "suggestedHours": null
   },
   {
@@ -553,7 +554,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 73,
     "blurb": "municipality in Huelva, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Palos.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Palos.jpg",
+    "imageAttribution": "MiguelAngel fotografo · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": null
   },
   {
@@ -569,7 +570,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 72,
     "blurb": "transnational UNESCO world heritage site",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Tysa%20Rakhiv.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Tysa Rakhiv.jpg",
+    "imageAttribution": "Varga Attila · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -586,7 +587,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 72,
     "blurb": "highest mountain of the Pyrenees",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Aneto%2001.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Aneto 01.jpg",
+    "imageAttribution": "Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 1
   },
   {
@@ -603,7 +604,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 72,
     "blurb": "national park of Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Bosque%20Encantado%2C%20Parque%20nacional%20de%20Garajonay%2C%20La%20Gomera%2C%20Espa%C3%B1a%2C%202012-12-14%2C%20DD%2019.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Bosque Encantado, Parque nacional de Garajonay, La Gomera, España, 2012-12-14, DD 19.jpg",
+    "imageAttribution": "Diego Delso · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -619,7 +620,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 72,
     "blurb": "highest mountain of the Sierra Nevada in Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mulhacen%20Winter.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Mulhacen Winter.jpg",
+    "imageAttribution": "Nilsf at German Wikipedia · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 1
   },
   {
@@ -635,7 +636,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 72,
     "blurb": "Ancient lighthouse in Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Torre%20de%20H%C3%A9rcules%202023.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Torre de Hércules 2023.jpg",
+    "imageAttribution": "Fernando · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -653,7 +654,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 71,
     "blurb": "national park located in Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Vista%20de%20las%20marismas%20del%20Parque%20Do%C3%B1ana.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Vista de las marismas del Parque Doñana.jpg",
+    "imageAttribution": "Gabriela Coronado Hernández · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -669,7 +670,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 70,
     "blurb": "palace in Granada, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Generalife%20Palace%2C%20Alhambra%2C%20Granada%2C%20Spain.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Generalife Palace, Alhambra, Granada, Spain.jpg",
+    "imageAttribution": "Charles J. Sharp · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -685,7 +686,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 69,
     "blurb": "multi-peaked mountain in Catalonia, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Montserrat%20-%20100.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Montserrat - 100.jpg",
+    "imageAttribution": "MARIA ROSA FERRE ✿ · Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": 1
   },
   {
@@ -701,7 +702,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 69,
     "blurb": "national museum of art in Madrid, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/MNCARS%2005.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · MNCARS 05.jpg",
+    "imageAttribution": "Luis García (Zaqarbal) · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -717,7 +718,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 69,
     "blurb": "royal palace in Seville, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Patio%20de%20las%20doncellas.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Patio de las doncellas.jpg",
+    "imageAttribution": "Cat from Sevilla, Spain · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 2
   },
   {
@@ -733,7 +734,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 69,
     "blurb": "official residence of the Spanish Royal Family",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Palacio%20Real%20de%20Madrid%20Julio%202016%20%28cropped%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Palacio Real de Madrid Julio 2016 (cropped).jpg",
+    "imageAttribution": "Tim Adams · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -749,7 +750,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 68,
     "blurb": "mountain in Huesca, next to the border with France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cirque%20de%20Soaso%20et%20massif%20du%20Mont-Perdu.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Cirque de Soaso et massif du Mont-Perdu.jpg",
+    "imageAttribution": "Patrick Rouzet · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 1
   },
   {
@@ -765,7 +766,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 67,
     "blurb": "cultural property in San Cristóbal de La Laguna, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/La%20Laguna%202022%20-%20main%20facade.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · La Laguna 2022 - main facade.jpg",
+    "imageAttribution": "Fernando · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -781,7 +782,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 67,
     "blurb": "municipality of Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Vista%20a%C3%A9rea%20de%20Jaraba.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Vista aérea de Jaraba.jpg",
+    "imageAttribution": "Benedii · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -797,7 +798,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 67,
     "blurb": "cultural property in Borrenes y Carucedo, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Las%20Medulas%20%2817504738221%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Las Medulas (17504738221).jpg",
+    "imageAttribution": "Frayle from Salamanca, España · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -813,7 +814,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 67,
     "blurb": "Royal palace of Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Palacio%20Real%20de%20Aranjuez%20%285%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Palacio Real de Aranjuez (5).jpg",
+    "imageAttribution": "Fernando García from Madrid, España · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 2
   },
   {
@@ -829,7 +830,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 66,
     "blurb": "archeological site of Moorish palace in Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Madinat%20al-Zahra%20%2852019329474%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Madinat al-Zahra (52019329474).jpg",
+    "imageAttribution": "Kent Wang from Barcelona, Spain · Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": 2
   },
   {
@@ -846,7 +847,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 65,
     "blurb": "national park",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Valley%20of%20Ordesa%2C%20Ordesa%20y%20Monte%20Perdido%20National%20Park%2C%20Spain.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Valley of Ordesa, Ordesa y Monte Perdido National Park, Spain.jpg",
+    "imageAttribution": "Heparina1985 · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -862,7 +863,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 65,
     "blurb": "castle and museum of the Old City of Segovia (Spain), UNESCO World Heritage Site",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Panor%C3%A1mica%20Oto%C3%B1o%20Alc%C3%A1zar%20de%20Segovia.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Panorámica Otoño Alcázar de Segovia.jpg",
+    "imageAttribution": "Ángel Sanz de Andrés · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -878,7 +879,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 65,
     "blurb": "semi-mythical harbor city and the surrounding culture on the south coast of the Iberian Peninsula",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Centro%20de%20Interpretaci%C3%B3n%20del%20Yacimiento%20de%20Cancho%20Roano.%20Paneles%20informativos%20I%2006.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Centro de Interpretación del Yacimiento de Cancho Roano. Paneles informativos I 06.jpg",
+    "imageAttribution": "Axel Cotón Gutiérrez · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -894,7 +895,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 64,
     "blurb": "Roman bridge over the Tagus in Extremadura",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Bridge%20Alcantara.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Bridge Alcantara.JPG",
+    "imageAttribution": "Dantla from de.wikipedia · Wikimedia Commons · GFDL",
     "suggestedHours": 2
   },
   {
@@ -912,7 +913,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 64,
     "blurb": "volcano in La Palma, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Plantation%20banana%20La%20Palma.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Plantation banana La Palma.jpg",
+    "imageAttribution": "Lviatour · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -928,7 +929,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 64,
     "blurb": "urban park in Madrid, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/June%20Parc%20Retiro%20Madrid%20-%20Mythos%20Spain%20Photography%202014%20-%20panoramio%20%288%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · June Parc Retiro Madrid - Mythos Spain Photography 2014 - panoramio (8).jpg",
+    "imageAttribution": "pictures Jettcom · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 2
   },
   {
@@ -944,7 +945,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 64,
     "blurb": "ancient city of Hispania Baetica",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Amphitheatre%20Italica%2C%20Spain.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Amphitheatre Italica, Spain.jpg",
+    "imageAttribution": "No machine-readable author provided. Joris assumed (based on copyright claims). · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -961,7 +962,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 64,
     "blurb": "UNESCO Biosphere Reserve and National Park in the Picos de Europa mountain range, in northern Spain. It is shared by the autonomous commu…",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Senderismo%20-%20sobre%20pistas%20de%20monta%C3%B1a%20y%20sue%C3%B1os%20-%20Picos%20de%20Europa.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Senderismo - sobre pistas de montaña y sueños - Picos de Europa.jpg",
+    "imageAttribution": "Sara Bento Photography · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -977,7 +978,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 64,
     "blurb": "19th-century pyramids in Tenerife, Canary Islands, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/G%C3%BC%C3%ADmar%20BW%201.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Güímar BW 1.JPG",
+    "imageAttribution": "Berthold Werner · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -993,7 +994,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 64,
     "blurb": "national park in the Canary Islands, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/2008-12-19%20Lanzarote%20Timanfaya.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 2008-12-19 Lanzarote Timanfaya.jpg",
+    "imageAttribution": "Gernot Keller, London (www.gernot-keller.com) · Wikimedia Commons · CC BY-SA 2.5",
     "suggestedHours": 5
   },
   {
@@ -1009,7 +1010,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 63,
     "blurb": "cultural property in Zaragoza, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Aljafer%C3%ADa%20Palace.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Aljafería Palace.jpg",
+    "imageAttribution": "Fernando · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -1025,7 +1026,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 63,
     "blurb": "marian sanctuary in Tenerife",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Candelaria%20Basilica.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Candelaria Basilica.jpg",
+    "imageAttribution": "Xauxa (Håkan Svensson) · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -1041,7 +1042,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 63,
     "blurb": "ancient city on the site of modern Tarragona, Catalonia, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Modell%20der%20der%20hohen%20Kaiserzeit%2C%20Blick%20von%20S%C3%BCden.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Modell der der hohen Kaiserzeit, Blick von Süden.jpg",
+    "imageAttribution": "Camkatka · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -1057,7 +1058,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 63,
     "blurb": "archaeological museum in Madrid, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Museo%20Arqueol%C3%B3gico%20Nacional%20%2835039235760%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Museo Arqueológico Nacional (35039235760).jpg",
+    "imageAttribution": "Emilio J. Rodríguez Posada · Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": 2
   },
   {
@@ -1073,7 +1074,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 63,
     "blurb": "mansion in Barcelona, Spain, designed by Antoni Gaudi",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Palau%20G%C3%BCell%2C%20Antoni%20Gaudi%2C%20Barcelona%202.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Palau Güell, Antoni Gaudi, Barcelona 2.jpg",
+    "imageAttribution": "Thomas Ledl · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -1089,7 +1090,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 63,
     "blurb": "cultural property in Granada, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Spain%20Andalusia%20Granada%20BW%202015-10-25%2013-20-43.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Spain Andalusia Granada BW 2015-10-25 13-20-43.jpg",
+    "imageAttribution": "Berthold Werner · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -1105,7 +1106,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 62,
     "blurb": "national park in Catalonia, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Estany%20de%20Sant%20Maurici.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Estany de Sant Maurici.JPG",
+    "imageAttribution": "Josep Renalias · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -1121,7 +1122,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 62,
     "blurb": "mountain in Barcelona",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Fale%20-%20Spain%20-%20Barcelona%20-%208.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Fale - Spain - Barcelona - 8.jpg",
+    "imageAttribution": "Fabio Alessandro Locati · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 1
   },
   {
@@ -1137,7 +1138,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 62,
     "blurb": "mountain in Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Almanzor%20sierra%20de%20gredos.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Almanzor sierra de gredos.jpg",
+    "imageAttribution": "Nachosan · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 1
   },
   {
@@ -1153,7 +1154,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 62,
     "blurb": "mountain in Barcelona, Spain (European Union)",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/El%20Tibidabo%2C%20l%27observatori%20Fabra%20i%20la%20punxa%20d%27una%20torre%20veneciana.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · El Tibidabo, l'observatori Fabra i la punxa d'una torre veneciana.jpg",
+    "imageAttribution": "jordi domènech · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 1
   },
   {
@@ -1169,7 +1170,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 61,
     "blurb": "national park in the Montes de Toledo, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Los%20Navalucillos-Caba%C3%B1eros%202022%2010.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Los Navalucillos-Cabañeros 2022 10.jpg",
+    "imageAttribution": "LBM1948 · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -1185,7 +1186,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 61,
     "blurb": "romanesque castle in Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Castillo%20de%20Loarre%202.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Castillo de Loarre 2.jpg",
+    "imageAttribution": "Josue Mendivil · Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": 2
   },
   {
@@ -1202,7 +1203,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 61,
     "blurb": "protected area in Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Salto%20del%20Gitano%2C%20Parque%20Nacional%20de%20Monfrag%C3%BCe.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Salto del Gitano, Parque Nacional de Monfragüe.jpg",
+    "imageAttribution": "Alonso de Mendoza · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -1218,7 +1219,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 61,
     "blurb": "residence of the Prime Minister of Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Fachada%20Moncloa.png?width=640",
-    "imageAttribution": "Wikimedia Commons · Fachada Moncloa.png",
+    "imageAttribution": "Pool Moncloa · Wikimedia Commons · Attribution",
     "suggestedHours": 2
   },
   {
@@ -1234,7 +1235,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 60,
     "blurb": "fortress",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Alcazaba%20de%20Almer%C3%ADa.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Alcazaba de Almería.jpg",
+    "imageAttribution": "ANE · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 2
   },
   {
@@ -1250,7 +1251,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 60,
     "blurb": "national park in Galicia, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Las%20Islas%20C%C3%ADes.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Las Islas Cíes.jpg",
+    "imageAttribution": "Luis Cayola · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -1266,7 +1267,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 60,
     "blurb": "castle in Mallorca",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Castillo%20de%20Bellver.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Castillo de Bellver.jpg",
+    "imageAttribution": "Poniol60 · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -1283,7 +1284,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 60,
     "blurb": "cave with prehistoric art and World Heritage Site in Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Techo%20de%20Altamira%20%28replica%29-Museo%20Arqueol%C3%B3gico%20Nacional.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Techo de Altamira (replica)-Museo Arqueológico Nacional.jpg",
+    "imageAttribution": "José-Manuel Benito · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -1299,7 +1300,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 60,
     "blurb": "mountain in Ceuta",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Monte%20Hacho.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Monte Hacho.JPG",
+    "imageAttribution": "The original uploader was Jguk 2 at English Wikipedia. · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 1
   },
   {
@@ -1315,7 +1316,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 60,
     "blurb": "national park of Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Parque%20nacional%20de%20Sierra%20Nevada%2050.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Parque nacional de Sierra Nevada 50.jpg",
+    "imageAttribution": "FrDr · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -1331,7 +1332,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 60,
     "blurb": "national park in Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Tblas%20Javier.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Tblas Javier.jpg",
+    "imageAttribution": "Jgg1992 · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -1347,7 +1348,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 60,
     "blurb": "summit of Vignemale massif, Pyrenees",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Vignemale%20Sommer.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Vignemale Sommer.jpg",
+    "imageAttribution": "User Sea-empress on de.wikipedia · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 1
   },
   {
@@ -1364,7 +1365,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 59,
     "blurb": "beach in Donostia-San Sebastian, Basque Country",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Donostia%20Kontxa%20Loretope%20gainetik2.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Donostia Kontxa Loretope gainetik2.JPG",
+    "imageAttribution": "No machine-readable author provided. Josugoni assumed (based on copyright claims). · Wikimedia Commons · Public domain",
     "suggestedHours": 3
   },
   {
@@ -1380,7 +1381,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 59,
     "blurb": "private residence of the Spanish royal family in Madrid, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Palacio%20de%20la%20Zarzuela%20%28An%C3%B3nimo%20madrile%C3%B1o%2C%20s.%20XVII%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Palacio de la Zarzuela (Anónimo madrileño, s. XVII).jpg",
+    "imageAttribution": "Juan Gómez de Mora · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -1397,7 +1398,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 59,
     "blurb": "sea resort in the south coast of the island of Gran Canaria",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Playa%20des%20ingles%20shoppingbeach.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Playa des ingles shoppingbeach.jpg",
+    "imageAttribution": "Wouter Hagens · Wikimedia Commons · Public domain",
     "suggestedHours": 3
   },
   {
@@ -1413,7 +1414,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 59,
     "blurb": "former royal summer palace near Madrid",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/La%20Granja%20Palacio.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · La Granja Palacio.jpg",
+    "imageAttribution": "Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -1429,7 +1430,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 58,
     "blurb": "palatial fortification in Málaga",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Alcazaba%20de%20M%C3%A1laga%20overview.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Alcazaba de Málaga overview.jpg",
+    "imageAttribution": "Fernando · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -1445,7 +1446,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 58,
     "blurb": "zoo in Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Zoo%20de%20Barcelona.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Zoo de Barcelona.JPG",
+    "imageAttribution": "No machine-readable author provided. 1997 assumed (based on copyright claims). · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -1461,7 +1462,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 58,
     "blurb": "nature park in Almería Province, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Arrecife%20de%20las%20Sirenas.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Arrecife de las Sirenas.jpg",
+    "imageAttribution": "Martyn Thompson (Cabo de Gata Photography) · Wikimedia Commons · CC BY-SA 2.5",
     "suggestedHours": 2
   },
   {
@@ -1477,7 +1478,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 58,
     "blurb": "zoo in Tenerife, Canary Islands",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Tenerife-phil43.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Tenerife-phil43.jpg",
+    "imageAttribution": "Phil ( secret ) from Midlands, England · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 2
   },
   {
@@ -1493,7 +1494,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 58,
     "blurb": "lake in Zamora Province, Castile and León, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Sanabria%20lake%20%28Zamora%2CSpain%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Sanabria lake (Zamora,Spain).jpg",
+    "imageAttribution": "Stegop · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 2
   },
   {
@@ -1509,7 +1510,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 57,
     "blurb": "natural landscape",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/El%20Torcal%20de%20Antequera%20-%20005.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · El Torcal de Antequera - 005.jpg",
+    "imageAttribution": "Roland Geider (Ogre) · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -1525,7 +1526,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 56,
     "blurb": "mountain road in Asturias, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/El%20angliru%20desde%20el%20Monsacro.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · El angliru desde el Monsacro.jpg",
+    "imageAttribution": "Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 1
   },
   {
@@ -1542,7 +1543,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 56,
     "blurb": "cave with prehistoric art",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cueva%20del%20Castillo%20interior.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Cueva del Castillo interior.jpg",
+    "imageAttribution": "Gabinete de Prensa del Gobierno de Cantabria · Wikimedia Commons · CC BY 3.0 es",
     "suggestedHours": 2
   },
   {
@@ -1559,7 +1560,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 56,
     "blurb": "lava tube and tourist attraction in Haria, Lanzarote, Canary Islands, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lanzarote%205%20Luc%20Viatour.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Lanzarote 5 Luc Viatour.jpg",
+    "imageAttribution": "Lviatour · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -1575,7 +1576,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 56,
     "blurb": "coastal saltwater lagoon of the Mediterranean Sea in Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cartagena%2C%20Mar%20Menor%2C%20i%20Cap%20de%20Pals%20%28foto%20sat%C3%A8l%C2%B7lit%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Cartagena, Mar Menor, i Cap de Pals (foto satèl·lit).jpg",
+    "imageAttribution": "Image Science &amp; Analysis Laboratory, of the NASA Johnson Space Center. · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -1591,7 +1592,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 56,
     "blurb": "mountain pass",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Roncevaux-Ibaneta.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Roncevaux-Ibaneta.jpg",
+    "imageAttribution": "Wikimedia Commons · Public domain",
     "suggestedHours": 1
   },
   {
@@ -1607,7 +1608,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 55,
     "blurb": "castle in Córdoba, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Spain%20Cordoba%20quality%20image.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Spain Cordoba quality image.jpg",
+    "imageAttribution": "Pixels4Free · Wikimedia Commons · CC0",
     "suggestedHours": 2
   },
   {
@@ -1623,7 +1624,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 55,
     "blurb": "aquarium located in Port Vell, a harbor in Barcelona, Catalonia, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Queen%20Angelfish%2014-05-2009%2015-24-48.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Queen Angelfish 14-05-2009 15-24-48.JPG",
+    "imageAttribution": "Paul Hermans · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -1640,7 +1641,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 55,
     "blurb": "cave on Mallorca",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Interior%20de%20las%20Cuevas%20del%20Drach.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Interior de las Cuevas del Drach.jpg",
+    "imageAttribution": "no · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 2
   },
   {
@@ -1656,7 +1657,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 54,
     "blurb": "cave in Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Frente%20de%20Tr%C3%A1pana%20desde%20el%20baluarte%20de%20la%20Concepci%C3%B3n.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Frente de Trápana desde el baluarte de la Concepción.jpg",
+    "imageAttribution": "Miguel González Novo from Melilla, España · Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": 2
   },
   {
@@ -1673,7 +1674,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 54,
     "blurb": "cave in southern Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cueva%20de%20Nerja%202020.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Cueva de Nerja 2020.jpg",
+    "imageAttribution": "Fernando · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -1689,7 +1690,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 54,
     "blurb": "mountain pass between France and Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Puerto%20del%20Somport.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Puerto del Somport.jpg",
+    "imageAttribution": "CHV · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 1
   },
   {
@@ -1705,7 +1706,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 54,
     "blurb": "mountain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Tenegu%C3%ADa%2C%20Geograf%C3%ADa%20de%20Fuentecaliente%2C%20La%20Palma%2C%20Espa%C3%B1a%2C%202015.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Teneguía, Geografía de Fuentecaliente, La Palma, España, 2015.jpg",
+    "imageAttribution": "Benjamín Núñez González · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -1721,7 +1722,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 53,
     "blurb": "mountain in Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Teide%20-%20pico%20viejo.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Teide - pico viejo.jpg",
+    "imageAttribution": "user:Sethaphopes · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -1737,7 +1738,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 53,
     "blurb": "protected area in Andalusia, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Zahara%20desde%20enfrente.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Zahara desde enfrente.jpg",
+    "imageAttribution": "Bocaleones · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -1753,7 +1754,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 53,
     "blurb": "zoo and aquarium in Madrid, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/OsosPardosZooMadrid.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · OsosPardosZooMadrid.JPG",
+    "imageAttribution": "Manuel de Corselas · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -1769,7 +1770,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 52,
     "blurb": "lake in Banyoles, Catalonia, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/136%20Estany%20de%20Banyoles%2C%20pesquera.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · 136 Estany de Banyoles, pesquera.JPG",
+    "imageAttribution": "Enfo · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -1785,7 +1786,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 51,
     "blurb": "cave in Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cueva%20de%20El%20Soplao%2C%20Cantabria.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Cueva de El Soplao, Cantabria.jpg",
+    "imageAttribution": "María Jesús Tomé · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 2
   },
   {
@@ -1801,7 +1802,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 51,
     "blurb": "human settlement in Yaiza, Las Palmas, Lanzarote, Las Palmas Province, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Yaiza%20Playa%20Blanca%20-%20Marina%20Rubic%C3%B3n%20%28Mirador%20de%20Rubic%C3%B3n%29%2002%20ies.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Yaiza Playa Blanca - Marina Rubicón (Mirador de Rubicón) 02 ies.jpg",
+    "imageAttribution": "Frank Vincentz · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 3
   },
   {
@@ -1817,7 +1818,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 50,
     "blurb": "coastal area in northern Catalonia",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Catalonia-Mataro-Beach.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Catalonia-Mataro-Beach.jpg",
+    "imageAttribution": "Friviere · Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": 3
   },
   {
@@ -1833,7 +1834,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 50,
     "blurb": "Shortest beach of the world",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Gulpiyuri.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Gulpiyuri.jpg",
+    "imageAttribution": "Ramon Diaz · Wikimedia Commons · Public domain",
     "suggestedHours": 3
   },
   {
@@ -1849,7 +1850,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 50,
     "blurb": "beach of San Andrés, Tenerife",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/At%20Tenerife%202019%20116.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · At Tenerife 2019 116.jpg",
+    "imageAttribution": "Photograph by Mike Peel (www.mikepeel.net). · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 3
   },
   {
@@ -1865,7 +1866,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 50,
     "blurb": "archaeological site on Gran Canaria in Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Risco%20Ca%C3%ADdo%2020191231%20134943.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Risco Caído 20191231 134943.jpg",
+    "imageAttribution": "Sino Yu · Wikimedia Commons · CC0",
     "suggestedHours": 2
   },
   {
@@ -1881,7 +1882,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 50,
     "blurb": "mountain in Catalonia, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Volc%C3%A0%20de%20Santa%20Margarida.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Volcà de Santa Margarida.jpg",
+    "imageAttribution": "Carquinyol from Badalona, Catalunya · Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": 2
   },
   {
@@ -1897,7 +1898,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 49,
     "blurb": "beach in Aguas Santas, Galicia, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/As%20Catedrais%20-%20Mari%C3%B1a%20luguesa.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · As Catedrais - Mariña luguesa.jpg",
+    "imageAttribution": "Atobar · Wikimedia Commons · Public domain",
     "suggestedHours": 3
   },
   {
@@ -1913,7 +1914,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 49,
     "blurb": "natural space in San Bartolomé de Tirajana, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Dunas%20de%20Maspalomas.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Dunas de Maspalomas.jpg",
+    "imageAttribution": "Himarerme · Wikimedia Commons · Public domain",
     "suggestedHours": 3
   },
   {
@@ -1929,7 +1930,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 48,
     "blurb": "mountain in Girona, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Volc%C3%A0%20del%20Croscat.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Volcà del Croscat.jpg",
+    "imageAttribution": "Carquinyol from Badalona, Catalunya · Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": 2
   },
   {
@@ -1945,7 +1946,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 48,
     "blurb": "human settlement in Tenerife",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Elmedano11.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Elmedano11.jpg",
+    "imageAttribution": "Pediant at Dutch Wikipedia · Wikimedia Commons · Public domain",
     "suggestedHours": 3
   },
   {
@@ -1961,7 +1962,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 48,
     "blurb": null,
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Atardecer%20en%20la%20R%C3%ADa%20de%20Bilbao.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Atardecer en la Ría de Bilbao.jpg",
+    "imageAttribution": "Andrea Pelayo Casado · Wikimedia Commons · CC BY 4.0",
     "suggestedHours": 2
   },
   {
@@ -1977,7 +1978,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 48,
     "blurb": "mountain pass",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Europe2005%20bonaigua3.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Europe2005 bonaigua3.jpg",
+    "imageAttribution": "Icmontreal · Wikimedia Commons · CC BY 2.5",
     "suggestedHours": 1
   },
   {
@@ -1993,7 +1994,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 48,
     "blurb": "mountain pass on the France–Spain border",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ancien%20poste%20fronti%C3%A8re%20au%20col%20du%20Pourtalet%20%28c%C3%B4t%C3%A9%20espagnol%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Ancien poste frontière au col du Pourtalet (côté espagnol).jpg",
+    "imageAttribution": "France64160 · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 1
   },
   {
@@ -2009,7 +2010,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 48,
     "blurb": "estuary in Galicia, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/R%C3%ADa%20de%20arousa01.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Ría de arousa01.JPG",
+    "imageAttribution": "No machine-readable author provided. Roi Xordo assumed (based on copyright claims). · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -2025,7 +2026,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 48,
     "blurb": "cultural property in Santander, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Santander.Gran.Casino.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Santander.Gran.Casino.jpg",
+    "imageAttribution": "Josep Panadero · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 3
   },
   {
@@ -2041,7 +2042,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 48,
     "blurb": "mountain pass in Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/January%20Suchodolski%2C%20Bitwa%20pod%20Somosierr%C4%85.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · January Suchodolski, Bitwa pod Somosierrą.jpg",
+    "imageAttribution": "January Suchodolski · Wikimedia Commons · Public domain",
     "suggestedHours": 1
   },
   {
@@ -2057,7 +2058,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 46,
     "blurb": "lake",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Estaens%20lac.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Estaens lac.jpg",
+    "imageAttribution": "Myrabella · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -2073,7 +2074,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 46,
     "blurb": "mountain pass in France and Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Port%20de%20Larrau.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Port de Larrau.JPG",
+    "imageAttribution": "John.john.59 · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 1
   },
   {
@@ -2089,7 +2090,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 46,
     "blurb": "watercourse in Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Panoramica%20bueu%201.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Panoramica bueu 1.jpg",
+    "imageAttribution": "No machine-readable author provided. Triart3d assumed (based on copyright claims). · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -2105,7 +2106,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 45,
     "blurb": "lake Enol and Lake Ercina in Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/ErcinaLake.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · ErcinaLake.JPG",
+    "imageAttribution": "Francisco M. Marzoa Alonso · Wikimedia Commons · CC BY-SA 2.5",
     "suggestedHours": 1
   },
   {
@@ -2121,7 +2122,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 45,
     "blurb": "mountain in Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Volc%C3%A0%20Montsacopa-Grederes-Olot-Catalunya.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Volcà Montsacopa-Grederes-Olot-Catalunya.jpg",
+    "imageAttribution": "puigalder · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -2137,7 +2138,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 45,
     "blurb": "beach in Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/W%20Barcelona%20by%20Ricardo%20Bofill.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · W Barcelona by Ricardo Bofill.jpg",
+    "imageAttribution": "W Barcelona · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 3
   },
   {
@@ -2153,7 +2154,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 43,
     "blurb": "beach in Barcelona, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Barcelona%20%2816877599244%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Barcelona (16877599244).jpg",
+    "imageAttribution": "Kuba Bożanowski from Warsaw, Poland · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 3
   },
   {
@@ -2169,7 +2170,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 43,
     "blurb": "Beach and human settlement",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Playa%20de%20Cofete%20-%20El%20Cofete%20-%20Jandia%20-%20Fuerteventura%20-%2008.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Playa de Cofete - El Cofete - Jandia - Fuerteventura - 08.jpg",
+    "imageAttribution": "Norbert Nagel · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 3
   },
   {
@@ -2185,7 +2186,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 43,
     "blurb": "beach in Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Es%20Trenc%20Winter.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Es Trenc Winter.jpg",
+    "imageAttribution": "Yaroslav Syubayev · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 3
   },
   {
@@ -2201,7 +2202,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 43,
     "blurb": "beach in Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ondarreta%20Donostia%202006-07-08.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Ondarreta Donostia 2006-07-08.JPG",
+    "imageAttribution": "Josu Goñi Etxabe · Wikimedia Commons · Public domain",
     "suggestedHours": 3
   },
   {
@@ -2217,7 +2218,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 43,
     "blurb": null,
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Platja%20de%20la%20Mar%20Bella%20%28Barcelona%29%2001.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Platja de la Mar Bella (Barcelona) 01.JPG",
+    "imageAttribution": "Jordiferrer · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 3
   },
   {
@@ -2233,7 +2234,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 43,
     "blurb": "beach of Las Palmas de Gran Canaria",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Canteras%205335%20Pan%20%2846886275114%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Canteras 5335 Pan (46886275114).jpg",
+    "imageAttribution": "Bengt Nyman from Vaxholm, Sweden · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 3
   },
   {
@@ -2249,7 +2250,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 43,
     "blurb": "mountain pass",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Puerto%20de%20Navacerrada%2014-10-2006.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Puerto de Navacerrada 14-10-2006.jpg",
+    "imageAttribution": "Miguel303xm · Wikimedia Commons · CC BY-SA 2.5",
     "suggestedHours": 1
   },
   {
@@ -2265,7 +2266,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 42,
     "blurb": "beach in Pontevedra province, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Playa%20de%20A%20Lanzada.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Playa de A Lanzada.jpg",
+    "imageAttribution": "Harpagornis · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 3
   },
   {
@@ -2281,7 +2282,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 42,
     "blurb": "ancient medieval baths in Cordoba, Spain, now a museum",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ba%C3%B1os%20califales%20de%20C%C3%B3rdoba%2003.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Baños califales de Córdoba 03.jpg",
+    "imageAttribution": "Rodelar · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -2297,7 +2298,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 42,
     "blurb": "mountain pass",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Parque%20Despe%C3%B1aperros1.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Parque Despeñaperros1.JPG",
+    "imageAttribution": "Veinticuatro de Jahén · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -2313,7 +2314,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 42,
     "blurb": "defile in Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Foz%20lumbier.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Foz lumbier.jpg",
+    "imageAttribution": "The original uploader was Jsanchezes at Spanish Wikipedia. · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -2329,7 +2330,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 42,
     "blurb": "beach in A Coruña, Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Praia%20de%20Riazor.A%20Coru%C3%B1a%20Galicia.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Praia de Riazor.A Coruña Galicia.jpg",
+    "imageAttribution": "Roberto Abizanda from Zaragoza, Aragón · Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": 3
   },
   {
@@ -2345,7 +2346,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 42,
     "blurb": "beach in Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/San%20Sebastian%20Zurriola.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · San Sebastian Zurriola.jpg",
+    "imageAttribution": "Laureà from Barcelona · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 3
   },
   {
@@ -2361,7 +2362,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 40,
     "blurb": null,
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Desfiladero%20de%20La%20Hermida%204.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Desfiladero de La Hermida 4.jpg",
+    "imageAttribution": "Frobles · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -2377,7 +2378,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 38,
     "blurb": "waterfall in Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Salto%20Nervi%C3%B3n%20invierno%202005.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Salto Nervión invierno 2005.jpg",
+    "imageAttribution": "Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -2393,7 +2394,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 35,
     "blurb": "canyon of the Pyrenees Mountains in Navarre",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Foz%20de%20ARBAIUN%2C%20Navarra.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Foz de ARBAIUN, Navarra.jpg",
+    "imageAttribution": "CRGC57 · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -2409,7 +2410,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 35,
     "blurb": null,
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Carnota%20-%20Monte%20Pindo%20%28A%20Coru%C3%B1a%2C%20Galicia%2C%20Espa%C3%B1a%29%2002%20-%20Cascada%20del%20%C3%89zaro.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Carnota - Monte Pindo (A Coruña, Galicia, España) 02 - Cascada del Ézaro.JPG",
+    "imageAttribution": "Tanja Freibott · Wikimedia Commons · CC BY-SA 3.0 es",
     "suggestedHours": 2
   },
   {
@@ -2425,7 +2426,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 35,
     "blurb": "waterfall",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cascada%20Gujuli.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Cascada Gujuli.jpg",
+    "imageAttribution": "Gazpa · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -2441,7 +2442,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 32,
     "blurb": "waterfall",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Aigualluts%201.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Aigualluts 1.JPG",
+    "imageAttribution": "Rahernaiz 91 · Wikimedia Commons · CC BY-SA 3.0 es",
     "suggestedHours": 2
   },
   {
@@ -2457,7 +2458,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 32,
     "blurb": "canyon in Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Tajoderonda.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Tajoderonda.jpg",
+    "imageAttribution": "phoenicoperus · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -2475,7 +2476,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 95,
     "blurb": "tower located on the Champ de Mars in Paris, France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Tour%20Eiffel%20Wikimedia%20Commons.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Tour Eiffel Wikimedia Commons.jpg",
+    "imageAttribution": "Benh LIEU SONG · Wikimedia Commons · Public domain",
     "suggestedHours": 1
   },
   {
@@ -2492,7 +2493,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 95,
     "blurb": "commune in Nord, France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/H%C3%B4tel%20de%20ville%20%283%29.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Hôtel de ville (3).JPG",
+    "imageAttribution": "Mairie de roubaix · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -2509,7 +2510,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 88,
     "blurb": "French commune and city in Alpes-Maritimes, Provence-Alpes-Côte d'Azur",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Hamnen%20Cannes%20Mipim%2020140312%20%2813120667594%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Hamnen Cannes Mipim 20140312 (13120667594).jpg",
+    "imageAttribution": "Jenny Andersson / News Oresund · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": null
   },
   {
@@ -2526,7 +2527,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 88,
     "blurb": "highest mountain in the Alps",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Panorama%20of%20Mont%20Blanc%20du%20Tacul%2C%20Mont%20Maudit%20and%20Mont%20Blanc%20from%20Aiguille%20du%20Midi%2C%20Chamonix%2C%20Haute-Savoie.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Panorama of Mont Blanc du Tacul, Mont Maudit and Mont Blanc from Aiguille du Midi, Chamonix, Haute-Savoie.jpg",
+    "imageAttribution": "Christian David · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 1
   },
   {
@@ -2543,7 +2544,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 87,
     "blurb": "French commune and prefecture of Corse-du-Sud and Corsica",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Aiacciu%20View%201.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Aiacciu View 1.jpg",
+    "imageAttribution": "Julian Nyča · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -2560,7 +2561,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 87,
     "blurb": "commune in Maine-et-Loire, Pays de la Loire, France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Angers%20collage.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Angers collage.jpg",
+    "imageAttribution": "User:Tango7174, etc. (see above) · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -2577,7 +2578,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 87,
     "blurb": "commune in Vaucluse, France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Avignon%2C%20Palais%20des%20Papes%20depuis%20Tour%20Philippe%20le%20Bel%20by%20JM%20Rosier.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Avignon, Palais des Papes depuis Tour Philippe le Bel by JM Rosier.jpg",
+    "imageAttribution": "Jean-Marc Rosier (de/from http://www.cjrosier.com + http://www.gordes-immobilier.com) · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -2593,7 +2594,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 87,
     "blurb": "commune and capital city of French Guiana",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cayenne%20av%20G%C3%A9n%C3%A9ral-de-Gaulle.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Cayenne av Général-de-Gaulle.jpg",
+    "imageAttribution": "Cayambe · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -2611,7 +2612,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 86,
     "blurb": "commune in Pas-de-Calais, France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Burghers%20of%20calais.jpeg?width=640",
-    "imageAttribution": "Wikimedia Commons · Burghers of calais.jpeg",
+    "imageAttribution": "~ · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -2627,7 +2628,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 86,
     "blurb": "commune in Vienne, France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Poitiers%20hill.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Poitiers hill.jpg",
+    "imageAttribution": "Vermario at English Wikipedia · Wikimedia Commons · Public domain",
     "suggestedHours": null
   },
   {
@@ -2644,7 +2645,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 85,
     "blurb": "palace in Versailles, France and location of the Museum of the History of France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Vue%20a%C3%A9rienne%20du%20domaine%20de%20Versailles%20par%20ToucanWings%20-%20Creative%20Commons%20By%20Sa%203.0%20-%20083.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Vue aérienne du domaine de Versailles par ToucanWings - Creative Commons By Sa 3.0 - 083.jpg",
+    "imageAttribution": "ToucanWings · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -2660,7 +2661,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 84,
     "blurb": "commune in Alpes-Maritimes, France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Antibes%20vieille%20ville%20mai%202014.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Antibes vieille ville mai 2014.JPG",
+    "imageAttribution": "Abxbay · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -2676,7 +2677,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 84,
     "blurb": "French commune; largest and capital city of Martinique",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Fort-de-france-harbor.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Fort-de-france-harbor.jpg",
+    "imageAttribution": "Scott S Bateman · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": null
   },
   {
@@ -2692,7 +2693,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 84,
     "blurb": "French commune and prefecture of Charente-Maritime, New Aquitaine",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/La%20Rochelle%20Vieux-Port.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · La Rochelle Vieux-Port.JPG",
+    "imageAttribution": "Remi Jouan · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -2708,7 +2709,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 84,
     "blurb": "capital of French Polynesia",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Papeete%20-%20Marina%20Taina.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Papeete - Marina Taina.JPG",
+    "imageAttribution": "Remi Jouan · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -2725,7 +2726,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 83,
     "blurb": "castle in the Loire valley France and location of château de montsoreau-museum of contemporary art",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Chateau%20de%20Montsoreau%20Museum%20of%20contemporary%20art%20Loire%20Valley%20France.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Chateau de Montsoreau Museum of contemporary art Loire Valley France.jpg",
+    "imageAttribution": "Suavemarimagno · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -2742,7 +2743,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 83,
     "blurb": "lake in Switzerland and France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lake%20Geneva%20aerial.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Lake Geneva aerial.jpg",
+    "imageAttribution": "kallerna · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -2758,7 +2759,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 83,
     "blurb": "city and commune in Pyrénées-Atlantiques, Nouvelle-Aquitaine, France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Montage%20Pau%204.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Montage Pau 4.jpg",
+    "imageAttribution": "Flo641 · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": null
   },
   {
@@ -2774,7 +2775,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 82,
     "blurb": "French commune and city in Loir-et-Cher, Centre-Val de Loire",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/00%202407%20Cath%C3%A9drale%20Saint-Louis%20de%20Blois.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 00 2407 Cathédrale Saint-Louis de Blois.jpg",
+    "imageAttribution": "W. Bulach · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": null
   },
   {
@@ -2790,7 +2791,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 81,
     "blurb": "commune in Savoie, France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Chamb%C3%A9ry%20depuis%20les%20Monts.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Chambéry depuis les Monts.JPG",
+    "imageAttribution": "Florian Pépellin · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -2807,7 +2808,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 80,
     "blurb": "triumphal arch in Paris",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Arc%20de%20Triomphe%2C%20Paris%2021%20October%202010.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Arc de Triomphe, Paris 21 October 2010.jpg",
+    "imageAttribution": "Jiuguang Wang · Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": 2
   },
   {
@@ -2823,7 +2824,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 80,
     "blurb": "city in Hérault, Occitanie, France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/CathedraleEtVieuxPontBeziers.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · CathedraleEtVieuxPontBeziers.jpg",
+    "imageAttribution": "Sanchezn · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -2839,7 +2840,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 80,
     "blurb": "commune in Hauts-de-Seine, France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Nanterre%20-%20Rue%20de%20l%27%C3%89glise.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Nanterre - Rue de l'Église.JPG",
+    "imageAttribution": "Benjamin Smith · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -2855,7 +2856,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 80,
     "blurb": "commune in Nord department, Hauts-de-France, France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Tourcoing%20hotel%20ville%203-4.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Tourcoing hotel ville 3-4.JPG",
+    "imageAttribution": "Velvet · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -2871,7 +2872,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 79,
     "blurb": "French commune and city in Val-de-Marne, Île-de-France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Vue%20a%C3%A9rienne%20du%20lac%20de%20Cr%C3%A9teil.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Vue aérienne du lac de Créteil.jpg",
+    "imageAttribution": "Suaudeau · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": null
   },
   {
@@ -2889,7 +2890,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 77,
     "blurb": "cave in southwestern France famous for its Paleolithic cave paintings",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lascaux%20painting.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Lascaux painting.jpg",
+    "imageAttribution": "EU · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -2905,7 +2906,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 76,
     "blurb": "official residence of the President of France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Secretary%20Pompeo%20Arrives%20to%20Meet%20with%20French%20Foreign%20Minister%20Le%20Drian%20in%20Paris%20%2850610423656%29%20%28cropped%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Secretary Pompeo Arrives to Meet with French Foreign Minister Le Drian in Paris (50610423656) (cropped).jpg",
+    "imageAttribution": "U.S. Department of State from United States · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -2923,7 +2924,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 75,
     "blurb": "islands in the southern Indian Ocean",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Amsterdam%20ASTER.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Amsterdam ASTER.jpg",
+    "imageAttribution": "NASA ASTER volcano archive jpl · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -2941,7 +2942,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 75,
     "blurb": "active stratovolcano",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/La%20Pel%C3%A9e%20vue%20du%20Carbet.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · La Pelée vue du Carbet.jpg",
+    "imageAttribution": "Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -2958,7 +2959,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 74,
     "blurb": "cave in France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Rhinoc%C3%A9ros%20grotte%20Chauvet.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Rhinocéros grotte Chauvet.jpg",
+    "imageAttribution": "Inocybe at French Wikipedia · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -2974,7 +2975,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 74,
     "blurb": "theme park resort in France, partially owned by The Walt Disney Company",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Disneyland%20Park%2005%2C%20Paris%2022%20August%202013.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Disneyland Park 05, Paris 22 August 2013.jpg",
+    "imageAttribution": "flightlog · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 2
   },
   {
@@ -2990,7 +2991,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 74,
     "blurb": "mausoleum in Paris for the most distinguished French people",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Panth%C3%A9on%2C%20Paris%2025%20March%202012.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Panthéon, Paris 25 March 2012.jpg",
+    "imageAttribution": "Camille Gévaudan · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -3006,7 +3007,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 74,
     "blurb": "ancient Roman aqueduct bridge that crosses the Gardon River in Vers-Pont-du-Gard, France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Pont%20du%20Gard%20BLS.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Pont du Gard BLS.jpg",
+    "imageAttribution": "Benh LIEU SONG (Flickr) · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -3023,7 +3024,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 73,
     "blurb": "island in the southern Indian Ocean",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/2020-11%20Saint-Paul%20Island%2003.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 2020-11 Saint-Paul Island 03.jpg",
+    "imageAttribution": "Antoine Lamielle · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -3039,7 +3040,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 72,
     "blurb": "transnational UNESCO world heritage site",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Tysa%20Rakhiv.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Tysa Rakhiv.jpg",
+    "imageAttribution": "Varga Attila · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -3055,7 +3056,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 72,
     "blurb": "seat of the French Senate",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/2017%20-%20Le%20palais%20du%20Luxembourg%2C%20dans%20le%20jardin%20du%20Luxembourg%2C%20Paris%20-%203.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 2017 - Le palais du Luxembourg, dans le jardin du Luxembourg, Paris - 3.jpg",
+    "imageAttribution": "Luis Miguel Bugallo Sánchez (Lmbuga) · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -3071,7 +3072,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 71,
     "blurb": "monument and building in Paris's La Défense",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Grande%20Arche%2C%20France%20-%20April%202011.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Grande Arche, France - April 2011.jpg",
+    "imageAttribution": "Cristian Bortes from Cluj-Napoca, Romania · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 2
   },
   {
@@ -3087,7 +3088,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 71,
     "blurb": "mountain of the Alps in southern France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mont%20ventoux.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Mont ventoux.jpg",
+    "imageAttribution": "NielsB at Dutch Wikipedia · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 1
   },
   {
@@ -3103,7 +3104,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 71,
     "blurb": "palace and an associated garden located in the 1st arrondissement of Paris",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Conseil%20d%27Etat%20Paris%20WA.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Conseil d'Etat Paris WA.jpg",
+    "imageAttribution": "Marie-Lan Nguyen · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -3119,7 +3120,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 70,
     "blurb": "commune in Pyrénées-Orientales, France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Am%C3%A9lie-les-Bains-Palalda%20-%20vue%20g%C3%A9n%C3%A9rale%20d%27Am%C3%A9lie-les-Bains%20et%20du%20pic%20du%20Canigou.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Amélie-les-Bains-Palalda - vue générale d'Amélie-les-Bains et du pic du Canigou.jpg",
+    "imageAttribution": "Jean-Pierre Bazard · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -3135,7 +3136,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 69,
     "blurb": "underground ossuary in Paris, France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Catacumbas%2C%20Par%C3%ADs%2C%20Francia%2C%202022-11-01%2C%20DD%20117-119%20HDR.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Catacumbas, París, Francia, 2022-11-01, DD 117-119 HDR.jpg",
+    "imageAttribution": "Diego Delso · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -3151,7 +3152,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 69,
     "blurb": "palace and museum in Avignon, France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/00%200711%20Avignon%20%28Frankreich%29%20-%20Kathetrale%20und%20Papstpalast.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 00 0711 Avignon (Frankreich) - Kathetrale und Papstpalast.jpg",
+    "imageAttribution": "W. Bulach · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -3168,7 +3169,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 68,
     "blurb": "mountain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Aiguille-du-Midi-summer.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Aiguille-du-Midi-summer.jpg",
+    "imageAttribution": "Martin Janner · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 1
   },
   {
@@ -3184,7 +3185,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 68,
     "blurb": "ancient Roman temple in Nîmes, southern France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Maison%20Carree%20in%20Nimes%20%2816%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Maison Carree in Nimes (16).jpg",
+    "imageAttribution": "Krzysztof Golik · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -3201,7 +3202,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 68,
     "blurb": "1944 one of the five sectors of the Allied invasion of German-occupied France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/1944%20NormandyLST.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 1944 NormandyLST.jpg",
+    "imageAttribution": "Chief Photographer's Mate (CPHOM) Robert F. Sargent, U.S. Coast Guard · Wikimedia Commons · Public domain",
     "suggestedHours": 3
   },
   {
@@ -3219,7 +3220,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 68,
     "blurb": "volcano in France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Aerial%20image%20of%20Puy%20de%20D%C3%B4me%20%28view%20from%20the%20west%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Aerial image of Puy de Dôme (view from the west).jpg",
+    "imageAttribution": "Carsten Steger · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -3235,7 +3236,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 67,
     "blurb": "triumphal arch in Paris",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Paris%20-%20Jardin%20des%20Tuileries%20-%20Arc%20de%20Triomphe%20du%20Carrousel%20-%20PA00085992%20-%20003.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Paris - Jardin des Tuileries - Arc de Triomphe du Carrousel - PA00085992 - 003.jpg",
+    "imageAttribution": "Thesupermat · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -3251,7 +3252,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 67,
     "blurb": "castle",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ch%C3%A2teau%20de%20Vincennes%20Paris%20FRA%20002.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Château de Vincennes Paris FRA 002.jpg",
+    "imageAttribution": "ignis · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -3267,7 +3268,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 67,
     "blurb": "Seat of the National Assembly in Paris, France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Fa%C3%A7ade%20Palais%20Bourbon%203.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Façade Palais Bourbon 3.jpg",
+    "imageAttribution": "ZeusUpsistos · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -3283,7 +3284,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 66,
     "blurb": "former royal palace, now hosting the Louvre Museum in Paris, France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Pavillon%20de%20Flore%2C%20Louvre%20Museum%2C%20Paris%205%20November%202019.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Pavillon de Flore, Louvre Museum, Paris 5 November 2019.jpg",
+    "imageAttribution": "Ali Sabbagh · Wikimedia Commons · CC0",
     "suggestedHours": 2
   },
   {
@@ -3300,7 +3301,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 66,
     "blurb": "Volcano on the French oversea department La Réunion",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Piton%20de%20La%20Fournaise%20-%20Paysage%20de%20l%27%C3%AEle%20de%20La%20R%C3%A9union.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Piton de La Fournaise - Paysage de l'île de La Réunion.jpg",
+    "imageAttribution": "Alexandre Péribé · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -3316,7 +3317,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 66,
     "blurb": "ancient Roman theatre in Orange, France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Le%20Th%C3%A9%C3%A2tre%20Antique%20d%27Orange%2C%202007.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Le Théâtre Antique d'Orange, 2007.jpg",
+    "imageAttribution": "Gromelle Grand Angle · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -3332,7 +3333,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 65,
     "blurb": "stone rows in Carnac, France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/France-Carnac-Alignement%20de%20Kermario.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · France-Carnac-Alignement de Kermario.jpg",
+    "imageAttribution": "--Pinpin 17:43, 1 August 2006 (UTC) · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -3348,7 +3349,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 64,
     "blurb": "museum and former capitol building in Paris, France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Trocadero%20pic1.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Trocadero pic1.jpg",
+    "imageAttribution": "AlfvanBeem · Wikimedia Commons · CC0",
     "suggestedHours": 2
   },
   {
@@ -3364,7 +3365,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 64,
     "blurb": "lake in France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lac%20du%20Bourget%20%40%20Mont%20Laval%20%2851043830807%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Lac du Bourget @ Mont Laval (51043830807).jpg",
+    "imageAttribution": "Guilhem Vellut from Annecy, France · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 2
   },
   {
@@ -3380,7 +3381,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 64,
     "blurb": "perialpine lake in Haute-Savoie, France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lac%20d%27Annecy%20from%20Col%20de%20la%20Forclaz.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Lac d'Annecy from Col de la Forclaz.jpg",
+    "imageAttribution": "H005 · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -3396,7 +3397,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 64,
     "blurb": "commune in Isère, France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mairie%20du%20Gua.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Mairie du Gua.jpg",
+    "imageAttribution": "Jvillafruela · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -3412,7 +3413,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 64,
     "blurb": "commune in Vosges, France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/BandeauMartigny.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · BandeauMartigny.jpg",
+    "imageAttribution": "Sébastien Michel · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -3429,7 +3430,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 64,
     "blurb": "island in French Polynesia",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mehetia-osnaburg.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Mehetia-osnaburg.jpg",
+    "imageAttribution": "James Cook · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -3446,7 +3447,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 64,
     "blurb": "highest mountain of the Massif Central in France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Puy%20de%20Sancy%202016-08-23%20n18.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Puy de Sancy 2016-08-23 n18.jpg",
+    "imageAttribution": "Marie-Lan Nguyen · Wikimedia Commons · CC BY 4.0",
     "suggestedHours": 2
   },
   {
@@ -3463,7 +3464,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 64,
     "blurb": "national park of France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/.00%202122%20Cirque%20de%20Gavarnie%20-%20Pyren%C3%A4en.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · .00 2122 Cirque de Gavarnie - Pyrenäen.jpg",
+    "imageAttribution": "W. Bulach · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -3480,7 +3481,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 64,
     "blurb": "1944 code name for the right flank of the Allied landing beaches in Normandy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Landings%20on%20Omaha%20beach.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Landings on Omaha beach.jpg",
+    "imageAttribution": "Photographer: Wall. ARC-Identifier: 111-SC-189902. Post-work: User:W.wolny · Wikimedia Commons · Public domain",
     "suggestedHours": 3
   },
   {
@@ -3496,7 +3497,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 63,
     "blurb": "antique Gallo-Roman town",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Vue%20a%C3%A9rienne%20vestiges%20Al%C3%A9sia.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Vue aérienne vestiges Alésia.jpg",
+    "imageAttribution": "Epona21 · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -3513,7 +3514,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 63,
     "blurb": "national park of France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cevennes%20Florac%20Mimente%20depuis%20Causse%20Mejean.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Cevennes Florac Mimente depuis Causse Mejean.jpg",
+    "imageAttribution": "Myrabella · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -3530,7 +3531,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 63,
     "blurb": "national park of France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Villar-d%27Ar%C3%AAne%20%28Rif%20de%20la%20Planche%201975%20m.%29.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Villar-d'Arêne (Rif de la Planche 1975 m.).JPG",
+    "imageAttribution": "Dominicus Johannes Bergsma · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -3547,7 +3548,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 63,
     "blurb": "national park of France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Voile%20de%20la%20Mari%C3%A9e%20Salazie%201.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Voile de la Mariée Salazie 1.JPG",
+    "imageAttribution": "© Geolina · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -3563,7 +3564,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 63,
     "blurb": "grave",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Paris%20Arc%20de%20Triomphe%20de%20l%27%C3%89toile%20Grabmal%20des%20Unbekannten%20Soldaten%202.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Paris Arc de Triomphe de l'Étoile Grabmal des Unbekannten Soldaten 2.jpg",
+    "imageAttribution": "Zairon · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -3579,7 +3580,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 63,
     "blurb": "national park of France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Parc%20Vanoise%20Vue%20vall%C3%A9e%20Termignon.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Parc Vanoise Vue vallée Termignon.jpg",
+    "imageAttribution": "Galano · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -3595,7 +3596,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 62,
     "blurb": "castle in France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ch%C3%A2teau%20de%20Chinon%20vu%20de%20la%20Vienne.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Château de Chinon vu de la Vienne.jpg",
+    "imageAttribution": "Franck Badaire · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -3611,7 +3612,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 62,
     "blurb": "skyscraper hotel in Paris, France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Hyatt%20Regency%20Paris%20%C3%89toile%2C%207%20February%202014.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Hyatt Regency Paris Étoile, 7 February 2014.jpg",
+    "imageAttribution": "BRENAC · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -3627,7 +3628,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 62,
     "blurb": "landing area during Operation Overlord",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Kanadische%20Truppen%20landen%20in%20der%20Normandie.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Kanadische Truppen landen in der Normandie.jpg",
+    "imageAttribution": "Gilbert A. Milne · Wikimedia Commons · Public domain",
     "suggestedHours": 3
   },
   {
@@ -3643,7 +3644,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 62,
     "blurb": "mountain pass in the Alps on the France–Italy border",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Route%20et%20hospice%20du%20col%20du%20Petit-Saint-Bernard%20en%20%C3%A9t%C3%A9%20%28ao%C3%BBt%202019%29.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Route et hospice du col du Petit-Saint-Bernard en été (août 2019).JPG",
+    "imageAttribution": "Florian Pépellin · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 1
   },
   {
@@ -3659,7 +3660,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 62,
     "blurb": "ancient Egyptian obelisk in Paris",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ob%C3%A9lisque%20Louqsor%20Concorde%20a.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Obélisque Louqsor Concorde a.jpg",
+    "imageAttribution": "Jebulon · Wikimedia Commons · CC0",
     "suggestedHours": 2
   },
   {
@@ -3675,7 +3676,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 62,
     "blurb": "mountain in Réunion",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Piton%20des%20Neiges1.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Piton des Neiges1.JPG",
+    "imageAttribution": "Dunog · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -3691,7 +3692,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 62,
     "blurb": "UNESCO World Heritage Site commemorating veterans of Rome's Gallic Wars",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/XDA%20PA00082097%2003.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · XDA PA00082097 03.jpg",
+    "imageAttribution": "Xavier D'ABRIGEON · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -3707,7 +3708,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 60,
     "blurb": "castle in Alsace, France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/France%20Haut-Koenigsbourg%20aerial%20view%20%28cropped%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · France Haut-Koenigsbourg aerial view (cropped).jpg",
+    "imageAttribution": "Wrtalya · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -3723,7 +3724,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 60,
     "blurb": "French theme park",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/ApolloDay-Toulouse-2019-07-21-2926.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · ApolloDay-Toulouse-2019-07-21-2926.jpg",
+    "imageAttribution": "Don-vip · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -3739,7 +3740,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 60,
     "blurb": "mountain pass",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Col%20du%20Galibier%20et%20massif%20du%20Galibier.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Col du Galibier et massif du Galibier.JPG",
+    "imageAttribution": "MOSSOT · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 1
   },
   {
@@ -3755,7 +3756,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 60,
     "blurb": "mountain pass",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/00%202846%20Col%20du%20Tourmalet%20-%20Skulptur%20von%20Jean-Bernard%20M%C3%A9tais.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 00 2846 Col du Tourmalet - Skulptur von Jean-Bernard Métais.jpg",
+    "imageAttribution": "W. Bulach · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 1
   },
   {
@@ -3771,7 +3772,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 60,
     "blurb": "landing area during Operation Overlord",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/The%20British%20Army%20in%20the%20Normandy%20Campaign%201944%20B5128.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · The British Army in the Normandy Campaign 1944 B5128.jpg",
+    "imageAttribution": "No 5 Army Film &amp; Photographic Unit, Laing (Sgt) · Wikimedia Commons · Public domain",
     "suggestedHours": 3
   },
   {
@@ -3787,7 +3788,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 60,
     "blurb": "natural reserves of Corsica",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/0%20Scandola%20Osani%20JPG03.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 0 Scandola Osani JPG03.jpg",
+    "imageAttribution": "Jean-Pol GRANDMONT · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 2
   },
   {
@@ -3803,7 +3804,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 60,
     "blurb": "landing area during Operation Overlord",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Infantry%20waiting%20to%20move%20off%20%27Queen%20White%27%20Beach.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Infantry waiting to move off 'Queen White' Beach.jpg",
+    "imageAttribution": "Wikimedia Commons · Public domain",
     "suggestedHours": 3
   },
   {
@@ -3819,7 +3820,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 60,
     "blurb": "river canyon in Provence-Alpes-Côte d'Azur, France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Verdon%20Gorge%201.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Verdon Gorge 1.jpg",
+    "imageAttribution": "kallerna · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -3835,7 +3836,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 59,
     "blurb": "French castle",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Le%20Ch%C3%A2teau%20de%20Pierrefonds.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Le Château de Pierrefonds.jpg",
+    "imageAttribution": "Crazyswan85 · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -3851,7 +3852,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 58,
     "blurb": "calanque",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/02%20Calanche%20Piana.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 02 Calanche Piana.jpg",
+    "imageAttribution": "Myrabella · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 3
   },
   {
@@ -3867,7 +3868,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 58,
     "blurb": "13th-century castle in France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Coucy%20comparaison.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Coucy comparaison.jpg",
+    "imageAttribution": "Stardsen · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -3883,7 +3884,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 58,
     "blurb": "castle",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/PixAile17.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · PixAile17.jpg",
+    "imageAttribution": "Pierre Mairé · Wikimedia Commons · CC BY 2.5",
     "suggestedHours": 2
   },
   {
@@ -3899,7 +3900,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 58,
     "blurb": "cave and archaeological site in France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Eyzies-Cro-Magnon-3.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Eyzies-Cro-Magnon-3.jpg",
+    "imageAttribution": "120 · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -3915,7 +3916,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 58,
     "blurb": "UNESCO World Heritage Site of prehistoric decorated caves in the Vézère Valley, France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lascaux%20painting.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Lascaux painting.jpg",
+    "imageAttribution": "EU · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -3931,7 +3932,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 57,
     "blurb": "show cave with prehistoric art",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Font-de-Gaume%20entree.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Font-de-Gaume entree.JPG",
+    "imageAttribution": "Traumrune · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -3947,7 +3948,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 57,
     "blurb": "national park located in the French Antillas, in Guadeloupe",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Guadeloupe%20123%20-%20Massif%20de%20la%20Soufri%C3%A8re%201467m%20-%20Chemin%20des%20bains%20jaunes.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Guadeloupe 123 - Massif de la Soufrière 1467m - Chemin des bains jaunes.jpg",
+    "imageAttribution": "No machine-readable author provided. Ofol assumed (based on copyright claims). · Wikimedia Commons · CC BY 2.5",
     "suggestedHours": 2
   },
   {
@@ -3963,7 +3964,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 56,
     "blurb": "cave in France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Calanques%20de%20Marseille%2020120922%2036.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Calanques de Marseille 20120922 36.jpg",
+    "imageAttribution": "Georges Seguin (Okki) · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -3979,7 +3980,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 56,
     "blurb": "island in French Polynesia",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/EIAO%202007%20Baie%20de%20Vaituha..JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · EIAO 2007 Baie de Vaituha..JPG",
+    "imageAttribution": "MCHX (Michel CHARLEUX) · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -3995,7 +3996,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 56,
     "blurb": "mountain pass in the Alps",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/RD%201006%20au%20col%20du%20Mont-Cenis%20c%C3%B4t%C3%A9%20Maurienne%20%28septembre%202024%29.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · RD 1006 au col du Mont-Cenis côté Maurienne (septembre 2024).JPG",
+    "imageAttribution": "Florian Pépellin · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 1
   },
   {
@@ -4011,7 +4012,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 55,
     "blurb": "castle",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Castle%20of%20Foix%2005.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Castle of Foix 05.jpg",
+    "imageAttribution": "Krzysztof Golik · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -4027,7 +4028,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 55,
     "blurb": "island in French Polynesia",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Nwmarqpic.png?width=640",
-    "imageAttribution": "Wikimedia Commons · Nwmarqpic.png",
+    "imageAttribution": "Image Science &amp; Analysis Laboratory, Lyndon B. Johnson Space Center · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -4043,7 +4044,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 55,
     "blurb": "mountain in France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/2020-08%20-%20Planche%20des%20Belles%20Filles%20-%2001.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 2020-08 - Planche des Belles Filles - 01.jpg",
+    "imageAttribution": "A.BourgeoisP · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 1
   },
   {
@@ -4059,7 +4060,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 54,
     "blurb": "mountain pass",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Col%20de%20l%27Iseran%202.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Col de l'Iseran 2.jpg",
+    "imageAttribution": "Wormke-Grutman at Dutch Wikipedia · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 1
   },
   {
@@ -4075,7 +4076,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 54,
     "blurb": "island",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/MohoTani%20vue%20depuis%20HivaOa%2020061110.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · MohoTani vue depuis HivaOa 20061110.jpg",
+    "imageAttribution": "Sémhur · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -4091,7 +4092,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 54,
     "blurb": "mountain pass between France and Spain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Puerto%20del%20Somport.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Puerto del Somport.jpg",
+    "imageAttribution": "CHV · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 1
   },
   {
@@ -4107,7 +4108,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 53,
     "blurb": "Mountain pass in France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cyclistes%20dans%20l%27ascension%20du%20Grand%20Colombier.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Cyclistes dans l'ascension du Grand Colombier.jpg",
+    "imageAttribution": "User:M. PELISSIER · Wikimedia Commons · Public domain",
     "suggestedHours": 1
   },
   {
@@ -4123,7 +4124,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 53,
     "blurb": "waterfall in France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Gavarnie-Cirque.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Gavarnie-Cirque.JPG",
+    "imageAttribution": "Jean-Christophe BENOIST · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 2
   },
   {
@@ -4139,7 +4140,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 53,
     "blurb": "decorated cave in southwestern France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Pech%20Merle%20main.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Pech Merle main.jpg",
+    "imageAttribution": "Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -4155,7 +4156,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 53,
     "blurb": "mountain pass",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Plateau%20de%20Beille.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Plateau de Beille.JPG",
+    "imageAttribution": "Maeva Loillier et Florent Paitrault · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 1
   },
   {
@@ -4171,7 +4172,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 52,
     "blurb": "islands in Guadeloupe, France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Phare%20de%20Petite%20Terre.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Phare de Petite Terre.jpg",
+    "imageAttribution": "Vyskocil · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -4187,7 +4188,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 51,
     "blurb": "canyon in France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/00%200449%20Saint-Georges-de-L%C3%A9v%C3%A9jac%20-%20Gorges%20du%20Tarn.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 00 0449 Saint-Georges-de-Lévéjac - Gorges du Tarn.jpg",
+    "imageAttribution": "W. Bulach · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -4203,7 +4204,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 50,
     "blurb": "World Heritage site in France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Avenue%20de%20Champagne%2C%20%C3%89pernay%20%288132669246%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Avenue de Champagne, Épernay (8132669246).jpg",
+    "imageAttribution": "Michal Osmenda from Brussels, Belgium · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 2
   },
   {
@@ -4219,7 +4220,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 49,
     "blurb": "Canyon on Reunion Island",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Trou-de-Fer.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Trou-de-Fer.jpg",
+    "imageAttribution": "Jennifer_greatoutdoors · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -4235,7 +4236,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 48,
     "blurb": "France's fall",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cascade%20Glandieu.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Cascade Glandieu.JPG",
+    "imageAttribution": "Tonton Mourial · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -4251,7 +4252,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 46,
     "blurb": "waterfalls on the Carbet River in Guadeloupe",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Chutesducarbet.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Chutesducarbet.jpg",
+    "imageAttribution": "bobyfume · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -4267,7 +4268,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 46,
     "blurb": "beaches in the south neighborhood of Marseille, France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mistral%20gagnant%20Plages%20du%20Prado%2C%20Marseille.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Mistral gagnant Plages du Prado, Marseille.jpg",
+    "imageAttribution": "Alpha du centaure · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 3
   },
   {
@@ -4283,7 +4284,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 45,
     "blurb": "landmark in Lyon, France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lyon%20-%20Tour%20m%C3%A9tallique%20de%20Fourvi%C3%A8re%2C%20septembre%202015.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Lyon - Tour métallique de Fourvière, septembre 2015.jpg",
+    "imageAttribution": "Yann Caradec from Paris, France · Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": 1
   },
   {
@@ -4299,7 +4300,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 42,
     "blurb": "waterfall",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Marquises%209631a.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Marquises 9631a.jpg",
+    "imageAttribution": "Yves Picq http://veton.picq.fr · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -4315,7 +4316,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 40,
     "blurb": "Biosphere reserve in France | designated in 2015",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Gorges%20du%20Gardon.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Gorges du Gardon.JPG",
+    "imageAttribution": "Ravenclaw · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -4331,7 +4332,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 35,
     "blurb": "Calanque in Cassis, France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Calanques%20Port-Miou.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Calanques Port-Miou.jpg",
+    "imageAttribution": "Alessandro Vecchi · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 3
   },
   {
@@ -4347,7 +4348,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 35,
     "blurb": "waterfall in Réunion, France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cascade-Blanche.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Cascade-Blanche.jpg",
+    "imageAttribution": "Thierry Caro · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -4363,7 +4364,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 35,
     "blurb": "canyon of the Alps in France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Gorges%20de%20la%20Nesque%20et%20Mont%20Ventoux.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Gorges de la Nesque et Mont Ventoux.JPG",
+    "imageAttribution": "Jean-Marc Rosier (de/from http://www.cjrosier.com + http://www.gordes-immobilier.com) · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -4379,7 +4380,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 35,
     "blurb": "protected area in France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mt%20Kaw.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Mt Kaw.JPG",
+    "imageAttribution": "Esperanto2000 · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -4395,7 +4396,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 35,
     "blurb": "beach in Ramatuelle, Var, France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Pampelone%20Saint%20Tropez%202.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Pampelone Saint Tropez 2.jpg",
+    "imageAttribution": "Arnaud 25 · Wikimedia Commons · Public domain",
     "suggestedHours": 3
   },
   {
@@ -4411,7 +4412,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 32,
     "blurb": "Special Area of Conservation in France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/00%200408%20Gorges%20de%20la%20Jonte%20-%20C%C3%A9vennes%20National%20Park.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 00 0408 Gorges de la Jonte - Cévennes National Park.jpg",
+    "imageAttribution": "W. Bulach · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -4427,7 +4428,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 29,
     "blurb": null,
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Plage%20de%20Cluny%2C%20Ste-Rose%2C%20Guadeloupe.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Plage de Cluny, Ste-Rose, Guadeloupe.jpg",
+    "imageAttribution": "FreeProuilhe · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 3
   },
   {
@@ -4443,7 +4444,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 29,
     "blurb": "beach in Terre-de-Haut, Les Saintes, Guandeloupe",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/PlagePompierre.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · PlagePompierre.JPG",
+    "imageAttribution": "Stéphane Batigne · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 3
   },
   {
@@ -4459,7 +4460,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 25,
     "blurb": "calanque in France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Marseille%20Calanque%20Sormiou.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Marseille Calanque Sormiou.jpg",
+    "imageAttribution": "Benh LIEU SONG · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 3
   },
   {
@@ -4475,7 +4476,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 25,
     "blurb": "bay in Guadeloupe, France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Plage%20de%20la%20perle.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Plage de la perle.jpg",
+    "imageAttribution": "Sam5993 · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 3
   },
   {
@@ -4491,7 +4492,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 25,
     "blurb": "beach in Corsica, France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Aerial%20view%20of%20Palombaggia%20Beach%2C%20Corsica%2C%20France%20%2852724214180%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Aerial view of Palombaggia Beach, Corsica, France (52724214180).jpg",
+    "imageAttribution": "dronepicr · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 3
   },
   {
@@ -4507,7 +4508,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 25,
     "blurb": null,
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Plage%20des%20Raisins%20Clairs%20%C3%A0%20Saint-Fran%C3%A7ois.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Plage des Raisins Clairs à Saint-François.JPG",
+    "imageAttribution": "LPLT · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 3
   },
   {
@@ -4523,7 +4524,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 25,
     "blurb": "protected area in France",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Sillon%20du%20Talbert%20%28mar%C3%A9e%20haute%29.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Sillon du Talbert (marée haute).JPG",
+    "imageAttribution": "Pilot'22 · Wikimedia Commons · CC BY-SA 2.5",
     "suggestedHours": 3
   },
   {
@@ -4540,7 +4541,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 100,
     "blurb": "capital and largest city of Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Akropolis%202015.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Akropolis 2015.jpg",
+    "imageAttribution": "Thomas Wolf, www.foto-tw.de · Wikimedia Commons · CC BY-SA 3.0 de",
     "suggestedHours": 2
   },
   {
@@ -4557,7 +4558,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 89,
     "blurb": "former temple of Athena on the Athenian Acropolis, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/The%20Parthenon%20in%20Athens.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · The Parthenon in Athens.jpg",
+    "imageAttribution": "Steve Swayne · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 2
   },
   {
@@ -4574,7 +4575,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 86,
     "blurb": "island in Aegean sea, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/RhodosStadtzentrum5.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · RhodosStadtzentrum5.JPG",
+    "imageAttribution": "Böhringer Friedrich · Wikimedia Commons · CC BY-SA 2.5",
     "suggestedHours": 2
   },
   {
@@ -4593,7 +4594,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 85,
     "blurb": "mountain in Elassona municipality, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mt%20Olympus%20aerial%202.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Mt Olympus aerial 2.jpg",
+    "imageAttribution": "kallerna · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -4610,7 +4611,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 83,
     "blurb": "ancient citadel above the city of Athens",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Attica%2006-13%20Athens%2050%20View%20from%20Philopappos%20-%20Acropolis%20Hill.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Attica 06-13 Athens 50 View from Philopappos - Acropolis Hill.jpg",
+    "imageAttribution": "A.Savin · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -4627,7 +4628,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 83,
     "blurb": "seaside city in Peloponnese, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/2007%20Greece%20Corinthian%20Gulf%20%26%20Corinth.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 2007 Greece Corinthian Gulf & Corinth.jpg",
+    "imageAttribution": "Nicholas Hartmann · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": null
   },
   {
@@ -4644,7 +4645,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 83,
     "blurb": "city in the island of Crete, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Panoramic%20of%20Heraklion.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Panoramic of Heraklion.jpg",
+    "imageAttribution": "Bernard Gagnon · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -4661,7 +4662,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 83,
     "blurb": "city in Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Patras%20Montage%20L.png?width=640",
-    "imageAttribution": "Wikimedia Commons · Patras Montage L.png",
+    "imageAttribution": "SilentResident (compilation, sources to attribute see above; if any of the sources used in the Montage are removed from Wikimedia Commons, or better ones are found, please inform its creator so that they can update it. You can contact the creator by leaving a message here: [1]) · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -4678,7 +4679,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 82,
     "blurb": "statue of the Greek Titan Helios; one of the seven wonders of the ancient world",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Colosse%20de%20Rhodes%20%28Barclay%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Colosse de Rhodes (Barclay).jpg",
+    "imageAttribution": "gravure sur bois de Sidney Barclay numérisée Google · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -4694,7 +4695,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 81,
     "blurb": "ancient town in Fokida, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Delfi%20Apollons%20tempel.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Delfi Apollons tempel.jpg",
+    "imageAttribution": "Helen Simonsson · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -4712,7 +4713,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 81,
     "blurb": "city and capital of Thessaly region, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Larissa%20City%20Montage.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Larissa City Montage.jpg",
+    "imageAttribution": "Self made based upon work by the authors shown above · Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": 2
   },
   {
@@ -4729,7 +4730,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 81,
     "blurb": "mountain in northeastern Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mt.%20Athos%20%283939757657%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Mt. Athos (3939757657).jpg",
+    "imageAttribution": "Dave Proffer · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 1
   },
   {
@@ -4745,7 +4746,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 81,
     "blurb": "ancient city, now an archaeological site in Argolis, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lions-Gate-Mycenae.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Lions-Gate-Mycenae.jpg",
+    "imageAttribution": "Andreas Trepte · Wikimedia Commons · CC BY-SA 2.5",
     "suggestedHours": 2
   },
   {
@@ -4761,7 +4762,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 81,
     "blurb": "town on the Peloponnese peninsula in Greece, site of the ancient Olympic Games",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Olympic%20Flame%2C%20the%20Start%20of%20the%20Olympic%20Torch%20Relay%20%2851224124860%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Olympic Flame, the Start of the Olympic Torch Relay (51224124860).jpg",
+    "imageAttribution": "dronepicr · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 2
   },
   {
@@ -4777,7 +4778,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 79,
     "blurb": "island in Greece with famous Apollo sanctuary",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ruines%20de%20D%C3%A9los.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Ruines de Délos.jpg",
+    "imageAttribution": "Romain Delanoë · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 2
   },
   {
@@ -4794,7 +4795,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 79,
     "blurb": "capital and largest city of Ioannina and Epirus, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/%CE%9A%CE%AC%CF%83%CF%84%CF%81%CE%BF%20%CE%99%CF%89%CE%B1%CE%BD%CE%BD%CE%AF%CE%BD%CF%89%CE%BD%2C%20%CE%AC%CF%80%CE%BF%CF%88%CE%B7%20%CF%84%CE%BF%CF%85%20%CF%84%CE%B6%CE%B1%CE%BC%CE%B9%CE%BF%CF%8D%20%CE%BC%CE%B5%20%CF%86%CF%8C%CE%BD%CF%84%CE%BF%20%CF%84%CE%B7%CE%BD%20%CE%BB%CE%AF%CE%BC%CE%BD%CE%B7%20%CF%84%CE%BF%CE%BD%20%CE%BF%CF%85%CF%81%CE%B1%CE%BD%CF%8C%20%CE%BA%CE%B1%CE%B9%20%CF%84%CE%BF%CF%85%CF%82%20%CE%B3%CE%BB%CE%AC%CF%81%CE%BF%CF%85%CF%82%21%21%21%28photosiotas%29%20%285%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Κάστρο Ιωαννίνων, άποψη του τζαμιού με φόντο την λίμνη τον ουρανό και τους γλάρους!!!(photosiotas) (5).jpg",
+    "imageAttribution": "photosiotas · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": null
   },
   {
@@ -4810,7 +4811,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 79,
     "blurb": "coastal port city in Thessaly, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Volos%20view%20from%20Pelion%20%28cropped%29.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Volos view from Pelion (cropped).JPG",
+    "imageAttribution": "Tsints · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -4826,7 +4827,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 78,
     "blurb": "city in Crete, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Aerial%20view%20of%20the%20Old%20Venetian%20Harbour%20in%20Chania%2C%20Greece.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Aerial view of the Old Venetian Harbour in Chania, Greece.jpg",
+    "imageAttribution": "dronepicr · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": null
   },
   {
@@ -4842,7 +4843,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 78,
     "blurb": "city in Macedonia, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Dimarxio%20katerini.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Dimarxio katerini.jpg",
+    "imageAttribution": "Lemur12 · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -4858,7 +4859,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 78,
     "blurb": "modern city in Boeotia, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/%CE%9A%CE%B1%CE%B4%CE%BC%CE%B5%CE%AF%CE%B1%2C%20%CE%98%CE%AE%CE%B2%CE%B1%203823.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Καδμεία, Θήβα 3823.jpg",
+    "imageAttribution": "C messier · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": null
   },
   {
@@ -4874,7 +4875,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 77,
     "blurb": "ancient Minoan through Roman administrative center and city",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Knossos%20-%20North%20Portico%2002.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Knossos - North Portico 02.jpg",
+    "imageAttribution": "Bernard Gagnon · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -4890,7 +4891,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 76,
     "blurb": "capital of the Greek island and municipality of Corfu",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Korfu%20%28GR%29%2C%20Korfu%2C%20Altstadt%20--%202018%20--%201114-21.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Korfu (GR), Korfu, Altstadt -- 2018 -- 1114-21.jpg",
+    "imageAttribution": "Dietmar Rabich · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": null
   },
   {
@@ -4906,7 +4907,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 76,
     "blurb": "mountain in Phthiotis Regional Unit, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Parnassos2.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Parnassos2.jpg",
+    "imageAttribution": "Electron08 · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 1
   },
   {
@@ -4922,7 +4923,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 75,
     "blurb": "Greek city in Central Greece region",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/%CE%A7%CE%B1%CE%BB%CE%BA%CE%AF%CE%B4%CE%B1%200067.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Χαλκίδα 0067.jpg",
+    "imageAttribution": "C messier · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": null
   },
   {
@@ -4938,7 +4939,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 75,
     "blurb": "modern city in West Attica, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Eleusis.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Eleusis.JPG",
+    "imageAttribution": "BishkekRocks · Wikimedia Commons · Public domain",
     "suggestedHours": null
   },
   {
@@ -4954,7 +4955,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 75,
     "blurb": "city in Peloponnese, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Kalamata%2C%20Peloponnese%2C%20Greece.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Kalamata, Peloponnese, Greece.jpg",
+    "imageAttribution": "Pfloros at English Wikipedia · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -4970,7 +4971,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 75,
     "blurb": "city in northern Greece, the principal seaport of eastern Macedonia and the capital of Kavala regional unit",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Port%20of%20Kavala.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Port of Kavala.jpg",
+    "imageAttribution": "Politicslover2 · Wikimedia Commons · Public domain",
     "suggestedHours": null
   },
   {
@@ -4986,7 +4987,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 75,
     "blurb": "city in Thrace, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Komotini%20Center.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Komotini Center.JPG",
+    "imageAttribution": "GregoryGR (Γρηγόρης Σεμπελίδης) · Wikimedia Commons · Attribution",
     "suggestedHours": null
   },
   {
@@ -5002,7 +5003,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 75,
     "blurb": "town in Macedonia, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Kozani%20Montage%20L.png?width=640",
-    "imageAttribution": "Wikimedia Commons · Kozani Montage L.png",
+    "imageAttribution": "SilentResident (compilation, sources to attribute see above; if any of the sources used in the Montage are removed from Wikimedia Commons, or better ones are found, please inform its creator so that they can update it. You can contact the creator by leaving a message here: [1]) · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -5018,7 +5019,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 75,
     "blurb": "city on the Greek island of Lesbos",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mytilene%20Montage%20L.png?width=640",
-    "imageAttribution": "Wikimedia Commons · Mytilene Montage L.png",
+    "imageAttribution": "SilentResident (compilation, sources to attribute see above; if any of the sources used in the Montage are removed from Wikimedia Commons, or better ones are found, please inform its creator so that they can update it. You can contact the creator by leaving a message here: [1]) · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -5034,7 +5035,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 75,
     "blurb": "town in Messenia, Peloponnese, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Dimos%20Pylou.png?width=640",
-    "imageAttribution": "Wikimedia Commons · Dimos Pylou.png",
+    "imageAttribution": "Badseed · Wikimedia Commons · Public domain",
     "suggestedHours": null
   },
   {
@@ -5050,7 +5051,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 75,
     "blurb": "city in Peloponnese, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Tripoli%20Montage%20L.png?width=640",
-    "imageAttribution": "Wikimedia Commons · Tripoli Montage L.png",
+    "imageAttribution": "SilentResident (compilation, sources to attribute see above; if any of the sources used in the Montage are removed from Wikimedia Commons, or better ones are found, please inform its creator so that they can update it. You can contact the creator by leaving a message here: [1]) · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -5066,7 +5067,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 74,
     "blurb": "city in Thrace, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/%CE%A6%CE%AC%CF%81%CE%BF%CF%82%20%CE%91%CE%BB%CE%B5%CE%BE%CE%B1%CE%BD%CE%B4%CF%81%CE%BF%CF%8D%CF%80%CE%BF%CE%BB%CE%B7%CF%82%202.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Φάρος Αλεξανδρούπολης 2.jpg",
+    "imageAttribution": "Spiridon Ion Cepleanu · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": null
   },
   {
@@ -5083,7 +5084,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 74,
     "blurb": "lakes in Southeastern Europe",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lake%20Prespa%20Albania.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Lake Prespa Albania.jpg",
+    "imageAttribution": "ILMOTOREDIRICERCA · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 2
   },
   {
@@ -5099,7 +5100,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 74,
     "blurb": "city in central Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lamia%20Montage%20L.png?width=640",
-    "imageAttribution": "Wikimedia Commons · Lamia Montage L.png",
+    "imageAttribution": "SilentResident (compilation, sources to attribute see above; if any of the sources used in the Montage are removed from Wikimedia Commons, or better ones are found, please inform its creator so that they can update it. You can contact the creator by leaving a message here: [1]) · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -5115,7 +5116,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 74,
     "blurb": "city in Crete, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Rethymno%20-%20Venetian%20fortress.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Rethymno - Venetian fortress.jpg",
+    "imageAttribution": "Lapplaender · Wikimedia Commons · CC BY-SA 3.0 de",
     "suggestedHours": null
   },
   {
@@ -5131,7 +5132,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 73,
     "blurb": "city in Macedonia, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/%CE%9A%CE%91%CE%A3%CE%A4%CE%9F%CE%A1%CE%99%CE%86.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · ΚΑΣΤΟΡΙΆ.jpg",
+    "imageAttribution": "SARIPANIDIS PETER · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": null
   },
   {
@@ -5147,7 +5148,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 73,
     "blurb": "city in western Attica, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Megara2.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Megara2.jpg",
+    "imageAttribution": "O.Mustafin · Wikimedia Commons · CC0",
     "suggestedHours": null
   },
   {
@@ -5163,7 +5164,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 73,
     "blurb": "city in Central Macedonia, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Serres%20overview.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Serres overview.jpg",
+    "imageAttribution": "No machine-readable author provided. Marsyas assumed (based on copyright claims). · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -5179,7 +5180,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 73,
     "blurb": "city of Thessaly, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/OldCityAndNewCity.VarousiTrikala.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · OldCityAndNewCity.VarousiTrikala.jpg",
+    "imageAttribution": "GNantin · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": null
   },
   {
@@ -5195,7 +5196,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 70,
     "blurb": "stadium in Athens, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/GR-athen-panathinaiko-stadion.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · GR-athen-panathinaiko-stadion.jpg",
+    "imageAttribution": "Bgabel · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -5212,7 +5213,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 69,
     "blurb": "lake in Greece and North Macedonia",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Dojran-Lake-MACEDONIA.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Dojran-Lake-MACEDONIA.JPG",
+    "imageAttribution": "Македонец · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -5228,7 +5229,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 68,
     "blurb": "mountain in Livadia municipality, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/IMG%20View%20from%20Helicon.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · IMG View from Helicon.jpg",
+    "imageAttribution": "Pavlos1988 · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 1
   },
   {
@@ -5244,7 +5245,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 67,
     "blurb": "highest mountain on Crete",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Landscape%20mountains%20Phaistos.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Landscape mountains Phaistos.jpg",
+    "imageAttribution": "Jebulon · Wikimedia Commons · CC0",
     "suggestedHours": 1
   },
   {
@@ -5261,7 +5262,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 66,
     "blurb": "lake in Aetolia-Acarnania, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Thea-limni-trihonida-aitwloakarnania.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Thea-limni-trihonida-aitwloakarnania.jpg",
+    "imageAttribution": "EviFast7 · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -5277,7 +5278,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 66,
     "blurb": "Cretaceous limestone hill in Athens, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mount%20Lycabettus%20from%20the%20Areopagus%20on%20June%207%2C%202020.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Mount Lycabettus from the Areopagus on June 7, 2020.jpg",
+    "imageAttribution": "George E. Koronaios · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 1
   },
   {
@@ -5293,7 +5294,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 65,
     "blurb": "fortified rocky hill, the acropolis of the ancient city of Corinth, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Acrocorinto.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Acrocorinto.jpg",
+    "imageAttribution": "MM · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -5309,7 +5310,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 65,
     "blurb": "a Roman tower in Athens that once housed an early weather vane, large clepsydra, and multiple sundials to function as an early clocktower",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/%CE%A4%CE%BF%20%CE%A9%CF%81%CE%BF%CE%BB%CF%8C%CE%B3%CE%B9%CE%BF%CE%BD%20%CF%84%CE%BF%CF%85%20%CE%91%CE%BD%CE%B4%CF%81%CE%BF%CE%BD%CE%AF%CE%BA%CE%BF%CF%85%20%CE%9A%CF%85%CF%81%CF%81%CE%AE%CF%83%CF%84%CE%BF%CF%85%20%CF%83%CF%84%CE%B9%CF%82%2016%20%CE%A3%CE%B5%CF%80%CF%84%CE%B5%CE%BC%CE%B2%CF%81%CE%AF%CE%BF%CF%85%202019.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Το Ωρολόγιον του Ανδρονίκου Κυρρήστου στις 16 Σεπτεμβρίου 2019.jpg",
+    "imageAttribution": "George E. Koronaios · Wikimedia Commons · CC0",
     "suggestedHours": 2
   },
   {
@@ -5325,7 +5326,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 64,
     "blurb": "mountain at the southeastern part of Thessaly in central Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Pilion%20with%20monastery%20pau.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Pilion with monastery pau.JPG",
+    "imageAttribution": "Heidi B · Wikimedia Commons · CC BY 2.5",
     "suggestedHours": 1
   },
   {
@@ -5341,7 +5342,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 64,
     "blurb": "national park in Crete, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Samari3.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Samari3.jpg",
+    "imageAttribution": "Kurnosem · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -5357,7 +5358,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 64,
     "blurb": "mountain in Ioannina Regional Unit, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Smolikas%20IMG%200118.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Smolikas IMG 0118.jpg",
+    "imageAttribution": "Deyan Vasilev ( Dido3 ) · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 1
   },
   {
@@ -5373,7 +5374,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 63,
     "blurb": "mountain in Tempi municipality, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Kisavos%20%28Ossa%29%20mountain%2C%20Thessaly%2C%20Greece.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Kisavos (Ossa) mountain, Thessaly, Greece.jpg",
+    "imageAttribution": "stg_gr1 from Abelonas, Greece · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 1
   },
   {
@@ -5389,7 +5390,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 62,
     "blurb": "sculpture by Phidias",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/NashvilleParthenon9.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · NashvilleParthenon9.jpg",
+    "imageAttribution": "Cdv1014 · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -5405,7 +5406,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 62,
     "blurb": "tall mountain and mountain range northeast of Athens, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/%CE%A0%CE%B1%CE%BD%CE%BF%CF%81%CE%B1%CE%BC%CE%B9%CE%BA%CE%AE%20%CE%9D%CE%AD%CE%B1%CF%82%20%CE%A0%CE%B5%CE%BD%CF%84%CE%AD%CE%BB%CE%B7%CF%82.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Πανοραμική Νέας Πεντέλης.jpg",
+    "imageAttribution": "Dimorsitanos · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 1
   },
   {
@@ -5421,7 +5422,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 61,
     "blurb": "lake in Greece and Albania",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/St.Ahil%20from%20Langi.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · St.Ahil from Langi.JPG",
+    "imageAttribution": "Todor Georgiev · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -5437,7 +5438,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 60,
     "blurb": "ancient sculpture of Phidias in Athens Acropolis",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Atena%20Promacos.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Atena Promacos.jpg",
+    "imageAttribution": "Unknown artistUnknown artist · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -5453,7 +5454,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 60,
     "blurb": "cave in Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cave%20of%20the%20Apocalypse.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Cave of the Apocalypse.jpg",
+    "imageAttribution": "Vladimir Boskovic at English Wikipedia · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -5469,7 +5470,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 60,
     "blurb": "lake of Kastoria, Macedonia, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Kastoria2%20200704.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Kastoria2 200704.JPG",
+    "imageAttribution": "Pvasiliadis · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -5485,7 +5486,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 60,
     "blurb": "lake in Epirus, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Pamvotida-See.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Pamvotida-See.jpg",
+    "imageAttribution": "Wikimedia Commons · CC BY-SA 2.0 de",
     "suggestedHours": 2
   },
   {
@@ -5502,7 +5503,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 60,
     "blurb": "national park in Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Pindus%20old%20bridge%203.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Pindus old bridge 3.jpg",
+    "imageAttribution": "Karayan74 · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -5518,7 +5519,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 59,
     "blurb": "ancient Greek choragic monument in Athens",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Choragic%20Monument%20of%20Lysicrates.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Choragic Monument of Lysicrates.jpg",
+    "imageAttribution": "User:Greenshed · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -5534,7 +5535,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 59,
     "blurb": "ancient lake in Greece, now dry",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Rottmann%20-%20Kopaissee%201839.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Rottmann - Kopaissee 1839.jpg",
+    "imageAttribution": "Carl Rottmann · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -5551,7 +5552,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 59,
     "blurb": "cave and archeological location in Petralona, Chalkidiki, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Eingang%20Petralona%20Hoehle.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Eingang Petralona Hoehle.JPG",
+    "imageAttribution": "Sven Dittmar · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -5567,7 +5568,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 59,
     "blurb": "\"tholos\" tomb located on the Panagitsa Hill at Mycenae, Greece, that dates ca.1250 BC",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Treasury%20of%20Atreus%20Mycenae.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Treasury of Atreus Mycenae.jpg",
+    "imageAttribution": "Ken Russell Salvador · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 2
   },
   {
@@ -5583,7 +5584,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 58,
     "blurb": "monument in Thessaloniki, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Arch%20of%20Galerius%20in%20September%20%283%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Arch of Galerius in September (3).jpg",
+    "imageAttribution": "Armineaghayan · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -5600,7 +5601,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 58,
     "blurb": "beach on Zakynthos, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Navagio%20beach%20Zakynthos.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Navagio beach Zakynthos.jpg",
+    "imageAttribution": "kallerna · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 3
   },
   {
@@ -5616,7 +5617,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 58,
     "blurb": "island in the Santorini caldera",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Nea%20Kameni.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Nea Kameni.jpg",
+    "imageAttribution": "Bernard Gagnon · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -5632,7 +5633,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 58,
     "blurb": "medieval fortress and palace of the Knights in the historic center of Rhodes, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/2023-09-20%20Courtyard%20Gro%C3%9Fmeisterpalast%201.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 2023-09-20 Courtyard Großmeisterpalast 1.jpg",
+    "imageAttribution": "Burkhard Mücke · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -5648,7 +5649,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 58,
     "blurb": "canyon in Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Vikos%20Gorge%20from%20Beloe.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Vikos Gorge from Beloe.jpg",
+    "imageAttribution": "Skamnelis · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -5664,7 +5665,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 57,
     "blurb": "cave in Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/The%20famous%20Cave%20of%20Euripides%20on%20Salamis%20island%2C%20Greece.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · The famous Cave of Euripides on Salamis island, Greece.jpg",
+    "imageAttribution": "Violeta Meleti · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -5681,7 +5682,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 57,
     "blurb": "cave near Psychro village, Crete, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cave%20Dikti12%28js%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Cave Dikti12(js).jpg",
+    "imageAttribution": "Jerzy Strzelecki · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -5697,7 +5698,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 57,
     "blurb": "submarine volcano near Santorini, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Kolumbo%20crater%20NOAA.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Kolumbo crater NOAA.jpg",
+    "imageAttribution": "NOAA graphics · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -5713,7 +5714,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 56,
     "blurb": "building of the Hellenic Parliament, formerly a royal palace",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Attica%2006-13%20Athens%2009%20Parliament.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Attica 06-13 Athens 09 Parliament.jpg",
+    "imageAttribution": "A.Savin · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -5730,7 +5731,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 56,
     "blurb": "national park in Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Zagori%20Vikos%20gorge%20Oxia%20towards%20Vikos.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Zagori Vikos gorge Oxia towards Vikos.jpg",
+    "imageAttribution": "Nikos A. Kanellopoulos · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 5
   },
   {
@@ -5746,7 +5747,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 55,
     "blurb": "palace on Corfu island, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Corfu%20Achilleion%20R05.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Corfu Achilleion R05.jpg",
+    "imageAttribution": "Marc Ryckaert (MJJR) · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 2
   },
   {
@@ -5763,7 +5764,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 54,
     "blurb": "town in Pieria, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Leptokaria%20paralia.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Leptokaria paralia.jpg",
+    "imageAttribution": "Lemur12 · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 3
   },
   {
@@ -5779,7 +5780,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 54,
     "blurb": "national park in eastern Crete, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Vai%20R06.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Vai R06.jpg",
+    "imageAttribution": "Marc Ryckaert (MJJR) · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 3
   },
   {
@@ -5795,7 +5796,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 54,
     "blurb": "building in Athens and official residence of the president of Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Presidential%20Mansion%20in%20Athens.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Presidential Mansion in Athens.jpg",
+    "imageAttribution": "Άργος · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -5811,7 +5812,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 54,
     "blurb": "palace in Attica, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Aspiotis%20276.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Aspiotis 276.jpg",
+    "imageAttribution": "The postcard was published by Aspiotis in c. 1915. · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -5828,7 +5829,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 53,
     "blurb": "cave near Kalambaka, Thessaly, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/%CE%A3%CF%80%CE%AE%CE%BB%CE%B1%CE%B9%CE%BF%20%CE%98%CE%B5%CF%8C%CF%80%CE%B5%CF%84%CF%81%CE%B1%CF%82.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Σπήλαιο Θεόπετρας.jpg",
+    "imageAttribution": "Tolis-3kala · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -5860,7 +5861,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 51,
     "blurb": "Venetian/Ottoman fortification on Crete",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Frangokastello%20R03.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Frangokastello R03.jpg",
+    "imageAttribution": "Marc Ryckaert (MJJR) · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 2
   },
   {
@@ -5876,7 +5877,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 51,
     "blurb": "island in the Santorini caldera",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Palea%20Kameni%20Swimming.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Palea Kameni Swimming.JPG",
+    "imageAttribution": "Mousemaster · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -5893,7 +5894,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 50,
     "blurb": "national park in Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/2003-11-Dadia-DSCN0027.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 2003-11-Dadia-DSCN0027.jpg",
+    "imageAttribution": "Odysseas031 · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -5909,7 +5910,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 50,
     "blurb": "part of the modern city on Rhodes island, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Grossmeisterpalast%20Rhodos%202010.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Grossmeisterpalast Rhodos 2010.jpg",
+    "imageAttribution": "Olbertz 23:14, 21. Dez. 2010 (CET) · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -5926,7 +5927,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 50,
     "blurb": "marine protected area in Ionian sea, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Marathonisi.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Marathonisi.jpg",
+    "imageAttribution": "Andy Buckingham · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 5
   },
   {
@@ -5942,7 +5943,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 49,
     "blurb": "Stalactite cave in Crete, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Id%C3%A4ische%20Grotte%2011.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Idäische Grotte 11.JPG",
+    "imageAttribution": "Olaf Tausch · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 2
   },
   {
@@ -5958,7 +5959,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 49,
     "blurb": "cave and cenote in Kefalonia, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Melissani%20Cave%2C%20Kefalonia%201.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Melissani Cave, Kefalonia 1.jpg",
+    "imageAttribution": "Matt Sims · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 2
   },
   {
@@ -5974,7 +5975,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 48,
     "blurb": "Byzantine castle near Palaiokastritsa, Corfu, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Angelokastro%20%28Corfu%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Angelokastro (Corfu).jpg",
+    "imageAttribution": "Dr.K. · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -5990,7 +5991,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 48,
     "blurb": "national park in Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Parc%20Axios%20wiki.png?width=640",
-    "imageAttribution": "Wikimedia Commons · Parc Axios wiki.png",
+    "imageAttribution": "Iolchos07 · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -6006,7 +6007,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 48,
     "blurb": "medieval castle in Elis regional unit, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Chlemutsi-Castle-Sotos-06.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Chlemutsi-Castle-Sotos-06.jpg",
+    "imageAttribution": "Σωτήριος Παν. Γιαννακουλόπουλος · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -6022,7 +6023,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 48,
     "blurb": "gorge in Crete, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/HaGorgeExit.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · HaGorgeExit.jpg",
+    "imageAttribution": "Lourakis (talk) · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -6038,7 +6039,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 48,
     "blurb": "Medieval castle in the city of Ioannina, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/%CE%9A%CE%AC%CF%83%CF%84%CF%81%CE%BF%20%CE%99%CF%89%CE%B1%CE%BD%CE%BD%CE%AF%CE%BD%CF%89%CE%BD%20%28photosiotas%29%20%284%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Κάστρο Ιωαννίνων (photosiotas) (4).jpg",
+    "imageAttribution": "photosiotas · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -6054,7 +6055,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 48,
     "blurb": "ancient Greek temple in Lavreotiki Municipality, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Greece%20Cape%20Sounion%20BW%202017-10-09%2010-12-43.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Greece Cape Sounion BW 2017-10-09 10-12-43.jpg",
+    "imageAttribution": "Berthold Werner · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -6070,7 +6071,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 46,
     "blurb": "private zoo in Spata, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Swans%20in%20Attica%20Zoological%20Park.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Swans in Attica Zoological Park.jpg",
+    "imageAttribution": "ΖῷονΠολιτικόν · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -6086,7 +6087,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 46,
     "blurb": "beach in Kefalonia, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Myrtos%20Beach%2C%20Kefalonia.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Myrtos Beach, Kefalonia.jpg",
+    "imageAttribution": "Matt Sims · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 3
   },
   {
@@ -6102,7 +6103,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 46,
     "blurb": "archaeological site in Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/%CE%9D%CE%B5%CE%BA%CF%81%CE%BF%CE%BC%CE%B1%CE%BD%CF%84%CE%B5%CE%AF%CE%BF%20%CE%91%CF%87%CE%AD%CF%81%CE%BF%CE%BD%CF%84%CE%B1.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Νεκρομαντείο Αχέροντα.jpg",
+    "imageAttribution": "Nikos Laskaridis · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -6118,7 +6119,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 46,
     "blurb": "fortress in Pylos, Messenia, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Pylos%20Festung%20380.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Pylos Festung 380.jpg",
+    "imageAttribution": "Harald Rossa · Wikimedia Commons · CC BY-SA 2.5",
     "suggestedHours": 2
   },
   {
@@ -6134,7 +6135,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 46,
     "blurb": "fortification in Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Platamon%20castro.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Platamon castro.JPG",
+    "imageAttribution": "Lemur12 · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -6150,7 +6151,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 45,
     "blurb": "an archaeological site in the Mani region of the Peloponnese peninsula of Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Diros-cave-greece%2016269357444%20o.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Diros-cave-greece 16269357444 o.jpg",
+    "imageAttribution": "George Fournaris · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -6166,7 +6167,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 45,
     "blurb": "research centre, aquarium and museum in Rhodes, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Holothurie%20D%C3%A9tail%20Rhodes.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Holothurie Détail Rhodes.jpg",
+    "imageAttribution": "Min's · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -6182,7 +6183,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 45,
     "blurb": "beach in Crete, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Preveli%20beach%2001.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Preveli beach 01.jpg",
+    "imageAttribution": "Mihael Grmek · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 3
   },
   {
@@ -6198,7 +6199,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 45,
     "blurb": "beach in Messenia, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Voidokilia%20Beach1.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Voidokilia Beach1.jpg",
+    "imageAttribution": "Grzontan · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 3
   },
   {
@@ -6214,7 +6215,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 45,
     "blurb": "waterfall in Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Edessa%20waterfalls.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Edessa waterfalls.jpg",
+    "imageAttribution": "Ευαγγελία Κατή · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -6230,7 +6231,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 43,
     "blurb": "canyon in Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Saint%20Irene%20gorge%20Crete%20a.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Saint Irene gorge Crete a.jpg",
+    "imageAttribution": "Γιώργος σιγά μην πω... · Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": 2
   },
   {
@@ -6246,7 +6247,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 43,
     "blurb": "aquarium in Gournes, Crete, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cretaquarium%20entrance.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Cretaquarium entrance.jpg",
+    "imageAttribution": "Lourakis · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -6262,7 +6263,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 43,
     "blurb": "place in Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/OlympicBeach.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · OlympicBeach.jpg",
+    "imageAttribution": "Edal Anton Lefterov · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 3
   },
   {
@@ -6278,7 +6279,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 43,
     "blurb": "beach on Lefkada island, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lefkada%20kosta.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Lefkada kosta.jpg",
+    "imageAttribution": "Moumouza at English Wikipedia · Wikimedia Commons · Public domain",
     "suggestedHours": 3
   },
   {
@@ -6294,7 +6295,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 43,
     "blurb": "national park in Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Frakto.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Frakto.jpg",
+    "imageAttribution": "Athanasios Benisis · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -6326,7 +6327,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 43,
     "blurb": null,
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cygnus%20cygnus%2C%20Schinias%2C%20Marathon.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Cygnus cygnus, Schinias, Marathon.jpg",
+    "imageAttribution": "Phanis Koumpis · Wikimedia Commons · CC BY-SA 3.0 gr",
     "suggestedHours": 5
   },
   {
@@ -6342,7 +6343,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 42,
     "blurb": "Canyon in Crete, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Imbros-Gorge.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Imbros-Gorge.jpg",
+    "imageAttribution": "AWI · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 2
   },
   {
@@ -6358,7 +6359,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 42,
     "blurb": "archaeological site in Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/CreteDeathValley.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · CreteDeathValley.jpg",
+    "imageAttribution": "Mhinner · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -6374,7 +6375,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 40,
     "blurb": "lagoon and beach in western Crete",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Aerial%20view%20of%20Balos%20Beach%20and%20Lagoon%20on%20Crete%2C%20Greece.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Aerial view of Balos Beach and Lagoon on Crete, Greece.jpg",
+    "imageAttribution": "dronepicr · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 3
   },
   {
@@ -6390,7 +6391,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 40,
     "blurb": "national park in Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Olympus%20National%20Park%2027.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Olympus National Park 27.jpg",
+    "imageAttribution": "kallerna · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -6406,7 +6407,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 40,
     "blurb": "building in Corfu, Ionian Islands Region, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/%CE%91%CE%9D%CE%91%CE%9A%CE%A4%CE%9F%CE%A1%CE%9F%20%CE%9A%CE%95%CE%A1%CE%9A%CE%A5%CE%A1%CE%91.xcf?width=640",
-    "imageAttribution": "Wikimedia Commons · ΑΝΑΚΤΟΡΟ ΚΕΡΚΥΡΑ.xcf",
+    "imageAttribution": "Vasilaki.athina · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -6422,7 +6423,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 38,
     "blurb": "beach on Lefkada island, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Egremni%2C%20Lefkada%205%20-%20panoramio.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Egremni, Lefkada 5 - panoramio.jpg",
+    "imageAttribution": "iant71 · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 3
   },
   {
@@ -6438,7 +6439,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 38,
     "blurb": "national park in Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Gka3469.jpeg%282%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Gka3469.jpeg(2).jpg",
+    "imageAttribution": "Evrodelta · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -6454,7 +6455,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 38,
     "blurb": "beach in Mykonos, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ftelia%20Bay%2C%20Mykonos%2C%20060363.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Ftelia Bay, Mykonos, 060363.jpg",
+    "imageAttribution": "Zde · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 3
   },
   {
@@ -6470,7 +6471,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 38,
     "blurb": "Minoan palace in Crete, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/%CE%91%CE%BD%CE%AC%CE%BA%CF%84%CE%BF%CF%81%CE%BF%20%CE%93%CE%B1%CE%BB%CE%B1%CF%84%CE%AC%201558.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Ανάκτορο Γαλατά 1558.jpg",
+    "imageAttribution": "C messier · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -6486,7 +6487,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 38,
     "blurb": "ancient Roman palace in Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Palais%20Gal%C3%A8re%2000263.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Palais Galère 00263.JPG",
+    "imageAttribution": "G.Garitan · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -6502,7 +6503,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 38,
     "blurb": "village in Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Koukounaries%20beach.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Koukounaries beach.jpg",
+    "imageAttribution": "Eleni Sagia · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 3
   },
   {
@@ -6518,7 +6519,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 38,
     "blurb": "village in Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Panteleimon%20Paralia.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Panteleimon Paralia.jpg",
+    "imageAttribution": "Lemur12 · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 3
   },
   {
@@ -6534,7 +6535,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 38,
     "blurb": "village in Pieria, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Beach%20of%20Skotina.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Beach of Skotina.jpg",
+    "imageAttribution": "Vericalshow at English Wikipedia · Wikimedia Commons · GFDL",
     "suggestedHours": 3
   },
   {
@@ -6550,7 +6551,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 38,
     "blurb": "beach in Milos, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Sarakiniko%20Beach%20on%20Milos%20Island%2C%20Greece%20with%20a%20view%20of%20the%20Aegean%20Sea.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Sarakiniko Beach on Milos Island, Greece with a view of the Aegean Sea.jpg",
+    "imageAttribution": "dronepicr · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 3
   },
   {
@@ -6566,7 +6567,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 35,
     "blurb": "village in Mykonos, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Agios%20Stefanos%20beach%20Mykonos.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Agios Stefanos beach Mykonos.jpg",
+    "imageAttribution": "Radosław Botev · Wikimedia Commons · CC BY 3.0 pl",
     "suggestedHours": 3
   },
   {
@@ -6582,7 +6583,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 35,
     "blurb": "village in Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Kokkino-nero-strand-b.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Kokkino-nero-strand-b.jpg",
+    "imageAttribution": "Mboesch · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 3
   },
   {
@@ -6598,7 +6599,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 35,
     "blurb": "volcano in eastern Peloponnese, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Vulkandom.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Vulkandom.jpg",
+    "imageAttribution": "Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -6614,7 +6615,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 35,
     "blurb": "national park in Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/20100215%20Vistonida%20Lake%20Xanthi%20Prefecture%20Thrace%20Greece.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 20100215 Vistonida Lake Xanthi Prefecture Thrace Greece.jpg",
+    "imageAttribution": "Ggia · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -6630,7 +6631,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 35,
     "blurb": "national park in Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Plaka%20bridge1.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Plaka bridge1.jpg",
+    "imageAttribution": "peppi9 · Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": 5
   },
   {
@@ -6646,7 +6647,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 35,
     "blurb": "volcano in Corinthia, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/%CE%A6%CE%B1%CF%81%CE%AC%CE%B3%CE%B3%CE%B9%20%CE%98%CE%B5%CE%B9%CE%BF%CF%87%CF%8E%CE%BC%CE%B1%CF%84%CE%BF%CF%82%202322.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Φαράγγι Θειοχώματος 2322.jpg",
+    "imageAttribution": "George Chrysafoudis · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 2
   },
   {
@@ -6662,7 +6663,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 32,
     "blurb": "human settlement in Corfu, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Corfu%20Agios%20Gordis%20R02.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Corfu Agios Gordis R02.jpg",
+    "imageAttribution": "Marc Ryckaert (MJJR) · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 3
   },
   {
@@ -6678,7 +6679,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 32,
     "blurb": "national park in Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mount-Aenos.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Mount-Aenos.JPG",
+    "imageAttribution": "No machine-readable author provided. Christos Vittoratos assumed (based on copyright claims). · Wikimedia Commons · CC BY-SA 2.5",
     "suggestedHours": 5
   },
   {
@@ -6694,7 +6695,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 32,
     "blurb": "national park in Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/%CE%94%CE%AC%CF%83%CE%BF%CF%82%20%CE%9A%CE%B1%CE%BB%CF%8C%CE%B3%CF%81%CE%B9%CE%B1%CF%82%2006.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Δάσος Καλόγριας 06.jpg",
+    "imageAttribution": "Kostas Katsenos · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -6710,7 +6711,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 32,
     "blurb": "village in Aetolia-Acarnania, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/IMG%20Kryoneri%20Aitoloakarnania.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · IMG Kryoneri Aitoloakarnania.jpg",
+    "imageAttribution": "Pavlos1988 · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 3
   },
   {
@@ -6727,7 +6728,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 32,
     "blurb": "gorge in Crete, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Richtis%20waterfall%20at%20Richtis%20gorge%20in%20Crete.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Richtis waterfall at Richtis gorge in Crete.jpg",
+    "imageAttribution": "Kostdro · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -6743,7 +6744,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 32,
     "blurb": "forest in Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Skiritida%20forest.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Skiritida forest.jpg",
+    "imageAttribution": "Apostolos Papageorgiou · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -6759,7 +6760,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 29,
     "blurb": "seaside resort village in Apokorónas, Crete, Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Waterfront%20of%20Almyrida%20on%20the%20Island%20of%20Crete%2C%20Greece%202009-04-12.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Waterfront of Almyrida on the Island of Crete, Greece 2009-04-12.jpg",
+    "imageAttribution": "Jlundqvi · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 3
   },
   {
@@ -6775,7 +6776,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 29,
     "blurb": "national park in Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/St.Ahil%20from%20Langi.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · St.Ahil from Langi.JPG",
+    "imageAttribution": "Todor Georgiev · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -6791,7 +6792,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 29,
     "blurb": "national park in Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Samaria%20Gorge%2003.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Samaria Gorge 03.jpg",
+    "imageAttribution": "Lapplaender · Wikimedia Commons · CC BY-SA 3.0 de",
     "suggestedHours": 5
   },
   {
@@ -6807,7 +6808,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 25,
     "blurb": "national park in Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Krathis%20river.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Krathis river.jpg",
+    "imageAttribution": "Georgikopoulos Manolis · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -6823,7 +6824,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 25,
     "blurb": "national park in Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/%CE%9A%CE%B1%CE%B8%CF%81%CE%B5%CF%86%CF%84%CE%B9%CF%83%CE%BC%CF%8C%CF%82%20%CF%83%CF%8D%CE%BD%CE%BD%CE%B5%CF%86%CF%89%CE%BD.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Καθρεφτισμός σύννεφων.jpg",
+    "imageAttribution": "Giannis Cholidis · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -6839,7 +6840,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 25,
     "blurb": "national park in Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mt.%20Parnassus.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Mt. Parnassus.jpg",
+    "imageAttribution": "Chavakismanolis · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -6855,7 +6856,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 25,
     "blurb": "national park in Greece",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Parnitha%20some%20snow%203%20Feby%202010.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Parnitha some snow 3 Feby 2010.jpg",
+    "imageAttribution": "Jola i Dimitris · Wikimedia Commons · Public domain",
     "suggestedHours": 5
   },
   {
@@ -6872,7 +6873,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 98,
     "blurb": "Italian commune and capital city of Lombardy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Milano%2C%20Duomo%20with%20Milan%20Cathedral%20and%20Galleria%20Vittorio%20Emanuele%20II%2C%202016.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Milano, Duomo with Milan Cathedral and Galleria Vittorio Emanuele II, 2016.jpg",
+    "imageAttribution": "Steffen Schmitz · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": null
   },
   {
@@ -6889,7 +6890,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 98,
     "blurb": "capital city of Veneto, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Floating%20city.tif?width=640",
-    "imageAttribution": "Wikimedia Commons · Floating city.tif",
+    "imageAttribution": "European Space Agency · Wikimedia Commons · CC BY-SA 3.0 igo",
     "suggestedHours": null
   },
   {
@@ -6906,7 +6907,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 96,
     "blurb": "capital city of Campania, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Naples%20from%20the%20Castello%20Sant%20Elmo%20with%20Abbazia%20San%20Martino%20the%20port%20and%20the%20Vesuv.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Naples from the Castello Sant Elmo with Abbazia San Martino the port and the Vesuv.jpg",
+    "imageAttribution": "This Photo was taken by Wolfgang Moroder.  \n\nFeel free to use my photos, but please mention me as the author and send me a  message. \n\n\n\nThis image is not in the public domain. Please respect the copyright protection. It may only be used according to the rules mentioned here. This specifically excludes use in social media, if applicable terms of the licenses listed here not appropriate.\n\n\n\nPlease do not upload an updated image here without consultation with the Author. The author would like to make corrections only at his own source. This ensures that the changes are preserved.Please if you think that any changes should be required, please inform the author.Otherwise you can upload a new image with a new name. Please use one of the templates derivative or extract. · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -6923,7 +6924,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 94,
     "blurb": "capital of Sicily, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Palermo02%20flickr.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Palermo02 flickr.jpg",
+    "imageAttribution": "Xerones · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": null
   },
   {
@@ -6940,7 +6941,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 91,
     "blurb": "Italian city, capital of the Apulia region",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Puglia%20bari%20old-town.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Puglia bari old-town.jpg",
+    "imageAttribution": "Francesco Di Stefano 08 · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": null
   },
   {
@@ -6956,7 +6957,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 91,
     "blurb": "city in Tuscany, Central Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Pisa%20-%20veduta%20dall%27aereo%204.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Pisa - veduta dall'aereo 4.JPG",
+    "imageAttribution": "Luca Aless · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": null
   },
   {
@@ -6973,7 +6974,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 90,
     "blurb": "ancient Roman amphitheatre, a landmark of Rome, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Colosseo%202020.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Colosseo 2020.jpg",
+    "imageAttribution": "FeaturedPics · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -6989,7 +6990,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 90,
     "blurb": "city in Veneto, northern Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Aerial%20picture%20of%20Verona.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Aerial picture of Verona.jpg",
+    "imageAttribution": "Guglielmo Giambartolomei · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": null
   },
   {
@@ -7007,7 +7008,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 89,
     "blurb": "Italian comune in Sicily",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Messina%20harbour%20-%20aerial%20view.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Messina harbour - aerial view.jpg",
+    "imageAttribution": "Stefano Barillà.\nOriginal uploader was StefanoBarillà at it.wikipedia.\n\nLater version(s) were uploaded by Neon97 at it.wikipedia. · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -7025,7 +7026,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 89,
     "blurb": "active stratovolcano in the Gulf of Naples, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Il%20cratere%20del%20Vulcano%20-%20panoramio.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Il cratere del Vulcano - panoramio.jpg",
+    "imageAttribution": "pietro scerrato · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 2
   },
   {
@@ -7041,7 +7042,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 89,
     "blurb": "city and seaport in northeastern Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Trieste%20%2828766391880%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Trieste (28766391880).jpg",
+    "imageAttribution": "Nick Savchenko from Kiev, Ukraine · Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": null
   },
   {
@@ -7057,7 +7058,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 88,
     "blurb": "comune in Lombardy, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/The%20Upper%20City%20of%20Bergamo.%20View%20from%20Via%20al%20Castello.%20Italy.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · The Upper City of Bergamo. View from Via al Castello. Italy.jpg",
+    "imageAttribution": "Ввласенко · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -7074,7 +7075,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 88,
     "blurb": "highest mountain in the Alps",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Panorama%20of%20Mont%20Blanc%20du%20Tacul%2C%20Mont%20Maudit%20and%20Mont%20Blanc%20from%20Aiguille%20du%20Midi%2C%20Chamonix%2C%20Haute-Savoie.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Panorama of Mont Blanc du Tacul, Mont Maudit and Mont Blanc from Aiguille du Midi, Chamonix, Haute-Savoie.jpg",
+    "imageAttribution": "Christian David · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 1
   },
   {
@@ -7090,7 +7091,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 88,
     "blurb": "Italian comune",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Perugia%20panoramic.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Perugia panoramic.jpg",
+    "imageAttribution": "Luca Vanzella · Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": null
   },
   {
@@ -7106,7 +7107,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 88,
     "blurb": "city in northern Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Basilica%20of%20San%20Vitale.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Basilica of San Vitale.jpg",
+    "imageAttribution": "Commonists · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": null
   },
   {
@@ -7122,7 +7123,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 88,
     "blurb": "city in Tuscany, Italy and capital of the province of Siena",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/PiazzadelCampoSiena.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · PiazzadelCampoSiena.jpg",
+    "imageAttribution": "Massimo Catarinella · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -7138,7 +7139,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 87,
     "blurb": "Italian city in the Marches region",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/AnkonPanorama.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · AnkonPanorama.jpg",
+    "imageAttribution": "No machine-readable author provided. Giacomus~commonswiki assumed (based on copyright claims). · Wikimedia Commons · CC BY-SA 2.5 it",
     "suggestedHours": null
   },
   {
@@ -7156,7 +7157,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 87,
     "blurb": "active stratovolcano on the east coast of Sicily, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/View%20of%20Mount%20Etna%20from%20Reggio%20Calabria%20-%20Italy%20-%2010%20Feb.%202017%20-%20%281%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · View of Mount Etna from Reggio Calabria - Italy - 10 Feb. 2017 - (1).jpg",
+    "imageAttribution": "Jacopo Werther · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -7172,7 +7173,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 87,
     "blurb": "city in the northern Italian region of Emilia-Romagna",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Parma%20dal%20Duomo%2C%20settembre%202014-1%20%2815481932581%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Parma dal Duomo, settembre 2014-1 (15481932581).jpg",
+    "imageAttribution": "Città di Parma · Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": null
   },
   {
@@ -7189,7 +7190,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 87,
     "blurb": "ancient Roman city near modern Naples, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Pompeii%20%284873744179%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Pompeii (4873744179).jpg",
+    "imageAttribution": "Glen Scarborough from The Central Coast, Australia · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 2
   },
   {
@@ -7207,7 +7208,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 87,
     "blurb": "Italian municipality",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ortigia%20dall%27alto.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Ortigia dall'alto.jpg",
+    "imageAttribution": "Agostino Artnoir Sella · Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": 2
   },
   {
@@ -7225,7 +7226,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 87,
     "blurb": "Italian comune",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Castello%20Aragonese%28Taranto%29.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Castello Aragonese(Taranto).JPG",
+    "imageAttribution": "Livioandronico2013 · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -7242,7 +7243,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 86,
     "blurb": "Italian comune in Sicily",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Agrigento%204m1.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Agrigento 4m1.jpg",
+    "imageAttribution": "jschoenhofer · Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": 2
   },
   {
@@ -7258,7 +7259,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 86,
     "blurb": "Italian city",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Como%20and%20its%20lake.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Como and its lake.jpg",
+    "imageAttribution": "Pxhere · Wikimedia Commons · CC0",
     "suggestedHours": null
   },
   {
@@ -7274,7 +7275,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 86,
     "blurb": "comune in Emilia-Romagna, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Castello%20esterno.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Castello esterno.jpg",
+    "imageAttribution": "Massimo Baraldi · Wikimedia Commons · CC BY 2.5 it",
     "suggestedHours": null
   },
   {
@@ -7290,7 +7291,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 86,
     "blurb": "Italian city and municipality",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Panorama%20modena%2009.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Panorama modena 09.jpg",
+    "imageAttribution": "SIG SG 510 · Wikimedia Commons · CC0",
     "suggestedHours": null
   },
   {
@@ -7306,7 +7307,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 86,
     "blurb": "Italian comune",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Reggia%20di%20Monza.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Reggia di Monza.jpg",
+    "imageAttribution": "Diego Bonacina · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": null
   },
   {
@@ -7322,7 +7323,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 86,
     "blurb": "Italian comune",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/08%20b%20piazza%20cavour%20pan%20301.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 08 b piazza cavour pan 301.jpg",
+    "imageAttribution": "Emilio Salvatori · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": null
   },
   {
@@ -7338,7 +7339,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 85,
     "blurb": "Italian city in Lombardy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cremona%20centro.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Cremona centro.jpg",
+    "imageAttribution": "Wikimedia Commons · Public domain",
     "suggestedHours": null
   },
   {
@@ -7354,7 +7355,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 85,
     "blurb": "Italian city, capital of the Abruzzo region and of the Province of L'Aquila",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/L%27Aquila%20Piazza%20del%20Duomo%202007%20by-RaBoe.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · L'Aquila Piazza del Duomo 2007 by-RaBoe.jpg",
+    "imageAttribution": "Ra Boe · Wikimedia Commons · CC BY-SA 2.5",
     "suggestedHours": null
   },
   {
@@ -7370,7 +7371,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 85,
     "blurb": "city and comune in Tuscany, Central Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/02%20Lucca%20seen%20from%20Torre%20Guinigi.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 02 Lucca seen from Torre Guinigi.jpg",
+    "imageAttribution": "Myrabella · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -7386,7 +7387,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 85,
     "blurb": "Italian comune",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Piazza%20dei%20Cavalli%20Piacenza.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Piazza dei Cavalli Piacenza.JPG",
+    "imageAttribution": "Harrie Gielen · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -7402,7 +7403,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 85,
     "blurb": "Italian comune",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Piazza%20san%20giacomo.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Piazza san giacomo.jpg",
+    "imageAttribution": "Gian77 at Italian Wikipedia · Wikimedia Commons · Public domain",
     "suggestedHours": null
   },
   {
@@ -7418,7 +7419,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 85,
     "blurb": "municipality of Northern Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Collage%20Vicenza.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Collage Vicenza.jpg",
+    "imageAttribution": "collection by DanieleDF1995 (talk) · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -7434,7 +7435,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 84,
     "blurb": "Italian comune",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Gela%20Montage.png?width=640",
-    "imageAttribution": "Wikimedia Commons · Gela Montage.png",
+    "imageAttribution": "AbelDionis · Wikimedia Commons · CC BY-SA 2.5",
     "suggestedHours": 2
   },
   {
@@ -7450,7 +7451,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 82,
     "blurb": "mountain in the Pennine Alps on the border between Switzerland and Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cervino%20cloud.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Cervino cloud.jpg",
+    "imageAttribution": "Gianluca Miscione · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 1
   },
   {
@@ -7467,7 +7468,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 81,
     "blurb": "lake in Lombardy, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Panoramic%20view%20of%20Como%20Lake%20%28Lago%20di%20Como%29%2C%20seen%20from%20the%20mountain%20Monte%20Grona%20-%20Plesio%20%28Como%29%202015-10-25.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Panoramic view of Como Lake (Lago di Como), seen from the mountain Monte Grona - Plesio (Como) 2015-10-25.JPG",
+    "imageAttribution": "Mænsard vokser · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -7484,7 +7485,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 81,
     "blurb": "lake in Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Punta%20San%20Vigilio.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Punta San Vigilio.jpg",
+    "imageAttribution": "Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": 2
   },
   {
@@ -7500,7 +7501,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 80,
     "blurb": "lake in Italy and Switzerland",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lago%20Maggiore%20Traghetto.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Lago Maggiore Traghetto.JPG",
+    "imageAttribution": "Corradox · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -7516,7 +7517,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 79,
     "blurb": "ancient Roman temple in Rome, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Pantheon%20%28Rome%29%20-%20Right%20side%20and%20front.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Pantheon (Rome) - Right side and front.jpg",
+    "imageAttribution": "NikonZ7II · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -7532,7 +7533,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 78,
     "blurb": "palace and art museum in Florence, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Florence%2C%20Italy%20-%20panoramio%20%28125%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Florence, Italy - panoramio (125).jpg",
+    "imageAttribution": "Arek N. · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -7548,7 +7549,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 76,
     "blurb": "Baroque fountain in Rome, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Trevi%20Fountain%20-%20Roma.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Trevi Fountain - Roma.jpg",
+    "imageAttribution": "NikonZ7II · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -7564,7 +7565,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 75,
     "blurb": "lake in Switzerland and Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lake%20Lugano%20Panorama.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Lake Lugano Panorama.jpg",
+    "imageAttribution": "Samuel Ferrara · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -7580,7 +7581,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 74,
     "blurb": "castle and museum in Rome, formerly the imperial mausoleum of the emperor Hadrian and subsequent Roman emperors",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Castel%20Sant%27Angelo%20at%20Night.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Castel Sant'Angelo at Night.jpg",
+    "imageAttribution": "Livioandronico2013 · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -7596,7 +7597,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 74,
     "blurb": "palace in Venice, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/%28Venice%29%20Doge%27s%20Palace%20facing%20the%20sea.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · (Venice) Doge's Palace facing the sea.jpg",
+    "imageAttribution": "Didier Descouens · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -7612,7 +7613,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 74,
     "blurb": "lake in Umbria, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lago%20Trasimeno%20vito%20con%20il%20drone.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Lago Trasimeno vito con il drone.jpg",
+    "imageAttribution": "Wikiriello · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -7629,7 +7630,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 74,
     "blurb": "small volcanic island north of Sicily",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Aerial%20image%20of%20Vulcano%20%28view%20from%20the%20east%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Aerial image of Vulcano (view from the east).jpg",
+    "imageAttribution": "Carsten Steger · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -7645,7 +7646,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 73,
     "blurb": "mountain pass at the international border between Austria and Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Brennerpass%20from%20north.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Brennerpass from north.JPG",
+    "imageAttribution": "Haneburger · Wikimedia Commons · Public domain",
     "suggestedHours": 1
   },
   {
@@ -7661,7 +7662,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 73,
     "blurb": "ancient Roman victory column, a landmark of Rome, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Trajan%20column%20%28Rome%29%20September%202015-2.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Trajan column (Rome) September 2015-2.jpg",
+    "imageAttribution": "Alvesgaspar · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -7677,7 +7678,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 72,
     "blurb": "transnational UNESCO world heritage site",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Tysa%20Rakhiv.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Tysa Rakhiv.jpg",
+    "imageAttribution": "Varga Attila · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -7693,7 +7694,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 72,
     "blurb": "former royal residence in Caserta, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Aerial%20image%20of%20the%20Palace%20of%20Caserta%20%28view%20from%20the%20south%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Aerial image of the Palace of Caserta (view from the south).jpg",
+    "imageAttribution": "Carsten Steger · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -7709,7 +7710,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 72,
     "blurb": "historic building in Rome, Italy; official residence of the President of the Italian Republic",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Quirinale%20palazzo%20e%20obelisco%20con%20dioscuri%20Roma.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Quirinale palazzo e obelisco con dioscuri Roma.jpg",
+    "imageAttribution": "This Photo was taken by Wolfgang Moroder.  \n\nFeel free to use my photos, but please mention me as the author and send me a  message. \n\n\n\nThis image is not in the public domain. Please respect the copyright protection. It may only be used according to the rules mentioned here. This specifically excludes use in social media, if applicable terms of the licenses listed here not appropriate.\n\n\n\nPlease do not upload an updated image here without consultation with the Author. The author would like to make corrections only at his own source. This ensures that the changes are preserved.Please if you think that any changes should be required, please inform the author.Otherwise you can upload a new image with a new name. Please use one of the templates derivative or extract. · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -7725,7 +7726,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 72,
     "blurb": "enclosed bay of the Adriatic Sea",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/The%20Venetian%20Lagoon%20ESA25362327%20%28cropped%29.tiff?width=640",
-    "imageAttribution": "Wikimedia Commons · The Venetian Lagoon ESA25362327 (cropped).tiff",
+    "imageAttribution": "European Space Agency · Wikimedia Commons · Attribution",
     "suggestedHours": 2
   },
   {
@@ -7741,7 +7742,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 71,
     "blurb": "fourth largest lake in Lombardy, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Isola%20di%20Loreto.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Isola di Loreto.jpg",
+    "imageAttribution": "Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -7757,7 +7758,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 70,
     "blurb": "triumphal arch in Rome",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Arch%20of%20Constantine%20%28Rome%29%20-%20South%20side%2C%20from%20Via%20triumphalis.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Arch of Constantine (Rome) - South side, from Via triumphalis.jpg",
+    "imageAttribution": "NikonZ7II (Paris Orlando) · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -7773,7 +7774,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 70,
     "blurb": "palace in Florence, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Piazza%20della%20signoria%2C%20palazzo%20vecchio%2C%20veduta%2001.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Piazza della signoria, palazzo vecchio, veduta 01.jpg",
+    "imageAttribution": "Francesco Bini · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -7789,7 +7790,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 70,
     "blurb": "villa in Tivoli, near Rome, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Villa%20d%27Este%2001.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Villa d'Este 01.jpg",
+    "imageAttribution": "Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -7805,7 +7806,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 69,
     "blurb": "mountain in the Graian Alps located between the Aosta Valley and Piedmont regions of north-west Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Gran%20Paradiso.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Gran Paradiso.jpg",
+    "imageAttribution": "Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 1
   },
   {
@@ -7821,7 +7822,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 69,
     "blurb": "mountain pass in the Western Alpes",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/GreatStBernardPassAugust232023%2003.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · GreatStBernardPassAugust232023 03.jpg",
+    "imageAttribution": "Hagai Agmon-Snir حچاي اچمون-سنير חגי אגמון-שניר · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 1
   },
   {
@@ -7838,7 +7839,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 69,
     "blurb": "sandbar island located on Laguna Veneta near Venice, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lido%20Aug%202020%201.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Lido Aug 2020 1.jpg",
+    "imageAttribution": "Kasa Fue · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 3
   },
   {
@@ -7854,7 +7855,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 69,
     "blurb": "castle in Milan, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/20110725%20Castello%20Sforzesco%20Milan%205557.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 20110725 Castello Sforzesco Milan 5557.jpg",
+    "imageAttribution": "Jakub Hałun · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -7870,7 +7871,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 68,
     "blurb": "triumphal arch in Rome (constructed c. 81 AD)",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Arch%20Titus%2C%20Forum%20Romanum%2C%20Rome%2C%20Italy.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Arch Titus, Forum Romanum, Rome, Italy.jpg",
+    "imageAttribution": "Jebulon · Wikimedia Commons · CC0",
     "suggestedHours": 2
   },
   {
@@ -7886,7 +7887,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 68,
     "blurb": "rocky hill with monastery, southeast of Rome, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Monte%20Cassino%20Abbey.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Monte Cassino Abbey.jpg",
+    "imageAttribution": "ThePhotografer · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 1
   },
   {
@@ -7903,7 +7904,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 67,
     "blurb": "Italian national park",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Nivoletto.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Nivoletto.jpg",
+    "imageAttribution": "Barbaresco · Wikimedia Commons · CC BY-SA 2.5",
     "suggestedHours": 5
   },
   {
@@ -7919,7 +7920,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 67,
     "blurb": "building in Campo Marzio, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Photographs%20of%20the%20Mausoleum%20of%20Augustus%2014%20%28cropped%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Photographs of the Mausoleum of Augustus 14 (cropped).jpg",
+    "imageAttribution": "MumblerJamie · Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": 2
   },
   {
@@ -7935,7 +7936,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 66,
     "blurb": "Celebratory monument/triumphal arch in the Roman Forum",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Arch%20of%20Septimius%20Severus.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Arch of Septimius Severus.jpg",
+    "imageAttribution": "Ramon Wijnands · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -7952,7 +7953,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 66,
     "blurb": "sea cave on the coast of Capri, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Grotta%20azzurra.capri.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Grotta azzurra.capri.JPG",
+    "imageAttribution": "Elenagm · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -7968,7 +7969,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 66,
     "blurb": "Roman victory column (completed 193)",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Colonna%20di%20Marco%20aurelio%20-%20Frontale.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Colonna di Marco aurelio - Frontale.jpg",
+    "imageAttribution": "WikiRomaWiki · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -7984,7 +7985,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 66,
     "blurb": "ancient palace in Rome",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Western%20facade%20Palazzo%20del%20Laterano%202006-09-07.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Western facade Palazzo del Laterano 2006-09-07.jpg",
+    "imageAttribution": "Jastrow · Wikimedia Commons · CC BY 2.5",
     "suggestedHours": 2
   },
   {
@@ -8000,7 +8001,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 66,
     "blurb": "castle in Trieste, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Castello%20di%20Miramare%20%28Trieste%29%20%287%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Castello di Miramare (Trieste) (7).jpg",
+    "imageAttribution": "Michał Bulsa · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -8016,7 +8017,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 66,
     "blurb": "palazzo in Rome, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Palais%20Farnese.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Palais Farnese.jpg",
+    "imageAttribution": "Myrabella · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -8032,7 +8033,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 65,
     "blurb": "domus, palace of Roman emperor Nero, \"Golden house\"",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Domus%20Aurea%20NEUTRA.png?width=640",
-    "imageAttribution": "Wikimedia Commons · Domus Aurea NEUTRA.png",
+    "imageAttribution": "Cristiano64 · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -8048,7 +8049,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 64,
     "blurb": "castle in Naples",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Naples-Castel%20Nuovo.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Naples-Castel Nuovo.jpg",
+    "imageAttribution": "Wikimedia Commons · CC BY-SA 2.5",
     "suggestedHours": 2
   },
   {
@@ -8064,7 +8065,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 64,
     "blurb": "attraction in Northern Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Zuliz.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Zuliz.JPG",
+    "imageAttribution": "Cash2013 · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -8080,7 +8081,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 64,
     "blurb": "mountain pass",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Stelvio%20Pass%20Bolzano%20side%202.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Stelvio Pass Bolzano side 2.jpg",
+    "imageAttribution": "kallerna · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 1
   },
   {
@@ -8096,7 +8097,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 63,
     "blurb": "waterfall in Umbria, Italy; tallest man-made waterfall in the world",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Aerial%20image%20of%20Cascata%20delle%20Marmore%20%28view%20from%20the%20northwest%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Aerial image of Cascata delle Marmore (view from the northwest).jpg",
+    "imageAttribution": "Carsten Steger · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -8112,7 +8113,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 63,
     "blurb": "submerged volcanic island south of Sicily",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ferdinadea%20historical%20part.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Ferdinadea historical part.jpg",
+    "imageAttribution": "Constant Prévost and a French artist. · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -8129,7 +8130,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 62,
     "blurb": "Italian national park",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Monti%20Della%20Laga.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Monti Della Laga.jpg",
+    "imageAttribution": "MatthewGITV · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -8147,7 +8148,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 62,
     "blurb": "Italian national park",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Parco%20del%20Cilento%20a%20Cannalonga.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Parco del Cilento a Cannalonga.jpg",
+    "imageAttribution": "No machine-readable author provided. Tramsvik~commonswiki assumed (based on copyright claims). · Wikimedia Commons · Public domain",
     "suggestedHours": 5
   },
   {
@@ -8163,7 +8164,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 62,
     "blurb": "mountain pass in the Alps on the France–Italy border",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Route%20et%20hospice%20du%20col%20du%20Petit-Saint-Bernard%20en%20%C3%A9t%C3%A9%20%28ao%C3%BBt%202019%29.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Route et hospice du col du Petit-Saint-Bernard en été (août 2019).JPG",
+    "imageAttribution": "Florian Pépellin · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 1
   },
   {
@@ -8180,7 +8181,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 61,
     "blurb": "national park in Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Monte%20Pollino%20%282.248%20m%29%20e%20serra%20Dolcedorme%20%282.267%20m%29.%20Salendo%20su%20serra%20del%20Prete%20%282.181%20m%29.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Monte Pollino (2.248 m) e serra Dolcedorme (2.267 m). Salendo su serra del Prete (2.181 m).JPG",
+    "imageAttribution": "Potito m. petrone · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -8196,7 +8197,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 60,
     "blurb": "castle in Naples, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Castel%20dell%27%20Ovo.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Castel dell' Ovo.jpg",
+    "imageAttribution": "PaestumPaestum · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -8212,7 +8213,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 60,
     "blurb": "national park in Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Nationalpark%20Stelvio%20Braulioschlucht.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Nationalpark Stelvio Braulioschlucht.jpg",
+    "imageAttribution": "Elch33 · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -8228,7 +8229,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 58,
     "blurb": "castle in Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Castello%20%28Canossa%29%20-%20lato%20sud%203%202022-07-23.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Castello (Canossa) - lato sud 3 2022-07-23.jpg",
+    "imageAttribution": "Parma1983 · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -8244,7 +8245,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 58,
     "blurb": "Italian amusement park",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Gardaland%20-%20panoramio%20-%20Emanuela%20Meme%20Giudic%E2%80%A6.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Gardaland - panoramio - Emanuela Meme Giudic….jpg",
+    "imageAttribution": "Emanuela Meme Giudic… · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 2
   },
   {
@@ -8260,7 +8261,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 58,
     "blurb": "Italian national park",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Gransasso%20dal%20cefalone.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Gransasso dal cefalone.jpg",
+    "imageAttribution": "Idéfix at Dutch Wikipedia · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -8277,7 +8278,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 58,
     "blurb": "cave near Alghero",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Grotta%20di%20nettuno%20sardinien.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Grotta di nettuno sardinien.jpg",
+    "imageAttribution": "Tobias Helfrich · Wikimedia Commons · CC BY-SA 2.5",
     "suggestedHours": 2
   },
   {
@@ -8293,7 +8294,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 58,
     "blurb": "palace in Palermo, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Palais%20des%20Normands.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Palais des Normands.jpg",
+    "imageAttribution": "Jules Vaulont · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -8309,7 +8310,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 58,
     "blurb": "mountain pass in Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Bord%20passo%20pordoi.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Bord passo pordoi.JPG",
+    "imageAttribution": "Frans Bosch at Dutch Wikipedia\n\n(Original text: Frans Bosch) · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 1
   },
   {
@@ -8325,7 +8326,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 58,
     "blurb": "mountain pass between Austria and Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Reschenpass%20IMG%204786.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Reschenpass IMG 4786.jpg",
+    "imageAttribution": "Alexander Migl · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 1
   },
   {
@@ -8341,7 +8342,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 58,
     "blurb": "national park",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Parco%20Nazionale%20della%20Sila%2C%20Lago%20Cecita%201.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Parco Nazionale della Sila, Lago Cecita 1.jpg",
+    "imageAttribution": "Ugo Leonetti · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -8357,7 +8358,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 57,
     "blurb": "national park",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Aerial%20image%20of%20Montecristo%20%28view%20from%20the%20west%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Aerial image of Montecristo (view from the west).jpg",
+    "imageAttribution": "Carsten Steger · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -8373,7 +8374,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 57,
     "blurb": "fortification in Naples, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Napoli%20s%20Elmo%20da%20Castel%20dell%27Ovo%201040688.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Napoli s Elmo da Castel dell'Ovo 1040688.JPG",
+    "imageAttribution": "Lalupa · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 2
   },
   {
@@ -8389,7 +8390,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 57,
     "blurb": "UNESCO world heritage",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Vicenza%20Italie.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Vicenza Italie.jpg",
+    "imageAttribution": "Original uploader was Mhwater at nl.wikipedia · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -8406,7 +8407,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 57,
     "blurb": "cave in Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Grotte%20di%20Frasassi.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Grotte di Frasassi.jpg",
+    "imageAttribution": "Frasassi · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -8422,7 +8423,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 57,
     "blurb": "Italian national park",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Majella001.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Majella001.jpg",
+    "imageAttribution": "No machine-readable author provided. Idéfix~commonswiki assumed (based on copyright claims). · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -8438,7 +8439,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 57,
     "blurb": "mountain pass",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/PassoUmbrail0002.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · PassoUmbrail0002.jpg",
+    "imageAttribution": "No machine-readable author provided. Idéfix~commonswiki assumed (based on copyright claims). · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 1
   },
   {
@@ -8454,7 +8455,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 57,
     "blurb": "national park in Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Vesuvio%20-%20Atrio%20del%20cavallo.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Vesuvio - Atrio del cavallo.jpg",
+    "imageAttribution": "Lobufalo · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -8470,7 +8471,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 56,
     "blurb": "national park",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/La%20Maddalena%20-%20Isola%20di%20Spargi%20%2801%29.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · La Maddalena - Isola di Spargi (01).JPG",
+    "imageAttribution": "Gianni Careddu · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -8486,7 +8487,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 56,
     "blurb": "national park",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Pentedattilo.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Pentedattilo.jpg",
+    "imageAttribution": "Me · Wikimedia Commons · Public domain",
     "suggestedHours": 5
   },
   {
@@ -8502,7 +8503,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 56,
     "blurb": "national park of Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Schiara.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Schiara.jpg",
+    "imageAttribution": "Original uploader was Armandoria at it.wikipedia · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -8518,7 +8519,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 56,
     "blurb": "national park of Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Tremiti%201999%20-Isola%20di%20San%20Nicola%20-%20Santa%20Maria%20a%20Mare-%20by-RaBoe%20001.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Tremiti 1999 -Isola di San Nicola - Santa Maria a Mare- by-RaBoe 001.jpg",
+    "imageAttribution": "User:Raboe001 · Wikimedia Commons · CC BY-SA 3.0 de",
     "suggestedHours": 5
   },
   {
@@ -8534,7 +8535,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 56,
     "blurb": "cave at the foot of the Palatine Hill in Rome",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Altar%20Mars%20Venus%20Massimo.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Altar Mars Venus Massimo.jpg",
+    "imageAttribution": "Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -8550,7 +8551,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 56,
     "blurb": "small church located inside the Basilica of Santa Maria degli Angeli in Assisi",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Portiuncula%20on%20the%20Feast%20of%20the%20Pardon.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Portiuncula on the Feast of the Pardon.jpg",
+    "imageAttribution": "Alekjds · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -8566,7 +8567,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 55,
     "blurb": "group of two karstic caves in the commune of Amantea in southern Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Coreca%20-%20Grotta%20du%20Scuru.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Coreca - Grotta du Scuru.jpg",
+    "imageAttribution": "Luigi Salvatore Vadacchino · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -8582,7 +8583,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 55,
     "blurb": "national park in Sardinia",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Parc%20National%20du%20Golfe%20de%20Orosei%20-%20Gennargentu.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Parc National du Golfe de Orosei - Gennargentu.JPG",
+    "imageAttribution": "Tuverivalentina89 · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -8598,7 +8599,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 55,
     "blurb": "protected area",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Montisibillini%20flickr03.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Montisibillini flickr03.jpg",
+    "imageAttribution": "pizzodisevo · Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": 5
   },
   {
@@ -8614,7 +8615,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 54,
     "blurb": "national park in Apulia, southern Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/La%20vallata%20di%20Poggiorsini%20vista%20nel%20dettaglio.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · La vallata di Poggiorsini vista nel dettaglio.jpg",
+    "imageAttribution": "Fishmax77 · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -8630,7 +8631,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 54,
     "blurb": "submarine volcano",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Aeolian%20Arc.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Aeolian Arc.jpg",
+    "imageAttribution": "Ferdinando chiodo · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -8646,7 +8647,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 54,
     "blurb": "national park in Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Laurasca.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Laurasca.jpg",
+    "imageAttribution": "Mara Piraglia · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -8662,7 +8663,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 53,
     "blurb": "national park",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Isola%20dell%27Asinara%20-%20vista%20da%20Torre%20del%20Falcone.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Isola dell'Asinara - vista da Torre del Falcone.JPG",
+    "imageAttribution": "Gianni Careddu · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -8679,7 +8680,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 53,
     "blurb": "national park in Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Corniglia%20costa.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Corniglia costa.jpg",
+    "imageAttribution": "Bernd Gehrmann · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -8696,7 +8697,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 53,
     "blurb": "national park in Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Terracina-vista01.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Terracina-vista01.jpg",
+    "imageAttribution": "tittimi · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 5
   },
   {
@@ -8712,7 +8713,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 53,
     "blurb": "limestone cave and former quarry in Syracuse, Sicily, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ear%20of%20Dionysus%20%28356526952%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Ear of Dionysus (356526952).jpg",
+    "imageAttribution": "Andrew Malone · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 2
   },
   {
@@ -8728,7 +8729,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 53,
     "blurb": "mountain pass at the Austrian-Italian border",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Timmelsjoch%20Total.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Timmelsjoch Total.jpg",
+    "imageAttribution": "Arne Hückelheim · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 1
   },
   {
@@ -8744,7 +8745,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 52,
     "blurb": "national park in Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Monte%20Prado.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Monte Prado.jpg",
+    "imageAttribution": "Emav71 at Italian Wikipedia · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -8760,7 +8761,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 52,
     "blurb": "mountain pass",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Colleagnello001.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Colleagnello001.jpg",
+    "imageAttribution": "No machine-readable author provided. Idéfix~commonswiki assumed (based on copyright claims). · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 1
   },
   {
@@ -8776,7 +8777,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 51,
     "blurb": "cave in Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/The%20lake%20of%20Agnano.%20Etching%2C%2016--.%20Wellcome%20L0038338.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · The lake of Agnano. Etching, 16--. Wellcome L0038338.jpg",
+    "imageAttribution": "Wikimedia Commons · CC BY 4.0",
     "suggestedHours": 2
   },
   {
@@ -8792,7 +8793,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 50,
     "blurb": "aquarium in Genoa, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Acquario%20di%20Genova.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Acquario di Genova.jpg",
+    "imageAttribution": "Stillyna at Italian Wikipedia · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -8808,7 +8809,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 49,
     "blurb": "national park in Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Contrafforte%20nord%20del%20Monte%20Volturino%20%281.836%20m%29%20-%20Monti%20della%20Maddalena%20%28Potenza%29.PNG?width=640",
-    "imageAttribution": "Wikimedia Commons · Contrafforte nord del Monte Volturino (1.836 m) - Monti della Maddalena (Potenza).PNG",
+    "imageAttribution": "Potito m. petrone at Italian Wikipedia · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -8824,7 +8825,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 49,
     "blurb": "karst cave system located in Castellana Grotte, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Castellana%27s%20caves%20wolf.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Castellana's caves wolf.jpg",
+    "imageAttribution": "Alessandro e Damiano · Wikimedia Commons · CC BY 4.0",
     "suggestedHours": 2
   },
   {
@@ -8856,7 +8857,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 49,
     "blurb": "cave",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Stalagmite-Grotta-Gigante.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Stalagmite-Grotta-Gigante.JPG",
+    "imageAttribution": "Thierry Caro · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -8872,7 +8873,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 49,
     "blurb": "island",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Meloria%20south%20lighthouse%2001%20%40andreani.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Meloria south lighthouse 01 @andreani.jpg",
+    "imageAttribution": "Alessandro Andreani · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 2
   },
   {
@@ -8888,7 +8889,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 49,
     "blurb": "Italian island",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ortofoto-piccola.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Ortofoto-piccola.jpg",
+    "imageAttribution": "Mediterranean.web · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -8904,7 +8905,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 49,
     "blurb": "church in Rome",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Santa%20Maria%20dei%20Miracoli%20in%20Rome%20%283%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Santa Maria dei Miracoli in Rome (3).jpg",
+    "imageAttribution": "Krzysztof Golik · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -8920,7 +8921,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 48,
     "blurb": "research institute in Naples, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/StazionezoologicaAntonDohrnNapoli19-12-10%201512.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · StazionezoologicaAntonDohrnNapoli19-12-10 1512.jpg",
+    "imageAttribution": "TatsuoTabei · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -8937,7 +8938,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 46,
     "blurb": "Italian national park",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Skyon%20mt-hawk.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Skyon mt-hawk.jpg",
+    "imageAttribution": "Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -8953,7 +8954,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 45,
     "blurb": "waterfall",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/CascataDelToceAug122024%2002.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · CascataDelToceAug122024 02.jpg",
+    "imageAttribution": "Hagai Agmon-Snir حچاي اچمون-سنير חגי אגמון-שניר · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -8969,7 +8970,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 45,
     "blurb": "botanical garden in Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Castello%20di%20ninfa%20e%20giardino.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Castello di ninfa e giardino.jpg",
+    "imageAttribution": "WikiRomaWiki · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -8985,7 +8986,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 45,
     "blurb": "lagoon in Province of Latina, Lazio",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lago%20di%20Fondi%202012%20by-RaBoe%2001.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Lago di Fondi 2012 by-RaBoe 01.jpg",
+    "imageAttribution": "© Ra Boe / Wikipedia · Wikimedia Commons · CC BY-SA 3.0 de",
     "suggestedHours": 2
   },
   {
@@ -9001,7 +9002,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 43,
     "blurb": "waterfall park in Riva del Garda, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/2021%20%E2%80%94%20Erste%20Julireise%20Mateus2019%20%E2%80%94%20Batch%20%28302%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 2021 — Erste Julireise Mateus2019 — Batch (302).jpg",
+    "imageAttribution": "Mateus2019 · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -9017,7 +9018,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 42,
     "blurb": "hamlet of Castiglione d’Orcia",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/BagniSanFilippoPanorama2.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · BagniSanFilippoPanorama2.JPG",
+    "imageAttribution": "LigaDue · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -9033,7 +9034,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 42,
     "blurb": "waterfall in Lombardy, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cascatedelserio.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Cascatedelserio.JPG",
+    "imageAttribution": "B.Matteo at Italian Wikipedia · Wikimedia Commons · CC BY-SA 2.5",
     "suggestedHours": 2
   },
   {
@@ -9049,7 +9050,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 42,
     "blurb": "valley",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Alcantara%20Canyon%20-%202018-07-27-A.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Alcantara Canyon - 2018-07-27-A.jpg",
+    "imageAttribution": "Eleassar · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -9065,7 +9066,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 40,
     "blurb": "lake in Barrea, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Aerial%20image%20of%20Lago%20di%20Barrea%20%28view%20from%20the%20southeast%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Aerial image of Lago di Barrea (view from the southeast).jpg",
+    "imageAttribution": "Carsten Steger · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -9081,7 +9082,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 40,
     "blurb": "national park in Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Specchio%20di%20Venere.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Specchio di Venere.jpg",
+    "imageAttribution": "mauro from PAVIA, ITALIA · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 5
   },
   {
@@ -9098,7 +9099,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 40,
     "blurb": "neighborhood of Cagliari",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Poetto%20beach.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Poetto beach.jpg",
+    "imageAttribution": "Chris · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 3
   },
   {
@@ -9114,7 +9115,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 40,
     "blurb": "protected area in Campania, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Punta%20Campanella%20from%20Capri%20%282004%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Punta Campanella from Capri (2004).jpg",
+    "imageAttribution": "WeEzE · Wikimedia Commons · CC BY-SA 2.5",
     "suggestedHours": 2
   },
   {
@@ -9130,7 +9131,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 40,
     "blurb": "human settlement in San Nicandro Garganico, Province of Foggia, Apulia, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Torre%20Mileto.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Torre Mileto.JPG",
+    "imageAttribution": "ekphrasis · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 3
   },
   {
@@ -9146,7 +9147,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 38,
     "blurb": "beach in Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cala%20Goloritz%C3%A9%201.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Cala Goloritzé 1.JPG",
+    "imageAttribution": "Mentnafunangann · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 3
   },
   {
@@ -9163,7 +9164,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 38,
     "blurb": "World Heritage site in Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Calanco-monte-calvo.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Calanco-monte-calvo.jpg",
+    "imageAttribution": "Paolo Carboni · Wikimedia Commons · CC BY-SA 2.5",
     "suggestedHours": 2
   },
   {
@@ -9179,7 +9180,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 35,
     "blurb": "landform in Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Spiaggia%20di%20Capocotta%20-%20panoramio.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Spiaggia di Capocotta - panoramio.jpg",
+    "imageAttribution": "Angela Stefanoni · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 3
   },
   {
@@ -9195,7 +9196,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 35,
     "blurb": "Canyon in Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Furlo%20Gorge.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Furlo Gorge.jpg",
+    "imageAttribution": "Furlio · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -9211,7 +9212,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 35,
     "blurb": "Marine Protected Area in Europe",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Stenella%20striata.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Stenella striata.JPG",
+    "imageAttribution": "Jose Antonio · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 2
   },
   {
@@ -9227,7 +9228,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 35,
     "blurb": "human settlement in Agrigento, Libero consorzio comunale di Agrigento, Sicily, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/San%20Leone%20Agrigento.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · San Leone Agrigento.JPG",
+    "imageAttribution": "Toni Pecoraro · Wikimedia Commons · Public domain",
     "suggestedHours": 3
   },
   {
@@ -9243,7 +9244,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 32,
     "blurb": "human settlement in Province of Syracuse, Sicily, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Arenella%2CSiracusa.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Arenella,Siracusa.jpg",
+    "imageAttribution": "Derbrauni · Wikimedia Commons · CC BY 4.0",
     "suggestedHours": 3
   },
   {
@@ -9259,7 +9260,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 32,
     "blurb": "waterfall in Trentino",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cascades%20Nardi%20Italia.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Cascades Nardi Italia.jpg",
+    "imageAttribution": "This picture belongs to Xavier Caré.\nPlease credit : Xavier Caré / Wikimedia Commons / CC-BY-SA.\nIf you would like special permission to use, license, or purchase the image please contact me to negotiate terms.\nI'd appreciate if you could let me know about it or mail me ( xavier.carepm.me) if you want to use this picture out of the Wikimedia project scope. · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -9275,7 +9276,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 32,
     "blurb": "river on Lake Como",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Fiumelatte%20torrente.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Fiumelatte torrente.jpg",
+    "imageAttribution": "Alessandro Vecchi · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -9291,7 +9292,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 32,
     "blurb": "valley in Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Gorropu%20-%20interno.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Gorropu - interno.JPG",
+    "imageAttribution": "Pigiosu · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 2
   },
   {
@@ -9307,7 +9308,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 32,
     "blurb": null,
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Arbus%20-%20Dune%20di%20Piscinas%20%2802%29.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Arbus - Dune di Piscinas (02).JPG",
+    "imageAttribution": "Gianni Careddu · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 3
   },
   {
@@ -9323,7 +9324,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 32,
     "blurb": null,
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Spendula1.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Spendula1.jpg",
+    "imageAttribution": "Giancarlo Dessì · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -9339,7 +9340,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 32,
     "blurb": "Group of thermal springs located in Manciano, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Terme%20di%20Saturnia%20-%20Cascate%20del%20Mulino-0491.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Terme di Saturnia - Cascate del Mulino-0491.jpg",
+    "imageAttribution": "Raimond Spekking · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -9355,7 +9356,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 29,
     "blurb": "cove on the Thyrrenian Sea",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cala%20Violina%20Grosseto%20Tuscany.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Cala Violina Grosseto Tuscany.jpg",
+    "imageAttribution": "Jacopo Marcovaldi · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 3
   },
   {
@@ -9387,7 +9388,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 29,
     "blurb": "frazione of Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Comacchio%2C%20Lido%20di%20Pomposa%20%2801%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Comacchio, Lido di Pomposa (01).jpg",
+    "imageAttribution": "Gianni Careddu · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 3
   },
   {
@@ -9403,7 +9404,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 29,
     "blurb": "beach in the island of Budelli, in Sardinia, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Spiaggia%20Rosa%2C%20Cala%20di%20Roto%20%28Isola%20di%20Budelli%29%2C%20Arcipelago%20di%20La%20Maddalena%2C%20Sardegna%2C%20Italia%2C%20Mar%20Mediterraneo.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Spiaggia Rosa, Cala di Roto (Isola di Budelli), Arcipelago di La Maddalena, Sardegna, Italia, Mar Mediterraneo.jpg",
+    "imageAttribution": "Luca Bittau · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 3
   },
   {
@@ -9419,7 +9420,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 29,
     "blurb": "natural coastline in Tuscany, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Vada%2C%20Spiagge%20Bianche.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Vada, Spiagge Bianche.jpg",
+    "imageAttribution": "Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 3
   },
   {
@@ -9467,7 +9468,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 25,
     "blurb": "beach in Sardinia, Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Dorgali%20-%20Codula%20e%20cala%20Fuili%20%2805%29.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Dorgali - Codula e cala Fuili (05).JPG",
+    "imageAttribution": "Gianni Careddu · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 3
   },
   {
@@ -9483,7 +9484,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 25,
     "blurb": null,
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/CalaLuna.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · CalaLuna.jpg",
+    "imageAttribution": "Io · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 3
   },
   {
@@ -9499,7 +9500,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 25,
     "blurb": null,
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cala%20Sisine.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Cala Sisine.jpg",
+    "imageAttribution": "Flickr user clurr · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 3
   },
   {
@@ -9531,7 +9532,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 25,
     "blurb": "national park in Italy",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Matese%20viewed%20from%20Ariano.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Matese viewed from Ariano.jpg",
+    "imageAttribution": "ALC · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -9547,7 +9548,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 25,
     "blurb": null,
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Scivu%20-%20panoramio.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Scivu - panoramio.jpg",
+    "imageAttribution": "Cristian Lorini · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 3
   },
   {
@@ -9565,7 +9566,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 90,
     "blurb": "volcano in Yamanashi and Shizuoka Prefectures, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Kodaki%20fuji%20frm%20shojinko%20refurb.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Kodaki fuji frm shojinko refurb.jpg",
+    "imageAttribution": "名古屋太郎, (edited by Hannes_24) · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -9582,7 +9583,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 82,
     "blurb": "city in Chiba prefecture, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Chiba%20City%20montage.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Chiba City montage.jpg",
+    "imageAttribution": "User:Xser21\nUser:掬茶\nUser:Shadow Fox\nUser:Kentagon\nUser:くろふね\nja:利用者:Skink\nUser:Yamato-i · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": null
   },
   {
@@ -9599,7 +9600,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 81,
     "blurb": "capital city of Okinawa prefecture, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Asahi-machi%20Naha%20Okinawa01s3s4410.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Asahi-machi Naha Okinawa01s3s4410.jpg",
+    "imageAttribution": "663highland · Wikimedia Commons · CC BY 2.5",
     "suggestedHours": null
   },
   {
@@ -9616,7 +9617,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 80,
     "blurb": "city in Okayama prefecture, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/The%20Okayama%20city%20office%20is%20faced%20from%20the%20north.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · The Okayama city office is faced from the north.JPG",
+    "imageAttribution": "Tatushin · Wikimedia Commons · Public domain",
     "suggestedHours": null
   },
   {
@@ -9633,7 +9634,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 78,
     "blurb": "Japanese castle complex",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Himeji%20castle%20in%20may%202015.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Himeji castle in may 2015.jpg",
+    "imageAttribution": "Nikos Kitsakis · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -9650,7 +9651,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 78,
     "blurb": "city in Kanagawa prefecture, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/230128%20Hasedera%20Kamakura%20Kanagawa%20pref%20Japan09s3.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 230128 Hasedera Kamakura Kanagawa pref Japan09s3.jpg",
+    "imageAttribution": "663highland · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -9667,7 +9668,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 78,
     "blurb": "city in Toyama Prefecture, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Toyama%20city%20%26%20Alps.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Toyama city & Alps.jpg",
+    "imageAttribution": "名古屋太郎 · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -9684,7 +9685,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 77,
     "blurb": "architectural structure",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Genbaku%20Dome04-r.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Genbaku Dome04-r.JPG",
+    "imageAttribution": "Oilstreet · Wikimedia Commons · CC BY 2.5",
     "suggestedHours": 2
   },
   {
@@ -9701,7 +9702,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 77,
     "blurb": "tower in Tokyo, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Tokyo%20Skytree%202023.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Tokyo Skytree 2023.jpg",
+    "imageAttribution": "Akonnchiroll · Wikimedia Commons · CC0",
     "suggestedHours": 2
   },
   {
@@ -9719,7 +9720,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 77,
     "blurb": "tower in Tokyo, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Tokyo%20Tower%202023.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Tokyo Tower 2023.jpg",
+    "imageAttribution": "Akonnchiroll · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 1
   },
   {
@@ -9736,7 +9737,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 76,
     "blurb": "freshwater lake in Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Top%20view%20of%20Lake%20Biwa.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Top view of Lake Biwa.jpg",
+    "imageAttribution": "Lonely Planet Japan · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -9753,7 +9754,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 72,
     "blurb": "city in Chiba Prefecture, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Abiko%20montage.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Abiko montage.jpg",
+    "imageAttribution": "User:あばさー\n運転太郎\nTakarkey · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": null
   },
   {
@@ -9771,7 +9772,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 72,
     "blurb": "volcano on the border of Gunma and Nagano prefectures in Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mt.Asama%20%28From%20saku%20city%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Mt.Asama (From saku city).jpg",
+    "imageAttribution": "Yu.nakai · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -9787,7 +9788,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 71,
     "blurb": "volcano and island located in Kagoshima prefecture, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Kagoshima%20and%20Sakurajima.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Kagoshima and Sakurajima.jpg",
+    "imageAttribution": "Takobou at Japanese Wikipedia · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 1
   },
   {
@@ -9804,7 +9805,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 71,
     "blurb": "national park in Hokkaidō, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/140829%20Track%20Near%20Furepe%20Falls%20Shiretoko%20Hokkaido%20Japan00s3.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 140829 Track Near Furepe Falls Shiretoko Hokkaido Japan00s3.jpg",
+    "imageAttribution": "663highland · Wikimedia Commons · CC BY 2.5",
     "suggestedHours": 5
   },
   {
@@ -9820,7 +9821,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 71,
     "blurb": "city in Chiba Prefecture, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Urayasu-city.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Urayasu-city.jpg",
+    "imageAttribution": "ja:user:Dddeco · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -9836,7 +9837,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 70,
     "blurb": "Shinto shrine in Tokyo, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/2018%20Haiden%20%28Yasukuni%20Shrine%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 2018 Haiden (Yasukuni Shrine).jpg",
+    "imageAttribution": "Kakidai · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -9852,7 +9853,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 69,
     "blurb": "main residence of the Emperor of Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Tatsumi-yagura%2C%20Tokyo%20Imperial%20Palace%20%2852158185625%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Tatsumi-yagura, Tokyo Imperial Palace (52158185625).jpg",
+    "imageAttribution": "Pierre Blaché from Paris, France · Wikimedia Commons · CC0",
     "suggestedHours": 2
   },
   {
@@ -9868,7 +9869,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 68,
     "blurb": "special wards in the eastern part of Tokyo Metropolis in Japan, that used to form a single city",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Akiba%20denkigai.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Akiba denkigai.jpg",
+    "imageAttribution": "Jmho · Wikimedia Commons · CC0",
     "suggestedHours": null
   },
   {
@@ -9884,7 +9885,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 67,
     "blurb": "Japanese castle located in Nagoya, central Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Nagoya%20Castle%28Larger%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Nagoya Castle(Larger).jpg",
+    "imageAttribution": "Base64 · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -9900,7 +9901,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 67,
     "blurb": "theme park in Japan, owned by The Oriental Land Company",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Tokyo%20Disneyland%20Cinderella%20Castle%202023-07-02.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Tokyo Disneyland Cinderella Castle 2023-07-02.jpg",
+    "imageAttribution": "LMP 2001 · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -9916,7 +9917,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 66,
     "blurb": "Ryukyuan gusuku castle",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Naha%20Shuri%20Castle51s3s4200.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Naha Shuri Castle51s3s4200.jpg",
+    "imageAttribution": "663highland · Wikimedia Commons · CC BY 2.5",
     "suggestedHours": 2
   },
   {
@@ -9932,7 +9933,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 65,
     "blurb": "mine",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/180504%20Shimizudani%20Refinery%20Ruins%20of%20Iwami%20Ginzan%20Silver%20Mine%20Oda%20Shimane%20pref%20Japan03s.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 180504 Shimizudani Refinery Ruins of Iwami Ginzan Silver Mine Oda Shimane pref Japan03s.jpg",
+    "imageAttribution": "663highland · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -9948,7 +9949,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 65,
     "blurb": "building in Matsumoto, Nagano Prefecture, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Matsumoto%20Castle05s5s4592.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Matsumoto Castle05s5s4592.jpg",
+    "imageAttribution": "663highland · Wikimedia Commons · CC BY 2.5",
     "suggestedHours": 2
   },
   {
@@ -9965,7 +9966,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 64,
     "blurb": "national park of Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Hokkaido%2C%20Japan%2C%20Lake%20Mash%C5%AB%2C%202008.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Hokkaido, Japan, Lake Mashū, 2008.jpg",
+    "imageAttribution": "Miya.m · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -9982,7 +9983,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 64,
     "blurb": "waterfall in Nikkō National Park, Tochigi Prefecture, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Kegon%20Taki.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Kegon Taki.jpg",
+    "imageAttribution": "Jordy Meow · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -9999,7 +10000,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 63,
     "blurb": "national park of Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Fujisan%20from%20Motohakone.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Fujisan from Motohakone.jpg",
+    "imageAttribution": "Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -10015,7 +10016,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 63,
     "blurb": "former imperial palace",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Kyoto-gosho%20Kenreimon%20%28open%29.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Kyoto-gosho Kenreimon (open).JPG",
+    "imageAttribution": "Saigen Jiro · Wikimedia Commons · CC0",
     "suggestedHours": 2
   },
   {
@@ -10031,7 +10032,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 63,
     "blurb": "Disney resort in Tokyo",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/A8%20Tokyo%20Disneyland.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · A8 Tokyo Disneyland.jpg",
+    "imageAttribution": "Øyvind Holmstad · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -10047,7 +10048,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 62,
     "blurb": "castle",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/HiroshimaCastle.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · HiroshimaCastle.jpg",
+    "imageAttribution": "Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -10063,7 +10064,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 62,
     "blurb": "memorial park located in Hiroshima, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/20181111%20Hiroshima%20Memorial%20Cenotaph-1.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 20181111 Hiroshima Memorial Cenotaph-1.jpg",
+    "imageAttribution": "Balon Greyjoy · Wikimedia Commons · CC0",
     "suggestedHours": 2
   },
   {
@@ -10079,7 +10080,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 62,
     "blurb": "lake in Ibaraki Prefecture, Kantō region, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Kasumigaura%20landsat.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Kasumigaura landsat.jpg",
+    "imageAttribution": "Tdk at Japanese Wikipedia · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -10095,7 +10096,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 62,
     "blurb": "World Heritage Site in Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Hagi%20castle%20Masudas.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Hagi castle Masudas.JPG",
+    "imageAttribution": "TT mk2 · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -10111,7 +10112,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 61,
     "blurb": "castle in Kyoto, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Nijo%20Castle.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Nijo Castle.jpg",
+    "imageAttribution": "Keith Pomakis · Wikimedia Commons · CC BY-SA 2.5",
     "suggestedHours": 2
   },
   {
@@ -10127,7 +10128,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 61,
     "blurb": "UNESCO World Heritage Site in Kantō region, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Nikko%20toshogu%20shrine.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Nikko toshogu shrine.jpg",
+    "imageAttribution": "Koichi Sato · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -10143,7 +10144,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 61,
     "blurb": "theme park in Osaka, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Harry%20Potter%20and%20the%20Forbidden%20Journey%20USJ.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Harry Potter and the Forbidden Journey USJ.JPG",
+    "imageAttribution": "Freddo · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -10160,7 +10161,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 60,
     "blurb": "national park of Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/140724%20Asahi-dake%20and%20Sugatami-no-ike%20Hokkaido%20Japan01bs3.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 140724 Asahi-dake and Sugatami-no-ike Hokkaido Japan01bs3.jpg",
+    "imageAttribution": "663highland · Wikimedia Commons · CC BY 2.5",
     "suggestedHours": 5
   },
   {
@@ -10176,7 +10177,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 60,
     "blurb": "building in Okinawa Prefecture, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Naha%20Shuri%20Castle16s5s3200.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Naha Shuri Castle16s5s3200.jpg",
+    "imageAttribution": "663highland · Wikimedia Commons · CC BY 2.5",
     "suggestedHours": 2
   },
   {
@@ -10192,7 +10193,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 60,
     "blurb": "castle",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/%E5%BD%A6%E6%A0%B9%E5%9F%8E%E3%81%AE%E5%A4%A9%E5%AE%88%E9%96%A3.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 彦根城の天守閣.jpg",
+    "imageAttribution": "高菜明太 · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -10208,7 +10209,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 60,
     "blurb": "UNESCO World Heritage Site in Iwate Prefecture, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Hiraizumi%27s%20surroundings%2C%20Iwate%20Prefecture%3B%20August%202018%20%2803%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Hiraizumi's surroundings, Iwate Prefecture; August 2018 (03).jpg",
+    "imageAttribution": "_steffen · Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": 2
   },
   {
@@ -10224,7 +10225,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 60,
     "blurb": "lake in Nagano prefecture, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Suwako.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Suwako.jpg",
+    "imageAttribution": "Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -10240,7 +10241,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 60,
     "blurb": "national park of Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/RRS%20National%20Park.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · RRS National Park.jpg",
+    "imageAttribution": "308 Bees · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -10256,7 +10257,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 60,
     "blurb": "statue located in Ushiku, Ibaraki Prefecture, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Pic%20kunojyou.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Pic kunojyou.jpg",
+    "imageAttribution": "山田吉彦 · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -10272,7 +10273,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 59,
     "blurb": "state guest house in Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/2019%20Akasaka%20Palace%2002.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 2019 Akasaka Palace 02.jpg",
+    "imageAttribution": "Kakidai · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -10288,7 +10289,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 59,
     "blurb": "fortress",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Hakodate%20Goryokaku%20Panorama%201.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Hakodate Goryokaku Panorama 1.JPG",
+    "imageAttribution": "Keihin nike · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -10304,7 +10305,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 59,
     "blurb": "national park of Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lake%20chuzenji%20and%20kegon%20waterfall.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Lake chuzenji and kegon waterfall.jpg",
+    "imageAttribution": "Uraomote yamaneko · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -10320,7 +10321,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 59,
     "blurb": "national park of Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Laketoya%2001.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Laketoya 01.jpg",
+    "imageAttribution": "NipponiaNippon · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -10336,7 +10337,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 59,
     "blurb": "zoo in Tokyo, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ueno-zoo.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Ueno-zoo.jpg",
+    "imageAttribution": "Los688 · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -10352,7 +10353,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 58,
     "blurb": "national park of Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mt.Aso%20and%20caldera01.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Mt.Aso and caldera01.jpg",
+    "imageAttribution": "Miya.m · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -10369,7 +10370,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 58,
     "blurb": "national park of Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Kushirositsugen%20Hosooka%20Tenboudai01.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Kushirositsugen Hosooka Tenboudai01.jpg",
+    "imageAttribution": "欅 (Keyaki) · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -10385,7 +10386,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 58,
     "blurb": "Motorsport track in Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Marc%20M%C3%A1rquez%2C%20Dani%20Pedrosa%20and%20Michael%20Laverty%202013%20Motegi.jpeg?width=640",
-    "imageAttribution": "Wikimedia Commons · Marc Márquez, Dani Pedrosa and Michael Laverty 2013 Motegi.jpeg",
+    "imageAttribution": "Box Repsol · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 2
   },
   {
@@ -10401,7 +10402,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 58,
     "blurb": "waterfall in Wakayama Prefecture, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Kumano%20Kodo%20World%20heritage%20Nachi-no-taki%20%E7%86%8A%E9%87%8E%E5%8F%A4%E9%81%93%20%E9%82%A3%E6%99%BA%E5%A4%A7%E6%BB%9D10.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Kumano Kodo World heritage Nachi-no-taki 熊野古道 那智大滝10.JPG",
+    "imageAttribution": "Nekosuki · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -10417,7 +10418,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 58,
     "blurb": "Shinto shrines in Tochigi Prefecture, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Nikko%20Toshogu%20Yomeimon%20Gate%202024.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Nikko Toshogu Yomeimon Gate 2024.jpg",
+    "imageAttribution": "Jpatokal · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -10433,7 +10434,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 57,
     "blurb": "observation tower",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Kobe%20port%20tower12s3200.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Kobe port tower12s3200.jpg",
+    "imageAttribution": "663highland · Wikimedia Commons · CC BY 2.5",
     "suggestedHours": 2
   },
   {
@@ -10449,7 +10450,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 57,
     "blurb": "national park of Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Oirase%20Stream%20%E5%B7%9D%28%E3%81%8B%E3%82%8F%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Oirase Stream 川(かわ).jpg",
+    "imageAttribution": "TANAKA Juuyoh (田中十洋) · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 5
   },
   {
@@ -10465,7 +10466,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 57,
     "blurb": "observation tower",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/New%20Tsutenkaku%20in%20201409%20003.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · New Tsutenkaku in 201409 003.JPG",
+    "imageAttribution": "Mc681 · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -10481,7 +10482,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 56,
     "blurb": "national park of Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mt.Kobushigatake%20and%20Mt.Sanpou%20from%20Mt.Tokusa.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Mt.Kobushigatake and Mt.Sanpou from Mt.Tokusa.jpg",
+    "imageAttribution": "Σ64 · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -10497,7 +10498,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 56,
     "blurb": "national park of Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mount%20Tate%20and%20Mount%20Tsurugi%20from%20Mount%20Nunobiki.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Mount Tate and Mount Tsurugi from Mount Nunobiki.jpg",
+    "imageAttribution": "Alpsdake · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -10513,7 +10514,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 56,
     "blurb": "national park of Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mt.Kitadake%20and%20Mt.Senjogatake%20from%20Mt.Nakashirane.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Mt.Kitadake and Mt.Senjogatake from Mt.Nakashirane.jpg",
+    "imageAttribution": "Σ64 · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -10529,7 +10530,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 55,
     "blurb": "national park of Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ashizurimisaki.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Ashizurimisaki.jpg",
+    "imageAttribution": "四万十人 · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -10545,7 +10546,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 55,
     "blurb": "national park of Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Bishamon%20Pond%20With%20Mount%20Bandai.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Bishamon Pond With Mount Bandai.JPG",
+    "imageAttribution": "Brian Adler (BrianAdler) · Wikimedia Commons · Public domain",
     "suggestedHours": 5
   },
   {
@@ -10561,7 +10562,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 55,
     "blurb": "national park of Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Hakusan01.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Hakusan01.JPG",
+    "imageAttribution": "Mass Ave 975 · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -10577,7 +10578,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 55,
     "blurb": "imperial residence in the Japanese capital city Heijō-kyō (today's Nara), during most of the Nara period",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/%E5%BE%A9%E5%85%83%E3%81%95%E3%82%8C%E3%81%9F%E7%AC%AC%E4%B8%80%E6%AC%A1%E5%A4%A7%E6%A5%B5%E6%AE%BF.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 復元された第一次大極殿.jpg",
+    "imageAttribution": "Tsuyoshi chiba · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -10593,7 +10594,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 55,
     "blurb": "national park of Okinawa, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Anparu.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Anparu.jpg",
+    "imageAttribution": "Paipateroma · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -10609,7 +10610,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 55,
     "blurb": "national park of Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Toba%20Mie%20-%20overview.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Toba Mie - overview.jpg",
+    "imageAttribution": "The original uploader was Michalkun at English Wikipedia. · Wikimedia Commons · CC BY-SA 2.5",
     "suggestedHours": 5
   },
   {
@@ -10626,7 +10627,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 55,
     "blurb": "national park of Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Joshinetsu-Kogen%20National-Park.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Joshinetsu-Kogen National-Park.jpg",
+    "imageAttribution": "MaedaAkihiko · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -10642,7 +10643,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 55,
     "blurb": "national park of Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mountains%20in%20Oze%20National%20Park.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Mountains in Oze National Park.JPG",
+    "imageAttribution": "BrianAdler · Wikimedia Commons · Public domain",
     "suggestedHours": 5
   },
   {
@@ -10658,7 +10659,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 54,
     "blurb": "former imperial capital of Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Plan%20of%20Oharida%20Palace.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Plan of Oharida Palace.jpg",
+    "imageAttribution": "Wikiwikiyarou · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -10674,7 +10675,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 54,
     "blurb": "national park of Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Senpiro%20Fall%20Yaku%20Island.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Senpiro Fall Yaku Island.jpg",
+    "imageAttribution": "Yosemite · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -10690,7 +10691,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 54,
     "blurb": "national park of Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Katsuodorijima%20and%20tairajima%2CAnejima.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Katsuodorijima and tairajima,Anejima.jpg",
+    "imageAttribution": "タクナワン · Wikimedia Commons · CC0",
     "suggestedHours": 5
   },
   {
@@ -10706,7 +10707,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 54,
     "blurb": "national park of Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Tottori-Sakyu%20Tottori%20Japan.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Tottori-Sakyu Tottori Japan.JPG",
+    "imageAttribution": "Hashi photo · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -10722,7 +10723,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 53,
     "blurb": "national park of Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Daisen%20highest%20peak.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Daisen highest peak.jpg",
+    "imageAttribution": "Mass Ave 975 at English Wikipedia · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -10738,7 +10739,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 53,
     "blurb": "park in Chuo, Tokyo, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Hamarikyu%20Garden%20as%20seen%20from%20Shiodome.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Hamarikyu Garden as seen from Shiodome.jpg",
+    "imageAttribution": "Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -10754,7 +10755,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 53,
     "blurb": "national park of Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Saikazaki%20Wakaura01bs4272.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Saikazaki Wakaura01bs4272.jpg",
+    "imageAttribution": "663highland · Wikimedia Commons · CC BY 2.5",
     "suggestedHours": 5
   },
   {
@@ -10770,7 +10771,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 53,
     "blurb": "waterfall in Fujinomiya, Shizuoka Prefecture, near Mount Fuji, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/N2%20Shiraito%20Falls%202.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · N2 Shiraito Falls 2.jpg",
+    "imageAttribution": "InvictusOU812 from USA · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 2
   },
   {
@@ -10786,7 +10787,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 53,
     "blurb": "national park of Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/140322%20Unzen%20Onsen%20Nagasaki%20pref%20Japan01s3.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 140322 Unzen Onsen Nagasaki pref Japan01s3.jpg",
+    "imageAttribution": "663highland · Wikimedia Commons · CC BY 2.5",
     "suggestedHours": 5
   },
   {
@@ -10802,7 +10803,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 53,
     "blurb": "national park of Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/180428%20Umikongo%20Kushimoto%20Wakayama%20pref%20Japan01bs.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 180428 Umikongo Kushimoto Wakayama pref Japan01bs.jpg",
+    "imageAttribution": "663highland · Wikimedia Commons · CC BY 2.5",
     "suggestedHours": 5
   },
   {
@@ -10818,7 +10819,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 52,
     "blurb": "building in Nishikyo-ku, Kyoto Prefecture, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Katsura%20Imperial%20Villa%20in%20Spring.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Katsura Imperial Villa in Spring.jpg",
+    "imageAttribution": "John Chang · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -10834,7 +10835,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 52,
     "blurb": "national park of Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Shiodawara%20cliff.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Shiodawara cliff.JPG",
+    "imageAttribution": "user:Sapphire123 · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -10850,7 +10851,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 51,
     "blurb": "national park of Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Amami%20beach.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Amami beach.jpg",
+    "imageAttribution": "TANAKA Juuyoh (田中十洋) · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 5
   },
   {
@@ -10866,7 +10867,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 51,
     "blurb": "national park in the Tohoku region in Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Jyoudogahama.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Jyoudogahama.jpg",
+    "imageAttribution": "Junpei Satoh · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -10882,7 +10883,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 50,
     "blurb": "historic ruins in Fukui, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Asakura%20Yakata%20of%20Ichijodani%20Asakura%20Family%20Historic%20Ruins02s3s4440.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Asakura Yakata of Ichijodani Asakura Family Historic Ruins02s3s4440.jpg",
+    "imageAttribution": "663highland · Wikimedia Commons · CC BY 2.5",
     "suggestedHours": 2
   },
   {
@@ -10898,7 +10899,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 50,
     "blurb": "Megalithic tombs in Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mozu%20Kofun%20Group%20Aerial%20photograph%202007.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Mozu Kofun Group Aerial photograph 2007.jpg",
+    "imageAttribution": "国土地理院 · Wikimedia Commons · Attribution",
     "suggestedHours": 2
   },
   {
@@ -10914,7 +10915,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 50,
     "blurb": "waterfall in Toyama Prefecture, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Shomyo-daki%201.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Shomyo-daki 1.jpg",
+    "imageAttribution": "kahusi (會話) · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -10930,7 +10931,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 48,
     "blurb": "hot spring in the city of Matsuyama, Ehime Prefecture on the island of Shikoku, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/D%C5%8Dgo%20Onsen.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Dōgo Onsen.jpg",
+    "imageAttribution": "Arnaud Malon · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 2
   },
   {
@@ -10946,7 +10947,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 48,
     "blurb": "cave in Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Reigand%C5%8D.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Reigandō.jpg",
+    "imageAttribution": "STA3816 · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -10962,7 +10963,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 48,
     "blurb": "Jōmon period archaeological site and museum",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/140913%20Sannai-Maruyama%20site%20Aomori%20Japan01bs6bs6.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 140913 Sannai-Maruyama site Aomori Japan01bs6bs6.jpg",
+    "imageAttribution": "663highland · Wikimedia Commons · CC BY 2.5",
     "suggestedHours": 2
   },
   {
@@ -10978,7 +10979,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 48,
     "blurb": "Castle ruins in Miyagi Prefecture, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Tagajo-ato%20seiden-2.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Tagajo-ato seiden-2.JPG",
+    "imageAttribution": "Saigen Jiro · Wikimedia Commons · CC0",
     "suggestedHours": 2
   },
   {
@@ -10994,7 +10995,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 46,
     "blurb": "waterfall in Daigo, Kuji district, Ibaraki prefecture, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Fukuroda%20Falls%20-%20%E8%A2%8B%E7%94%B0%E3%81%AE%E6%BB%9D%28%E3%81%B5%E3%81%8F%E3%82%8D%E3%81%A0%E3%81%AE%E3%81%9F%E3%81%8D%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Fukuroda Falls - 袋田の滝(ふくろだのたき).jpg",
+    "imageAttribution": "TANAKA Juuyoh (田中十洋) · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 2
   },
   {
@@ -11010,7 +11011,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 46,
     "blurb": "lake in Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lake%20Man.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Lake Man.jpg",
+    "imageAttribution": "N · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -11026,7 +11027,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 45,
     "blurb": "hot springs in Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/170811%20Rokko-Arima%20Ropeway%20Kobe%20Japan00n.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 170811 Rokko-Arima Ropeway Kobe Japan00n.jpg",
+    "imageAttribution": "663highland · Wikimedia Commons · CC BY 2.5",
     "suggestedHours": 2
   },
   {
@@ -11042,7 +11043,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 43,
     "blurb": "Buddhist temple in Kyoto, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Daigakuji.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Daigakuji.jpg",
+    "imageAttribution": "PlusMinus · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -11059,7 +11060,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 43,
     "blurb": "protected area",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/%E8%93%AE%E6%B2%BC%E6%B5%B7%E6%B5%9C%E5%85%AC%E5%9C%92%E4%BB%98%E8%BF%91%EF%BC%88%E4%B9%9D%E5%8D%81%E4%B9%9D%E9%87%8C%E6%B5%9C%E3%80%81%E5%B1%B1%E6%AD%A6%E5%B8%82%EF%BC%89%20-%20panoramio.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 蓮沼海浜公園付近（九十九里浜、山武市） - panoramio.jpg",
+    "imageAttribution": "☆ブロッコリーマン☆ · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 3
   },
   {
@@ -11075,7 +11076,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 43,
     "blurb": "waterfall",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Otodome%20Falls%20201310.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Otodome Falls 201310.JPG",
+    "imageAttribution": "アルトクール · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -11091,7 +11092,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 43,
     "blurb": "waterfall in Tochigi Prefecture, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/200731%20Ryuzu%20Falls%20Nikko%20Japan01s3.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 200731 Ryuzu Falls Nikko Japan01s3.jpg",
+    "imageAttribution": "663highland · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -11107,7 +11108,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 43,
     "blurb": "Imperial Villa in Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Shugaku-in%20Imperial%20Villa%20-%20Upper%20Garden%20pond.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Shugaku-in Imperial Villa - Upper Garden pond.JPG",
+    "imageAttribution": "Daderot · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -11123,7 +11124,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 42,
     "blurb": "building in Gunma Prefecture, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/%E8%8D%89%E6%B4%A5%E6%B8%A9%E6%B3%89%E3%81%AE%E6%B9%AF%E7%95%9103.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 草津温泉の湯畑03.jpg",
+    "imageAttribution": "くろふね · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -11140,7 +11141,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 42,
     "blurb": "sandy beach in Kamakura, Kanagawa prefecture, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/230128%20At%20Shichirigahama%20Kamakura%20Kanagawa%20pref%20Japan02s3.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 230128 At Shichirigahama Kamakura Kanagawa pref Japan02s3.jpg",
+    "imageAttribution": "663highland · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 3
   },
   {
@@ -11156,7 +11157,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 42,
     "blurb": "mountain pass between Nagano and Gunma Prefectures in Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Route18-Usui-Pass-01.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Route18-Usui-Pass-01.jpg",
+    "imageAttribution": "Rs1421 · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 1
   },
   {
@@ -11172,7 +11173,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 40,
     "blurb": "building in Tochigi Prefecture, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Kinugawa%20Onsen%20Hotel%202020.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Kinugawa Onsen Hotel 2020.jpg",
+    "imageAttribution": "Miyuki Meinaka · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -11188,7 +11189,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 40,
     "blurb": "beach and neighborhood in Kamakura, Kanagawa prefecture, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/230128%20Yuigahama%20Kamakura%20Kanagawa%20pref%20Japan02s3.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 230128 Yuigahama Kamakura Kanagawa pref Japan02s3.jpg",
+    "imageAttribution": "663highland · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 3
   },
   {
@@ -11204,7 +11205,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 40,
     "blurb": "hot spring and ski resort in Yamagata Prefecture, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/220430%20ZaoOnsen%20Yamagata%20Yamagata%20pref%20Japan24s3.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 220430 ZaoOnsen Yamagata Yamagata pref Japan24s3.jpg",
+    "imageAttribution": "663highland · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -11220,7 +11221,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 38,
     "blurb": "building in Aomori Prefecture, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Asamushi%20Onsen%20-Yanagi%20no%20yu.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Asamushi Onsen -Yanagi no yu.jpg",
+    "imageAttribution": "振 · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -11236,7 +11237,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 38,
     "blurb": "cave in Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Fugaku%20Fuketu%20Entrance%20Stairs%2020161025.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Fugaku Fuketu Entrance Stairs 20161025.jpg",
+    "imageAttribution": "Kounoichi · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -11252,7 +11253,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 38,
     "blurb": "Japanese park",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mount%20Fuji%20and%20Miho%20no%20Matsubara%2020170211-8.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Mount Fuji and Miho no Matsubara 20170211-8.jpg",
+    "imageAttribution": "Suicasmo · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 3
   },
   {
@@ -11268,7 +11269,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 38,
     "blurb": "lava tube in Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Stairs%20and%20passage%20towards%20the%20Narusawa%20Hyoketsu%2020161025.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Stairs and passage towards the Narusawa Hyoketsu 20161025.jpg",
+    "imageAttribution": "Kounoichi · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -11284,7 +11285,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 35,
     "blurb": "limestone caves in Fukushima, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Flowstones%20and%20Mushroom%20Rocks%20inside%20Abukuma-do%20Cave.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Flowstones and Mushroom Rocks inside Abukuma-do Cave.JPG",
+    "imageAttribution": "Brian Adler 09:29, 17 June 2007 (UTC) · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -11300,7 +11301,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 35,
     "blurb": "longest cave in Japan, a limestone cave in Iwaizumi Town, Shimohei District, Iwate Prefecture, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Akkado%20SHINDEN.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Akkado SHINDEN.jpg",
+    "imageAttribution": "(関西地方) · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -11316,7 +11317,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 35,
     "blurb": "cave in Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/MAKIDOH1.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · MAKIDOH1.JPG",
+    "imageAttribution": "Chen4 · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -11332,7 +11333,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 35,
     "blurb": "peninsula on the east coast of Hokkaido, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Notsuke%20peninsulas.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Notsuke peninsulas.JPG",
+    "imageAttribution": "100yen · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 3
   },
   {
@@ -11348,7 +11349,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 35,
     "blurb": "gorge in Kamikawa, Hokkaido, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/%E7%A7%8B%E5%87%BD%EF%BC%88Autumn%20in%20valley%EF%BC%89%20-%20panoramio.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 秋函（Autumn in valley） - panoramio.jpg",
+    "imageAttribution": "pakku · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 2
   },
   {
@@ -11364,7 +11365,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 35,
     "blurb": "building in Ishikawa Prefecture, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/260606%20Kikuno-yu%20Yamanaka%20Onsen%20Kaga%20Ishikawa%20pref%20Japan01s3.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 260606 Kikuno-yu Yamanaka Onsen Kaga Ishikawa pref Japan01s3.jpg",
+    "imageAttribution": "663highland · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -11380,7 +11381,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 32,
     "blurb": null,
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/230729%20Geibikei%20Ichinoseki%20Iwate%20pref%20Japan21s3.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 230729 Geibikei Ichinoseki Iwate pref Japan21s3.jpg",
+    "imageAttribution": "663highland · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -11396,7 +11397,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 32,
     "blurb": "Part of the Rikuchū Kaigan National Park, in Miyako, Iwate Prefecture, Japan.",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Jyoudogahama.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Jyoudogahama.jpg",
+    "imageAttribution": "Junpei Satoh · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 3
   },
   {
@@ -11412,7 +11413,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 32,
     "blurb": "solutional cave in Iwaizumi, Iwate, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ryusendo%20Cave%20Underground%20Lake%20Cap%2020201115.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Ryusendo Cave Underground Lake Cap 20201115.jpg",
+    "imageAttribution": "--[[利用者:あおもりくま|あおもりくま]]（会話） 2020年11月21日 (土) 01:16 (UTC) · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -11428,7 +11429,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 29,
     "blurb": "beach located in Kyotango, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Kotohiki%20beach.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Kotohiki beach.jpg",
+    "imageAttribution": "sdkfz183 · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 3
   },
   {
@@ -11444,7 +11445,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 25,
     "blurb": "Uninhabited Japanese island in the Yaeyama chain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Barasu%20Island%20near%20Iriomote%20Island%202.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Barasu Island near Iriomote Island 2.jpg",
+    "imageAttribution": "Kzaral · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 3
   },
   {
@@ -11460,7 +11461,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 25,
     "blurb": "beach in Mitoyo, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Titibugahama%2001.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Titibugahama 01.jpg",
+    "imageAttribution": "Dokudami · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 3
   },
   {
@@ -11476,7 +11477,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 25,
     "blurb": "beach in Kōchi, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Kochi%20Katsurahama%20Daytime%201.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Kochi Katsurahama Daytime 1.JPG",
+    "imageAttribution": "京浜にけ · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 3
   },
   {
@@ -11492,7 +11493,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 25,
     "blurb": "recreational beach on Lake Inawashiro in Fukushima Prefecture, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Tenjinhama%20in%20winter.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Tenjinhama in winter.JPG",
+    "imageAttribution": "BrianAdler · Wikimedia Commons · Public domain",
     "suggestedHours": 3
   },
   {
@@ -11508,7 +11509,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 25,
     "blurb": "place in Okinawa Prefecture, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Miyako%20maipama%201.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Miyako maipama 1.jpg",
+    "imageAttribution": "Paipateroma · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 3
   },
   {
@@ -11524,7 +11525,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 25,
     "blurb": "town located in Kamakura City, Kanagawa Prefecture, Japan",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Kamakura%20zaimokuza%2020180619.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Kamakura zaimokuza 20180619.jpg",
+    "imageAttribution": "Kaba-maru · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 3
   },
   {
@@ -11541,7 +11542,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 90,
     "blurb": "Norwegian city in Vestland, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/00%204400%20View%20over%20the%20store%20Lungeg%C3%A5rdsvann%20-%20Bergen%20%28Norway%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 00 4400 View over the store Lungegårdsvann - Bergen (Norway).jpg",
+    "imageAttribution": "W. Bulach · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": null
   },
   {
@@ -11558,7 +11559,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 88,
     "blurb": "city in Trøndelag, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Overview%20of%20Trondheim%202008%2003.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Overview of Trondheim 2008 03.jpg",
+    "imageAttribution": "Åge Hojem/Trondheim Havn from Trondheim, Norway · Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": null
   },
   {
@@ -11575,7 +11576,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 78,
     "blurb": "settlement in Narvik Municipality, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Norway%20Narvik%203.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Norway Narvik 3.jpg",
+    "imageAttribution": "Tom Corser · Wikimedia Commons · CC BY-SA 2.0 uk",
     "suggestedHours": null
   },
   {
@@ -11592,7 +11593,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 74,
     "blurb": "town in Sør-Varanger Municipality, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/00%200912%20Kirkenes%20-%20Hafen%20%28Hurtigruten%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 00 0912 Kirkenes - Hafen (Hurtigruten).jpg",
+    "imageAttribution": "W. Bulach · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": null
   },
   {
@@ -11609,7 +11610,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 74,
     "blurb": "meridian arc from Hammerfest in Norway to the Black Sea",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Hammerfest%2C%20fuglenes%2C%20memoriale%20per%20l%27arco%20geodetico%20di%20struve%2C%20misurato%20a%20partire%20da%20qui%2C%20colonna%2002.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Hammerfest, fuglenes, memoriale per l'arco geodetico di struve, misurato a partire da qui, colonna 02.jpg",
+    "imageAttribution": "Francesco Bini · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -11626,7 +11627,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 72,
     "blurb": "mountain in Lom, Oppland, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Galdhopiggen%202004.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Galdhopiggen 2004.jpg",
+    "imageAttribution": "Jojo · Wikimedia Commons · Public domain",
     "suggestedHours": 1
   },
   {
@@ -11643,7 +11644,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 69,
     "blurb": "Russian settlement in Svalbard",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Barentsburg%20Mine%20Dock.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Barentsburg Mine Dock.JPG",
+    "imageAttribution": "(WT-en) Jpatokal at English Wikivoyage · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -11661,7 +11662,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 69,
     "blurb": "mountain on Jan Mayen island",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Beerenberg%20Jan%20Mayen.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Beerenberg Jan Mayen.JPG",
+    "imageAttribution": "Dreizung · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -11677,7 +11678,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 69,
     "blurb": "fell at the Finnish–Norwegian border",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Haltitunturi.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Haltitunturi.jpg",
+    "imageAttribution": "Ari Mure · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 1
   },
   {
@@ -11693,7 +11694,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 69,
     "blurb": "settlement in Nordkapp Municipality, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Honningsv%C3%A5g%202013%2006%2009%203507%20%2810319264275%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Honningsvåg 2013 06 09 3507 (10319264275).jpg",
+    "imageAttribution": "Harvey Barrison from Massapequa, NY, USA · Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": null
   },
   {
@@ -11710,7 +11711,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 69,
     "blurb": "lake in Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mj%C3%B8sa%201.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Mjøsa 1.jpg",
+    "imageAttribution": "kallerna · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -11727,7 +11728,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 66,
     "blurb": "lake in Norway, and Europe's deepest lake",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Hornindalsvatnet%20map.png?width=640",
-    "imageAttribution": "Wikimedia Commons · Hornindalsvatnet map.png",
+    "imageAttribution": "No machine-readable author provided. NormanEinstein assumed (based on copyright claims). · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -11744,7 +11745,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 65,
     "blurb": "former medieval castle in Oslo, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/OSLO-NO-02%2005%20ubt.jpeg?width=640",
-    "imageAttribution": "Wikimedia Commons · OSLO-NO-02 05 ubt.jpeg",
+    "imageAttribution": "Photo © 2005 by Tomasz Sienicki [user: tsca, mail: tomasz.sienicki at gmail.com] · Wikimedia Commons · CC BY 2.5",
     "suggestedHours": 2
   },
   {
@@ -11761,7 +11762,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 65,
     "blurb": "1936 Scharnhorst-class battleship",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Bundesarchiv%20DVM%2010%20Bild-23-63-07%2C%20Schlachtschiff%20%22Scharnhorst%22.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Bundesarchiv DVM 10 Bild-23-63-07, Schlachtschiff \"Scharnhorst\".jpg",
+    "imageAttribution": "UnknownUnknown · Wikimedia Commons · CC BY-SA 3.0 de",
     "suggestedHours": 2
   },
   {
@@ -11778,7 +11779,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 63,
     "blurb": "official residence of the monarch of Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Slottet%20i%20Oslo%201.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Slottet i Oslo 1.jpg",
+    "imageAttribution": "Andreas Haldorsen · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -11795,7 +11796,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 62,
     "blurb": "lake in Engerdal, Os and Røros Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Engerdal%20Femunden.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Engerdal Femunden.jpg",
+    "imageAttribution": "Mahlum · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -11811,7 +11812,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 62,
     "blurb": "largest and highest mountain in Svalbard, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Newtontoppen.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Newtontoppen.jpg",
+    "imageAttribution": "Gérard Bodineau · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 1
   },
   {
@@ -11828,7 +11829,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 62,
     "blurb": "national park in Innlandet county, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/DigerMidtH%C3%B8grondenFromVeslesmeden.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · DigerMidtHøgrondenFromVeslesmeden.jpg",
+    "imageAttribution": "Håvard Berland · Wikimedia Commons · CC BY-SA 2.5",
     "suggestedHours": 5
   },
   {
@@ -11844,7 +11845,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 62,
     "blurb": "seven-stream waterfall in Stranda, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/00%203584%20The%20Seven%20Sisters%20-%20Geirangerfjord.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 00 3584 The Seven Sisters - Geirangerfjord.jpg",
+    "imageAttribution": "W. Bulach · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -11860,7 +11861,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 62,
     "blurb": "lake in Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Holsfjorden%2C%20Hole.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Holsfjorden, Hole.jpg",
+    "imageAttribution": "Wikimedia Commons · CC BY-SA 2.5",
     "suggestedHours": 2
   },
   {
@@ -11876,7 +11877,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 61,
     "blurb": "mountain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Glittertind.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Glittertind.jpg",
+    "imageAttribution": "Sigmund · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 1
   },
   {
@@ -11893,7 +11894,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 60,
     "blurb": "national park in Northern Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Jetnamsklumpen.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Jetnamsklumpen.jpg",
+    "imageAttribution": "EdiBlox · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -11909,7 +11910,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 60,
     "blurb": "mountain pass",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/.00%207891%20Trollstigen%20-%20Norway.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · .00 7891 Trollstigen - Norway.jpg",
+    "imageAttribution": "W. Bulach · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 1
   },
   {
@@ -11926,7 +11927,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 59,
     "blurb": "national park",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Snohetta.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Snohetta.jpg",
+    "imageAttribution": "Kjetil Kjernsmo · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -11943,7 +11944,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 59,
     "blurb": "international tripoint between Sweden, Norway and Finland",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cairn%20des%20trois%20royaumes%20-%20close%20up.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Cairn des trois royaumes - close up.jpg",
+    "imageAttribution": "Azerty197666 · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -11959,7 +11960,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 59,
     "blurb": "waterfall in Sunndal, Norway; allest waterfall in Europe",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Vinnufossen%2C%20Sunndal%2C%20Norway%20%28front%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Vinnufossen, Sunndal, Norway (front).jpg",
+    "imageAttribution": "User no:User:Carl S Bj at no.wikipedia · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -11976,7 +11977,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 58,
     "blurb": "national park in Senja, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/%C3%85nderdalen%20nasjonalpark%203.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Ånderdalen nasjonalpark 3.jpg",
+    "imageAttribution": "Bjarkan · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -11992,7 +11993,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 58,
     "blurb": "mountain in Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Snohetta.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Snohetta.jpg",
+    "imageAttribution": "Kjetil Kjernsmo · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 1
   },
   {
@@ -12008,7 +12009,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 58,
     "blurb": "1927 Königsberg-class cruiser",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Bundesarchiv%20Bild%20102-12746%2C%20Kaiser-Wilhelm-Kanal%2C%20Kreuzer%20%22Karlsruhe%22.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Bundesarchiv Bild 102-12746, Kaiser-Wilhelm-Kanal, Kreuzer \"Karlsruhe\".jpg",
+    "imageAttribution": "Unknown authorUnknown author · Wikimedia Commons · CC BY-SA 3.0 de",
     "suggestedHours": 2
   },
   {
@@ -12024,7 +12025,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 58,
     "blurb": "national park",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Hardangerviddaflora.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Hardangerviddaflora.jpg",
+    "imageAttribution": "Smtunli,  Svein-Magne Tunli - http://www.tunliweb.no/SM/English/sm_eng.htm · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -12040,7 +12041,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 58,
     "blurb": "commemorative monument of the unification of the Norwegian Kingdom",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Sverd%20i%20fjell%20-%20panoramio%20%281%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Sverd i fjell - panoramio (1).jpg",
+    "imageAttribution": "TomasEE · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 2
   },
   {
@@ -12056,7 +12057,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 58,
     "blurb": "waterfall in Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/V%C3%B8ringfossen.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Vøringfossen.jpg",
+    "imageAttribution": "Kenny Louie · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 2
   },
   {
@@ -12072,7 +12073,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 57,
     "blurb": "national park",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Jotunheimen%20-%20view%20from%20Galdh%C3%B8piggen1.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Jotunheimen - view from Galdhøpiggen1.JPG",
+    "imageAttribution": "Pudelek (Marcin Szala) · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -12088,7 +12089,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 57,
     "blurb": "national park in Nordland, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Rago-2015-8794.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Rago-2015-8794.jpg",
+    "imageAttribution": "SiberianJay · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -12104,7 +12105,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 57,
     "blurb": "national park in Nordreisa, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mollisfossen.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Mollisfossen.jpg",
+    "imageAttribution": "pululante · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 5
   },
   {
@@ -12120,7 +12121,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 57,
     "blurb": "national park in Nordland, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Bjell%C3%A5vasstua.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Bjellåvasstua.jpg",
+    "imageAttribution": "Lars Røed Hansen · Wikimedia Commons · CC BY-SA 2.5",
     "suggestedHours": 5
   },
   {
@@ -12136,7 +12137,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 56,
     "blurb": "mountain in Bergen, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Fl%C3%B8yvarden%20p%C3%A5%20Fl%C3%B8yfjellet%20med%20Ulriken%20i%20bakrunnen%20-%202020.12.06.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Fløyvarden på Fløyfjellet med Ulriken i bakrunnen - 2020.12.06.jpg",
+    "imageAttribution": "Svein Harkestad · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 1
   },
   {
@@ -12152,7 +12153,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 56,
     "blurb": "national park",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Prins-karls-forrland%20pho.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Prins-karls-forrland pho.jpg",
+    "imageAttribution": "Per Harald Olsen – User Perhols on no.wikipedia · Wikimedia Commons · CC BY 2.5",
     "suggestedHours": 5
   },
   {
@@ -12168,7 +12169,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 56,
     "blurb": "1909 Indefatigable-class battlecruiser",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/HMS%20Indefatigable%20%281909%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · HMS Indefatigable (1909).jpg",
+    "imageAttribution": "Surgeon Oscar Parkes · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -12184,7 +12185,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 56,
     "blurb": "national park in Troms, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/%C3%96vre%20dividal%20anjajohka.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Övre dividal anjajohka.jpg",
+    "imageAttribution": "The original uploader was Edgarski at German Wikipedia.\n\n(Original text: Piotr Wolf (= de:Benutzer:Edgarski) · Wikimedia Commons · CC BY-SA 2.0 de",
     "suggestedHours": 5
   },
   {
@@ -12200,7 +12201,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 56,
     "blurb": "national park in Finnmark, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Twisted%20trunk.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Twisted trunk.jpg",
+    "imageAttribution": "Dan Nordal from Kirkenes, Norway · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 5
   },
   {
@@ -12216,7 +12217,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 56,
     "blurb": "waterfall in Stryn, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Kjenndalen.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Kjenndalen.jpg",
+    "imageAttribution": "Sindre · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 2
   },
   {
@@ -12248,7 +12249,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 55,
     "blurb": "national park",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Hardanger%20Folgefonna-Gletscher%2011.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Hardanger Folgefonna-Gletscher 11.JPG",
+    "imageAttribution": "Zairon · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -12264,7 +12265,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 55,
     "blurb": "national park",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Gutulia%2008-0003.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Gutulia 08-0003.jpg",
+    "imageAttribution": "Peter Möllenkamp · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -12280,7 +12281,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 55,
     "blurb": "1912 Lion-class battlecruiser",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/QueenMary.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · QueenMary.jpg",
+    "imageAttribution": "Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -12296,7 +12297,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 55,
     "blurb": "national park of Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/The%20road%20to%20Jostedals%20Glacier.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · The road to Jostedals Glacier.jpg",
+    "imageAttribution": "Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -12312,7 +12313,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 55,
     "blurb": "national park in Nordland, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Sjurfjellet.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Sjurfjellet.jpg",
+    "imageAttribution": "Rotehodet · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -12328,7 +12329,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 55,
     "blurb": "mountain in Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lysefjorden%20fjord.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Lysefjorden fjord.jpg",
+    "imageAttribution": "User Vikingstad on en.wikipedia · Wikimedia Commons · Public domain",
     "suggestedHours": 1
   },
   {
@@ -12344,7 +12345,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 55,
     "blurb": "national park in Finnmark, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Stabbursdalen%20National%20Park%20-%202.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Stabbursdalen National Park - 2.jpg",
+    "imageAttribution": "Thor Thorsson from Stenungsund, Sweden · Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": 5
   },
   {
@@ -12360,7 +12361,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 54,
     "blurb": "1907 Invincible-class battlecruiser",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/HMS%20Invincible%20%281907%29%20British%20Battleship.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · HMS Invincible (1907) British Battleship.jpg",
+    "imageAttribution": "Presumed to be an official British Government photograph. · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -12376,7 +12377,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 54,
     "blurb": "national park in the group of islands Spitsbergen, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Indre%20Wijdefjorden%20National%20Park%20map.svg?width=640",
-    "imageAttribution": "Wikimedia Commons · Indre Wijdefjorden National Park map.svg",
+    "imageAttribution": "Norwegian Ministry of the Environment / Miljøverndepartementet · Wikimedia Commons · Public domain",
     "suggestedHours": 5
   },
   {
@@ -12392,7 +12393,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 54,
     "blurb": "waterfall in Ullensvang, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/00%20N223%20L%C3%A5tefossen%20-%20Norwegen.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 00 N223 Låtefossen - Norwegen.jpg",
+    "imageAttribution": "W. Bulach · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -12408,7 +12409,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 54,
     "blurb": "waterfall in Nesset, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mardalsfossen.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Mardalsfossen.jpg",
+    "imageAttribution": "Ernst Vikne · Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": 2
   },
   {
@@ -12424,7 +12425,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 54,
     "blurb": "protected area in Norway (Naturbase code: VV00002584)",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/IsfjordenSouthShore.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · IsfjordenSouthShore.JPG",
+    "imageAttribution": "Wilson44691 · Wikimedia Commons · Public domain",
     "suggestedHours": 5
   },
   {
@@ -12440,7 +12441,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 54,
     "blurb": "mountain in Tromsø, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Summit%20marker%20of%20Tromsdalstinden%202022-09-07%2003.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Summit marker of Tromsdalstinden 2022-09-07 03.jpg",
+    "imageAttribution": "Leonhard Lenz · Wikimedia Commons · CC0",
     "suggestedHours": 1
   },
   {
@@ -12456,7 +12457,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 53,
     "blurb": "national park in Northern Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Arctic%20sunset.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Arctic sunset.jpg",
+    "imageAttribution": "Lauri Rantala from Espoo, Finland · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 5
   },
   {
@@ -12472,7 +12473,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 53,
     "blurb": "national park in Trøndelag, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Skj%C3%A6kerhatten.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Skjækerhatten.jpg",
+    "imageAttribution": "Olavfin · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -12488,7 +12489,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 53,
     "blurb": "national park",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Grimsdalen%20Panorama4718.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Grimsdalen Panorama4718.jpg",
+    "imageAttribution": "Zitronenpresse · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -12504,7 +12505,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 53,
     "blurb": "national park in Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Femundsmarka01.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Femundsmarka01.jpg",
+    "imageAttribution": "Aslak Raanes · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 5
   },
   {
@@ -12520,7 +12521,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 53,
     "blurb": "waterfall in Rauma, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Grytten%20et%20g%C3%A5rdsbruk%20ved%20Mongefossen%20-%20NB%20MS%20G4%200001.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Grytten et gårdsbruk ved Mongefossen - NB MS G4 0001.jpg",
+    "imageAttribution": "Marthinius Skøien · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -12536,7 +12537,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 53,
     "blurb": "national park in Nordland, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Moysalen%202.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Moysalen 2.jpg",
+    "imageAttribution": "Nomen nescio · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -12552,7 +12553,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 53,
     "blurb": "protected area in Norway (Naturbase code: VV00002573)",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lilliehookbreen1.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Lilliehookbreen1.jpg",
+    "imageAttribution": "Jerzy Strzelecki · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -12568,7 +12569,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 53,
     "blurb": "mountain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Bouvet%20Map.png?width=640",
-    "imageAttribution": "Wikimedia Commons · Bouvet Map.png",
+    "imageAttribution": "varp · Wikimedia Commons · Public domain",
     "suggestedHours": 1
   },
   {
@@ -12584,7 +12585,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 53,
     "blurb": "national park in Finnmark, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/E75-Varanger-Vard%C3%B8-2012-07-07-16-30-03.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · E75-Varanger-Vardø-2012-07-07-16-30-03.jpg",
+    "imageAttribution": "Karl Brodowsky · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -12600,7 +12601,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 52,
     "blurb": "settlement in Sør-Varanger Municipality, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Pykeija5.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Pykeija5.jpg",
+    "imageAttribution": "Motopark · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -12616,7 +12617,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 51,
     "blurb": "national park in Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Storbukk%20Gjersj%C3%B8h%C3%B8a.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Storbukk Gjersjøhøa.jpg",
+    "imageAttribution": "Apple farmer · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -12632,7 +12633,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 51,
     "blurb": "1907 Minotaur-class armoured cruiser",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/HMS%20Defence%201907.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · HMS Defence 1907.jpg",
+    "imageAttribution": "unknown Royal Navy serviceman. · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -12648,7 +12649,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 51,
     "blurb": "national park in Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/03%20Reinheimen-Nationalpark%20%28Norwegen%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 03 Reinheimen-Nationalpark (Norwegen).jpg",
+    "imageAttribution": "W. Bulach · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -12664,7 +12665,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 51,
     "blurb": "national park",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/SV%20Eltanin%20Brucebyen.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · SV Eltanin Brucebyen.jpg",
+    "imageAttribution": "Krzysztof Maria Różański, (Upior polnocy) · Wikimedia Commons · Public domain",
     "suggestedHours": 5
   },
   {
@@ -12680,7 +12681,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 50,
     "blurb": "fort at Halden on the Norwegian-Swedish border",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Fredriksten%20fortress%20Norway%20seen%20from%20Halden%20harbor.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Fredriksten fortress Norway seen from Halden harbor.jpg",
+    "imageAttribution": "Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -12712,7 +12713,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 48,
     "blurb": "Medieval fortress located in Bergen, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Bergenhus.2.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Bergenhus.2.JPG",
+    "imageAttribution": "Wikimedia Commons · CC BY-SA 2.5",
     "suggestedHours": 2
   },
   {
@@ -12728,7 +12729,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 48,
     "blurb": "tourist route in Northern Europe",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/%D0%A0-21%28Karelia%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Р-21(Karelia).jpg",
+    "imageAttribution": "Semenov.m7 · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -12744,7 +12745,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 46,
     "blurb": "zoo in Kristiansand, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Kardemomme%20by.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Kardemomme by.jpg",
+    "imageAttribution": "KEN · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -12760,7 +12761,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 46,
     "blurb": "Palace in Oslo, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Oscarshall%20in%202025.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Oscarshall in 2025.jpg",
+    "imageAttribution": "Premeditated · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -12776,7 +12777,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 46,
     "blurb": "building in Skatval, Nord-Trøndelag, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Steinvikholm%20slottIMG%205980.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Steinvikholm slottIMG 5980.jpg",
+    "imageAttribution": "Wenche77 · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -12792,7 +12793,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 46,
     "blurb": "royal palace in Trondheim, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Stiftsgaarden%20Trondheim.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Stiftsgaarden Trondheim.jpg",
+    "imageAttribution": "User:Jensens · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -12808,7 +12809,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 46,
     "blurb": "hydroelectric power station and museum in Tinn, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Vemork%20Hydroelectric%20Plant%201935.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Vemork Hydroelectric Plant 1935.jpg",
+    "imageAttribution": "Anders Beer Wilse · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -12824,7 +12825,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 45,
     "blurb": "cultural property",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Einangsteinen%2C%20Vestre%20Slidre%2C%202005-08-18%2C%2002.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Einangsteinen, Vestre Slidre, 2005-08-18, 02.jpg",
+    "imageAttribution": "Jeblad · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -12840,7 +12841,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 45,
     "blurb": "archipelago in Finnmark, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Gjesv%C3%A6rstappan%20natural%20reserve-4.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Gjesværstappan natural reserve-4.jpg",
+    "imageAttribution": "Fanny Schertzer · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -12856,7 +12857,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 45,
     "blurb": "district of Vestland, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mo%202.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Mo 2.jpg",
+    "imageAttribution": "Tor-Egil Farestveit · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -12872,7 +12873,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 45,
     "blurb": "nature reserve in Sør-Varanger municipality, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Pasvik%20Zapovednik%2C%20River%20Paz.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Pasvik Zapovednik, River Paz.jpg",
+    "imageAttribution": "Andrei Humala (Panoramio) · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -12888,7 +12889,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 45,
     "blurb": "zoo in Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Bear-Ursus%20arctos-male-Polar%20Park%20Norway.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Bear-Ursus arctos-male-Polar Park Norway.jpg",
+    "imageAttribution": "Hans-Petter Fjeld · Wikimedia Commons · CC BY-SA 2.5",
     "suggestedHours": 2
   },
   {
@@ -12904,7 +12905,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 43,
     "blurb": "nature reserve",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Nordaustlandet%20%28js%29%202.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Nordaustlandet (js) 2.jpg",
+    "imageAttribution": "Jerzy Strzelecki · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -12920,7 +12921,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 43,
     "blurb": "aquarium in Tromsø, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Polaria%2001.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Polaria 01.JPG",
+    "imageAttribution": "Bjoertvedt · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -12936,7 +12937,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 43,
     "blurb": "amusement park near Oslo, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/TusenfrydEntrance.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · TusenfrydEntrance.jpg",
+    "imageAttribution": "Wikimedia Commons · CC BY-SA 2.5",
     "suggestedHours": 2
   },
   {
@@ -12952,7 +12953,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 42,
     "blurb": "aquarium in Bergen, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Entrance%20Akvariet%20i%20Bergen%20%282022%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Entrance Akvariet i Bergen (2022).jpg",
+    "imageAttribution": "Premeditated · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -12968,7 +12969,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 42,
     "blurb": "cave in Rana, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Gr%C3%B6nligrotta%20Strudelloch.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Grönligrotta Strudelloch.jpg",
+    "imageAttribution": "Kroelleboelle · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -12984,7 +12985,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 42,
     "blurb": "amusement park in Oppland, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Hunderfossen%20troll.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Hunderfossen troll.jpg",
+    "imageAttribution": "Åsmund Ødegård from Oslo/Ås, Norway · Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": 2
   },
   {
@@ -13000,7 +13001,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 42,
     "blurb": "park on the border between Norway and Sweden",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Fredsmonument%20i%20Morokulien.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Fredsmonument i Morokulien.jpg",
+    "imageAttribution": "Peter Aronsson · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -13016,7 +13017,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 42,
     "blurb": "scenic viewpoint in Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Stegastein%20viewpoint%20-%20panoramio%20%281%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Stegastein viewpoint - panoramio (1).jpg",
+    "imageAttribution": "TomasEE · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 2
   },
   {
@@ -13032,7 +13033,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 40,
     "blurb": "late Viking Age runestone from Gran, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Dynnasteinen%20-%20black%20white%20simple.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Dynnasteinen - black white simple.jpg",
+    "imageAttribution": "Kulturhistorisk museum, Oslo · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -13048,7 +13049,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 40,
     "blurb": "cultural property",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mandal%2001%20hogganviksteinen%20hestehaven%20129840.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Mandal 01 hogganviksteinen hestehaven 129840.jpg",
+    "imageAttribution": "Bjoertvedt · Wikimedia Commons · CC BY-SA 3.0 no",
     "suggestedHours": 2
   },
   {
@@ -13064,7 +13065,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 40,
     "blurb": "Monument in Vardø, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Steglneset.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Steglneset.jpg",
+    "imageAttribution": "Stylegar · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -13080,7 +13081,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 40,
     "blurb": "building in Tønsberg, Vestfold, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/T%C3%B8nsberg%20-%20tower%20and%20ruins.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Tønsberg - tower and ruins.JPG",
+    "imageAttribution": "Pudelek (Marcin Szala) · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -13096,7 +13097,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 40,
     "blurb": "UNESCO designated world heritage area",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Village%20in%20Norway.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Village in Norway.jpg",
+    "imageAttribution": "No machine-readable author provided. Yorian~commonswiki assumed (based on copyright claims). · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -13112,7 +13113,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 38,
     "blurb": "canyon in Alta, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Altaelva%20canyon.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Altaelva canyon.JPG",
+    "imageAttribution": "Glivi · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -13129,7 +13130,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 38,
     "blurb": "beach in Mandal, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Sjosanden.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Sjosanden.jpg",
+    "imageAttribution": "https://www.flickr.com/people/kalevkevad/ · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 3
   },
   {
@@ -13177,7 +13178,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 35,
     "blurb": "protected area in Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Dorst%20bay.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Dorst bay.jpg",
+    "imageAttribution": "Hermanhi · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -13193,7 +13194,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 32,
     "blurb": "protected area in Norway (Naturbase code: VV00001871)",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/N%2C%20Oppland%2C%20Dovre%2C%20Fokstumyra%2025%2C%20Saxifraga-Jan%20van%20der%20Straaten.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · N, Oppland, Dovre, Fokstumyra 25, Saxifraga-Jan van der Straaten.jpg",
+    "imageAttribution": "Stichting Saxifraga · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -13210,7 +13211,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 32,
     "blurb": "beach in Agder, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Hamresanden.png?width=640",
-    "imageAttribution": "Wikimedia Commons · Hamresanden.png",
+    "imageAttribution": "Havstad112 · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 3
   },
   {
@@ -13226,7 +13227,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 32,
     "blurb": "beach on Bygdøy, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Huk%2C%20Oslo%20-%20bay%20with%20beach.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Huk, Oslo - bay with beach.jpg",
+    "imageAttribution": "Grzegorz Wysocki · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 3
   },
   {
@@ -13242,7 +13243,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 32,
     "blurb": "canyon in Hedmark, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Jutulhogget.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Jutulhogget.JPG",
+    "imageAttribution": "No machine-readable author provided. Punkmorten assumed (based on copyright claims). · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -13258,7 +13259,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 32,
     "blurb": "nature reserve in Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ossian%20Sars%20Area%20011.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Ossian Sars Area 011.jpg",
+    "imageAttribution": "Bjoertvedt · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -13290,7 +13291,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 29,
     "blurb": "beach in Kristiansand, Norway",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Bystranda%202014-07-21.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Bystranda 2014-07-21.JPG",
+    "imageAttribution": "Carsten R D · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 3
   },
   {
@@ -13323,7 +13324,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 73,
     "blurb": "fortified tower located in the civil parish of Santa Maria de Belém in the municipality of Lisbon, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Belem%20Tower%20-%20April%202019%20%282%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Belem Tower - April 2019 (2).jpg",
+    "imageAttribution": "Rehman Abubakr · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -13341,7 +13342,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 68,
     "blurb": "stratovolcano in the Azores and the highest mountain of Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ilha%20do%20Pico%20vista%20da%20Faj%C3%A3%20Grande%2C%20Calheta%2C%20ilha%20de%20S%C3%A3o%20Jorge%2C%20A%C3%A7ores%2C%20Portugal.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Ilha do Pico vista da Fajã Grande, Calheta, ilha de São Jorge, Açores, Portugal.JPG",
+    "imageAttribution": "José Luís Ávila Silveira/Pedro Noronha e Costa · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -13358,7 +13359,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 66,
     "blurb": "palace in Sintra, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Pal%C3%A1cio%20Nacional%20da%20Pena%20por%20Rodrigo%20Tetsuo%20Argenton%20%2839%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Palácio Nacional da Pena por Rodrigo Tetsuo Argenton (39).jpg",
+    "imageAttribution": "Wilhelm Ludwig von Eschwege · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -13375,7 +13376,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 63,
     "blurb": "memorial in Lisbon, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lisbonne%20-%20Padr%C3%A3o%20dos%20Descobrimentos%20-%20Closeup.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Lisbonne - Padrão dos Descobrimentos - Closeup.jpg",
+    "imageAttribution": "Jean-Christophe BENOIST · Wikimedia Commons · CC BY 4.0",
     "suggestedHours": 2
   },
   {
@@ -13392,7 +13393,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 63,
     "blurb": "protected area in Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Near%20Campo%20do%20Ger%C3%AAs%2C%20Portugal%20%28373505187%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Near Campo do Gerês, Portugal (373505187).jpg",
+    "imageAttribution": "Rosino · Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": 5
   },
   {
@@ -13409,7 +13410,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 63,
     "blurb": "paleolithic archaeological site in Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Rock%20Art%20Foz%20Coa%2001.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Rock Art Foz Coa 01.jpg",
+    "imageAttribution": "Henrique Matos · Wikimedia Commons · GFDL 1.2",
     "suggestedHours": 2
   },
   {
@@ -13426,7 +13427,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 62,
     "blurb": "Moorish castle in Lisbon, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Castelo%20de%20S%C3%A3o%20Jorge%20%284166049903%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Castelo de São Jorge (4166049903).jpg",
+    "imageAttribution": "Robert Nyman · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 2
   },
   {
@@ -13442,7 +13443,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 62,
     "blurb": "church building in Mafra, Lisbon District, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mafra%20May%202013-2.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Mafra May 2013-2.jpg",
+    "imageAttribution": "Alvesgaspar · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -13459,7 +13460,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 62,
     "blurb": "highest peak on the Madeira Islands",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Pico%20Ruivo.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Pico Ruivo.jpg",
+    "imageAttribution": "Kogo · Wikimedia Commons · GFDL",
     "suggestedHours": 1
   },
   {
@@ -13475,7 +13476,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 61,
     "blurb": "bridge in Porto, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Puente%20Don%20Luis%20I%2C%20Oporto%2C%20Portugal%2C%202012-05-09%2C%20DD%2013.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Puente Don Luis I, Oporto, Portugal, 2012-05-09, DD 13.JPG",
+    "imageAttribution": "Diego Delso · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -13491,7 +13492,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 59,
     "blurb": "former royal palace and current national palace at Queluz, Sintra, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Palais%20royal%20de%20Queluz%20-%20Vue%20g%C3%A9n%C3%A9rale.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Palais royal de Queluz - Vue générale.jpg",
+    "imageAttribution": "Jean-Christophe BENOIST · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -13507,7 +13508,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 59,
     "blurb": "building in Sintra, Lisbon District, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Palacio%20Nacional%2C%20Sintra%2C%20Portugal%2C%202019-05-25%2C%20DD%2089.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Palacio Nacional, Sintra, Portugal, 2019-05-25, DD 89.jpg",
+    "imageAttribution": "Diego Delso · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -13523,7 +13524,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 57,
     "blurb": "church in Lisbon",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Igr%20s%20engracia%202.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Igr s engracia 2.jpg",
+    "imageAttribution": "Carlos Luis M C da Cruz · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -13539,7 +13540,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 57,
     "blurb": "Madeira island's third highest peak",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Vista%20desde%20el%20pico%20de%20Arieiro%2C%20Madeira%2C%20Portugal%2C%202019-05-30%2C%20DD%20134-141%20PAN.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Vista desde el pico de Arieiro, Madeira, Portugal, 2019-05-30, DD 134-141 PAN.jpg",
+    "imageAttribution": "Diego Delso · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 1
   },
   {
@@ -13555,7 +13556,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 56,
     "blurb": "building in Santa Maria de Belém, Lisbon District, Portugal and official residence of the President of the Portuguese Republic",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Palacio%20Belem%20Lisboa.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Palacio Belem Lisboa.JPG",
+    "imageAttribution": "Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": 2
   },
   {
@@ -13571,7 +13572,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 56,
     "blurb": "building in Guimarães, Braga District, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Castelo%20de%20Guimaraes%20%289%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Castelo de Guimaraes (9).jpg",
+    "imageAttribution": "Krzysztof Golik · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -13587,7 +13588,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 56,
     "blurb": "bridge in Porto, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ponte%20D.%20Maria%20Pia-Porto.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Ponte D. Maria Pia-Porto.JPG",
+    "imageAttribution": "Joseolgon · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -13603,7 +13604,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 55,
     "blurb": "cultural heritage monument in Sintra, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Castelo%20dos%20Mouros.%20Sintra%2C%20Portugal.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Castelo dos Mouros. Sintra, Portugal.jpg",
+    "imageAttribution": "Ввласенко · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -13619,7 +13620,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 55,
     "blurb": "building in Porto, Porto District, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Palacio%20da%20Bolsa%20%28Porto%29.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Palacio da Bolsa (Porto).JPG",
+    "imageAttribution": "Manuel de Sousa · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -13635,7 +13636,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 55,
     "blurb": "culture heritage estate near Sintra, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Quinta%20da%20Regaleira%2C%20Sintra%2C%20Portugal%2C%202019-05-25%2C%20DD%2069.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Quinta da Regaleira, Sintra, Portugal, 2019-05-25, DD 69.jpg",
+    "imageAttribution": "Diego Delso · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -13651,7 +13652,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 55,
     "blurb": "building in Lisbon, Lisbon District, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Parlamento%20April%202009-1a.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Parlamento April 2009-1a.jpg",
+    "imageAttribution": "Alvesgaspar · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -13669,7 +13670,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 54,
     "blurb": "mountain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/CapelinhosFaialAzores1.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · CapelinhosFaialAzores1.jpg",
+    "imageAttribution": "Marlene Angeja · Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": 2
   },
   {
@@ -13685,7 +13686,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 53,
     "blurb": "historic aqueduct in Lisbon, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Aqueduto%20das%20%C3%81guas%20Livres%20%281%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Aqueduto das Águas Livres (1).jpg",
+    "imageAttribution": "No machine-readable author provided. Juntas assumed (based on copyright claims). · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -13701,7 +13702,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 53,
     "blurb": "railway station in Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Esta%C3%A7%C3%A3o%20S%C3%A3o%20Bento%20Porto.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Estação São Bento Porto.JPG",
+    "imageAttribution": "Jose Goncalves / Joseolgon at Portuguese Wikipedia · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -13717,7 +13718,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 52,
     "blurb": "former monastery of the Carmelite Order in Lisbon",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lissabon%20-%20Convento%20do%20Carmo%20from%20Castle.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Lissabon - Convento do Carmo from Castle.jpg",
+    "imageAttribution": "Ingo Mehling · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -13733,7 +13734,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 52,
     "blurb": "railway station in Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lisboa%20Esta%C3%A7%C3%A3o%20do%20Rossio%20%2853820098461%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Lisboa Estação do Rossio (53820098461).jpg",
+    "imageAttribution": "Jorge Franganillo · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 2
   },
   {
@@ -13749,7 +13750,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 52,
     "blurb": "triumphal arch",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lisbon%20Pra%C3%A7a%20do%20Com%C3%A9rcio%20BW%202018-10-03%2013-33-44%20s.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Lisbon Praça do Comércio BW 2018-10-03 13-33-44 s.jpg",
+    "imageAttribution": "Berthold Werner · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -13765,7 +13766,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 51,
     "blurb": "protected area in Madeira, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Base%20of%20Cabo%20Girao%20from%20viewpoint%202013.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Base of Cabo Girao from viewpoint 2013.JPG",
+    "imageAttribution": "Bjørn Christian Tørrissen · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -13781,7 +13782,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 51,
     "blurb": "oceanarium in Lisbon, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lisboa%20June%202014-8a.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Lisboa June 2014-8a.jpg",
+    "imageAttribution": "Alvesgaspar · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -13797,7 +13798,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 51,
     "blurb": "Highest point of continental Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Os%20quatro%20edif%C3%ADcios.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Os quatro edifícios.jpg",
+    "imageAttribution": "JC Ferreira - Fotografia · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 1
   },
   {
@@ -13813,7 +13814,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 50,
     "blurb": "castle in Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Almourol%20034.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Almourol 034.jpg",
+    "imageAttribution": "Daniel Feliciano · Wikimedia Commons · CC BY-SA 2.5",
     "suggestedHours": 2
   },
   {
@@ -13829,7 +13830,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 49,
     "blurb": "stone circle in Évora, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cromeleque%20dos%20Almendres1341.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Cromeleque dos Almendres1341.JPG",
+    "imageAttribution": "Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -13845,7 +13846,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 49,
     "blurb": "Medieval Castle in Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Obidos%20April%202009-4b.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Obidos April 2009-4b.jpg",
+    "imageAttribution": "Alvesgaspar · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -13862,7 +13863,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 48,
     "blurb": "beach of Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Praia%20da%20Marinha%20%282012-09-27%29%2C%20by%20Klugschnacker%20in%20Wikipedia%20%2886%29.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Praia da Marinha (2012-09-27), by Klugschnacker in Wikipedia (86).JPG",
+    "imageAttribution": "Klugschnacker · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 3
   },
   {
@@ -13878,7 +13879,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 48,
     "blurb": "temple in Alentejo, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Evora-RomanTemple.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Evora-RomanTemple.jpg",
+    "imageAttribution": "ho visto nina volare from Italy · Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": 2
   },
   {
@@ -13896,7 +13897,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 46,
     "blurb": "Stratovolcano in São Miguel Island",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lagoa%20do%20Fogo.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Lagoa do Fogo.jpg",
+    "imageAttribution": "Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 2
   },
   {
@@ -13913,7 +13914,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 46,
     "blurb": "lagoon in Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ria%20de%20Aveiro%20-%20Portugal%20%F0%9F%87%B5%F0%9F%87%B9%20%2855118312473%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Ria de Aveiro - Portugal 🇵🇹 (55118312473).jpg",
+    "imageAttribution": "Vitor Oliveira from Torres Vedras, PORTUGAL · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -13929,7 +13930,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 46,
     "blurb": "building in Marvão, Portalegre District, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/CastillodeMarvao.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · CastillodeMarvao.jpg",
+    "imageAttribution": "Elemaki · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 2
   },
   {
@@ -13945,7 +13946,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 46,
     "blurb": "castle in Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Silves%20-%20Portugal%20%2852157551779%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Silves - Portugal (52157551779).jpg",
+    "imageAttribution": "Vitor Oliveira from Torres Vedras, PORTUGAL · Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": 2
   },
   {
@@ -13961,7 +13962,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 46,
     "blurb": "a zoo in Lisbon, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Jardim%20Zoologico%20Lisboa%201.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Jardim Zoologico Lisboa 1.JPG",
+    "imageAttribution": "Wikimedia Commons · CC BY 2.5",
     "suggestedHours": 2
   },
   {
@@ -13977,7 +13978,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 46,
     "blurb": "mountain in Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Sierra%20de%20la%20Culebra%20Pe%C3%B1a%20Mira.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Sierra de la Culebra Peña Mira.jpg",
+    "imageAttribution": "Victor Salvador Vilariño · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 1
   },
   {
@@ -13993,7 +13994,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 46,
     "blurb": "cultural heritage monument in Lisboa, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Portuguese%20Electricity%20museum.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Portuguese Electricity museum.jpg",
+    "imageAttribution": "Pedro Simões from Lisboa, Portugal · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 2
   },
   {
@@ -14009,7 +14010,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 45,
     "blurb": "protected area in Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Algar%20do%20Carvao%2C%20isla%20de%20Terceira%2C%20Azores%2C%20Portugal%2C%202020-07-25%2C%20DD%2068-70%20HDR.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Algar do Carvao, isla de Terceira, Azores, Portugal, 2020-07-25, DD 68-70 HDR.jpg",
+    "imageAttribution": "Diego Delso · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 1
   },
   {
@@ -14025,7 +14026,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 45,
     "blurb": "mountain and stratovolcano which forms the island of Faial",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Caldeira%20faial.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Caldeira faial.jpg",
+    "imageAttribution": "myself · Wikimedia Commons · Public domain",
     "suggestedHours": 1
   },
   {
@@ -14041,7 +14042,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 45,
     "blurb": "mountain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/F%C3%B3ia.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Fóia.jpg",
+    "imageAttribution": "Felix König · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 1
   },
   {
@@ -14057,7 +14058,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 45,
     "blurb": "mountain in São Jorge, Azores, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Pico%20da%20Esperan%C3%A7a%2C%20Norte%20Grande%2C%20Velas%2C%20ilha%20de%20S%C3%A3o%20Jorge%2C%20A%C3%A7ores.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Pico da Esperança, Norte Grande, Velas, ilha de São Jorge, Açores.JPG",
+    "imageAttribution": "José Luís Ávila Silveira/Pedro Noronha e Costa · Wikimedia Commons · Public domain",
     "suggestedHours": 1
   },
   {
@@ -14073,7 +14074,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 45,
     "blurb": "mountain in Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Pico%20da%20Vara%205%20panorama.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Pico da Vara 5 panorama.jpg",
+    "imageAttribution": "putneymark · Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": 1
   },
   {
@@ -14089,7 +14090,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 45,
     "blurb": "mountain and crater lake in Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Sete%20cidades%20twin%20lakes.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Sete cidades twin lakes.JPG",
+    "imageAttribution": "Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -14106,7 +14107,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 43,
     "blurb": "beach in Lagoa, Algarve, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/02-05-2017%20Praia%20de%20Benagil%20%282%29.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · 02-05-2017 Praia de Benagil (2).JPG",
+    "imageAttribution": "Kolforn (Kolforn)\nI'd appreciate if you could mail me (Kolforn@gmail.com) if you want to use this picture out of the Wikimedia project scope.\n\n\n\n This file is licensed under the Creative Commons Attribution-Share Alike 4.0 International license.\nYou are free:\nto share – to copy, distribute and transmit the work\nto remix – to adapt the work\nUnder the following conditions:\nattribution – You must give appropriate credit, provide a link to the license, and indicate if changes were made. You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.\nshare alike – If you remix, transform, or build upon the material, you must distribute your contributions under the same or compatible license as the original.https://creativecommons.org/licenses/by-sa/4.0CC BY-SA 4.0 Creative Commons Attribution-Share Alike 4.0 truetrue · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 3
   },
   {
@@ -14122,7 +14123,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 43,
     "blurb": "building in Elvas, Portalegre District, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Porta%20do%20Castelo%20de%20Elvas.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Porta do Castelo de Elvas.jpg",
+    "imageAttribution": "Nmmacedo · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -14138,7 +14139,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 43,
     "blurb": "dolmen in Évora, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Anta%20grande%20do%20Zambujeiro.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Anta grande do Zambujeiro.jpg",
+    "imageAttribution": "Nemracc · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 2
   },
   {
@@ -14154,7 +14155,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 43,
     "blurb": "crater lake, on the island of São Miguel",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Sao%20Miguel%20-%20Lagoa%20do%20Fogo.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Sao Miguel - Lagoa do Fogo.jpg",
+    "imageAttribution": "Andree Stephan · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -14170,7 +14171,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 43,
     "blurb": "ancient town and port in current-day northern Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Vila%20Nova%20de%20Gaia%20seen%20from%20Porto.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Vila Nova de Gaia seen from Porto.jpg",
+    "imageAttribution": "Wikimedia Commons · CC BY-SA 2.5",
     "suggestedHours": 2
   },
   {
@@ -14186,7 +14187,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 43,
     "blurb": "lagoon in the Algarve, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/RiaFormosaQtaLagoPortugal.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · RiaFormosaQtaLagoPortugal.JPG",
+    "imageAttribution": "Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": 2
   },
   {
@@ -14202,7 +14203,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 43,
     "blurb": "protected area in Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ria%20Formosa%20Natural%20Park%20%288086738179%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Ria Formosa Natural Park (8086738179).jpg",
+    "imageAttribution": "Natalia · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 2
   },
   {
@@ -14218,7 +14219,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 43,
     "blurb": "protected area in Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Malcata%20Rio%20Coa.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Malcata Rio Coa.JPG",
+    "imageAttribution": "José Miguel López · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -14234,7 +14235,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 42,
     "blurb": "building or structure in Coimbra, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Portugal%20dos%20pequenitos%20%282%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Portugal dos pequenitos (2).jpg",
+    "imageAttribution": "No machine-readable author provided. Juntas assumed (based on copyright claims). · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -14250,7 +14251,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 42,
     "blurb": "Beach in Algarve, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Praia%20da%20Rocha%20-%20Portugal%20%2811747902275%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Praia da Rocha - Portugal (11747902275).jpg",
+    "imageAttribution": "Vitor Oliveira from Torres Vedras, PORTUGAL · Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": 3
   },
   {
@@ -14266,7 +14267,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 40,
     "blurb": "Castle in the district of Bragança, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/CASTELO%20DE%20BRAGAN%C3%87A%202.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · CASTELO DE BRAGANÇA 2.jpg",
+    "imageAttribution": "Lídia Maria Faria · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -14282,7 +14283,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 40,
     "blurb": "cave and archaeological site in Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Aroeira3.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Aroeira3.jpg",
+    "imageAttribution": "UtaUtaNapishtim · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -14298,7 +14299,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 40,
     "blurb": "protected area in Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Gruta%20das%20Torres%20Exit.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Gruta das Torres Exit.jpg",
+    "imageAttribution": "Ulrich Thumult · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -14314,7 +14315,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 40,
     "blurb": "crater lake",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lagoa%20das%20Sete%20Cidades3.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Lagoa das Sete Cidades3.jpg",
+    "imageAttribution": "Lacobrigo · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -14330,7 +14331,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 40,
     "blurb": "cultural heritage monument in Porto de Mós, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Grutas%20de%20Mira%20Daire3.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Grutas de Mira Daire3.jpg",
+    "imageAttribution": "Vitor Oliveira from Torres Vedras, PORTUGAL · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 2
   },
   {
@@ -14346,7 +14347,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 40,
     "blurb": "mountain in Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Contrafortes%20da%20Serra%20de%20Santa%20B%C3%A1rbara%2C%20ilha%20Terceira%2C%20A%C3%A7ores%2C%20Portugal.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Contrafortes da Serra de Santa Bárbara, ilha Terceira, Açores, Portugal.jpg",
+    "imageAttribution": "José Luís Ávila Silveira/Pedro Noronha e Costa · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -14362,7 +14363,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 38,
     "blurb": "protected area in Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Paul%20do%20Boquilobo%20Nature%20Reserve%2001.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Paul do Boquilobo Nature Reserve 01.jpg",
+    "imageAttribution": "dsbp · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -14378,7 +14379,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 38,
     "blurb": "geographical object",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Entrada%20da%20Gruta%20do%20Escoural.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Entrada da Gruta do Escoural.jpg",
+    "imageAttribution": "José Miguel Soares · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -14394,7 +14395,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 38,
     "blurb": "viewpoint in Alfama, Lisbon, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/MiradouroSantaLuzia.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · MiradouroSantaLuzia.JPG",
+    "imageAttribution": "Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -14410,7 +14411,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 38,
     "blurb": "submarine canyon in the North Atlantic Ocean",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Canh%C3%A3o%20da%20Nazar%C3%A9.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Canhão da Nazaré.jpg",
+    "imageAttribution": "NASA · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -14426,7 +14427,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 38,
     "blurb": "protected area in Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Rede%20Natura%202000%20-%20S%C3%ADtio%20do%20Estu%C3%A1rio%20do%20Tejo%2009.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Rede Natura 2000 - Sítio do Estuário do Tejo 09.jpg",
+    "imageAttribution": "Joao 1968 · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -14442,7 +14443,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 38,
     "blurb": "mountain in Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Urzelina%201808%20eruptive%20center.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Urzelina 1808 eruptive center.jpg",
+    "imageAttribution": "Angrense · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -14458,7 +14459,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 35,
     "blurb": "building in Palmela, Setúbal District, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Hipogeo%202%20de%20Quinta%20do%20Anjo%20%2850450876603%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Hipogeo 2 de Quinta do Anjo (50450876603).jpg",
+    "imageAttribution": "Ángel M. Felicísimo from Mérida, España · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 2
   },
   {
@@ -14474,7 +14475,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 35,
     "blurb": "protected area in Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cegonha%20em%20cima%20do%20Moinho%20de%20%C3%81gua.tif?width=640",
-    "imageAttribution": "Wikimedia Commons · Cegonha em cima do Moinho de Água.tif",
+    "imageAttribution": "Raquel Soares · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -14490,7 +14491,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 35,
     "blurb": "crater lake",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lagoa%20das%20Furnas%2C%20ilha%20de%20S%C3%A3o%20Miguel%2C%20Arquip%C3%A9lago%20dos%20A%C3%A7ores%2C%20Portugal.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Lagoa das Furnas, ilha de São Miguel, Arquipélago dos Açores, Portugal.JPG",
+    "imageAttribution": "José Luís Ávila Silveira/Pedro Noronha e Costa · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -14506,7 +14507,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 35,
     "blurb": "beach in Burgau, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/East%20Praia%20Burgau.png?width=640",
-    "imageAttribution": "Wikimedia Commons · East Praia Burgau.png",
+    "imageAttribution": "Alpha x at English Wikipedia · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 3
   },
   {
@@ -14522,7 +14523,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 35,
     "blurb": "waterfall in Guadiana Valley Natural Park, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Pulo%20Do%20Lobo%202.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Pulo Do Lobo 2.jpg",
+    "imageAttribution": "Migaspinto · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -14538,7 +14539,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 35,
     "blurb": "protected area in Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Estu%C3%A1rio%20do%20Sado%203.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Estuário do Sado 3.JPG",
+    "imageAttribution": "Epinheiro · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 2
   },
   {
@@ -14554,7 +14555,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 32,
     "blurb": "waterfall in Madeira, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/25Fontes-Madeira-2013.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · 25Fontes-Madeira-2013.JPG",
+    "imageAttribution": "Bjørn Christian Tørrissen · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -14570,7 +14571,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 32,
     "blurb": "beach in Albufeira, Algarve, southern Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Falesia%20Beach%20seen%20from%20sea.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Falesia Beach seen from sea.JPG",
+    "imageAttribution": "Diana5cruz · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 3
   },
   {
@@ -14586,7 +14587,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 32,
     "blurb": "protected area in Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Banco%20de%20salemas%20%28Sarpa%20salpa%29%2C%20Madeira%2C%20Portugal%2C%202019-05-30%2C%20DD%2006.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Banco de salemas (Sarpa salpa), Madeira, Portugal, 2019-05-30, DD 06.jpg",
+    "imageAttribution": "Diego Delso · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -14602,7 +14603,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 32,
     "blurb": null,
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mira%20D%27Aire.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Mira D'Aire.JPG",
+    "imageAttribution": "Lara Maia · Wikimedia Commons · CC BY-SA 3.0 es",
     "suggestedHours": 2
   },
   {
@@ -14618,7 +14619,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 32,
     "blurb": "beach in Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Guincho%20June%202013-4.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Guincho June 2013-4.jpg",
+    "imageAttribution": "Alvesgaspar · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 3
   },
   {
@@ -14634,7 +14635,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 32,
     "blurb": "lake in Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Caldeir%C3%A3o%2C%20Caldeira%20Vulc%C3%A2nica%20com%20as%20suas%20respectivas%20lagoas%20da%20ilha%20do%20corvo%2C%20A%C3%A7ores%2C%20Portugal.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Caldeirão, Caldeira Vulcânica com as suas respectivas lagoas da ilha do corvo, Açores, Portugal.jpg",
+    "imageAttribution": "José Luís Ávila Silveira/Pedro Noronha e Costa · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -14650,7 +14651,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 32,
     "blurb": "Portuguese beach",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Arrifana.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Arrifana.JPG",
+    "imageAttribution": "User:Lusitana · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 3
   },
   {
@@ -14666,7 +14667,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 32,
     "blurb": "waterfall in Madeira, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Madeira%20Cascata%20do%20Veu%20da%20Noiva.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Madeira Cascata do Veu da Noiva.jpg",
+    "imageAttribution": "Unukorno · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 2
   },
   {
@@ -14682,7 +14683,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 29,
     "blurb": "beach in Arrábida Mountain, Setúbal, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Arr%C3%A1bida.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Arrábida.JPG",
+    "imageAttribution": "Husond at English Wikipedia · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 3
   },
   {
@@ -14698,7 +14699,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 29,
     "blurb": "beach in Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/011293%20-%20Costa%20Nova%20do%20Prado%20%2821171782496%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 011293 - Costa Nova do Prado (21171782496).jpg",
+    "imageAttribution": "M.Peinado from Alcalá de Henares, España · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 3
   },
   {
@@ -14714,7 +14715,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 29,
     "blurb": "beach in Arrábida Mountain, Setúbal, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Figueirinha.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Figueirinha.jpg",
+    "imageAttribution": "Aabasch · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 3
   },
   {
@@ -14730,7 +14731,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 29,
     "blurb": "beach in Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Praia%20da%20adraga%201.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Praia da adraga 1.jpg",
+    "imageAttribution": "Adrião · Wikimedia Commons · CC BY-SA 2.5",
     "suggestedHours": 3
   },
   {
@@ -14762,7 +14763,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 29,
     "blurb": "beach in Albufeira, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/View%20of%20Praia%20da%20Rocha%20Baixinha%2024%20September%202012.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · View of Praia da Rocha Baixinha 24 September 2012.JPG",
+    "imageAttribution": "stavros1 · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 3
   },
   {
@@ -14794,7 +14795,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 29,
     "blurb": "beach in São Martinho, Funchal, Madeira",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Praia%20Formosa%20-%20Black%20Pebble%20Beach%20in%20February%20Sunshine%20%2832823123041%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Praia Formosa - Black Pebble Beach in February Sunshine (32823123041).jpg",
+    "imageAttribution": "muffinn from Worcester, UK · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 3
   },
   {
@@ -14810,7 +14811,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 29,
     "blurb": "beach in Lagoa, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ferragudo1.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Ferragudo1.jpg",
+    "imageAttribution": "Joergsam · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 3
   },
   {
@@ -14826,7 +14827,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 29,
     "blurb": "beach in Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Estela%20beach%2C%20povoa%20de%20varzim.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Estela beach, povoa de varzim.jpg",
+    "imageAttribution": "Wikimedia Commons · GPL",
     "suggestedHours": 3
   },
   {
@@ -14842,7 +14843,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 29,
     "blurb": "maritime beach of Póvoa de Varzim, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Praia%20da%20Agu%C3%A7adoura.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Praia da Aguçadoura.JPG",
+    "imageAttribution": "Wikimedia Commons · CC BY 2.5",
     "suggestedHours": 3
   },
   {
@@ -14858,7 +14859,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 25,
     "blurb": "Portuguese beach in the Algarve region",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Praia%20da%20Albandeira-CTH.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Praia da Albandeira-CTH.JPG",
+    "imageAttribution": "CTHOE · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 3
   },
   {
@@ -14874,7 +14875,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 25,
     "blurb": "beach in Albufeira, Portugal",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/P283%20Praia%20da%20Oura%20Albufeira%201%20May%202014.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · P283 Praia da Oura Albufeira 1 May 2014.JPG",
+    "imageAttribution": "Kolforn · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 3
   },
   {
@@ -14891,7 +14892,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 100,
     "blurb": "central district and city in Edirne Province, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Edirne%20at%20sunrise%2021%2052%2030%20274000.jpeg?width=640",
-    "imageAttribution": "Wikimedia Commons · Edirne at sunrise 21 52 30 274000.jpeg",
+    "imageAttribution": "Robot8A · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": null
   },
   {
@@ -14908,7 +14909,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 99,
     "blurb": "capital of Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ankara%20%2816290014657%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Ankara (16290014657).jpg",
+    "imageAttribution": "Jorge Franganillo from Barcelona, Spain · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": null
   },
   {
@@ -14925,7 +14926,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 89,
     "blurb": "city in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Antalya%20city.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Antalya city.jpg",
+    "imageAttribution": "Lower Duden Falls.jpg:Saffron Blaze\nYivli Minaret Mosque Antalya.jpg:Saffron Blaze\nAntalya dusk.JPG:Mbilgen\nAntalyabeach.JPG:دانقولا\nHadrianstor Antalya.JPG:Elelicht\n\nAntalya - Hidirlik Tower.jpg:Imehling · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -14942,7 +14943,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 89,
     "blurb": "city in Bursa province in western Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/City%20of%20Bursa.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · City of Bursa.jpg",
+    "imageAttribution": "see above · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -14959,7 +14960,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 88,
     "blurb": "central district and city in Adana Province, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Adana1.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Adana1.jpg",
+    "imageAttribution": "Anatolianpride · Wikimedia Commons · Public domain",
     "suggestedHours": null
   },
   {
@@ -14975,7 +14976,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 87,
     "blurb": "city in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Gaziantepskyline.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Gaziantepskyline.jpg",
+    "imageAttribution": "Emz12 · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": null
   },
   {
@@ -14991,7 +14992,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 87,
     "blurb": "city in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Trabzon%2Charbour.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Trabzon,harbour.jpg",
+    "imageAttribution": "Bertramz · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -15007,7 +15008,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 86,
     "blurb": "city in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/City%20of%20Kayseri.png?width=640",
-    "imageAttribution": "Wikimedia Commons · City of Kayseri.png",
+    "imageAttribution": "Kadir Has Stadium in Kayseri.jpg:Namuslu\nKayseri-Meydan-sardic.jpg:Magnus Manske\nSivas Avenue Kayseri.JPG:Ahmet Gürsakal\nKayseri Meydan Panorama.jpg:Flickr upload bot\nKayseray32 fotoresim 18.png:Alperen93100\n\nKayseri-walls-sardic1.jpg:Magnus Manske · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": null
   },
   {
@@ -15023,7 +15024,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 86,
     "blurb": "metropolitan municipality in Central Anatolia, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/City%20of%20Konya.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · City of Konya.jpg",
+    "imageAttribution": "MevlanaMuseum.jpg:OgreBot\nCentral Konya.jpg:Quintucket\nKonya, tram No. 107 (01).jpg:Harold\nAziziye Mosque, Konya.JPG:Nedim Ardoğa\n\nA view of Avenue Nalçacı in Konya.jpg:Reality006 · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -15041,7 +15042,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 85,
     "blurb": "highest peak in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/NEO%20ararat%20big.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · NEO ararat big.jpg",
+    "imageAttribution": "NASA/JSC · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -15057,7 +15058,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 83,
     "blurb": "city in Southeastern Anatolia, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/City%20of%20Diyarbak%C4%B1r.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · City of Diyarbakır.jpg",
+    "imageAttribution": "Diyarbakirmosque218.jpg:Soman\nDiyarbakr Western City Wall.JPG: Bjørn Christian Tørrissen\nSeyrangeha Parkormanê Amed 2010.JPG: MikaelF\nDeriyê Çiyê Amed 2010.JPG: MikaelF\nOnGozluBridge.jpg: Noumenon\nNebi Mosque (6526104263).jpg: Magnus Manske\nGazi Pavillion.jpg: Cemallamec\nMinareya Çarling Amed 2010.JPG:MikaelF · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": null
   },
   {
@@ -15074,7 +15075,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 83,
     "blurb": "ancient Greek city in Anatolia",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ephesus%20Celsus%20Library%20Fa%C3%A7ade.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Ephesus Celsus Library Façade.jpg",
+    "imageAttribution": "Benh LIEU SONG · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -15090,7 +15091,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 83,
     "blurb": "city in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/%C5%9Eanl%C4%B1urfa%20skyline.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Şanlıurfa skyline.jpg",
+    "imageAttribution": "Damien Halleux Radermecker · Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": null
   },
   {
@@ -15106,7 +15107,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 82,
     "blurb": "central district and city in Amasya Province, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ye%C5%9Fil%C4%B1rmak2.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Yeşilırmak2.jpg",
+    "imageAttribution": "Ahmtzngn34 · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": null
   },
   {
@@ -15122,7 +15123,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 82,
     "blurb": "central district and city in Çanakkale Province, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Havadan%20cnk.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Havadan cnk.jpg",
+    "imageAttribution": "Myamya · Wikimedia Commons · Public domain",
     "suggestedHours": null
   },
   {
@@ -15138,7 +15139,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 82,
     "blurb": "city in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/TR%20Denizli%20asv2020-02%20img11%20view%20from%20Teleferik%20viewpoint.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · TR Denizli asv2020-02 img11 view from Teleferik viewpoint.jpg",
+    "imageAttribution": "A.Savin · Wikimedia Commons · FAL",
     "suggestedHours": null
   },
   {
@@ -15154,7 +15155,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 82,
     "blurb": "city in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Erzurum555.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Erzurum555.jpg",
+    "imageAttribution": "Erzurum Lala Mustafa Paşa Camii4.jpg: Eğitmen Mahmut \nErzurum Havuzbaşı Meydanı.jpg: Eğitmen Mahmut \nErzurum Cumhuriyet Caddesi3.jpg: Eğitmen Mahmut\nNene Hatun Heykeli (Erzurum Tabyalar).jpg: Eğitmen Mahmut\nErzurum Kiremitliktepe Kayakla Atlama Kuleleri1.jpg: Eğitmen Mahmut\n\nErzurum Özgürlük Anıtı.jpg: Eğitmen Mahmut · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -15170,7 +15171,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 82,
     "blurb": "metropolitan municipality in Central Anatolia, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Eski%C5%9Fehirdetekne.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Eskişehirdetekne.JPG",
+    "imageAttribution": "Vikiçizer · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -15186,7 +15187,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 82,
     "blurb": "city in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Collage%20of%20Mersin.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Collage of Mersin.jpg",
+    "imageAttribution": "Catholic Church of Mersin.jpg:Nedim Ardoğa\n126 Mersin.07.2006 resize.JPG:Avniyazici\n131 Mersin.07.2006 resize.JPG:Avniyazici\nKongre ve kültür merkezi.jpg:Nedim Ardoğa\nSportshall in Mersin, Turkey.JPG:Nedim Ardoğa · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -15202,7 +15203,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 82,
     "blurb": "city in northern Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Samsun%20-%20panoramio%20%2811%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Samsun - panoramio (11).jpg",
+    "imageAttribution": "sami yılmaz · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": null
   },
   {
@@ -15219,7 +15220,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 82,
     "blurb": "temple in Ephesus, one of the Seven Wonders of the Ancient World",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ephesos.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Ephesos.jpg",
+    "imageAttribution": "Arkiyolok · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -15235,7 +15236,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 82,
     "blurb": "city in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/City%20of%20Van%20%28view%20from%20Van%20Kalesi%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · City of Van (view from Van Kalesi).jpg",
+    "imageAttribution": "EvgenyGenkin · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": null
   },
   {
@@ -15251,7 +15252,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 81,
     "blurb": "central district and city in Batman Province, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Batman%28city%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Batman(city).jpg",
+    "imageAttribution": "Ferhat 72 at Turkish Wikipedia · Wikimedia Commons · Public domain",
     "suggestedHours": null
   },
   {
@@ -15267,7 +15268,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 81,
     "blurb": "central district and city of Kocaeli in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ferry%20at%20the%20Gulf%20of%20Izmit.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Ferry at the Gulf of Izmit.jpg",
+    "imageAttribution": "Gulf of Astacus · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -15283,7 +15284,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 81,
     "blurb": "city in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Trabzon%20Caddesi.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Trabzon Caddesi.jpg",
+    "imageAttribution": "Wiki akt · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -15299,7 +15300,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 81,
     "blurb": "central district and city in Kars Province, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Kars%20Panorama.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Kars Panorama.JPG",
+    "imageAttribution": "Bjørn Christian Tørrissen · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": null
   },
   {
@@ -15316,7 +15317,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 81,
     "blurb": "largest lake in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lakevanlandsat.jpeg?width=640",
-    "imageAttribution": "Wikimedia Commons · Lakevanlandsat.jpeg",
+    "imageAttribution": "Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -15332,7 +15333,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 81,
     "blurb": "city in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ulu%20Cami%20%C3%B6n%C3%BCnden%20Manisa%27n%C4%B1n%20g%C3%B6r%C3%BCn%C3%BC%C5%9F%C3%BC%202010.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Ulu Cami önünden Manisa'nın görünüşü 2010.jpg",
+    "imageAttribution": "Tarih · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": null
   },
   {
@@ -15348,7 +15349,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 81,
     "blurb": "central district and city in Sivas Province, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Sivas%2020-08-2009%20-%20panoramio.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Sivas 20-08-2009 - panoramio.jpg",
+    "imageAttribution": "Валерий Дед · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": null
   },
   {
@@ -15365,7 +15366,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 79,
     "blurb": "palace museum in Istanbul, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Topkapi%20Palace%20Seen%20From%20Harem.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Topkapi Palace Seen From Harem.JPG",
+    "imageAttribution": "Bjørn Christian Tørrissen · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -15382,7 +15383,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 77,
     "blurb": "ancient city of Ionia in modern-day Turkey and UNESCO World Heritage Site",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Temple%20of%20Trajan%2C%20Pergamon%2001.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Temple of Trajan, Pergamon 01.jpg",
+    "imageAttribution": "Bernard Gagnon · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -15399,7 +15400,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 76,
     "blurb": "hot springs in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Pamukkale%2C%20Denizli%202026%2068.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Pamukkale, Denizli 2026 68.jpg",
+    "imageAttribution": "Biologg · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -15416,7 +15417,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 75,
     "blurb": "urban waterway and the primary inlet of the Bosphorus in Istanbul, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Istanbul%20panorama%20%2816293921746%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Istanbul panorama (16293921746).jpg",
+    "imageAttribution": "Juraj Patekar · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 2
   },
   {
@@ -15433,7 +15434,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 74,
     "blurb": "mountain and UNESCO World Heritage Site in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Nemrut%20Mountain%20Peak.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Nemrut Mountain Peak.JPG",
+    "imageAttribution": "Bjørn Christian Tørrissen · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 1
   },
   {
@@ -15450,7 +15451,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 74,
     "blurb": "ancient city in Anatolia, today an archaeological site at Sart, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/The%20Bath-Gymnasium%20complex%20at%20Sardis%2C%20late%202nd%20-%20early%203rd%20century%20AD%2C%20Sardis%2C%20Turkey%20%2817098680002%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · The Bath-Gymnasium complex at Sardis, late 2nd - early 3rd century AD, Sardis, Turkey (17098680002).jpg",
+    "imageAttribution": "Carole Raddato from FRANKFURT, Germany · Wikimedia Commons · CC BY-SA 2.0",
     "suggestedHours": 2
   },
   {
@@ -15466,7 +15467,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 72,
     "blurb": "Atatürk's mausoleum in Ankara, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ankara%20asv2021-10%20img04%20An%C4%B1tkabir.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Ankara asv2021-10 img04 Anıtkabir.jpg",
+    "imageAttribution": "A.Savin · Wikimedia Commons · FAL",
     "suggestedHours": 2
   },
   {
@@ -15482,7 +15483,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 72,
     "blurb": "palace in Istanbul, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Palacio%20de%20Dolmabah%C3%A7e%2C%20Estambul%2C%20Turqu%C3%ADa%2C%202024-09-29%2C%20DD%2024.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Palacio de Dolmabahçe, Estambul, Turquía, 2024-09-29, DD 24.jpg",
+    "imageAttribution": "Diego Delso · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -15498,7 +15499,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 70,
     "blurb": "endorheic basin",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lake%20Tuz.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Lake Tuz.jpg",
+    "imageAttribution": "NASA · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -15515,7 +15516,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 70,
     "blurb": "volcano in Kayseri, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Turkey.Mount%20Erciyes01.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Turkey.Mount Erciyes01.jpg",
+    "imageAttribution": "Georges Jansoone JoJan · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 2
   },
   {
@@ -15531,7 +15532,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 69,
     "blurb": "lighthouse at the southern entrance of the Bosphorus in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Istanbul%20asv2020-02%20img53%20Maiden%27s%20Tower.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Istanbul asv2020-02 img53 Maiden's Tower.jpg",
+    "imageAttribution": "A.Savin · Wikimedia Commons · FAL",
     "suggestedHours": 2
   },
   {
@@ -15547,7 +15548,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 68,
     "blurb": "mosque in İstanbul, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Princova%20me%C5%A1ita.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Princova mešita.jpg",
+    "imageAttribution": "Ondřej Žváček · Wikimedia Commons · CC BY 2.5",
     "suggestedHours": 2
   },
   {
@@ -15563,7 +15564,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 67,
     "blurb": "cistern of Byzantine Constantinople",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cisterna%20Bas%C3%ADlica%2C%20Estambul%2C%20Turqu%C3%ADa%2C%202024-09-28%2C%20DD%2058-60%20HDR.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Cisterna Basílica, Estambul, Turquía, 2024-09-28, DD 58-60 HDR.jpg",
+    "imageAttribution": "Diego Delso · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -15579,7 +15580,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 67,
     "blurb": "mosque in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Divrigi%20complex%20DSCF3028.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Divrigi complex DSCF3028.jpg",
+    "imageAttribution": "R Prazeres · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -15595,7 +15596,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 67,
     "blurb": "library constructed over the burial of the Roman senator Ti. Iulius Celsus Polemaeanus in Ephesus",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ephesus%20Celsus%20Library%20Fa%C3%A7ade.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Ephesus Celsus Library Façade.jpg",
+    "imageAttribution": "Benh LIEU SONG · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -15611,7 +15612,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 66,
     "blurb": "mountain in western Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Uludag.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Uludag.JPG",
+    "imageAttribution": "Julian Nyča · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 1
   },
   {
@@ -15627,7 +15628,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 65,
     "blurb": "human settlement",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/K%C3%BCltepeOberstadtPalast.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · KültepeOberstadtPalast.jpg",
+    "imageAttribution": "Klaus-Peter Simon · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -15644,7 +15645,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 65,
     "blurb": "volcano in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Vulkan%20Hasan%20Bagi.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Vulkan Hasan Bagi.jpg",
+    "imageAttribution": "Dr. Hans-Helmut Bissem · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -15661,7 +15662,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 64,
     "blurb": "national park in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/00%203598%20Felsformation%20aus%20vulkanischer%20Ascheablagerung%20-%20Felswohnungen.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · 00 3598 Felsformation aus vulkanischer Ascheablagerung - Felswohnungen.jpg",
+    "imageAttribution": "W. Bulach · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -15677,7 +15678,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 64,
     "blurb": "lake in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lake%20Beysehir%20NASA.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Lake Beysehir NASA.jpg",
+    "imageAttribution": "Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -15693,7 +15694,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 64,
     "blurb": "lake in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lake%20Egirdir.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Lake Egirdir.jpg",
+    "imageAttribution": "Ingo Mehling · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -15709,7 +15710,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 64,
     "blurb": "Ottoman castle in Istanbul",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Twierdza%20Rumeli%20Istambu%C5%82%20RB1.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Twierdza Rumeli Istambuł RB1.jpg",
+    "imageAttribution": "Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -15725,7 +15726,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 63,
     "blurb": "archaeological site in Reyhanlı, Hatay, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Archaeological%20site%20of%20Alalakh%20%28Tell%20Atchana%29.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Archaeological site of Alalakh (Tell Atchana).JPG",
+    "imageAttribution": "Fkitselis · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -15741,7 +15742,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 63,
     "blurb": "building in Istanbul, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Bosfor%20B17-35.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Bosfor B17-35.jpg",
+    "imageAttribution": "User:Roweromaniak · Wikimedia Commons · CC BY-SA 2.5",
     "suggestedHours": 2
   },
   {
@@ -15757,7 +15758,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 63,
     "blurb": "mountain pass in southern Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Puertas%20Cil%C3%ADcias.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Puertas Cilícias.jpg",
+    "imageAttribution": "No machine-readable author provided. Teogomez assumed (based on copyright claims). · Wikimedia Commons · Public domain",
     "suggestedHours": 1
   },
   {
@@ -15773,7 +15774,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 63,
     "blurb": "palace",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Istanbul%20asv2020-02%20img59%20%C3%87%C4%B1ra%C4%9Fan%20Palace.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Istanbul asv2020-02 img59 Çırağan Palace.jpg",
+    "imageAttribution": "A.Savin · Wikimedia Commons · FAL",
     "suggestedHours": 2
   },
   {
@@ -15789,7 +15790,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 63,
     "blurb": "mountain in Bitlis Province, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Nemrut%20Vulcano.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Nemrut Vulcano.jpg",
+    "imageAttribution": "NASA · Wikimedia Commons · Public domain",
     "suggestedHours": 1
   },
   {
@@ -15805,7 +15806,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 63,
     "blurb": "palace in Istanbul, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/%C4%B0stanbul%205716.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · İstanbul 5716.jpg",
+    "imageAttribution": "User:Darwinek · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -15821,7 +15822,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 62,
     "blurb": "ancient Hittite site in northern Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Sphinx%20Gate%2C%20Alaca%20H%C3%B6y%C3%BCk%2002.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Sphinx Gate, Alaca Höyük 02.jpg",
+    "imageAttribution": "Bernard Gagnon · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -15838,7 +15839,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 62,
     "blurb": "volcano in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Suphan%2001.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Suphan 01.jpg",
+    "imageAttribution": "EvgenyGenkin · Wikimedia Commons · CC BY 2.5",
     "suggestedHours": 2
   },
   {
@@ -15854,7 +15855,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 61,
     "blurb": "lake near İznik, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lake%20Iznik%20NASA.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Lake Iznik NASA.jpg",
+    "imageAttribution": "Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -15870,7 +15871,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 60,
     "blurb": "fortification",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/TurkeyBodrumCastle.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · TurkeyBodrumCastle.jpg",
+    "imageAttribution": "Horvat · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -15886,7 +15887,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 60,
     "blurb": "Byzantine imperial palace complex",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Pier%20Great%20Palace%20Istanbul%20%281%29.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Pier Great Palace Istanbul (1).JPG",
+    "imageAttribution": "Gryffindor · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -15902,7 +15903,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 60,
     "blurb": "mountain in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/KackarDagi%20fromNorth%20hory.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · KackarDagi fromNorth hory.jpg",
+    "imageAttribution": "Wikimol · Wikimedia Commons · CC BY-SA 2.5",
     "suggestedHours": 1
   },
   {
@@ -15918,7 +15919,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 59,
     "blurb": "observation tower and shopping mall in Ankara, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ankara%20asv2021-10%20img10%20Atakule.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Ankara asv2021-10 img10 Atakule.jpg",
+    "imageAttribution": "A.Savin · Wikimedia Commons · FAL",
     "suggestedHours": 2
   },
   {
@@ -15934,7 +15935,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 59,
     "blurb": "palace in Constantinople",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Bucoleon%20March%202008.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Bucoleon March 2008.JPG",
+    "imageAttribution": "Gryffindor · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -15950,7 +15951,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 59,
     "blurb": "lake in Burdur and Isparta provinces, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lake%20Burdur%20NASA.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Lake Burdur NASA.jpg",
+    "imageAttribution": "Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -15966,7 +15967,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 58,
     "blurb": "castle in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/AntepKale2%20%28cropped%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · AntepKale2 (cropped).jpg",
+    "imageAttribution": "Klaus-Peter Simon · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -15982,7 +15983,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 58,
     "blurb": "The Cage, part of the Imperial Harem of the Ottoman empire",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Veliahd%20Dairesi%20Topkapi%20Istanbul%202007.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Veliahd Dairesi Topkapi Istanbul 2007.jpg",
+    "imageAttribution": "Gryffindor  This  panoramic image was created with Autostitch (stitched images may differ from reality). · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -15998,7 +15999,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 58,
     "blurb": "mountain in Manisa, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mount%20Sipylus%20Manisa%20Turkey%20Atalani%20Lake.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Mount Sipylus Manisa Turkey Atalani Lake.jpg",
+    "imageAttribution": "Mr. V. Yuksel · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 1
   },
   {
@@ -16014,7 +16015,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 57,
     "blurb": "castle in Ankara, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ankara%20Castle.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Ankara Castle.jpg",
+    "imageAttribution": "Bernard Gagnon · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -16030,7 +16031,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 56,
     "blurb": "massive stone fortification in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Van%20Fortress%20From%20Northwest.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Van Fortress From Northwest.JPG",
+    "imageAttribution": "Bjørn Christian Tørrissen · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -16046,7 +16047,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 55,
     "blurb": "group of waterfalls in the province of Antalya, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Duden%20steps.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Duden steps.jpg",
+    "imageAttribution": "karmakolle · Wikimedia Commons · CC0",
     "suggestedHours": 2
   },
   {
@@ -16063,7 +16064,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 55,
     "blurb": "volcano in eastern Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Nature%20stone%20wall.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Nature stone wall.jpg",
+    "imageAttribution": "Mahmud2182 · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -16079,7 +16080,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 55,
     "blurb": "mountain",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Palandoken%20Erzurum%202009.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Palandoken Erzurum 2009.JPG",
+    "imageAttribution": "Bjørn Christian Tørrissen · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 1
   },
   {
@@ -16095,7 +16096,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 54,
     "blurb": "castle",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Alanya%20kale.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Alanya kale.jpg",
+    "imageAttribution": "Luke_33 · Wikimedia Commons · CC BY 2.5 pl",
     "suggestedHours": 2
   },
   {
@@ -16111,7 +16112,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 54,
     "blurb": "mountain in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/The%20Structure%20Claimed%20to%20be%20the%20Noah%27s%20Ark%20near%20the%20Mount%20Ararat%20in%20Turkey.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · The Structure Claimed to be the Noah's Ark near the Mount Ararat in Turkey.jpg",
+    "imageAttribution": "Mfikretyilmaz · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 2
   },
   {
@@ -16127,7 +16128,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 54,
     "blurb": "castle ruin",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Hromkla%20Halfeti.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Hromkla Halfeti.jpg",
+    "imageAttribution": "Ferrus · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -16143,7 +16144,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 53,
     "blurb": "castle",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Baghras2.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Baghras2.jpg",
+    "imageAttribution": "No machine-readable author provided. Godfried Warreyn assumed (based on copyright claims). · Wikimedia Commons · CC BY 2.5",
     "suggestedHours": 2
   },
   {
@@ -16160,7 +16161,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 53,
     "blurb": "national park in Bolu Province, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/TR%20Yedig%C3%B6ller%20asv2021-10%20img16.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · TR Yedigöller asv2021-10 img16.jpg",
+    "imageAttribution": "A.Savin · Wikimedia Commons · FAL",
     "suggestedHours": 5
   },
   {
@@ -16176,7 +16177,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 52,
     "blurb": "cave in Döşemealtı, Antalya, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Karain%20-%20Cave%20Chamber.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Karain - Cave Chamber.jpg",
+    "imageAttribution": "Ingo Mehling · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -16193,7 +16194,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 52,
     "blurb": "national park in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Sakl%C4%B1kent%20Kanyonu%20%282%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Saklıkent Kanyonu (2).jpg",
+    "imageAttribution": "Cobija · Wikimedia Commons · CC0",
     "suggestedHours": 5
   },
   {
@@ -16210,7 +16211,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 51,
     "blurb": "national park in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ku%C5%9Fadas%C4%B1%20from%20Milli%20Park.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Kuşadası from Milli Park.jpg",
+    "imageAttribution": "ahenobarbus · Wikimedia Commons · CC BY 2.0",
     "suggestedHours": 5
   },
   {
@@ -16226,7 +16227,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 50,
     "blurb": "cave",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Damlata%C5%9F.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Damlataş.jpg",
+    "imageAttribution": "Kostya Wiki · Wikimedia Commons · CC BY-SA 2.5",
     "suggestedHours": 2
   },
   {
@@ -16242,7 +16243,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 49,
     "blurb": "aquarium in Istanbul, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/%C4%B0stanbul%20Akvaryumun%20giri%C5%9Fi.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · İstanbul Akvaryumun girişi.jpg",
+    "imageAttribution": "Tarih · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -16258,7 +16259,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 49,
     "blurb": "cave in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/P%C4%B1narg%C3%B6z%C3%BC-ISPARTA-TURKEY.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Pınargözü-ISPARTA-TURKEY.jpg",
+    "imageAttribution": "Bekir Işıldak · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -16274,7 +16275,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 45,
     "blurb": "waterfall in Manavgat, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Manavgat%20waterfall%20by%20tomgensler.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Manavgat waterfall by tomgensler.JPG",
+    "imageAttribution": "Thomas Gensler · Wikimedia Commons · CC BY-SA 2.0 de",
     "suggestedHours": 2
   },
   {
@@ -16290,7 +16291,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 45,
     "blurb": "waterfall",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Tortum%20Waterfall%20%282%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Tortum Waterfall (2).jpg",
+    "imageAttribution": "Jaba1977 · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -16339,7 +16340,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 43,
     "blurb": "cave in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Karaca%20Ma%C4%9Faras%C4%B1%20%2813%29.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Karaca Mağarası (13).jpg",
+    "imageAttribution": "En Merker · Wikimedia Commons · CC0",
     "suggestedHours": 2
   },
   {
@@ -16355,7 +16356,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 43,
     "blurb": "largest and the most biodiverse national park in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ovacik1.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Ovacik1.jpg",
+    "imageAttribution": "Arser · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 5
   },
   {
@@ -16371,7 +16372,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 43,
     "blurb": "mountain pass in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Zigana.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Zigana.JPG",
+    "imageAttribution": "Elelicht · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 1
   },
   {
@@ -16388,7 +16389,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 42,
     "blurb": "Cave in Pazar, Tokat, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ballica-magarasi%20109064.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Ballica-magarasi 109064.jpg",
+    "imageAttribution": "Ümit1991 · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -16404,7 +16405,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 42,
     "blurb": "telecommunications towers in Istanbul, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Camlica%20Tower.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Camlica Tower.jpg",
+    "imageAttribution": "Korybiko · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -16436,7 +16437,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 42,
     "blurb": "city gate of Constantinople",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Istanbul%20asv2021-11%20img57%20Yedikule.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Istanbul asv2021-11 img57 Yedikule.jpg",
+    "imageAttribution": "A.Savin · Wikimedia Commons · FAL",
     "suggestedHours": 2
   },
   {
@@ -16452,7 +16453,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 42,
     "blurb": "national park and and wildlife refuge in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Karatepe%20Stadtmauer.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Karatepe Stadtmauer.JPG",
+    "imageAttribution": "Elelicht · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -16469,7 +16470,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 42,
     "blurb": "beach in Antalya, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Konyaalt%C4%B1%20Plaj%C4%B1%20-%20panoramio.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Konyaaltı Plajı - panoramio.jpg",
+    "imageAttribution": "reyhan_kahraman@hotm… · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 3
   },
   {
@@ -16485,7 +16486,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 42,
     "blurb": "canyon and a national park in Antalya Province, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/K%C3%B6pr%C3%BCl%C3%BC%20Kanyon.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Köprülü Kanyon.JPG",
+    "imageAttribution": "Gökhannergiz at Turkish Wikipedia · Wikimedia Commons · Public domain",
     "suggestedHours": 2
   },
   {
@@ -16501,7 +16502,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 42,
     "blurb": "national park and and wildlife refuge in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/K%C3%BCre%20Da%C4%9Flar%C4%B1%20G%C3%BCll%C3%BCce%20K%C3%B6y%C3%BC%20Kanyonu%202014-06-15%2019-58.jpeg?width=640",
-    "imageAttribution": "Wikimedia Commons · Küre Dağları Güllüce Köyü Kanyonu 2014-06-15 19-58.jpeg",
+    "imageAttribution": "User:Mklbyrk · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -16517,7 +16518,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 40,
     "blurb": "show cave in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Dupnisa%20Cave%2C%20Kirklareli%20-%20Ahmet%20Baris%20ISITAN.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Dupnisa Cave, Kirklareli - Ahmet Baris ISITAN.jpg",
+    "imageAttribution": "Ahmet Baris ISITAN · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -16533,7 +16534,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 40,
     "blurb": "extinct volcano in Kula, Manisa Province, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/The%20scoria%20cone%20at%20the%20Kula%20Volcano.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · The scoria cone at the Kula Volcano.JPG",
+    "imageAttribution": "Ksmithoo · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -16549,7 +16550,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 40,
     "blurb": "national park in Edirne, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/A%20Day%20in%20Gala%20Lake%20National%20Park.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · A Day in Gala Lake National Park.jpg",
+    "imageAttribution": "Cems77 · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -16565,7 +16566,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 40,
     "blurb": "national park and and wildlife refuge in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ilgaz%20Da%C4%9F%C4%B1.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Ilgaz Dağı.jpg",
+    "imageAttribution": "Nedim Ardoğa (talk) · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -16581,7 +16582,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 40,
     "blurb": "national park in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/TR%20K%C4%B1z%C4%B1lcahamam%20asv2021-10%20img04.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · TR Kızılcahamam asv2021-10 img04.jpg",
+    "imageAttribution": "A.Savin · Wikimedia Commons · FAL",
     "suggestedHours": 5
   },
   {
@@ -16597,7 +16598,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 38,
     "blurb": "national park in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Aladaglar%20detail.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Aladaglar detail.JPG",
+    "imageAttribution": "Bicounet · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -16613,7 +16614,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 38,
     "blurb": "national park in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Alt%C4%B1nbesik.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Altınbesik.jpg",
+    "imageAttribution": "Masis Usenmez · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -16629,7 +16630,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 38,
     "blurb": "national park in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/S%C3%BCmela%20manast%C4%B1r%C4%B102.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Sümela manastırı02.jpg",
+    "imageAttribution": "umit sahin · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -16645,7 +16646,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 38,
     "blurb": "Mountain pass in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/IskenderunShorelineWithMountain092012.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · IskenderunShorelineWithMountain092012.jpg",
+    "imageAttribution": "Locus1891 · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 1
   },
   {
@@ -16661,7 +16662,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 38,
     "blurb": null,
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Girlevik%20Waterfall%2C%20Erzincan%2C%20Turkey.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Girlevik Waterfall, Erzincan, Turkey.jpg",
+    "imageAttribution": "Medgeorgia · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 2
   },
   {
@@ -16693,7 +16694,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 38,
     "blurb": "national reservate in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/%C4%B0%C4%9FneadaFloodplainForestsNP%20%2815%29.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · İğneadaFloodplainForestsNP (15).JPG",
+    "imageAttribution": "CeeGee · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -16710,7 +16711,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 38,
     "blurb": "beach between Kaş and Kalkan in southwestern Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/KAPUTA%C5%9E%20BEACH%20-%20panoramio%20-%20Haluk%20Comertel.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · KAPUTAŞ BEACH - panoramio - Haluk Comertel.jpg",
+    "imageAttribution": "Haluk Comertel · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 3
   },
   {
@@ -16726,7 +16727,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 38,
     "blurb": "national park and and wildlife refuge in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Karag%C3%B6l-Sahara%20National%20Park%20entrance.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Karagöl-Sahara National Park entrance.jpg",
+    "imageAttribution": "BSRF · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -16742,7 +16743,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 38,
     "blurb": "national park and and wildlife refuge in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lake%20Kovada.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Lake Kovada.jpg",
+    "imageAttribution": "Spica-Vega Photo Arts Banu Nazikcan · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -16758,7 +16759,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 38,
     "blurb": "national park and and wildlife refuge in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Olympos%20Gesamtansicht.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · Olympos Gesamtansicht.JPG",
+    "imageAttribution": "Gunthram · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -16774,7 +16775,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 38,
     "blurb": "Turkish beach",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Patara%20D%C3%BCnen.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Patara Dünen.jpg",
+    "imageAttribution": "Hauseltr at German Wikipedia · Wikimedia Commons · Public domain",
     "suggestedHours": 3
   },
   {
@@ -16790,7 +16791,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 38,
     "blurb": "Nature park in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ulubey%20Canyon%20Usak%20Province%20Turkey.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Ulubey Canyon Usak Province Turkey.jpg",
+    "imageAttribution": "Mr. Arif Solak · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -16806,7 +16807,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 38,
     "blurb": "national park and and wildlife refuge in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Yozgat-%C3%A7aml%C4%B1%C4%9F%C4%B1-milli-park%C4%B1.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Yozgat-çamlığı-milli-parkı.jpg",
+    "imageAttribution": "Sevdeartun · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -16822,7 +16823,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 35,
     "blurb": "national park in northwestern Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Kirli%20Cennet.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Kirli Cennet.jpg",
+    "imageAttribution": "Wb serhat · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -16838,7 +16839,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 35,
     "blurb": "waterfall on Göksu river in Kayseri Province, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/SIZIR%20SELALESI%202009%2004%2018.JPG?width=640",
-    "imageAttribution": "Wikimedia Commons · SIZIR SELALESI 2009 04 18.JPG",
+    "imageAttribution": "Kasım GÖKSU · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 2
   },
   {
@@ -16854,7 +16855,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 35,
     "blurb": "national park in southwestern Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Kavakarasi.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Kavakarasi.jpg",
+    "imageAttribution": "Maria Jonker · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -16870,7 +16871,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 35,
     "blurb": "national park in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Sultan%20sazl%C4%B1%C4%9F%C4%B1.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Sultan sazlığı.jpg",
+    "imageAttribution": "User:21gazi · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -16886,7 +16887,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 35,
     "blurb": "national park in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Sumatar1.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Sumatar1.jpg",
+    "imageAttribution": "Klaus-Peter Simon · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -16934,7 +16935,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 32,
     "blurb": "national park in Konya, Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Eflatunpinar.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Eflatunpinar.jpg",
+    "imageAttribution": "Noumenon · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -16950,7 +16951,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 32,
     "blurb": "national park and and wildlife refuge in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Amphitheatre%20Termessos.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Amphitheatre Termessos.jpg",
+    "imageAttribution": "Saffron Blaze · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 5
   },
   {
@@ -16966,7 +16967,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 32,
     "blurb": "protected area of natural habitats and historically significant structures in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Yaz%C4%B1l%C4%B1%20kanyaon%20-%20panoramio.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Yazılı kanyaon - panoramio.jpg",
+    "imageAttribution": "Cafer Ari · Wikimedia Commons · CC BY 3.0",
     "suggestedHours": 2
   },
   {
@@ -17014,7 +17015,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 29,
     "blurb": "national park in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Makinali%20T%C3%BCfek.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Makinali Tüfek.jpg",
+    "imageAttribution": "Wikimedia Commons · Public domain",
     "suggestedHours": 5
   },
   {
@@ -17030,7 +17031,7 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 29,
     "blurb": "national park in Turkey",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Above%20the%20forest.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Above the forest.jpg",
+    "imageAttribution": "Perseusfs · Wikimedia Commons · CC BY-SA 4.0",
     "suggestedHours": 5
   },
   {
@@ -17046,10 +17047,4880 @@ export const DISCOVER_PLACES: readonly DiscoverPlace[] = [
     "rank": 25,
     "blurb": "Long, sandy beach in Alanya",
     "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Kleopatra%20beach.jpg?width=640",
-    "imageAttribution": "Wikimedia Commons · Kleopatra beach.jpg",
+    "imageAttribution": "Shoorick · Wikimedia Commons · CC BY-SA 3.0",
     "suggestedHours": 3
+  },
+  {
+    "id": "us-new-york-city",
+    "name": "New York City",
+    "countryCode": "US",
+    "region": "New York",
+    "lat": 40.71278,
+    "lng": -74.00611,
+    "categories": [
+      "must_visit",
+      "cities"
+    ],
+    "rank": 100,
+    "blurb": "most populous city in the United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/NYC%20Downtown%20Manhattan%20Skyline%20seen%20from%20Paulus%20Hook%202019-12-20%20IMG%207347%20FRD%20%28cropped%29.jpg?width=640",
+    "imageAttribution": "Fred Hsu on en.wikipedia · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": null
+  },
+  {
+    "id": "us-statue-of-liberty",
+    "name": "Statue of Liberty",
+    "countryCode": "US",
+    "region": "New York City",
+    "lat": 40.68921,
+    "lng": -74.04443,
+    "categories": [
+      "must_visit",
+      "landmarks"
+    ],
+    "rank": 91,
+    "blurb": "monument in New York",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Statue%20of%20Liberty%20and%20a%20sightseeing%20boat%2C%20Liberty%20Island%2C%20New%20York.jpg?width=640",
+    "imageAttribution": "Christian David · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-white-house",
+    "name": "White House",
+    "countryCode": "US",
+    "region": "Washington, D.C.",
+    "lat": 38.89778,
+    "lng": -77.03667,
+    "categories": [
+      "must_visit",
+      "landmarks"
+    ],
+    "rank": 90,
+    "blurb": "official residence and office of the President of the United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/WhiteHouseSouthFacade.JPG?width=640",
+    "imageAttribution": "This image or media was taken or created by Matt H. Wade. To see his entire portfolio, click here.@thatmattwade\n\n This image is protected by copyright! If you would like to use it, please read this first. · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-niagara-falls",
+    "name": "Niagara Falls",
+    "countryCode": "US",
+    "region": "New York",
+    "lat": 43.08,
+    "lng": -79.071,
+    "categories": [
+      "must_visit",
+      "nature"
+    ],
+    "rank": 89,
+    "blurb": "three waterfalls that straddle the international border between Canada and the United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Niagara%20Falls%20USA%20Canada%20from%20Skylon%20Tower%20on%202002-05-28%2C%20full%20size.jpg?width=640",
+    "imageAttribution": "Robert F. Tobler · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-dover",
+    "name": "Dover",
+    "countryCode": "US",
+    "region": "Kent County",
+    "lat": 39.16166,
+    "lng": -75.52571,
+    "categories": [
+      "must_visit",
+      "cities"
+    ],
+    "rank": 88,
+    "blurb": "capital city of the U.S. state of Delaware and seat of Kent County",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Dover%20Delaware.jpg?width=640",
+    "imageAttribution": "Tim Kiser (w:User:Malepheasant) · Wikimedia Commons · CC BY-SA 2.5",
+    "suggestedHours": null
+  },
+  {
+    "id": "us-grand-canyon",
+    "name": "Grand Canyon",
+    "countryCode": "US",
+    "region": "Arizona",
+    "lat": 36.0975,
+    "lng": -112.09528,
+    "categories": [
+      "must_visit",
+      "nature"
+    ],
+    "rank": 86,
+    "blurb": "steep-sided canyon carved by the Colorado River in Arizona, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Grand%20Canyon%20view%20from%20Pima%20Point%202010.jpg?width=640",
+    "imageAttribution": "Chensiyuan · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-yellowstone-national-park",
+    "name": "Yellowstone National Park",
+    "countryCode": "US",
+    "region": "Montana",
+    "lat": 44.6,
+    "lng": -110.5,
+    "categories": [
+      "must_visit",
+      "national_parks",
+      "nature"
+    ],
+    "rank": 86,
+    "blurb": "first national park in the world, located in Wyoming, Montana, and Idaho in the United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Grand%20Prismatic%20Spring%202013.jpg?width=640",
+    "imageAttribution": "James St. John from Newark, Ohio · Wikimedia Commons · CC BY 2.0",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-lake-michigan",
+    "name": "Lake Michigan",
+    "countryCode": "US",
+    "region": "Wisconsin",
+    "lat": 44.00787,
+    "lng": -86.75645,
+    "categories": [
+      "must_visit",
+      "nature"
+    ],
+    "rank": 85,
+    "blurb": "one of the Great Lakes of North America",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lake%20Michigan%20in%20true%20color.jpg?width=640",
+    "imageAttribution": "Earth Science and Remote Sensing Unit, NASA Johnson Space Center, ISS Expedition 60 · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-lake-superior",
+    "name": "Lake Superior",
+    "countryCode": "US",
+    "region": "Michigan",
+    "lat": 47.52882,
+    "lng": -87.76002,
+    "categories": [
+      "nature"
+    ],
+    "rank": 85,
+    "blurb": "largest of the Great Lakes of North America",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lake%20Superior%2C%20ISS.jpg?width=640",
+    "imageAttribution": "NASA · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-cambridge",
+    "name": "Cambridge",
+    "countryCode": "US",
+    "region": "Middlesex County",
+    "lat": 42.375,
+    "lng": -71.10611,
+    "categories": [
+      "must_visit",
+      "cities"
+    ],
+    "rank": 84,
+    "blurb": "city in Middlesex County, Massachusetts, United States of America",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cambridge%20Skyline.jpg?width=640",
+    "imageAttribution": "en:User:Shinkuken · Wikimedia Commons · Public domain",
+    "suggestedHours": null
+  },
+  {
+    "id": "us-lake-erie",
+    "name": "Lake Erie",
+    "countryCode": "US",
+    "region": "Pennsylvania",
+    "lat": 42.25,
+    "lng": -80.99972,
+    "categories": [
+      "nature"
+    ],
+    "rank": 84,
+    "blurb": "one of the Great Lakes in North America",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/A1.23188.1851.LakeErie.143.250m.jpg?width=640",
+    "imageAttribution": "NOAA · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-lake-ontario",
+    "name": "Lake Ontario",
+    "countryCode": "US",
+    "region": "Ontario",
+    "lat": 43.72889,
+    "lng": -78.10639,
+    "categories": [
+      "nature"
+    ],
+    "rank": 84,
+    "blurb": "one of the Great Lakes in North America",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/ISS-36%20Lake%20Ontario%20%28horizontal%29.jpg?width=640",
+    "imageAttribution": "NASA · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-rochester",
+    "name": "Rochester",
+    "countryCode": "US",
+    "region": "Monroe County",
+    "lat": 43.16556,
+    "lng": -77.61139,
+    "categories": [
+      "must_visit",
+      "cities"
+    ],
+    "rank": 84,
+    "blurb": "county seat of Monroe County, New York, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Downtown%20Rochester%2C%20NY%20HDR%20by%20patrickashley.jpg?width=640",
+    "imageAttribution": "Patrick Ashley · Wikimedia Commons · CC BY 2.0",
+    "suggestedHours": null
+  },
+  {
+    "id": "us-lake-huron",
+    "name": "Lake Huron",
+    "countryCode": "US",
+    "region": "Ontario",
+    "lat": 44.59258,
+    "lng": -82.75629,
+    "categories": [
+      "nature"
+    ],
+    "rank": 83,
+    "blurb": "one of the Great Lakes of North America",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lake%20Huron%20in%20winter.jpg?width=640",
+    "imageAttribution": "NASA · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-mount-rushmore",
+    "name": "Mount Rushmore",
+    "countryCode": "US",
+    "region": "Pennington County",
+    "lat": 43.87889,
+    "lng": -103.45917,
+    "categories": [
+      "must_visit",
+      "viewpoints"
+    ],
+    "rank": 83,
+    "blurb": "mountain in South Dakota featuring a sculpture of four US presidents",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mount%20Rushmore%20detail%20view%20%28100MP%29.jpg?width=640",
+    "imageAttribution": "Thomas Wolf, www.foto-tw.de · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 1
+  },
+  {
+    "id": "us-palo-alto",
+    "name": "Palo Alto",
+    "countryCode": "US",
+    "region": "Santa Clara County",
+    "lat": 37.41667,
+    "lng": -122.13333,
+    "categories": [
+      "must_visit",
+      "cities"
+    ],
+    "rank": 83,
+    "blurb": "city in Santa Clara County, California, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Palo%20Alto%2C%20California%20%28City%20Hall%29%202004.jpg?width=640",
+    "imageAttribution": "Nader Moussa · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": null
+  },
+  {
+    "id": "us-yosemite-national-park",
+    "name": "Yosemite National Park",
+    "countryCode": "US",
+    "region": "California",
+    "lat": 37.7425,
+    "lng": -119.5375,
+    "categories": [
+      "must_visit",
+      "national_parks"
+    ],
+    "rank": 81,
+    "blurb": "national park in California, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Half%20Dome%20with%20Eastern%20Yosemite%20Valley%20%2850MP%29.jpg?width=640",
+    "imageAttribution": "Thomas Wolf, www.foto-tw.de · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-alexandria",
+    "name": "Alexandria",
+    "countryCode": "US",
+    "region": "Virginia",
+    "lat": 38.80472,
+    "lng": -77.04722,
+    "categories": [
+      "cities"
+    ],
+    "rank": 80,
+    "blurb": "city in the state of Virginia, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/AlexandriaOleTowne.jpg?width=640",
+    "imageAttribution": "Duane Lempke · Wikimedia Commons · CC0",
+    "suggestedHours": null
+  },
+  {
+    "id": "us-palm-springs",
+    "name": "Palm Springs",
+    "countryCode": "US",
+    "region": "Riverside County",
+    "lat": 33.82389,
+    "lng": -116.53028,
+    "categories": [
+      "cities"
+    ],
+    "rank": 80,
+    "blurb": "resort city in Riverside County, California, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Downtown%20Palm%20Springs%20CA.JPG?width=640",
+    "imageAttribution": "Patrick Pelster · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": null
+  },
+  {
+    "id": "us-disneyland",
+    "name": "Disneyland",
+    "countryCode": "US",
+    "region": "Anaheim",
+    "lat": 33.809,
+    "lng": -117.919,
+    "categories": [
+      "must_visit",
+      "landmarks"
+    ],
+    "rank": 79,
+    "blurb": "American theme park in California owned by The Walt Disney Company",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Christmas%20for%20Sleeping%20Beauty%20Castle%20%2828017248690%29.jpg?width=640",
+    "imageAttribution": "HarshLight from San Jose, CA, USA · Wikimedia Commons · CC BY 2.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-stamford",
+    "name": "Stamford",
+    "countryCode": "US",
+    "region": "Western Connecticut Planning Region",
+    "lat": 41.09667,
+    "lng": -73.55222,
+    "categories": [
+      "cities"
+    ],
+    "rank": 79,
+    "blurb": "city in Fairfield County, Connecticut, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Stamford%2C%20CT%20%28cropped%29.jpg?width=640",
+    "imageAttribution": "Quintin Soloviev · Wikimedia Commons · CC BY 4.0",
+    "suggestedHours": null
+  },
+  {
+    "id": "us-hollywood-walk-of-fame",
+    "name": "Hollywood Walk of Fame",
+    "countryCode": "US",
+    "region": "Los Angeles",
+    "lat": 34.1014,
+    "lng": -118.34497,
+    "categories": [
+      "must_visit",
+      "landmarks"
+    ],
+    "rank": 78,
+    "blurb": "more than 2,700 five-pointed terrazzo and brass stars embedded in the sidewalks along 15 blocks of Hollywood Boulevard and three blocks o…",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Stan%20Freberg%20Walk%20of%20fame.jpg?width=640",
+    "imageAttribution": "BenSherman · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-everglades-national-park",
+    "name": "Everglades National Park",
+    "countryCode": "US",
+    "region": "Monroe County",
+    "lat": 25.3125,
+    "lng": -80.6875,
+    "categories": [
+      "must_visit",
+      "national_parks"
+    ],
+    "rank": 77,
+    "blurb": "one-and-a-half million acres in Florida (US) managed by the National Park Service",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Sunset%20over%20the%20River%20of%20Grass%2C%20NPSphoto%2C%20G.Gardner%20%289255157507%29.jpg?width=640",
+    "imageAttribution": "Everglades NPS from Homestead, Florida, United States · Wikimedia Commons · Public domain",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-great-salt-lake",
+    "name": "Great Salt Lake",
+    "countryCode": "US",
+    "region": "Davis County",
+    "lat": 41.16667,
+    "lng": -112.58333,
+    "categories": [
+      "nature"
+    ],
+    "rank": 77,
+    "blurb": "salt lake in Utah, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Great%20Salt%20Lake%20by%20Sentinel-2.jpg?width=640",
+    "imageAttribution": "Copernicus Sentinel-2, ESA · Wikimedia Commons · CC BY-SA 3.0 igo",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-mount-rainier",
+    "name": "Mount Rainier",
+    "countryCode": "US",
+    "region": "Washington",
+    "lat": 46.85167,
+    "lng": -121.76028,
+    "categories": [
+      "must_visit",
+      "nature",
+      "viewpoints"
+    ],
+    "rank": 77,
+    "blurb": "stratovolcano in the U.S. state of Washington",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mount%20Rainier%205917s.JPG?width=640",
+    "imageAttribution": "Walter Siegmund (talk) · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-washington-monument",
+    "name": "Washington Monument",
+    "countryCode": "US",
+    "region": "Washington, D.C.",
+    "lat": 38.88947,
+    "lng": -77.03524,
+    "categories": [
+      "must_visit",
+      "landmarks"
+    ],
+    "rank": 77,
+    "blurb": "obelisk on the National Mall in Washington, D.C.",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Washington%20250424%20Washington%20Monument%2001.jpg?width=640",
+    "imageAttribution": "Oren Rozen · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-arlington-national-cemetery",
+    "name": "Arlington National Cemetery",
+    "countryCode": "US",
+    "region": "Arlington County",
+    "lat": 38.87809,
+    "lng": -77.06877,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 75,
+    "blurb": "national cemetery in Virginia, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Arlington%20House.jpg?width=640",
+    "imageAttribution": "Protoant · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-grand-canyon-national-park",
+    "name": "Grand Canyon National Park",
+    "countryCode": "US",
+    "region": "Mohave County",
+    "lat": 36.0553,
+    "lng": -112.122,
+    "categories": [
+      "must_visit",
+      "national_parks"
+    ],
+    "rank": 75,
+    "blurb": "national park in Coconino and Mohave counties in Arizona, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/10%20Grand%20Canyon%20Navajo%20Point%20viewpoint%20terrace%2C%20Grand%20Canyon%20National%20Park%2C%20USA%20-%20American%20nature.jpg?width=640",
+    "imageAttribution": "Marek Ślusarczyk (Tupungato) Photo portfolio · Wikimedia Commons · CC BY 3.0",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-bristol",
+    "name": "Bristol",
+    "countryCode": "US",
+    "region": "Naugatuck Valley Planning Region",
+    "lat": 41.68111,
+    "lng": -72.94056,
+    "categories": [
+      "cities"
+    ],
+    "rank": 74,
+    "blurb": "city in Hartford County, Connecticut, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/St%20Joseph%20Church%2C%20Bristol%20CT.jpg?width=640",
+    "imageAttribution": "John Phelan · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": null
+  },
+  {
+    "id": "us-bryce-canyon-national-park",
+    "name": "Bryce Canyon National Park",
+    "countryCode": "US",
+    "region": "Kane County",
+    "lat": 37.64,
+    "lng": -112.17,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 74,
+    "blurb": "national park in Garfield and Kane counties in Utah, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/USA%2010654%20Bryce%20Canyon%20Luca%20Galuzzi%202007.jpg?width=640",
+    "imageAttribution": "Luca Galuzzi (Lucag) · Wikimedia Commons · CC BY-SA 2.5",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-lake-tahoe",
+    "name": "Lake Tahoe",
+    "countryCode": "US",
+    "region": "Nevada",
+    "lat": 39.08333,
+    "lng": -120.03333,
+    "categories": [
+      "nature"
+    ],
+    "rank": 74,
+    "blurb": "lake in California and Nevada, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Tahoe%20North%20Shore%20from%20the%20East%20Shore.jpg?width=640",
+    "imageAttribution": "Lara Farhadi · Wikimedia Commons · CC BY 2.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-mesa-verde-national-park",
+    "name": "Mesa Verde National Park",
+    "countryCode": "US",
+    "region": "Montezuma County",
+    "lat": 37.26038,
+    "lng": -108.49444,
+    "categories": [
+      "national_parks",
+      "landmarks"
+    ],
+    "rank": 74,
+    "blurb": "U.S. national park in Colorado",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mesa%20Verde.jpg?width=640",
+    "imageAttribution": "Elaine from Sheffield, England · Wikimedia Commons · CC BY 2.0",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-mount-whitney",
+    "name": "Mount Whitney",
+    "countryCode": "US",
+    "region": "Inyo County",
+    "lat": 36.57861,
+    "lng": -118.29194,
+    "categories": [
+      "viewpoints"
+    ],
+    "rank": 74,
+    "blurb": "highest mountain in California and the contiguous United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mount%20Whitney%202003-03-25.jpg?width=640",
+    "imageAttribution": "Geographer (talk · contribs) · Wikimedia Commons · CC BY 1.0",
+    "suggestedHours": 1
+  },
+  {
+    "id": "us-carrollton",
+    "name": "Carrollton",
+    "countryCode": "US",
+    "region": "Collin County",
+    "lat": 32.99,
+    "lng": -96.89333,
+    "categories": [
+      "cities"
+    ],
+    "rank": 73,
+    "blurb": "city in Denton, Dallas, and Collin counties in Texas, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Carrollton%20July%202019%2009%20%28Carrollton%20Square%29.jpg?width=640",
+    "imageAttribution": "Michael Barera · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": null
+  },
+  {
+    "id": "us-death-valley-national-park",
+    "name": "Death Valley National Park",
+    "countryCode": "US",
+    "region": "Inyo County",
+    "lat": 36.45,
+    "lng": -116.85,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 73,
+    "blurb": "national park in California and Nevada in the United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Aguereberry%20Point%20-%20View%20South%20%283811736781%29.jpg?width=640",
+    "imageAttribution": "Greg Willis from Denver, CO, usa · Wikimedia Commons · CC BY-SA 2.0",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-glacier-national-park",
+    "name": "Glacier National Park",
+    "countryCode": "US",
+    "region": "Glacier County",
+    "lat": 48.755,
+    "lng": -113.8,
+    "categories": [
+      "national_parks",
+      "nature"
+    ],
+    "rank": 73,
+    "blurb": "national park in Flathead and Glacier counties in Montana, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Saint%20Mary%20Lake%20and%20Wildgoose%20Island.jpg?width=640",
+    "imageAttribution": "U.S. National Park Service · Wikimedia Commons · Public domain",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-liberty-island",
+    "name": "Liberty Island",
+    "countryCode": "US",
+    "region": "Manhattan",
+    "lat": 40.69,
+    "lng": -74.045,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 73,
+    "blurb": "island in the Upper New York Bay, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Liberty%20Island%20photo%20Don%20Ramey%20Logan.jpg?width=640",
+    "imageAttribution": "Don Ramey Logan · Wikimedia Commons · CC BY 4.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-middletown",
+    "name": "Middletown",
+    "countryCode": "US",
+    "region": "Middlesex County",
+    "lat": 41.56222,
+    "lng": -72.65111,
+    "categories": [
+      "cities"
+    ],
+    "rank": 73,
+    "blurb": "city in Middlesex County, Connecticut, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Middletown%20CT%20river%20skyline.JPG?width=640",
+    "imageAttribution": "Bflood · Wikimedia Commons · CC BY 3.0",
+    "suggestedHours": null
+  },
+  {
+    "id": "us-newton",
+    "name": "Newton",
+    "countryCode": "US",
+    "region": "Middlesex County",
+    "lat": 42.33694,
+    "lng": -71.20972,
+    "categories": [
+      "cities"
+    ],
+    "rank": 73,
+    "blurb": "city in Massachusetts, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Masonic%20Building%2C%202022%2C%20Newtonville%20MA.jpg?width=640",
+    "imageAttribution": "John Phelan · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": null
+  },
+  {
+    "id": "us-olympic-national-park",
+    "name": "Olympic National Park",
+    "countryCode": "US",
+    "region": "Clallam County",
+    "lat": 47.7,
+    "lng": -123.75,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 73,
+    "blurb": "national park on the Olympic Peninsula in Washington State, USA",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/HurricaneRidge%207392t.jpg?width=640",
+    "imageAttribution": "Wsiegmund · Wikimedia Commons · CC BY 2.5",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-walt-disney-world-resort",
+    "name": "Walt Disney World Resort",
+    "countryCode": "US",
+    "region": "Orange County",
+    "lat": 28.3722,
+    "lng": -81.5494,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 73,
+    "blurb": "resort and entertainment complex in Bay Lake and Lake Buena Vista, Florida, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Walt%20Disney%20World%20Epcot%20Spaceship%20Earth%20%2850099574831%29.jpg?width=640",
+    "imageAttribution": "Anthony Quintano from Westminster, United States · Wikimedia Commons · CC BY 2.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-zion-national-park",
+    "name": "Zion National Park",
+    "countryCode": "US",
+    "region": "Washington County",
+    "lat": 37.20262,
+    "lng": -112.98785,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 73,
+    "blurb": "national park in Washington, Iron, and Kane counties in Utah, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Zion%20angels%20landing%20view.jpg?width=640",
+    "imageAttribution": "Diliff · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-cahokia",
+    "name": "Cahokia",
+    "countryCode": "US",
+    "region": "Collinsville",
+    "lat": 38.65389,
+    "lng": -90.06444,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 72,
+    "blurb": "archaeological site near East St. Louis, Illinois, USA",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Monks%20Mound%20in%20July.JPG?width=640",
+    "imageAttribution": "Skubasteve834 · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-crater-lake",
+    "name": "Crater Lake",
+    "countryCode": "US",
+    "region": "Klamath County",
+    "lat": 42.94361,
+    "lng": -122.10667,
+    "categories": [
+      "nature"
+    ],
+    "rank": 72,
+    "blurb": "caldera lake in south-central Oregon and main feature of Crater Lake National Park",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Day%20181%20-%20Crater%20Lake%2C%20Oregon%20%2818695528363%29.jpg?width=640",
+    "imageAttribution": "Judy Gallagher · Wikimedia Commons · CC BY 2.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-grand-teton-national-park",
+    "name": "Grand Teton National Park",
+    "countryCode": "US",
+    "region": "Teton County",
+    "lat": 43.83333,
+    "lng": -110.70083,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 72,
+    "blurb": "United States National Park in northwestern Wyoming",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Barns%20grand%20tetons.jpg?width=640",
+    "imageAttribution": "Jon Sullivan, PD Photo. · Wikimedia Commons · Public domain",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-lincoln-memorial",
+    "name": "Lincoln Memorial",
+    "countryCode": "US",
+    "region": "Washington, D.C.",
+    "lat": 38.88928,
+    "lng": -77.05014,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 72,
+    "blurb": "memorial in Washington, D.C., United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Aerial%20view%20of%20Lincoln%20Memorial%20-%20east%20side%20EDIT.jpeg?width=640",
+    "imageAttribution": "Aerial_view_of_Lincoln_Memorial_-_east_side.jpg: Carol M. Highsmith\nderivative work: upstateNYer · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-mammoth-cave-national-park",
+    "name": "Mammoth Cave National Park",
+    "countryCode": "US",
+    "region": "Barren County",
+    "lat": 37.18694,
+    "lng": -86.10111,
+    "categories": [
+      "national_parks",
+      "nature",
+      "landmarks"
+    ],
+    "rank": 72,
+    "blurb": "U.S. national park in Kentucky",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mammoth%20Cave%20Rotunda%20%28USGS%20Lwt02830%29.jpg?width=640",
+    "imageAttribution": "Willis Thomas Lee · Wikimedia Commons · Public domain",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-arches-national-park",
+    "name": "Arches National Park",
+    "countryCode": "US",
+    "region": "Grand County",
+    "lat": 38.72806,
+    "lng": -109.54,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 71,
+    "blurb": "national park in Grand County, Utah, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Delicate%20Arch%20-%20Arches%20National%20Park%20%2828744386992%29.jpg?width=640",
+    "imageAttribution": "m01229 from USA · Wikimedia Commons · CC BY-SA 2.0",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-carlsbad-caverns-national-park",
+    "name": "Carlsbad Caverns National Park",
+    "countryCode": "US",
+    "region": "Eddy County",
+    "lat": 32.17528,
+    "lng": -104.44389,
+    "categories": [
+      "national_parks",
+      "nature",
+      "landmarks"
+    ],
+    "rank": 71,
+    "blurb": "United States National Park in the Guadalupe Mountains in southeastern New Mexico",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Carlsbad%20Interior%20Formations.jpg?width=640",
+    "imageAttribution": "Eric Guinther, User:Marshman · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-coney-island",
+    "name": "Coney Island",
+    "countryCode": "US",
+    "region": "Brooklyn",
+    "lat": 40.575,
+    "lng": -73.9825,
+    "categories": [
+      "must_visit",
+      "beaches"
+    ],
+    "rank": 71,
+    "blurb": "coastal neighborhood in Brooklyn, New York City, New York, USA",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Coney%20Island%20Parachute%20Jump.JPG?width=640",
+    "imageAttribution": "OptimumPx · Wikimedia Commons · Public domain",
+    "suggestedHours": 3
+  },
+  {
+    "id": "us-devils-tower",
+    "name": "Devils Tower",
+    "countryCode": "US",
+    "region": "Crook County",
+    "lat": 44.59028,
+    "lng": -104.71528,
+    "categories": [
+      "viewpoints"
+    ],
+    "rank": 71,
+    "blurb": "mountain near Moorcroft, Wyoming, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Flaganddevilstower.jpg?width=640",
+    "imageAttribution": "Ealdgyth · Wikimedia Commons · CC BY 3.0",
+    "suggestedHours": 1
+  },
+  {
+    "id": "us-great-smoky-mountains-national-park",
+    "name": "Great Smoky Mountains National Park",
+    "countryCode": "US",
+    "region": "Tennessee",
+    "lat": 35.61111,
+    "lng": -83.425,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 71,
+    "blurb": "U.S. national park in Tennessee and North Carolina",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Great%20Smoky%20Mountains%20Cades%20Cove%20View.jpg?width=640",
+    "imageAttribution": "Vicpeters · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-peekskill",
+    "name": "Peekskill",
+    "countryCode": "US",
+    "region": "Westchester County",
+    "lat": 41.28889,
+    "lng": -73.92,
+    "categories": [
+      "cities"
+    ],
+    "rank": 71,
+    "blurb": "city in Westchester County, New York, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Division%20and%20Park%2C%20Peekskill%2C%20NY.jpg?width=640",
+    "imageAttribution": "Daniel Case · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": null
+  },
+  {
+    "id": "us-pullman",
+    "name": "Pullman",
+    "countryCode": "US",
+    "region": "Whitman County",
+    "lat": 46.73333,
+    "lng": -117.16667,
+    "categories": [
+      "cities"
+    ],
+    "rank": 71,
+    "blurb": "city in Whitman County, Washington State, USA",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/02-07-04%2C%20round%20top%20park%20-%20panoramio.jpg?width=640",
+    "imageAttribution": "David Dugan · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": null
+  },
+  {
+    "id": "us-independence-hall",
+    "name": "Independence Hall",
+    "countryCode": "US",
+    "region": "Philadelphia",
+    "lat": 39.94889,
+    "lng": -75.15,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 70,
+    "blurb": "historic building in Philadelphia, Pennsylvania, USA",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Exterior%20of%20the%20Independence%20Hall%2C%20Aug%202019.jpg?width=640",
+    "imageAttribution": "Mys 721tx · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-lake-champlain",
+    "name": "Lake Champlain",
+    "countryCode": "US",
+    "region": "New York",
+    "lat": 44.53,
+    "lng": -73.33,
+    "categories": [
+      "nature"
+    ],
+    "rank": 70,
+    "blurb": "lake in New York, Vermont and Quebec",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lake%20Champlain%20by%20Sentinel-2.jpg?width=640",
+    "imageAttribution": "Copernicus Sentinel-2, ESA · Wikimedia Commons · CC BY-SA 3.0 igo",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-mono-lake",
+    "name": "Mono Lake",
+    "countryCode": "US",
+    "region": "Mono County",
+    "lat": 38.01659,
+    "lng": -119.00931,
+    "categories": [
+      "nature"
+    ],
+    "rank": 70,
+    "blurb": "endorheic lake in California",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mono%20Lake%20sat%20zoomed.jpg?width=640",
+    "imageAttribution": "File:Mono lake sat.jpg: created by NASA\nRotation and crop: Hike395 · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-petrified-forest-national-park",
+    "name": "Petrified Forest National Park",
+    "countryCode": "US",
+    "region": "Apache County",
+    "lat": 35.0881,
+    "lng": -109.806,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 70,
+    "blurb": "national park of the United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/The%20PEFO%20Tepees.jpg?width=640",
+    "imageAttribution": "Finetooth · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-salton-sea",
+    "name": "Salton Sea",
+    "countryCode": "US",
+    "region": "Riverside County",
+    "lat": 33.3377,
+    "lng": -115.8391,
+    "categories": [
+      "nature"
+    ],
+    "rank": 70,
+    "blurb": "saline lake in Imperial and Riverside counties in California, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Salton%20Sea%20from%20Space.jpg?width=640",
+    "imageAttribution": "NASA · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-acadia-national-park",
+    "name": "Acadia National Park",
+    "countryCode": "US",
+    "region": "Hancock County",
+    "lat": 44.35,
+    "lng": -68.21667,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 69,
+    "blurb": "national park in the US state of Maine",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Acadia%20National%20Park%2002.JPG?width=640",
+    "imageAttribution": "Plh1234us · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-antelope-canyon",
+    "name": "Antelope Canyon",
+    "countryCode": "US",
+    "region": "Arizona",
+    "lat": 36.85778,
+    "lng": -111.37222,
+    "categories": [
+      "nature"
+    ],
+    "rank": 69,
+    "blurb": "landform",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/USA%20Antelope-Canyon.jpg?width=640",
+    "imageAttribution": "Lucas Löffler · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-joshua-tree-national-park",
+    "name": "Joshua Tree National Park",
+    "countryCode": "US",
+    "region": "Riverside County",
+    "lat": 33.74838,
+    "lng": -115.81931,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 69,
+    "blurb": "national park of the United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Joshua%20Tree%20National%20Park%202025.jpg?width=640",
+    "imageAttribution": "Sergiy Galyonkin · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-lake-chaubunagungamaug",
+    "name": "Lake Chaubunagungamaug",
+    "countryCode": "US",
+    "region": "Webster",
+    "lat": 42.0425,
+    "lng": -71.84333,
+    "categories": [
+      "nature"
+    ],
+    "rank": 69,
+    "blurb": "lake in the town of Webster, Massachusetts, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lake%20Chaubunagungamaugg.jpg?width=640",
+    "imageAttribution": "Bree from Worcester, MA, USA · Wikimedia Commons · CC BY-SA 2.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-port-orford",
+    "name": "Port Orford",
+    "countryCode": "US",
+    "region": "Curry County",
+    "lat": 42.74972,
+    "lng": -124.49806,
+    "categories": [
+      "cities"
+    ],
+    "rank": 69,
+    "blurb": "city in Curry County, Oregon, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Port%20Orford.jpg?width=640",
+    "imageAttribution": "Wikimedia Commons · Public domain",
+    "suggestedHours": null
+  },
+  {
+    "id": "us-rocky-mountain-national-park",
+    "name": "Rocky Mountain National Park",
+    "countryCode": "US",
+    "region": "Colorado",
+    "lat": 40.35,
+    "lng": -105.6833,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 69,
+    "blurb": "National park in Colorado, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Rocky%20Mountain%20National%20Park.jpg?width=640",
+    "imageAttribution": "Self · Wikimedia Commons · CC BY-SA 2.5",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-sequoia-national-park",
+    "name": "Sequoia National Park",
+    "countryCode": "US",
+    "region": "Tulare County",
+    "lat": 36.56472,
+    "lng": -118.77278,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 69,
+    "blurb": "national park in the Sierra Nevada mountains, California, U.S.",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Sequoia%20National%20Park%2C%20California%20%282011%29.jpg?width=640",
+    "imageAttribution": "Alberto Carrasco Casado · Wikimedia Commons · CC BY 2.0",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-space-needle",
+    "name": "Space Needle",
+    "countryCode": "US",
+    "region": "Seattle",
+    "lat": 47.6204,
+    "lng": -122.3491,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 69,
+    "blurb": "observation tower in Seattle, Washington, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Seattle%2C%20October%206%2C%202023%20-%2060.jpg?width=640",
+    "imageAttribution": "Another Believer · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-spotsylvania-county",
+    "name": "Spotsylvania County",
+    "countryCode": "US",
+    "region": "Virginia",
+    "lat": 38.18,
+    "lng": -77.65,
+    "categories": [
+      "cities"
+    ],
+    "rank": 69,
+    "blurb": "county in Virginia, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Spotsylvania%20County%20Courthouse%20%28Built%201839%29%2C%20Spotsylvania%20Virginia.jpg?width=640",
+    "imageAttribution": "Calvin Beale · Wikimedia Commons · Public domain",
+    "suggestedHours": null
+  },
+  {
+    "id": "us-badlands-national-park",
+    "name": "Badlands National Park",
+    "countryCode": "US",
+    "region": "Oglala Lakota County",
+    "lat": 43.75,
+    "lng": -102.5,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 68,
+    "blurb": "national park in South Dakota, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/MK00609%20Badlands.jpg?width=640",
+    "imageAttribution": "Martin Kraft · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-canyonlands-national-park",
+    "name": "Canyonlands National Park",
+    "countryCode": "US",
+    "region": "Utah",
+    "lat": 38.1669,
+    "lng": -109.76,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 68,
+    "blurb": "U.S. National Park located in southeastern Utah near the town of Moab",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/CanyonlandsNP%20GreenRiverOverlook.jpg?width=640",
+    "imageAttribution": "Phil Armitage · Wikimedia Commons · Public domain",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-hollywood-sign",
+    "name": "Hollywood Sign",
+    "countryCode": "US",
+    "region": "Los Angeles",
+    "lat": 34.1341,
+    "lng": -118.32169,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 68,
+    "blurb": "sign reading \"HOLLYWOOD\" located in Los Angeles, California, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Hollywood%20Sign%20%28Zuschnitt%29.jpg?width=640",
+    "imageAttribution": "Thomas Wolf, www.foto-tw.de · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-kilgore",
+    "name": "Kilgore",
+    "countryCode": "US",
+    "region": "Rusk County",
+    "lat": 32.3856,
+    "lng": -94.8686,
+    "categories": [
+      "cities"
+    ],
+    "rank": 68,
+    "blurb": "city in the state of Texas, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Kilgore%20May%202016%2016%20%28Main%20Street%29.jpg?width=640",
+    "imageAttribution": "Michael Barera · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": null
+  },
+  {
+    "id": "us-lake-saint-clair",
+    "name": "Lake Saint Clair",
+    "countryCode": "US",
+    "region": "Tecumseh",
+    "lat": 42.45027,
+    "lng": -82.67572,
+    "categories": [
+      "nature"
+    ],
+    "rank": 68,
+    "blurb": "lake bordering Ontario, Canada and Michigan, US",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lake%20St%20Clair%20by%20Sentinel-2%202022-08-13.jpg?width=640",
+    "imageAttribution": "Copernicus Sentinel-2, ESA · Wikimedia Commons · CC BY-SA 3.0 igo",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-mount-hood",
+    "name": "Mount Hood",
+    "countryCode": "US",
+    "region": "Clackamas County",
+    "lat": 45.37361,
+    "lng": -121.69583,
+    "categories": [
+      "nature",
+      "viewpoints"
+    ],
+    "rank": 68,
+    "blurb": "stratovolcano in the Cascade Volcanic Arc in Oregon, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mount%20Hood%20reflected%20in%20Mirror%20Lake%2C%20Oregon.jpg?width=640",
+    "imageAttribution": "Oregon's Mt. Hood Territory. · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-mount-shasta",
+    "name": "Mount Shasta",
+    "countryCode": "US",
+    "region": "Siskiyou County",
+    "lat": 41.4092,
+    "lng": -122.19489,
+    "categories": [
+      "nature",
+      "viewpoints"
+    ],
+    "rank": 68,
+    "blurb": "stratovolcano in Siskiyou County, California, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/North%20face%20of%20Mount%20Shasta%20at%20sunset-2175.jpg?width=640",
+    "imageAttribution": "Frank Schulenburg · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-bronx-zoo",
+    "name": "Bronx Zoo",
+    "countryCode": "US",
+    "region": "The Bronx",
+    "lat": 40.85028,
+    "lng": -73.87833,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 67,
+    "blurb": "metropolitan zoo in the Bronx, New York City, New York, USA",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Stavenn%20Bronx%20Zoo%2000.jpg?width=640",
+    "imageAttribution": "Stavenn · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-gateway-arch",
+    "name": "Gateway Arch",
+    "countryCode": "US",
+    "region": "St. Louis",
+    "lat": 38.62461,
+    "lng": -90.18497,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 67,
+    "blurb": "monument in St. Louis, Missouri",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/St%20Louis%20Gateway%20Arch.jpg?width=640",
+    "imageAttribution": "[https://www.flickr.com/photos/11399912@N00  B0iwehijro2i0-\n]\n\n`1l]] from Davis, CA, USA · Wikimedia Commons · CC BY 2.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-jefferson-memorial",
+    "name": "Jefferson Memorial",
+    "countryCode": "US",
+    "region": "Washington, D.C.",
+    "lat": 38.88139,
+    "lng": -77.03667,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 67,
+    "blurb": "memorial in Washington, D.C., United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Jefferson%20Memorial%20Washington%20April%202017%20002.jpg?width=640",
+    "imageAttribution": "King of Hearts · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-yosemite-falls",
+    "name": "Yosemite Falls",
+    "countryCode": "US",
+    "region": "Mariposa County",
+    "lat": 37.75502,
+    "lng": -119.5973,
+    "categories": [
+      "nature"
+    ],
+    "rank": 67,
+    "blurb": "Highest waterfall in Yosemite National Park",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Yosemite%20Falls%20Trail%20May%202011%20003.jpg?width=640",
+    "imageAttribution": "King of Hearts · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-biscayne-national-park",
+    "name": "Biscayne National Park",
+    "countryCode": "US",
+    "region": "Florida",
+    "lat": 25.50185,
+    "lng": -80.18097,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 66,
+    "blurb": "180,000 acres of mostly waterways, in Florida (US), managed by the National Park Service",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Biscayne%20NP%20snorkeling.jpg?width=640",
+    "imageAttribution": "National Park Service · Wikimedia Commons · Public domain",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-black-canyon-of-the-gunnison-national-park",
+    "name": "Black Canyon of the Gunnison National Park",
+    "countryCode": "US",
+    "region": "Montrose County",
+    "lat": 38.58,
+    "lng": -107.7275,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 66,
+    "blurb": "national park in Montrose County, Colorado, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Black%20canyon%20map.jpg?width=640",
+    "imageAttribution": "http://www.terraprints.com · Wikimedia Commons · CC BY 2.5",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-channel-islands-national-park",
+    "name": "Channel Islands National Park",
+    "countryCode": "US",
+    "region": "Santa Barbara County",
+    "lat": 33.66,
+    "lng": -119.64,
+    "categories": [
+      "national_parks",
+      "nature"
+    ],
+    "rank": 66,
+    "blurb": "national park of the United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Channel%20Islands%20National%20Park.jpg?width=640",
+    "imageAttribution": "The original uploader was Rmhermen at English Wikipedia. · Wikimedia Commons · Public domain",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-great-sand-dunes-national-park-and-preserve",
+    "name": "Great Sand Dunes National Park and Preserve",
+    "countryCode": "US",
+    "region": "Alamosa County",
+    "lat": 37.73278,
+    "lng": -105.51222,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 66,
+    "blurb": "national park in Alamosa and Saguache counties in Colorado, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Great%20Sand%20Dunes%20NP%201.JPG?width=640",
+    "imageAttribution": "Preiselbeere (talk) · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-lake-of-the-woods",
+    "name": "Lake of the Woods",
+    "countryCode": "US",
+    "region": "Lake of the Woods",
+    "lat": 49.09029,
+    "lng": -95.23938,
+    "categories": [
+      "nature"
+    ],
+    "rank": 66,
+    "blurb": "large glacial lake in the Canadian provinces of Manitoba and Ontario and the U.S. state of Minnesota",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lake%20of%20the%20Woods%20by%20Sentinel-2.jpg?width=640",
+    "imageAttribution": "Copernicus Sentinel-2, ESA · Wikimedia Commons · CC BY-SA 3.0 igo",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-lake-okeechobee",
+    "name": "Lake Okeechobee",
+    "countryCode": "US",
+    "region": "Florida",
+    "lat": 26.95,
+    "lng": -80.8,
+    "categories": [
+      "nature"
+    ],
+    "rank": 66,
+    "blurb": "freshwater lake in the state of Florida, USA",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Okeechobee%20lake%20from%20space.jpg?width=640",
+    "imageAttribution": "NASA · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-mount-baker",
+    "name": "Mount Baker",
+    "countryCode": "US",
+    "region": "Whatcom County",
+    "lat": 48.77734,
+    "lng": -121.8132,
+    "categories": [
+      "nature",
+      "viewpoints"
+    ],
+    "rank": 66,
+    "blurb": "stratovolcano in Washington State, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mount%20Baker%2022101.JPG?width=640",
+    "imageAttribution": "Walter Siegmund (talk) · Wikimedia Commons · CC BY 2.5",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-mount-elbert",
+    "name": "Mount Elbert",
+    "countryCode": "US",
+    "region": "Lake County",
+    "lat": 39.11778,
+    "lng": -106.44528,
+    "categories": [
+      "viewpoints"
+    ],
+    "rank": 66,
+    "blurb": "highest mountain in the U.S. state of Colorado (14,440')",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mt.%20Elbert.jpg?width=640",
+    "imageAttribution": "Hogs555 (talk · contribs) · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 1
+  },
+  {
+    "id": "us-mount-rainier-national-park",
+    "name": "Mount Rainier National Park",
+    "countryCode": "US",
+    "region": "Pierce County",
+    "lat": 46.85,
+    "lng": -121.75,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 66,
+    "blurb": "national park of the United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Tolmie%20Peak.jpg?width=640",
+    "imageAttribution": "Ricardo Martins from Gent, Belgium · Wikimedia Commons · CC BY 2.0",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-united-states-holocaust-memorial-museum",
+    "name": "United States Holocaust Memorial Museum",
+    "countryCode": "US",
+    "region": "Washington, D.C.",
+    "lat": 38.88667,
+    "lng": -77.0325,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 66,
+    "blurb": "United States' official memorial to the Holocaust in Washington, D.C.",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/United%20States%20Holocaust%20Memorial%20Museum.jpeg?width=640",
+    "imageAttribution": "Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-big-bend-national-park",
+    "name": "Big Bend National Park",
+    "countryCode": "US",
+    "region": "Brewster County",
+    "lat": 29.25,
+    "lng": -103.25,
+    "categories": [
+      "national_parks",
+      "nature"
+    ],
+    "rank": 65,
+    "blurb": "U.S. national park located in Southern Texas, bordering Mexico",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Santa%20Elena%20Canyon.jpg?width=640",
+    "imageAttribution": "eclectico63 · Wikimedia Commons · CC BY-SA 2.0",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-capitol-reef-national-park",
+    "name": "Capitol Reef National Park",
+    "countryCode": "US",
+    "region": "Utah",
+    "lat": 38.2,
+    "lng": -111.167,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 65,
+    "blurb": "national park in Wayne and Garfield counties in Utah, United State",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Capitol%20Reef%20-%20Cathedral%20Valley.jpg?width=640",
+    "imageAttribution": "Bob Palin · Wikimedia Commons · CC BY-SA 2.5",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-crater-lake-national-park",
+    "name": "Crater Lake National Park",
+    "countryCode": "US",
+    "region": "Douglas County",
+    "lat": 42.91194,
+    "lng": -122.14806,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 65,
+    "blurb": "national park in Klamath, Douglas, and Jackson counties in Oregon, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Crater%20lake%20oregon.jpg?width=640",
+    "imageAttribution": "Zainubrazvi · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-fort-sumter",
+    "name": "Fort Sumter",
+    "countryCode": "US",
+    "region": "Charleston",
+    "lat": 32.7525,
+    "lng": -79.87444,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 65,
+    "blurb": "fort in Charleston, South Carolina",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/FortSumter2009.jpg?width=640",
+    "imageAttribution": "Bubba73 (talk), (Jud McCranie) · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-mount-mitchell",
+    "name": "Mount Mitchell",
+    "countryCode": "US",
+    "region": "Yancey County",
+    "lat": 35.76476,
+    "lng": -82.26486,
+    "categories": [
+      "viewpoints"
+    ],
+    "rank": 65,
+    "blurb": "Highest mountain in the Eastern United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mount%20Mitchell.jpg?width=640",
+    "imageAttribution": "Wikimedia Commons · Public domain",
+    "suggestedHours": 1
+  },
+  {
+    "id": "us-north-cascades-national-park",
+    "name": "North Cascades National Park",
+    "countryCode": "US",
+    "region": "Skagit County",
+    "lat": 48.48306,
+    "lng": -120.91139,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 65,
+    "blurb": "U.S. National Park located in the state of Washington",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cascade%20pass.jpg?width=640",
+    "imageAttribution": "Daniel Hershman · Wikimedia Commons · CC BY 2.0",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-san-diego-zoo",
+    "name": "San Diego Zoo",
+    "countryCode": "US",
+    "region": "San Diego",
+    "lat": 32.73611,
+    "lng": -117.15139,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 65,
+    "blurb": "zoo in Balboa Park, San Diego, California, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/San%20Diego%20Zoo%20entrance%20elephant.jpg?width=640",
+    "imageAttribution": "en:User:Cburnett · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-theodore-roosevelt-national-park",
+    "name": "Theodore Roosevelt National Park",
+    "countryCode": "US",
+    "region": "Billings County",
+    "lat": 46.96667,
+    "lng": -103.45,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 65,
+    "blurb": "United States National Park in western North Dakota",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/View%20of%20Theodore%20Roosevelt%20National%20Park.jpg?width=640",
+    "imageAttribution": "NPS/Mark Hoffman · Wikimedia Commons · Public domain",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-vietnam-veterans-memorial",
+    "name": "Vietnam Veterans Memorial",
+    "countryCode": "US",
+    "region": "Washington, D.C.",
+    "lat": 38.89111,
+    "lng": -77.04778,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 65,
+    "blurb": "US national memorial in Washington, D.C.",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Vietnam%20Memorial%20Wall%20with%20Washington%20Monument.jpg?width=640",
+    "imageAttribution": "David J. Jackson · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-yellowstone-volcano",
+    "name": "Yellowstone volcano",
+    "countryCode": "US",
+    "region": "Idaho",
+    "lat": 44.4,
+    "lng": -110.7,
+    "categories": [
+      "nature",
+      "viewpoints"
+    ],
+    "rank": 65,
+    "blurb": "volcanic caldera in Yellowstone National Park in the United states",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Yellowstone%20River%20in%20Hayden%20Valley.jpg?width=640",
+    "imageAttribution": "Ed Austin/Herb Jones · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-fort-ross",
+    "name": "Fort Ross",
+    "countryCode": "US",
+    "region": "California",
+    "lat": 38.51444,
+    "lng": -123.24361,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 64,
+    "blurb": "former Russian establishment in the United States of America",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Russian%20chapel%20at%20Fort%20Ross%20%282016%29.jpg?width=640",
+    "imageAttribution": "Frank Schulenburg · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-great-basin-national-park",
+    "name": "Great Basin National Park",
+    "countryCode": "US",
+    "region": "White Pine County",
+    "lat": 39.0058,
+    "lng": -114.2197,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 64,
+    "blurb": "United States National Park in White Pine County, Nevada, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/ParkFromLexRoad%20GreatBasin.jpg?width=640",
+    "imageAttribution": "Wikimedia Commons · Public domain",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-half-dome",
+    "name": "Half Dome",
+    "countryCode": "US",
+    "region": "Mariposa County",
+    "lat": 37.746,
+    "lng": -119.53317,
+    "categories": [
+      "viewpoints"
+    ],
+    "rank": 64,
+    "blurb": "granite dome in Yosemite National Park, California",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Yosemite%2020%20bg%20090404.jpg?width=640",
+    "imageAttribution": "Jon Sullivan · Wikimedia Commons · Public domain",
+    "suggestedHours": 1
+  },
+  {
+    "id": "us-horse-cave",
+    "name": "Horse Cave",
+    "countryCode": "US",
+    "region": "Hart County",
+    "lat": 37.17623,
+    "lng": -85.90614,
+    "categories": [
+      "nature",
+      "landmarks"
+    ],
+    "rank": 64,
+    "blurb": "city in Kentucky",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Davedowntwn8vl.jpg?width=640",
+    "imageAttribution": "Jbacardi at en.wikipedia · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-kings-canyon-national-park",
+    "name": "Kings Canyon National Park",
+    "countryCode": "US",
+    "region": "Fresno County",
+    "lat": 36.78928,
+    "lng": -118.67286,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 64,
+    "blurb": "national park in the Sierra Nevada mountains in California, USA",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Dusy%20Basin%20in%20Kings%20Canyon1.jpg?width=640",
+    "imageAttribution": "NileGuide.com (Josh Steinitz) · Wikimedia Commons · CC BY 2.0",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-national-september-11-memorial-museum",
+    "name": "National September 11 Memorial & Museum",
+    "countryCode": "US",
+    "region": "New York City",
+    "lat": 40.71139,
+    "lng": -74.01361,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 64,
+    "blurb": "memorial & museum in New York City commemorating the September 11, 2001 attacks",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/9-11%20Memorial%20and%20Museum%20%2828815276064%29.jpg?width=640",
+    "imageAttribution": "Paul Sableman · Wikimedia Commons · CC BY 2.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-old-faithful",
+    "name": "Old Faithful",
+    "countryCode": "US",
+    "region": "Teton County",
+    "lat": 44.46047,
+    "lng": -110.82814,
+    "categories": [
+      "nature"
+    ],
+    "rank": 64,
+    "blurb": "geyser in Yellowstone National Park in Wyoming, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Yellowstone%20National%20Park%20%28WY%2C%20USA%29%2C%20Old%20Faithful%20Geyser%20--%202022%20--%202599.jpg?width=640",
+    "imageAttribution": "Dietmar Rabich · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-redwood-national-and-state-parks",
+    "name": "Redwood National and State Parks",
+    "countryCode": "US",
+    "region": "Del Norte County",
+    "lat": 41.52917,
+    "lng": -124.05833,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 64,
+    "blurb": "U.S. national park in California",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/.00%200561%20Coast%20redwood%20%28Sequoia%20sempervirens%29.jpg?width=640",
+    "imageAttribution": "W. Bulach · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-saguaro-national-park",
+    "name": "Saguaro National Park",
+    "countryCode": "US",
+    "region": "Pima County",
+    "lat": 32.20217,
+    "lng": -110.61094,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 64,
+    "blurb": "United States National Park, in the state of Arizona",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Saguaronationalparl17102008.jpg?width=640",
+    "imageAttribution": "Luke Jones from Yucca Valley · Wikimedia Commons · CC BY 2.0",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-shenandoah-national-park",
+    "name": "Shenandoah National Park",
+    "countryCode": "US",
+    "region": "Virginia",
+    "lat": 38.5333,
+    "lng": -78.35,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 64,
+    "blurb": "195,000 acres in Virginia (US) maintained by the National Park Service",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Skyline%20drive%2020050521%20123518%202.jpg?width=640",
+    "imageAttribution": "Image copyright 2005 by user G. Edward Johnson (user Lorax) and released under the terms of the GFDL · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-congaree-national-park",
+    "name": "Congaree National Park",
+    "countryCode": "US",
+    "region": "Richland County",
+    "lat": 33.78333,
+    "lng": -80.78333,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 63,
+    "blurb": "national park located in South Carolina",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Congaree%20swamp.jpg?width=640",
+    "imageAttribution": "Wikimedia Commons · Public domain",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-cuyahoga-valley-national-park",
+    "name": "Cuyahoga Valley National Park",
+    "countryCode": "US",
+    "region": "Cuyahoga County",
+    "lat": 41.24167,
+    "lng": -81.54972,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 63,
+    "blurb": "national park in Ohio, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cuyahoga%20River.jpg?width=640",
+    "imageAttribution": "Wikimedia Commons · Public domain",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-dry-tortugas-national-park",
+    "name": "Dry Tortugas National Park",
+    "countryCode": "US",
+    "region": "Monroe County",
+    "lat": 24.62861,
+    "lng": -82.87333,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 63,
+    "blurb": "64,657 acres in Florida (US) managed by the National Park Service",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Fort-Jefferson%20Dry-Tortugas.jpg?width=640",
+    "imageAttribution": "U.S. National Park Service · Wikimedia Commons · Public domain",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-grand-prismatic-spring",
+    "name": "Grand Prismatic Spring",
+    "countryCode": "US",
+    "region": "Wyoming",
+    "lat": 44.525,
+    "lng": -110.83806,
+    "categories": [
+      "nature"
+    ],
+    "rank": 63,
+    "blurb": "natural hot spring within Yellowstone National Park",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Yellowstone%20National%20Park%20%28WY%2C%20USA%29%2C%20Grand%20Prismatic%20Spring%20--%202022%20--%202514.jpg?width=640",
+    "imageAttribution": "Dietmar Rabich · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-isle-royale-national-park",
+    "name": "Isle Royale National Park",
+    "countryCode": "US",
+    "region": "Michigan",
+    "lat": 47.99587,
+    "lng": -88.90929,
+    "categories": [
+      "national_parks",
+      "nature"
+    ],
+    "rank": 63,
+    "blurb": "United States National Park on Isle Royale in the Upper Peninsula of Michigan",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lake%20Superior%20Shore%20at%20Isle%20Royale%20National%20Park%20%2849051653101%29.jpg?width=640",
+    "imageAttribution": "Tony Webster from Minneapolis, Minnesota, United States · Wikimedia Commons · CC BY 2.0",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-lassen-peak",
+    "name": "Lassen Peak",
+    "countryCode": "US",
+    "region": "Shasta County",
+    "lat": 40.48806,
+    "lng": -121.505,
+    "categories": [
+      "nature",
+      "viewpoints"
+    ],
+    "rank": 63,
+    "blurb": "lava dome in the Cascade Range",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lassen%20Peak%20in%20June%202020.jpg?width=640",
+    "imageAttribution": "Frank Schulenburg · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-lassen-volcanic-national-park",
+    "name": "Lassen Volcanic National Park",
+    "countryCode": "US",
+    "region": "Shasta County",
+    "lat": 40.49806,
+    "lng": -121.4275,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 63,
+    "blurb": "national park of the United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lassen%20Peak%20from%20Devastated%20Area-1200px.jpg?width=640",
+    "imageAttribution": "en:User:Mav · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-mount-adams",
+    "name": "Mount Adams",
+    "countryCode": "US",
+    "region": "Washington",
+    "lat": 46.20241,
+    "lng": -121.49089,
+    "categories": [
+      "nature"
+    ],
+    "rank": 63,
+    "blurb": "Southern Washington stratovolcano in the Cascade Volcanic Arc",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mount%20Adams.jpg?width=640",
+    "imageAttribution": "USGS Photo by R. Iverson, USGS/CVO · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-mount-washington",
+    "name": "Mount Washington",
+    "countryCode": "US",
+    "region": "Coös County",
+    "lat": 44.27083,
+    "lng": -71.30348,
+    "categories": [
+      "viewpoints"
+    ],
+    "rank": 63,
+    "blurb": "highest mountain in the U.S. state of New Hampshire",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mt.%20Washington%20from%20Bretton%20Woods.JPG?width=640",
+    "imageAttribution": "wwoods · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 1
+  },
+  {
+    "id": "us-the-strat-hotel-casino-skypod",
+    "name": "The STRAT Hotel, Casino & SkyPod",
+    "countryCode": "US",
+    "region": "Las Vegas",
+    "lat": 36.14746,
+    "lng": -115.15603,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 63,
+    "blurb": "hotel, casino, and tower located in Las Vegas",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Stratosphere%20Las%20Vegas%20-%20November%202003.jpg?width=640",
+    "imageAttribution": "Original uploader was Timjarrett at en.wikipedia · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-wind-cave-national-park",
+    "name": "Wind Cave National Park",
+    "countryCode": "US",
+    "region": "Custer County",
+    "lat": 43.55635,
+    "lng": -103.47865,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 63,
+    "blurb": "national park in South Dakota, USA",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Boxwork%20in%20Elks%20Room%20Sf34.jpg?width=640",
+    "imageAttribution": "USGS/USGov · Wikimedia Commons · Public domain",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-crazy-horse-memorial",
+    "name": "Crazy Horse Memorial",
+    "countryCode": "US",
+    "region": "Custer County",
+    "lat": 43.83679,
+    "lng": -103.62439,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 62,
+    "blurb": "mountain monument complex that is under construction on privately held land in the Black Hills",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Crazy%20Horse%20Memorial%20from%20Visitors%20Center.jpg?width=640",
+    "imageAttribution": "Jeffreylcooke · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-deepwater-horizon",
+    "name": "Deepwater Horizon",
+    "countryCode": "US",
+    "region": null,
+    "lat": 28.74167,
+    "lng": -88.38417,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 62,
+    "blurb": "former offshore oil drilling rig",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Deepwater%20Horizon%20offshore%20drilling%20unit%20on%20fire%202010.jpg?width=640",
+    "imageAttribution": "Unknown authorUnknown author · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-guadalupe-mountains-national-park",
+    "name": "Guadalupe Mountains National Park",
+    "countryCode": "US",
+    "region": "Texas",
+    "lat": 31.91667,
+    "lng": -104.86667,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 62,
+    "blurb": "national park in Texas, USA",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Guadalupe%20Mtns%20El%20Capitan%202006.JPG?width=640",
+    "imageAttribution": "Leaflet · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-hot-springs-national-park",
+    "name": "Hot Springs National Park",
+    "countryCode": "US",
+    "region": "Garland County",
+    "lat": 34.51361,
+    "lng": -93.05361,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 62,
+    "blurb": "United States National Park in central Arkansas",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Hots%20Springs%20National%20Park%20aerial.jpg?width=640",
+    "imageAttribution": "Wikimedia Commons · Public domain",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-siesta-key",
+    "name": "Siesta Key",
+    "countryCode": "US",
+    "region": "Sarasota County",
+    "lat": 27.2762,
+    "lng": -82.5643,
+    "categories": [
+      "must_visit",
+      "beaches"
+    ],
+    "rank": 62,
+    "blurb": "census-designated place and barrier island in Sarasota County, Florida, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Red%20Lifeguard%20Stand%20at%20Siesta%20Key%20Beach.jpg?width=640",
+    "imageAttribution": "Mickey Luigi Logitmark · Wikimedia Commons · CC0",
+    "suggestedHours": 3
+  },
+  {
+    "id": "us-voyageurs-national-park",
+    "name": "Voyageurs National Park",
+    "countryCode": "US",
+    "region": "St. Louis County",
+    "lat": 48.5,
+    "lng": -92.88333,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 62,
+    "blurb": "United States National Park near International Falls, Minnesota",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Voyageurs%20National%20Park.jpg?width=640",
+    "imageAttribution": "Wikimedia Commons · Public domain",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-white-sands-national-park",
+    "name": "White Sands National Park",
+    "countryCode": "US",
+    "region": "Otero County",
+    "lat": 32.77972,
+    "lng": -106.17167,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 62,
+    "blurb": "national park in Otero and Doña Ana counties in New Mexico, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Aerial%20view%20of%20dunefield%2C%20White%20Sands%20National%20Park%2C%20New%20Mexico%2C%20United%20States.png?width=640",
+    "imageAttribution": "uncredited NPS employee · Wikimedia Commons · Public domain",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-federal-hall",
+    "name": "Federal Hall",
+    "countryCode": "US",
+    "region": "Manhattan",
+    "lat": 40.7072,
+    "lng": -74.0103,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 61,
+    "blurb": "building and historic site in New York City",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Federal%20Hall%20%2848126566178%29.jpg?width=640",
+    "imageAttribution": "Ajay Suresh from New York, NY, USA · Wikimedia Commons · CC BY 2.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-lombard-street",
+    "name": "Lombard Street",
+    "countryCode": "US",
+    "region": "San Francisco",
+    "lat": 37.80194,
+    "lng": -122.41889,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 61,
+    "blurb": "thoroughfare in San Francisco, California, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Full%20view%20of%20crooked%20Lombard%20Street%2C%20SF%20%28Feb%202006%29.jpg?width=640",
+    "imageAttribution": "The original uploader was Y6y6y6 at English Wikipedia. · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-magic-kingdom",
+    "name": "Magic Kingdom",
+    "countryCode": "US",
+    "region": "Bay Lake",
+    "lat": 28.41861,
+    "lng": -81.58111,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 61,
+    "blurb": "Theme park at Walt Disney World Resort in Florida",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Magic%20Kingdom%20castle.jpg?width=640",
+    "imageAttribution": "Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-unisphere",
+    "name": "Unisphere",
+    "countryCode": "US",
+    "region": "Queens",
+    "lat": 40.74639,
+    "lng": -73.845,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 61,
+    "blurb": "Steel structure in Queens, New York",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Unisphere%20in%20summer.jpg?width=640",
+    "imageAttribution": "Beyond My Ken · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-epcot",
+    "name": "Epcot",
+    "countryCode": "US",
+    "region": "Bay Lake",
+    "lat": 28.371,
+    "lng": -81.55,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 60,
+    "blurb": "Walt Disney World Resort's second theme park, with attractions based on international culture and human achievement",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Epcot07.jpg?width=640",
+    "imageAttribution": "The original uploader was Erik16 at English Wikipedia. · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-hearst-castle",
+    "name": "Hearst Castle",
+    "countryCode": "US",
+    "region": "San Luis Obispo County",
+    "lat": 35.68528,
+    "lng": -121.16778,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 60,
+    "blurb": "National Historic Landmark and California Historical Landmark located on the Central Coast of California, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Hearst%20Castle%20Casa%20Grande1.jpg?width=640",
+    "imageAttribution": "No machine-readable author provided. Urban~commonswiki assumed (based on copyright claims). · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-north-acomita-village",
+    "name": "North Acomita Village",
+    "countryCode": "US",
+    "region": "Cibola County",
+    "lat": 35.06778,
+    "lng": -107.56528,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 60,
+    "blurb": "human settlement in Cibola County, New Mexico, United States of America",
+    "imageUrl": null,
+    "imageAttribution": null,
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-pinnacles-national-park",
+    "name": "Pinnacles National Park",
+    "countryCode": "US",
+    "region": "San Benito County",
+    "lat": 36.4869,
+    "lng": -121.167,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 60,
+    "blurb": "national park in California, United States of America",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Rock%20formations%20at%20Pinnacles%20National%20Park%202.jpg?width=640",
+    "imageAttribution": "Brocken Inaglory · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-disney-s-animal-kingdom",
+    "name": "Disney's Animal Kingdom",
+    "countryCode": "US",
+    "region": "Orange County",
+    "lat": 28.358,
+    "lng": -81.59,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 59,
+    "blurb": "theme park at Walt Disney World",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/At%20Disney%27s%20Animal%20Kingdom%201.JPG?width=640",
+    "imageAttribution": "BrokenSphere · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-disney-s-hollywood-studios",
+    "name": "Disney's Hollywood Studios",
+    "countryCode": "US",
+    "region": "Orange County",
+    "lat": 28.3575,
+    "lng": -81.56,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 59,
+    "blurb": "Walt Disney World Resort's third theme park, with attractions based on film, television, and music",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Sombrero%20MGM.JPG?width=640",
+    "imageAttribution": "Rllaque · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-kvly-tv-mast",
+    "name": "KVLY-TV mast",
+    "countryCode": "US",
+    "region": "North Dakota",
+    "lat": 47.34222,
+    "lng": -97.28917,
+    "categories": [
+      "viewpoints"
+    ],
+    "rank": 59,
+    "blurb": "tall television-transmitting mast in Blanchard, Traill County, North Dakota, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/KVLY-TV%20Mast%20Tower%20Wide.jpg?width=640",
+    "imageAttribution": "Ratsbew · Wikimedia Commons · Public domain",
+    "suggestedHours": 1
+  },
+  {
+    "id": "us-poverty-point",
+    "name": "Poverty Point",
+    "countryCode": "US",
+    "region": "West Carroll Parish",
+    "lat": 32.6367,
+    "lng": -91.4114,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 59,
+    "blurb": "prehistoric site of the Poverty Point culture in northeastern Louisiana, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mound%20A%20at%20Poverty%20Point.jpg?width=640",
+    "imageAttribution": "https://www.flickr.com/photos/15308454@N06/ Kniemla · Wikimedia Commons · CC BY-SA 2.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-taos-pueblo",
+    "name": "Taos Pueblo",
+    "countryCode": "US",
+    "region": "Taos County",
+    "lat": 36.43864,
+    "lng": -105.54445,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 59,
+    "blurb": "federally recognized Native American Nation",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Taos%20Pueblo2.jpg?width=640",
+    "imageAttribution": "Wikimedia Commons · CC BY 2.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-acomita-lake",
+    "name": "Acomita Lake",
+    "countryCode": "US",
+    "region": "Cibola County",
+    "lat": 35.06583,
+    "lng": -107.62361,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 58,
+    "blurb": "human settlement in Cibola County, New Mexico, United States of America",
+    "imageUrl": null,
+    "imageAttribution": null,
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-canyon-de-chelly-national-monument",
+    "name": "Canyon de Chelly National Monument",
+    "countryCode": "US",
+    "region": "Apache County",
+    "lat": 36.1553,
+    "lng": -109.509,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 58,
+    "blurb": "national monument in Apache County, Arizona",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/00%20699%20USA%20Arizona%20-%20Canyon%20de%20Chelly%20National%20Monument.jpg?width=640",
+    "imageAttribution": "W. Bulach · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-fly-geyser",
+    "name": "Fly Geyser",
+    "countryCode": "US",
+    "region": "Nevada",
+    "lat": 40.8594,
+    "lng": -119.332,
+    "categories": [
+      "nature"
+    ],
+    "rank": 58,
+    "blurb": "geyser in Washoe County, Nevada, United States of America",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Fly%20geyser.jpg?width=640",
+    "imageAttribution": "Jeremy C. Munns · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-h-l-hunley",
+    "name": "H. L. Hunley",
+    "countryCode": "US",
+    "region": "North Charleston",
+    "lat": 32.85667,
+    "lng": -79.95889,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 58,
+    "blurb": "submarine",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Css%20hunley%20on%20pier.jpg?width=640",
+    "imageAttribution": "Sepia wash drawing by R.G. Skerrett, 1902, after a painting then held by the Confederate Memorial Literary Society Museum, Richmond, Virginia. · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-lechuguilla-cave",
+    "name": "Lechuguilla Cave",
+    "countryCode": "US",
+    "region": "Eddy County",
+    "lat": 32.19064,
+    "lng": -104.50331,
+    "categories": [
+      "nature"
+    ],
+    "rank": 58,
+    "blurb": "cave in Eddy County, New Mexico, U.S.",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lechuguilla%20Cave%20Pearlsian%20Gulf.jpg?width=640",
+    "imageAttribution": "Dave Bunnell / Under Earth Images · Wikimedia Commons · CC BY-SA 2.5",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-multnomah-falls",
+    "name": "Multnomah Falls",
+    "countryCode": "US",
+    "region": "Multnomah County",
+    "lat": 45.57595,
+    "lng": -122.11536,
+    "categories": [
+      "nature"
+    ],
+    "rank": 58,
+    "blurb": "waterfall in the Columbia Gorge in Multnomah County, Oregon, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Multnomah%20Falls%20on%202%20August%202012.jpg?width=640",
+    "imageAttribution": "John Fowler from Placitas, NM, USA · Wikimedia Commons · CC BY 2.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-padre-island",
+    "name": "Padre Island",
+    "countryCode": "US",
+    "region": "Willacy County",
+    "lat": 26.8445,
+    "lng": -97.36776,
+    "categories": [
+      "beaches"
+    ],
+    "rank": 58,
+    "blurb": "barrier island in Texas, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Padre%20Island%20National%20Seashore%20-%20sand%20dunes3.jpg?width=640",
+    "imageAttribution": "Unknown authorUnknown author · Wikimedia Commons · Public domain",
+    "suggestedHours": 3
+  },
+  {
+    "id": "us-skyline-ganipa",
+    "name": "Skyline-Ganipa",
+    "countryCode": "US",
+    "region": "Cibola County",
+    "lat": 35.0375,
+    "lng": -107.62389,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 58,
+    "blurb": "human settlement in Cibola County, New Mexico, United States of America",
+    "imageUrl": null,
+    "imageAttribution": null,
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-la-garita-caldera",
+    "name": "La Garita Caldera",
+    "countryCode": "US",
+    "region": "Mineral County",
+    "lat": 37.75639,
+    "lng": -106.93417,
+    "categories": [
+      "nature"
+    ],
+    "rank": 57,
+    "blurb": "supervolcanic caldera",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/WheelerGACO.jpg?width=640",
+    "imageAttribution": "en:User:G. Thomas · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-horsetail-fall",
+    "name": "Horsetail Fall",
+    "countryCode": "US",
+    "region": "Mariposa County",
+    "lat": 37.7291,
+    "lng": -119.628,
+    "categories": [
+      "nature"
+    ],
+    "rank": 56,
+    "blurb": "waterfall in Yosemite National Park, California",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/2007-02-16%20-%20Horsetail%20Fall%20%28Yosemite%29.jpg?width=640",
+    "imageAttribution": "Ambitious Wench · Wikimedia Commons · CC BY-SA 2.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-gateway-arch-national-park",
+    "name": "Gateway Arch National Park",
+    "countryCode": "US",
+    "region": "St. Louis",
+    "lat": 38.6246,
+    "lng": -90.185,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 55,
+    "blurb": "American National Park in St. Louis, Missouri",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/St%20Louis%20night%20expblend.jpg?width=640",
+    "imageAttribution": "Daniel Schwen · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-mount-bachelor",
+    "name": "Mount Bachelor",
+    "countryCode": "US",
+    "region": "Deschutes County",
+    "lat": 43.97917,
+    "lng": -121.68833,
+    "categories": [
+      "nature"
+    ],
+    "rank": 55,
+    "blurb": "volcano in Oregon, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mount%20Bachelor%20closeup.jpg?width=640",
+    "imageAttribution": "DimiTalen · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-nutty-putty-cave",
+    "name": "Nutty Putty Cave",
+    "countryCode": "US",
+    "region": "Utah",
+    "lat": 40.0975,
+    "lng": -112.037,
+    "categories": [
+      "nature"
+    ],
+    "rank": 55,
+    "blurb": "hydrothermal cave west of Utah Lake (USA)",
+    "imageUrl": null,
+    "imageAttribution": null,
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-galveston-island",
+    "name": "Galveston Island",
+    "countryCode": "US",
+    "region": "Texas",
+    "lat": 29.22222,
+    "lng": -94.90889,
+    "categories": [
+      "beaches"
+    ],
+    "rank": 53,
+    "blurb": "barrier island on the Texas Gulf Coast in the United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/ISS-39%20Galveston%20Island.jpg?width=640",
+    "imageAttribution": "NASA · Wikimedia Commons · Public domain",
+    "suggestedHours": 3
+  },
+  {
+    "id": "us-indiana-dunes-national-park",
+    "name": "Indiana Dunes National Park",
+    "countryCode": "US",
+    "region": "LaPorte County",
+    "lat": 41.64806,
+    "lng": -87.10806,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 53,
+    "blurb": "United States National Park in Indiana",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/2010-11-26%203060x2040%20portage%20indiana%20dunes.jpg?width=640",
+    "imageAttribution": "J. Crocker · Wikimedia Commons · Attribution",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-serpent-mound",
+    "name": "Serpent Mound",
+    "countryCode": "US",
+    "region": "Adams County",
+    "lat": 39.0253,
+    "lng": -83.4305,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 53,
+    "blurb": "prehistoric effigy mound in Ohio, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/26%20of%20%27A%20School%20History%20of%20the%20United%20States%20...Serpent%20Mound%20in%20Ohio%22%27%20no%20cap%20%2811303842305%29%20%28cropped%29.jpg?width=640",
+    "imageAttribution": "The British Library · Wikimedia Commons · No restrictions",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-dry-falls",
+    "name": "Dry Falls",
+    "countryCode": "US",
+    "region": "Grant County",
+    "lat": 47.60572,
+    "lng": -119.35364,
+    "categories": [
+      "nature"
+    ],
+    "rank": 52,
+    "blurb": "waterfall",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Dry%20Falls.jpg?width=640",
+    "imageAttribution": "Ikiwaner · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-horseshoe-falls",
+    "name": "Horseshoe Falls",
+    "countryCode": "US",
+    "region": "Niagara Falls",
+    "lat": 43.07731,
+    "lng": -79.07562,
+    "categories": [
+      "nature"
+    ],
+    "rank": 52,
+    "blurb": "waterfall of the Niagara Falls",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Canadian%20Horseshoe%20Falls%20with%20city%20of%20Niagara%20Falls%2C%20Ontario%20in%20background.jpg?width=640",
+    "imageAttribution": "Ujjwal Kumar · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-three-sisters",
+    "name": "Three Sisters",
+    "countryCode": "US",
+    "region": "Oregon",
+    "lat": 44.1035,
+    "lng": -121.769,
+    "categories": [
+      "nature"
+    ],
+    "rank": 52,
+    "blurb": "three volcanic peaks of the Cascade Volcanic Arc and the Cascade Range in Oregon",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Three%20sisters.jpg?width=640",
+    "imageAttribution": "USGS photo by Lyn Topinka · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-aztec-ruins-national-monument",
+    "name": "Aztec Ruins National Monument",
+    "countryCode": "US",
+    "region": "New Mexico",
+    "lat": 36.83682,
+    "lng": -107.99981,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 51,
+    "blurb": "National monument in New Mexico, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Aztec%20ruins%20national%20monument%2020030922%20100357%201.1504x1000.jpg?width=640",
+    "imageAttribution": "G. Edward Johnson · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-mammoth-mountain",
+    "name": "Mammoth Mountain",
+    "countryCode": "US",
+    "region": "Mono County",
+    "lat": 37.6306,
+    "lng": -119.033,
+    "categories": [
+      "nature"
+    ],
+    "rank": 51,
+    "blurb": "mountain in the Sierra Nevada of California, home to a ski resort",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ritter%20Range%20and%20Mammoth%20Mountain.jpg?width=640",
+    "imageAttribution": "Hike395 (talk · contribs) · Wikimedia Commons · CC BY 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-nevada-fall",
+    "name": "Nevada Fall",
+    "countryCode": "US",
+    "region": "Mariposa County",
+    "lat": 37.72528,
+    "lng": -119.53278,
+    "categories": [
+      "nature"
+    ],
+    "rank": 51,
+    "blurb": "waterfall in Yosemite National Park, California",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Vernall%20Nevada%20Falls.JPG?width=640",
+    "imageAttribution": "self · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-saint-anthony-falls",
+    "name": "Saint Anthony Falls",
+    "countryCode": "US",
+    "region": "Minneapolis",
+    "lat": 44.98167,
+    "lng": -93.25861,
+    "categories": [
+      "nature"
+    ],
+    "rank": 51,
+    "blurb": "waterfall on the Mississippi River in Minneapolis, Minnesota, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Saint%20Anthony%20Falls%20aerial.jpg?width=640",
+    "imageAttribution": "The original uploader was Mulad at English Wikipedia. · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-american-falls",
+    "name": "American Falls",
+    "countryCode": "US",
+    "region": "Niagara Falls",
+    "lat": 43.085,
+    "lng": -79.07,
+    "categories": [
+      "nature"
+    ],
+    "rank": 50,
+    "blurb": "waterfall of Niagara Falls in Niagara Falls, New York, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/American%20and%20Bridalveil%20Falls%207.JPG?width=640",
+    "imageAttribution": "Ad Meskens · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-bridalveil-fall",
+    "name": "Bridalveil Fall",
+    "countryCode": "US",
+    "region": "Mariposa County",
+    "lat": 37.71675,
+    "lng": -119.64651,
+    "categories": [
+      "nature"
+    ],
+    "rank": 50,
+    "blurb": "waterfall in Yosemite National Park, California",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Bridalveil%20Falls%2008183.JPG?width=640",
+    "imageAttribution": "Walter Siegmund (talk · contribs) · Wikimedia Commons · CC BY 2.5",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-columbia-river-gorge",
+    "name": "Columbia River Gorge",
+    "countryCode": "US",
+    "region": "Multnomah County",
+    "lat": 45.70472,
+    "lng": -121.79167,
+    "categories": [
+      "nature"
+    ],
+    "rank": 50,
+    "blurb": "canyon along the border of Oregon and Washington in the United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Columbia%20river%20gorge%20from%20crown%20point.jpg?width=640",
+    "imageAttribution": "Hux · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-independence-national-historical-park",
+    "name": "Independence National Historical Park",
+    "countryCode": "US",
+    "region": "Philadelphia",
+    "lat": 39.9478,
+    "lng": -75.1481,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 49,
+    "blurb": "national historic site in Philadelphia, Pennsylvania, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Liberty%20Bell%2C%20Independence%20Hall.jpg?width=640",
+    "imageAttribution": "Bev Sykes from Davis, CA, USA · Wikimedia Commons · CC BY 2.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-morning-glory-pool",
+    "name": "Morning Glory Pool",
+    "countryCode": "US",
+    "region": "Teton County",
+    "lat": 44.47506,
+    "lng": -110.84353,
+    "categories": [
+      "nature"
+    ],
+    "rank": 49,
+    "blurb": "lake in Teton County, Wyoming, USA",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Morning%20Glory%20Pool.jpg?width=640",
+    "imageAttribution": "Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-palo-duro-canyon",
+    "name": "Palo Duro Canyon",
+    "countryCode": "US",
+    "region": "Briscoe County",
+    "lat": 34.95,
+    "lng": -101.667,
+    "categories": [
+      "nature"
+    ],
+    "rank": 49,
+    "blurb": "canyon system in the U.S. state of Texas",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Palo%20Duro%20Canyon%202.jpg?width=640",
+    "imageAttribution": "Kimberly Vardeman from Lubbock, TX, USA · Wikimedia Commons · CC BY 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-uss-massachusetts",
+    "name": "USS Massachusetts",
+    "countryCode": "US",
+    "region": "Escambia County",
+    "lat": 30.29694,
+    "lng": -87.31139,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 49,
+    "blurb": "1893 Indiana-class battleship",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Massachusetts%20%28BB2%29.%20Starboard%20bow%20at%20wharf%2C%2006-1901%20-%20NARA%20-%20535432.jpg?width=640",
+    "imageAttribution": "Unknown authorUnknown author or not provided · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-vernal-fall",
+    "name": "Vernal Fall",
+    "countryCode": "US",
+    "region": "Mariposa County",
+    "lat": 37.7274,
+    "lng": -119.544,
+    "categories": [
+      "nature"
+    ],
+    "rank": 49,
+    "blurb": "waterfall in Yosemite National Park, California",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Vernal%20Fall%2C%20Yosemite%20NP%2C%20CA%2C%20US%20-%20Diliff.jpg?width=640",
+    "imageAttribution": "Diliff · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-yellowstone-falls",
+    "name": "Yellowstone Falls",
+    "countryCode": "US",
+    "region": "Wyoming",
+    "lat": 44.71799,
+    "lng": -110.49604,
+    "categories": [
+      "nature"
+    ],
+    "rank": 49,
+    "blurb": "waterfalls in Yellowstone National Park, Wyoming",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Upper%20Falls%20of%20the%20Yellowstone%20River.jpg?width=640",
+    "imageAttribution": "Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-eternal-flame-falls",
+    "name": "Eternal Flame Falls",
+    "countryCode": "US",
+    "region": "Orchard Park",
+    "lat": 42.70177,
+    "lng": -78.75171,
+    "categories": [
+      "nature"
+    ],
+    "rank": 48,
+    "blurb": "waterfall in New York state, United States, known for flammable natural gas vent",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Eternal%20flame%20falls%207252.jpg?width=640",
+    "imageAttribution": "Mpmajewski · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-havasu-falls",
+    "name": "Havasu Falls",
+    "countryCode": "US",
+    "region": "Havasupai Indian Reservation",
+    "lat": 36.255,
+    "lng": -112.69778,
+    "categories": [
+      "nature"
+    ],
+    "rank": 48,
+    "blurb": "waterfall in the Grand Canyon in Arizona",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/New%20havasu%20falls.JPG?width=640",
+    "imageAttribution": "Gonzo fan2007 · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-valles-caldera",
+    "name": "Valles Caldera",
+    "countryCode": "US",
+    "region": "New Mexico",
+    "lat": 35.86667,
+    "lng": -106.56667,
+    "categories": [
+      "nature"
+    ],
+    "rank": 48,
+    "blurb": "mountain in United States of America",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Valle%20Caldera%2C%20New%20Mexico.jpg?width=640",
+    "imageAttribution": "Jesse Allen and Robert Simmon · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-bridal-veil-falls",
+    "name": "Bridal Veil Falls",
+    "countryCode": "US",
+    "region": "Niagara Falls",
+    "lat": 43.0835,
+    "lng": -79.0707,
+    "categories": [
+      "nature"
+    ],
+    "rank": 46,
+    "blurb": "waterfall of the Niagara Falls",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Bridal%20Veil%20Falls%20below.png?width=640",
+    "imageAttribution": "No machine-readable author provided. Liffer~commonswiki assumed (based on copyright claims). · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-devils-hole",
+    "name": "Devils Hole",
+    "countryCode": "US",
+    "region": "Nye County",
+    "lat": 36.4254,
+    "lng": -116.29137,
+    "categories": [
+      "nature"
+    ],
+    "rank": 46,
+    "blurb": "spring in Nye County, Nevada, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Devils%20Hole%206.jpg?width=640",
+    "imageAttribution": "Stan Shebs · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-fulmer-falls",
+    "name": "Fulmer Falls",
+    "countryCode": "US",
+    "region": "Pike County",
+    "lat": 41.2367,
+    "lng": -74.9156,
+    "categories": [
+      "nature"
+    ],
+    "rank": 46,
+    "blurb": "American waterfall",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Fulmer%20Falls%20Wide%20View%203000px.jpg?width=640",
+    "imageAttribution": "Photo by and (c)2006 Derek Ramsey (Ram-Man) · Wikimedia Commons · GFDL 1.2",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-glass-beach",
+    "name": "Glass Beach",
+    "countryCode": "US",
+    "region": "California",
+    "lat": 39.45361,
+    "lng": -123.81306,
+    "categories": [
+      "beaches"
+    ],
+    "rank": 46,
+    "blurb": "beach in northern California, USA",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Glass%20Beach%20Fort%20Bragg.jpg?width=640",
+    "imageAttribution": "Ggerdel - Foto de: Gustavo Gerdel · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 3
+  },
+  {
+    "id": "us-glen-canyon",
+    "name": "Glen Canyon",
+    "countryCode": "US",
+    "region": "Arizona",
+    "lat": 36.86443,
+    "lng": -111.58794,
+    "categories": [
+      "nature"
+    ],
+    "rank": 46,
+    "blurb": "canyon in southern Utah and northern Arizona, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/00%209871%20Glen%20Canyon%20Nationalpark%20US%20-%20Stevens%20Arch.jpg?width=640",
+    "imageAttribution": "W. Bulach · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-laurel-canyon",
+    "name": "Laurel Canyon",
+    "countryCode": "US",
+    "region": "Los Angeles",
+    "lat": 34.11722,
+    "lng": -118.37528,
+    "categories": [
+      "nature"
+    ],
+    "rank": 46,
+    "blurb": "neighborhood of Los Angeles, California, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/View%20across%20Laurel%20Canyon%20from%20the%20corner%20of%20Carmar%20Place%20%26%20Carmar%20Drive.jpg?width=640",
+    "imageAttribution": "Joe Mabel · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-mammoth-cave",
+    "name": "Mammoth Cave",
+    "countryCode": "US",
+    "region": "Kentucky",
+    "lat": 37.18333,
+    "lng": -86.1,
+    "categories": [
+      "nature"
+    ],
+    "rank": 46,
+    "blurb": "cave system in Kentucky, United States of America",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mammoth%20Cave%20tour.jpg?width=640",
+    "imageAttribution": "Daniel Schwen · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-north-carolina-state-capitol",
+    "name": "North Carolina State Capitol",
+    "countryCode": "US",
+    "region": "Raleigh",
+    "lat": 35.78028,
+    "lng": -78.63917,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 46,
+    "blurb": "state capitol building of the U.S. state of North Carolina",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/North%20Carolina%20State%20Capitol%2C%20Raleigh.jpg?width=640",
+    "imageAttribution": "Jim Bowen from Fort Worth, US · Wikimedia Commons · CC BY 2.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-oregon-caves-national-monument-and-preserve",
+    "name": "Oregon Caves National Monument and Preserve",
+    "countryCode": "US",
+    "region": "Josephine County",
+    "lat": 42.09556,
+    "lng": -123.40583,
+    "categories": [
+      "nature"
+    ],
+    "rank": 46,
+    "blurb": "national monument in the United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cave%20Entrance%20%289938955404%29.jpg?width=640",
+    "imageAttribution": "Oregon Caves from Cave Junction, USA · Wikimedia Commons · CC BY 2.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-organ-pipe-cactus-national-monument",
+    "name": "Organ Pipe Cactus National Monument",
+    "countryCode": "US",
+    "region": "Pima County",
+    "lat": 31.954,
+    "lng": -112.80095,
+    "categories": [
+      "nature"
+    ],
+    "rank": 46,
+    "blurb": "United States National Monument In Arizona",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Organ%20Pipe%20%26%20antler.jpg?width=640",
+    "imageAttribution": "Miguel Angel de la Cueva · Wikimedia Commons · CC BY-SA 2.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-south-pass",
+    "name": "South Pass",
+    "countryCode": "US",
+    "region": "Fremont County",
+    "lat": 42.37,
+    "lng": -108.914,
+    "categories": [
+      "viewpoints"
+    ],
+    "rank": 46,
+    "blurb": "collective term for two mountain passes on the Continental Divide in the Rocky Mountains in southwestern Wyoming",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/DSCN6109%20pacificspringsandsouthpass%20e%20600.jpg?width=640",
+    "imageAttribution": "Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 1
+  },
+  {
+    "id": "us-steamboat-geyser",
+    "name": "Steamboat Geyser",
+    "countryCode": "US",
+    "region": "Park County",
+    "lat": 44.7235,
+    "lng": -110.70303,
+    "categories": [
+      "nature"
+    ],
+    "rank": 46,
+    "blurb": "geyser in Yellowstone National Park",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Steamboatgeyser1.jpg?width=640",
+    "imageAttribution": "EE Mackin · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-chilnualna-fall",
+    "name": "Chilnualna Fall",
+    "countryCode": "US",
+    "region": "Mariposa County",
+    "lat": 37.5634,
+    "lng": -119.618,
+    "categories": [
+      "nature"
+    ],
+    "rank": 45,
+    "blurb": "waterfall on Chilnualna Creek in Yosemite National Park, California",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Chilnualna%20Falls%202006.JPG?width=640",
+    "imageAttribution": "Ben Lane · Wikimedia Commons · CC BY-SA 2.5",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-cumberland-gap",
+    "name": "Cumberland Gap",
+    "countryCode": "US",
+    "region": "Kentucky",
+    "lat": 36.60406,
+    "lng": -83.67364,
+    "categories": [
+      "viewpoints"
+    ],
+    "rank": 45,
+    "blurb": "narrow pass through the Cumberland Mountains",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cumberland%20Gap%20foggy.jpg?width=640",
+    "imageAttribution": "Aaron/ConspiracyofHappiness · Wikimedia Commons · CC BY 2.0",
+    "suggestedHours": 1
+  },
+  {
+    "id": "us-elakala-falls",
+    "name": "Elakala Falls",
+    "countryCode": "US",
+    "region": "Tucker County",
+    "lat": 39.109,
+    "lng": -79.499,
+    "categories": [
+      "nature"
+    ],
+    "rank": 45,
+    "blurb": "waterfalls in West Virginia, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Elakala%20Waterfalls%20Swirling%20Pool%20Mossy%20Rocks.jpg?width=640",
+    "imageAttribution": "Forest Wander from Cross Lanes · Wikimedia Commons · CC BY-SA 2.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-hopewell-culture-national-historical-park",
+    "name": "Hopewell Culture National Historical Park",
+    "countryCode": "US",
+    "region": "Ross County",
+    "lat": 39.3758,
+    "lng": -83.0064,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 45,
+    "blurb": "United States national historical park",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Hopewell%20Culture%20National%20Historical%20Park.jpg?width=640",
+    "imageAttribution": "Ɱ · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-jacob-s-well-texas",
+    "name": "Jacob's Well (Texas)",
+    "countryCode": "US",
+    "region": "Hays County",
+    "lat": 30.03444,
+    "lng": -98.12639,
+    "categories": [
+      "nature"
+    ],
+    "rank": 45,
+    "blurb": "artesian spring",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Swimming%20in%20Jacob%27s%20Well.jpg?width=640",
+    "imageAttribution": "Larry D. Moore · Wikimedia Commons · CC BY 4.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-jamaica-bay-wildlife-refuge",
+    "name": "Jamaica Bay Wildlife Refuge",
+    "countryCode": "US",
+    "region": "New York City",
+    "lat": 40.61583,
+    "lng": -73.83,
+    "categories": [
+      "nature"
+    ],
+    "rank": 45,
+    "blurb": "Wildlife refuge in New York City",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Aerial%20view%20of%20Subway%20Island%2C%20July%202019.JPG?width=640",
+    "imageAttribution": "Pi.1415926535 · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-celilo-falls",
+    "name": "Celilo Falls",
+    "countryCode": "US",
+    "region": "Oregon",
+    "lat": 45.64945,
+    "lng": -120.97792,
+    "categories": [
+      "nature"
+    ],
+    "rank": 43,
+    "blurb": "Submerged waterfall on the Columbia River in Oregon and Washington. Largest waterfall by flow rate in North America until 1957.",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Celilo%20Falls%20on%20the%20Columbia%20River.jpg?width=640",
+    "imageAttribution": "Barrows, Benjamin H; Union Pacific Railroad Company. Photographer name Benjamin A. Gifford (based on another image) · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-cumberland-falls",
+    "name": "Cumberland Falls",
+    "countryCode": "US",
+    "region": "Kentucky",
+    "lat": 36.83801,
+    "lng": -84.34444,
+    "categories": [
+      "nature"
+    ],
+    "rank": 43,
+    "blurb": "waterfall in the U.S. state of Kentucky",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/CumberlandFalls.jpg?width=640",
+    "imageAttribution": "ChrisKuehl · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-illilouette-fall",
+    "name": "Illilouette Fall",
+    "countryCode": "US",
+    "region": "Mariposa County",
+    "lat": 37.7141,
+    "lng": -119.561,
+    "categories": [
+      "nature"
+    ],
+    "rank": 43,
+    "blurb": "waterfall in Yosemite National Park, California",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Illilouette%20Fall%2008911.JPG?width=640",
+    "imageAttribution": "Walter Siegmund · Wikimedia Commons · CC BY 2.5",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-lake-merritt",
+    "name": "Lake Merritt",
+    "countryCode": "US",
+    "region": "Oakland",
+    "lat": 37.8039,
+    "lng": -122.2591,
+    "categories": [
+      "nature"
+    ],
+    "rank": 43,
+    "blurb": "lagoon in Oakland, California, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Closeup%20aerial%20view%20of%20Downtown%20Oakland%20and%20Lakeside%20Park.jpg?width=640",
+    "imageAttribution": "Dcoetzee · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-luray-caverns",
+    "name": "Luray Caverns",
+    "countryCode": "US",
+    "region": "Virginia",
+    "lat": 38.66909,
+    "lng": -78.50195,
+    "categories": [
+      "nature"
+    ],
+    "rank": 43,
+    "blurb": "landform",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Luray%20Caverns%20%22Dream%20Lake%22%20%288041060683%29%20%282%29.jpg?width=640",
+    "imageAttribution": "Paulo Ordoveza from Washington, DC · Wikimedia Commons · CC BY 2.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-mammoth-hot-springs",
+    "name": "Mammoth Hot Springs",
+    "countryCode": "US",
+    "region": "Park County",
+    "lat": 44.97062,
+    "lng": -110.70564,
+    "categories": [
+      "nature"
+    ],
+    "rank": 43,
+    "blurb": "large complex of hot springs in Park County, Wyoming, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/00%200346%20Sinter%20terraces%20-%20Yellowstone-Nationalpark.jpg?width=640",
+    "imageAttribution": "W. Bulach · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-niagara-gorge",
+    "name": "Niagara Gorge",
+    "countryCode": "US",
+    "region": "Ontario",
+    "lat": 43.12083,
+    "lng": -79.07056,
+    "categories": [
+      "nature"
+    ],
+    "rank": 43,
+    "blurb": "gorge of the Niagara River on the boundary of Canada and the United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Niagara%20Gorge%20at%20Niagara%20Glen%20Nature%20Reserve.jpg?width=640",
+    "imageAttribution": "Mhsheikholeslami · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-snoqualmie-pass",
+    "name": "Snoqualmie Pass",
+    "countryCode": "US",
+    "region": "Washington",
+    "lat": 47.42333,
+    "lng": -121.41083,
+    "categories": [
+      "viewpoints"
+    ],
+    "rank": 43,
+    "blurb": "mountain pass in Washington state, U.S",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/I90ThruSnoqualmiePass.jpg?width=640",
+    "imageAttribution": "Mountains to Sound Greenway Trust · Wikimedia Commons · Attribution",
+    "suggestedHours": 1
+  },
+  {
+    "id": "us-assateague-island",
+    "name": "Assateague Island",
+    "countryCode": "US",
+    "region": "Accomack County",
+    "lat": 38.09179,
+    "lng": -75.2038,
+    "categories": [
+      "beaches"
+    ],
+    "rank": 42,
+    "blurb": "barrier island in Maryland and Virginia, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/AssateagueLighthouse.jpg?width=640",
+    "imageAttribution": "DCwom (talk) (Uploads) · Wikimedia Commons · Public domain",
+    "suggestedHours": 3
+  },
+  {
+    "id": "us-baker-beach",
+    "name": "Baker Beach",
+    "countryCode": "US",
+    "region": "San Francisco",
+    "lat": 37.79368,
+    "lng": -122.4837,
+    "categories": [
+      "beaches"
+    ],
+    "rank": 42,
+    "blurb": "beach on the peninsula of San Francisco, California, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Baker%20Beach%202.jpg?width=640",
+    "imageAttribution": "Daniel Schwen · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 3
+  },
+  {
+    "id": "us-black-canyon-of-the-colorado",
+    "name": "Black Canyon of the Colorado",
+    "countryCode": "US",
+    "region": "Nevada",
+    "lat": 35.80556,
+    "lng": -114.71167,
+    "categories": [
+      "nature"
+    ],
+    "rank": 42,
+    "blurb": "canyon on the Colorado River where Hoover Dam was built",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Looking%20upstream%20through%20Black%20Canyon%20toward%20Hoover%20Damsite.%20View%20showing%20condition%20of%20canyon%20prior%20to%20inauguration...%20-%20NARA%20-%20293792.tiff?width=640",
+    "imageAttribution": "Unknown authorUnknown author or not provided · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-castle-geyser",
+    "name": "Castle Geyser",
+    "countryCode": "US",
+    "region": "Teton County",
+    "lat": 44.46366,
+    "lng": -110.83647,
+    "categories": [
+      "nature"
+    ],
+    "rank": 42,
+    "blurb": "geyser in Yellowstone National Park, Wyoming",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Yellowstone%20Castle%20Geysir%202.jpg?width=640",
+    "imageAttribution": "user: Flicka · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-comet-falls",
+    "name": "Comet Falls",
+    "countryCode": "US",
+    "region": "Pierce County",
+    "lat": 46.7958,
+    "lng": -121.78,
+    "categories": [
+      "nature"
+    ],
+    "rank": 42,
+    "blurb": "waterfall on Van Trump Creek in Mount Rainier National Park, Washington",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Comet%20Falls.jpg?width=640",
+    "imageAttribution": "J Brew · Wikimedia Commons · CC BY-SA 2.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-grand-canyon-of-the-yellowstone",
+    "name": "Grand Canyon of the Yellowstone",
+    "countryCode": "US",
+    "region": "Park County",
+    "lat": 44.71667,
+    "lng": -110.49667,
+    "categories": [
+      "nature"
+    ],
+    "rank": 42,
+    "blurb": "canyon on the Yellowstone River in Park County, Wyoming, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Grand%20canyon%20of%20Yellowstone%20and%20Yellowstone%20fall.jpg?width=640",
+    "imageAttribution": "Brocken Inaglory · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-great-falls",
+    "name": "Great Falls",
+    "countryCode": "US",
+    "region": "Montana",
+    "lat": 47.57,
+    "lng": -111.123,
+    "categories": [
+      "nature"
+    ],
+    "rank": 42,
+    "blurb": "series of falls along the Missouri River in Montana",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Great%20falls%20of%20missouri%20river.jpg?width=640",
+    "imageAttribution": "Tim1965 · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-hells-canyon",
+    "name": "Hells Canyon",
+    "countryCode": "US",
+    "region": "Idaho",
+    "lat": 45.3714,
+    "lng": -116.638,
+    "categories": [
+      "nature"
+    ],
+    "rank": 42,
+    "blurb": "landform",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/OR%20hells%20canyon.jpg?width=640",
+    "imageAttribution": "Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-lewis-falls",
+    "name": "Lewis Falls",
+    "countryCode": "US",
+    "region": "Teton County",
+    "lat": 44.2674,
+    "lng": -110.6357,
+    "categories": [
+      "nature"
+    ],
+    "rank": 42,
+    "blurb": "waterfall located on the Lewis River in Yellowstone National Park, Wyoming, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Lewis%20Falls.jpg?width=640",
+    "imageAttribution": "No machine-readable author provided. MONGO assumed (based on copyright claims). · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-monterey-canyon",
+    "name": "Monterey Canyon",
+    "countryCode": "US",
+    "region": "California",
+    "lat": 36.78333,
+    "lng": -121.83333,
+    "categories": [
+      "nature"
+    ],
+    "rank": 42,
+    "blurb": "landform",
+    "imageUrl": null,
+    "imageAttribution": null,
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-okefenokee-national-wildlife-refuge",
+    "name": "Okefenokee National Wildlife Refuge",
+    "countryCode": "US",
+    "region": "Baker County",
+    "lat": 30.73812,
+    "lng": -82.13974,
+    "categories": [
+      "nature"
+    ],
+    "rank": 42,
+    "blurb": "nature center in Folkston, Georgia, USA",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/OkefenokeeNWR1.jpg?width=640",
+    "imageAttribution": "US Fish and Wildlife Service · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-pine-barrens",
+    "name": "Pine Barrens",
+    "countryCode": "US",
+    "region": "New Jersey",
+    "lat": 39.75,
+    "lng": -74.75,
+    "categories": [
+      "nature"
+    ],
+    "rank": 42,
+    "blurb": "coastal pine barrens in southern New Jersey, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/2016-08-14%2013%2026%2030%20Grove%20of%20Pitch%20Pine%20along%20the%20Reed%27s%20Road%20Maritime%20Forest%20Trail%20in%20Island%20Beach%20State%20Park%2C%20New%20Jersey.jpg?width=640",
+    "imageAttribution": "Famartin · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-timpanogos-cave-national-monument",
+    "name": "Timpanogos Cave National Monument",
+    "countryCode": "US",
+    "region": "Utah County",
+    "lat": 40.44056,
+    "lng": -111.70944,
+    "categories": [
+      "nature"
+    ],
+    "rank": 42,
+    "blurb": "national monument in Utah County, Utah, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Timpanogos%20Cave.gif?width=640",
+    "imageAttribution": "Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-bitterroot-national-forest",
+    "name": "Bitterroot National Forest",
+    "countryCode": "US",
+    "region": "Montana",
+    "lat": 46.2328,
+    "lng": -113.964,
+    "categories": [
+      "nature"
+    ],
+    "rank": 40,
+    "blurb": "U.S. Forest across Montana and Idaho",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Trappk.jpg?width=640",
+    "imageAttribution": "U.S. Forest Service · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-black-s-beach",
+    "name": "Black's Beach",
+    "countryCode": "US",
+    "region": "San Diego County",
+    "lat": 32.8925,
+    "lng": -117.25361,
+    "categories": [
+      "beaches"
+    ],
+    "rank": 40,
+    "blurb": "beach in San Diego County, California, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Black%27s%20Beach%2C%20La%20Jolla%2C%20San%20Diego%2C%20California%2003.jpg?width=640",
+    "imageAttribution": "Levi Clancy · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 3
+  },
+  {
+    "id": "us-blanchard-springs-caverns",
+    "name": "Blanchard Springs Caverns",
+    "countryCode": "US",
+    "region": "Stone County",
+    "lat": 35.96368,
+    "lng": -92.17933,
+    "categories": [
+      "nature"
+    ],
+    "rank": 40,
+    "blurb": "cave system in Stone County, Arkansas, United States of America",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ghost%20Room.jpg?width=640",
+    "imageAttribution": "Eric Hunt · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-cahuenga-pass",
+    "name": "Cahuenga Pass",
+    "countryCode": "US",
+    "region": "Los Angeles",
+    "lat": 34.1245,
+    "lng": -118.343,
+    "categories": [
+      "viewpoints"
+    ],
+    "rank": 40,
+    "blurb": "landform in the Santa Monica Mountains of California",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/US%20Route%20101%20North%20entering%20the%20Cahuenga%20Pass.jpg?width=640",
+    "imageAttribution": "Downtowngal · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 1
+  },
+  {
+    "id": "us-grand-geyser",
+    "name": "Grand Geyser",
+    "countryCode": "US",
+    "region": "Teton County",
+    "lat": 44.46668,
+    "lng": -110.83698,
+    "categories": [
+      "nature"
+    ],
+    "rank": 40,
+    "blurb": "geyser in Teton County, Wyoming, United States of America",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Grand%20Geyser%20eruption%20opening%20day%202019%20%2833792661878%29.jpg?width=640",
+    "imageAttribution": "Yellowstone National Park · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-marias-pass",
+    "name": "Marias Pass",
+    "countryCode": "US",
+    "region": "Montana",
+    "lat": 48.3183,
+    "lng": -113.355,
+    "categories": [
+      "viewpoints"
+    ],
+    "rank": 40,
+    "blurb": "mountain pass in Montana",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Marias%20Pass%20Monuments.JPG?width=640",
+    "imageAttribution": "Kjmoss1 at English Wikipedia · Wikimedia Commons · CC BY 3.0",
+    "suggestedHours": 1
+  },
+  {
+    "id": "us-meadowcroft-rockshelter",
+    "name": "Meadowcroft Rockshelter",
+    "countryCode": "US",
+    "region": "Jefferson Township",
+    "lat": 40.28639,
+    "lng": -80.49167,
+    "categories": [
+      "nature"
+    ],
+    "rank": 40,
+    "blurb": "archaeological site in Washington County, Pennsylvania",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/MeadowcroftRockshelter.jpg?width=640",
+    "imageAttribution": "Lee Paxton · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-ocean-beach",
+    "name": "Ocean Beach",
+    "countryCode": "US",
+    "region": "San Francisco",
+    "lat": 37.75944,
+    "lng": -122.51083,
+    "categories": [
+      "beaches"
+    ],
+    "rank": 40,
+    "blurb": "beach that runs adjacent to Golden Gate Park in San Francisco",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Oceanbeachsf.jpg?width=640",
+    "imageAttribution": "Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 3
+  },
+  {
+    "id": "us-anastasia-island",
+    "name": "Anastasia Island",
+    "countryCode": "US",
+    "region": "St. Johns County",
+    "lat": 29.82664,
+    "lng": -81.27729,
+    "categories": [
+      "beaches"
+    ],
+    "rank": 38,
+    "blurb": "barrier island in St. Johns County, Florida, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/St.%20Augustine%20Lighthouse%20located%20in%20Florida.jpg?width=640",
+    "imageAttribution": "JRetherfordHunter · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 3
+  },
+  {
+    "id": "us-cajon-pass",
+    "name": "Cajon Pass",
+    "countryCode": "US",
+    "region": "San Bernardino County",
+    "lat": 34.32583,
+    "lng": -117.42833,
+    "categories": [
+      "viewpoints"
+    ],
+    "rank": 38,
+    "blurb": "mountain pass in Southern California",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cajon%20Pass%2C%20wide%20angle.jpg?width=640",
+    "imageAttribution": "jcookfisher · Wikimedia Commons · CC BY 2.0",
+    "suggestedHours": 1
+  },
+  {
+    "id": "us-cave-of-the-winds",
+    "name": "Cave of the Winds",
+    "countryCode": "US",
+    "region": "New York",
+    "lat": 43.0834,
+    "lng": -79.071,
+    "categories": [
+      "nature"
+    ],
+    "rank": 38,
+    "blurb": "former cave and current tourist attraction at Niagara Falls",
+    "imageUrl": null,
+    "imageAttribution": null,
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-false-kiva",
+    "name": "False Kiva",
+    "countryCode": "US",
+    "region": null,
+    "lat": 38.4185,
+    "lng": -109.91842,
+    "categories": [
+      "nature"
+    ],
+    "rank": 38,
+    "blurb": "Stone circle in a cave in the Canyonlands National Park in Utah",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/False%20Kiva%20%287351510924%29.jpg?width=640",
+    "imageAttribution": "John Fowler from Placitas, NM, USA · Wikimedia Commons · CC BY 2.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-giant-geyser",
+    "name": "Giant Geyser",
+    "countryCode": "US",
+    "region": "Teton County",
+    "lat": 44.47064,
+    "lng": -110.84055,
+    "categories": [
+      "nature"
+    ],
+    "rank": 38,
+    "blurb": "geyser in Yellowstone National Park",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/GiantGeyserMarler1952.jpg?width=640",
+    "imageAttribution": "Marler · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-independence-pass",
+    "name": "Independence Pass",
+    "countryCode": "US",
+    "region": "Lake County",
+    "lat": 39.1081,
+    "lng": -106.564,
+    "categories": [
+      "viewpoints"
+    ],
+    "rank": 38,
+    "blurb": "mountain pass in Colorado",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/View%20across%20Independence%20Pass%2C%20CO.jpg?width=640",
+    "imageAttribution": "Daniel Case · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 1
+  },
+  {
+    "id": "us-marble-canyon",
+    "name": "Marble Canyon",
+    "countryCode": "US",
+    "region": "Arizona",
+    "lat": 36.86362,
+    "lng": -111.59015,
+    "categories": [
+      "nature"
+    ],
+    "rank": 38,
+    "blurb": "section of the Colorado River canyon from Lee's Ferry to the confluence with the Little Colorado River",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Leesferry-river.jpg?width=640",
+    "imageAttribution": "Busterfreak at en.wikipedia · Wikimedia Commons · CC BY 2.5",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-natural-bridge-caverns",
+    "name": "Natural Bridge Caverns",
+    "countryCode": "US",
+    "region": "Comal County",
+    "lat": 29.69199,
+    "lng": -98.34285,
+    "categories": [
+      "nature"
+    ],
+    "rank": 38,
+    "blurb": "in the southern U.S. state of Texas",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/NaturalBridgeCaverns1.jpg?width=640",
+    "imageAttribution": "Rei at en.wikipedia · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-oak-street-beach",
+    "name": "Oak Street Beach",
+    "countryCode": "US",
+    "region": "Chicago",
+    "lat": 41.903,
+    "lng": -87.623,
+    "categories": [
+      "beaches"
+    ],
+    "rank": 38,
+    "blurb": "beach in Chicago, Illinois, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/20070703%20Oak%20Street%20Beachstro.JPG?width=640",
+    "imageAttribution": "User:TonyTheTiger · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 3
+  },
+  {
+    "id": "us-paisley-caves",
+    "name": "Paisley Caves",
+    "countryCode": "US",
+    "region": "Lake County",
+    "lat": 42.7613,
+    "lng": -120.551,
+    "categories": [
+      "nature"
+    ],
+    "rank": 38,
+    "blurb": "cave in United States of America",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Paisley%20caves%20-%20Fossil%20Cave5.jpg?width=640",
+    "imageAttribution": "BLM photo · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-palace-of-the-governors",
+    "name": "Palace of the Governors",
+    "countryCode": "US",
+    "region": "Santa Fe",
+    "lat": 35.68785,
+    "lng": -105.9382,
+    "categories": [
+      "landmarks"
+    ],
+    "rank": 38,
+    "blurb": "building in Santa Fe",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/NewMexicoPalaceSantaFe.jpg?width=640",
+    "imageAttribution": "Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-raton-pass",
+    "name": "Raton Pass",
+    "countryCode": "US",
+    "region": "Las Animas County",
+    "lat": 36.9911,
+    "lng": -104.487,
+    "categories": [
+      "viewpoints"
+    ],
+    "rank": 38,
+    "blurb": "mountain pass on the New Mexico-Colorado border in the United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Westbound%20Southwest%20Chief%20on%20Raton%20Pass.jpg?width=640",
+    "imageAttribution": "Hinge of fate · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 1
+  },
+  {
+    "id": "us-santa-monica-state-beach",
+    "name": "Santa Monica State Beach",
+    "countryCode": "US",
+    "region": "Santa Monica",
+    "lat": 34.015,
+    "lng": -118.502,
+    "categories": [
+      "beaches"
+    ],
+    "rank": 38,
+    "blurb": "beach in Santa Monica, California, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Santa%20Monica%20State%20Beach%20P4060277.jpg?width=640",
+    "imageAttribution": "Alexander Migl · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 3
+  },
+  {
+    "id": "us-the-narrows",
+    "name": "The Narrows",
+    "countryCode": "US",
+    "region": "Washington County",
+    "lat": 37.30669,
+    "lng": -112.94769,
+    "categories": [
+      "nature"
+    ],
+    "rank": 38,
+    "blurb": "narrowest part of Zion Canyon in Zion National Park, Utah, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Zion%20Narrows.jpg?width=640",
+    "imageAttribution": "Jon Sullivan · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-wyandotte-caves",
+    "name": "Wyandotte Caves",
+    "countryCode": "US",
+    "region": "Indiana",
+    "lat": 38.22806,
+    "lng": -86.29611,
+    "categories": [
+      "nature"
+    ],
+    "rank": 38,
+    "blurb": "park and its caverns in southern Indiana",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Wyandotte%20cave9.jpg?width=640",
+    "imageAttribution": "Cool10191 · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-anna-maria-island",
+    "name": "Anna Maria Island",
+    "countryCode": "US",
+    "region": "Florida",
+    "lat": 27.513,
+    "lng": -82.719,
+    "categories": [
+      "beaches"
+    ],
+    "rank": 35,
+    "blurb": "island in Florida, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/My%20Day%20on%20Anna%20Maria%20Island%20-%20Nov%2030%202009%20028.JPG?width=640",
+    "imageAttribution": "Bfpage at English Wikipedia · Wikimedia Commons · CC BY 3.0",
+    "suggestedHours": 3
+  },
+  {
+    "id": "us-aransas-national-wildlife-refuge",
+    "name": "Aransas National Wildlife Refuge",
+    "countryCode": "US",
+    "region": "Texas",
+    "lat": 28.2667,
+    "lng": -96.8167,
+    "categories": [
+      "nature"
+    ],
+    "rank": 35,
+    "blurb": "National Wildlife Refuge",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Aransas%20national%20wildlife%20refuge1.jpg?width=640",
+    "imageAttribution": "Larry D. Moore · Wikimedia Commons · CC BY 4.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-ash-meadows-national-wildlife-refuge",
+    "name": "Ash Meadows National Wildlife Refuge",
+    "countryCode": "US",
+    "region": "Nye County",
+    "lat": 36.425,
+    "lng": -116.333,
+    "categories": [
+      "nature"
+    ],
+    "rank": 35,
+    "blurb": "protected area in the Amargosa Valley of southern Nye County, Nevada",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Ash%20Meadows%20Nat%27l.%20Wildlife%20Ref.%2C%20NW%20of%20Pahrump%2C%20Nev%20-%20%2817479519654%29.jpg?width=640",
+    "imageAttribution": "Murray Foubister · Wikimedia Commons · CC BY-SA 2.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-beehive-geyser",
+    "name": "Beehive Geyser",
+    "countryCode": "US",
+    "region": "Wyoming",
+    "lat": 44.4626,
+    "lng": -110.83,
+    "categories": [
+      "nature"
+    ],
+    "rank": 35,
+    "blurb": "geyser",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Beehive%20geyser%202.jpg?width=640",
+    "imageAttribution": "Unknown authorUnknown author · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-bluejohn-canyon",
+    "name": "Bluejohn Canyon",
+    "countryCode": "US",
+    "region": "Wayne County",
+    "lat": 38.3783,
+    "lng": -110.278,
+    "categories": [
+      "nature"
+    ],
+    "rank": 35,
+    "blurb": "slot canyon in Canyonlands National Park in Wayne County, Utah, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/BlueJohnCooridoor.JPG?width=640",
+    "imageAttribution": "Michael Grindstaff · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-fales-hot-springs",
+    "name": "Fales Hot Springs",
+    "countryCode": "US",
+    "region": "Mono County",
+    "lat": 38.35111,
+    "lng": -119.40028,
+    "categories": [
+      "nature"
+    ],
+    "rank": 35,
+    "blurb": "hot spring in California",
+    "imageUrl": null,
+    "imageAttribution": null,
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-florida-caverns-state-park",
+    "name": "Florida Caverns State Park",
+    "countryCode": "US",
+    "region": "Florida",
+    "lat": 30.81389,
+    "lng": -85.23306,
+    "categories": [
+      "nature"
+    ],
+    "rank": 35,
+    "blurb": "State park in Florida, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/FLCaverns-Jan2007.jpg?width=640",
+    "imageAttribution": "Tim Ross · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-giantess-geyser",
+    "name": "Giantess Geyser",
+    "countryCode": "US",
+    "region": "Teton County",
+    "lat": 44.46352,
+    "lng": -110.82902,
+    "categories": [
+      "nature"
+    ],
+    "rank": 35,
+    "blurb": "geyser in Teton County, Wyoming, United States of America",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/GiantessGeyser-Douglass1969.jpg?width=640",
+    "imageAttribution": "JR Douglass · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-glenwood-canyon",
+    "name": "Glenwood Canyon",
+    "countryCode": "US",
+    "region": "Garfield County",
+    "lat": 39.575,
+    "lng": -107.223,
+    "categories": [
+      "nature"
+    ],
+    "rank": 35,
+    "blurb": "scenic canyon in Garfield and Eagle counties in Colorado, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/2020%2008%2023-20.41.33.572-CDT.jpg?width=640",
+    "imageAttribution": "White River National Forest\n\nU.S. Forest Service · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-grand-strand",
+    "name": "Grand Strand",
+    "countryCode": "US",
+    "region": "South Carolina",
+    "lat": 33.68,
+    "lng": -78.88,
+    "categories": [
+      "beaches"
+    ],
+    "rank": 35,
+    "blurb": "coastal area in South Carolina, US",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Myrtle%20Beach%2C%208%20a.m..jpg?width=640",
+    "imageAttribution": "Phil Guest from Bournemouth, UK · Wikimedia Commons · CC BY-SA 2.0",
+    "suggestedHours": 3
+  },
+  {
+    "id": "us-jacob-riis-park",
+    "name": "Jacob Riis Park",
+    "countryCode": "US",
+    "region": "Queens",
+    "lat": 40.567,
+    "lng": -73.8741,
+    "categories": [
+      "beaches"
+    ],
+    "rank": 35,
+    "blurb": "beachfront park in New York City",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Jacob%20Riis%20Park.jpg?width=640",
+    "imageAttribution": "You may select the license of your choice. · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 3
+  },
+  {
+    "id": "us-kartchner-caverns-state-park",
+    "name": "Kartchner Caverns State Park",
+    "countryCode": "US",
+    "region": "Cochise County",
+    "lat": 31.8375,
+    "lng": -110.34722,
+    "categories": [
+      "nature"
+    ],
+    "rank": 35,
+    "blurb": "state park in the US state of Arizona",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Kartchner%20Big%20Room.jpg?width=640",
+    "imageAttribution": "Mike Lewis · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-nantasket-beach",
+    "name": "Nantasket Beach",
+    "countryCode": "US",
+    "region": "Plymouth County",
+    "lat": 42.29167,
+    "lng": -70.87444,
+    "categories": [
+      "beaches"
+    ],
+    "rank": 35,
+    "blurb": "beach in Massachusetts",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/General%20View%2C%20Nantasket%20Beach%2C%20MA.jpg?width=640",
+    "imageAttribution": "Unknown authorUnknown author · Wikimedia Commons · Public domain",
+    "suggestedHours": 3
+  },
+  {
+    "id": "us-national-elk-refuge",
+    "name": "National Elk Refuge",
+    "countryCode": "US",
+    "region": "Teton County",
+    "lat": 43.4803,
+    "lng": -110.748,
+    "categories": [
+      "nature"
+    ],
+    "rank": 35,
+    "blurb": "protected area in Wyoming",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Wapiti%20on%20the%20National%20Elk%20Refuge.jpg?width=640",
+    "imageAttribution": "Fish and Wildlife Service · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-oak-creek-canyon",
+    "name": "Oak Creek Canyon",
+    "countryCode": "US",
+    "region": "Arizona",
+    "lat": 34.9125,
+    "lng": -111.727,
+    "categories": [
+      "nature"
+    ],
+    "rank": 35,
+    "blurb": "river gorge located in northern Arizona between the cities of Flagstaff and Sedona",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/00%201007%20Oak%20Creek%20Canyon%20-%20Arizona%20%28USA%29.jpg?width=640",
+    "imageAttribution": "W. Bulach · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-opal-pool",
+    "name": "Opal Pool",
+    "countryCode": "US",
+    "region": "Teton County",
+    "lat": 44.52667,
+    "lng": -110.83872,
+    "categories": [
+      "nature"
+    ],
+    "rank": 35,
+    "blurb": "hot spring in Teton County, Wyoming, United States of America",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Opal%20Pool%20YNP2%20filtered%20noise.jpg?width=640",
+    "imageAttribution": "Opal_Pool_YNP2.jpg: Acroterion\nderivative work: Gaendalf · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-sandia-cave",
+    "name": "Sandia Cave",
+    "countryCode": "US",
+    "region": "New Mexico",
+    "lat": 35.255,
+    "lng": -106.406,
+    "categories": [
+      "nature"
+    ],
+    "rank": 35,
+    "blurb": "show cave in New Mexico",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Sandia%20Man%20Cave.JPG?width=640",
+    "imageAttribution": "Skarz · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-seedskadee-national-wildlife-refuge",
+    "name": "Seedskadee National Wildlife Refuge",
+    "countryCode": "US",
+    "region": "Sweetwater County",
+    "lat": 41.8569,
+    "lng": -109.837,
+    "categories": [
+      "nature"
+    ],
+    "rank": 35,
+    "blurb": "national wildlife refuge",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Seedskadee%20nwr%20sunset.jpg?width=640",
+    "imageAttribution": "Tom Koerner/USFWS · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-wallula-gap",
+    "name": "Wallula Gap",
+    "countryCode": "US",
+    "region": "Washington",
+    "lat": 46.0444,
+    "lng": -118.947,
+    "categories": [
+      "nature"
+    ],
+    "rank": 35,
+    "blurb": "large water gap of the Columbia River through basalt anticlines in the U.S. state of Washington",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/View%20from%20Wallula%20Main%20Street%20IMG%201480.JPG?width=640",
+    "imageAttribution": "Williamborg · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-wichita-mountains-wildlife-refuge",
+    "name": "Wichita Mountains Wildlife Refuge",
+    "countryCode": "US",
+    "region": "Comanche County",
+    "lat": 34.7667,
+    "lng": -98.7003,
+    "categories": [
+      "nature"
+    ],
+    "rank": 35,
+    "blurb": "protected area in Oklahoma, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Coreopsis%2C%20Wichita%20Mountains%20Wildlife%20Refuge.jpg?width=640",
+    "imageAttribution": "U.S. Fish and Wildlife Service Headquarters · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-zion-canyon",
+    "name": "Zion Canyon",
+    "countryCode": "US",
+    "region": "Washington County",
+    "lat": 37.165,
+    "lng": -113.012,
+    "categories": [
+      "nature"
+    ],
+    "rank": 35,
+    "blurb": "canyon in Washington County, Utah, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Zion%20angels%20landing%20view%20v2.jpg?width=640",
+    "imageAttribution": "No machine-readable author provided. Antilived assumed (based on copyright claims). · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-american-fork-canyon",
+    "name": "American Fork Canyon",
+    "countryCode": "US",
+    "region": "Utah County",
+    "lat": 40.4333,
+    "lng": -111.733,
+    "categories": [
+      "nature"
+    ],
+    "rank": 32,
+    "blurb": "canyon located in the Wasatch Range in Utah County, Utah, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/American%20Fork%20Canyon%20from%20Timpanogos%20Cave%20entrance.jpg?width=640",
+    "imageAttribution": "Ken Lund from Las Vegas, Nevada, USA. Edited slightly prior to uploac by Daniel Case · Wikimedia Commons · CC BY-SA 2.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-arroyo-seco",
+    "name": "Arroyo Seco",
+    "countryCode": "US",
+    "region": "Los Angeles County",
+    "lat": 34.0789,
+    "lng": -118.22591,
+    "categories": [
+      "nature"
+    ],
+    "rank": 32,
+    "blurb": "seasonal watercourse in Los Angeles County, California, United States of America",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/2010-1101-06-ColoradoStBridge.jpg?width=640",
+    "imageAttribution": "Bobak Ha'Eri · Wikimedia Commons · CC BY 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-aurum-geyser",
+    "name": "Aurum Geyser",
+    "countryCode": "US",
+    "region": "Wyoming",
+    "lat": 44.46458,
+    "lng": -110.8295,
+    "categories": [
+      "nature"
+    ],
+    "rank": 32,
+    "blurb": "geyser in the Upper Geyser Basin of Yellowstone National Park",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Aurum%20geyser.jpg?width=640",
+    "imageAttribution": "Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-big-thicket-national-preserve",
+    "name": "Big Thicket National Preserve",
+    "countryCode": "US",
+    "region": "Texas",
+    "lat": 30.1991,
+    "lng": -94.11601,
+    "categories": [
+      "nature"
+    ],
+    "rank": 32,
+    "blurb": "protected area",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Big%20thicket.jpg?width=640",
+    "imageAttribution": "NPS · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-blackwater-national-wildlife-refuge",
+    "name": "Blackwater National Wildlife Refuge",
+    "countryCode": "US",
+    "region": "Dorchester County",
+    "lat": 38.4139,
+    "lng": -76.0972,
+    "categories": [
+      "nature"
+    ],
+    "rank": 32,
+    "blurb": "waterfowl sanctuary in Maryland, USA",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Blackwater-wildlife-drive.jpg?width=640",
+    "imageAttribution": "Jcantroot · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-bracken-cave",
+    "name": "Bracken Cave",
+    "countryCode": "US",
+    "region": "Comal County",
+    "lat": 29.68715,
+    "lng": -98.35261,
+    "categories": [
+      "nature"
+    ],
+    "rank": 32,
+    "blurb": "Texas home to world's largest concentration of bats and mammals",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Bracken%20Cave%20Bats.jpg?width=640",
+    "imageAttribution": "Daniel Spiess · Wikimedia Commons · CC BY-SA 2.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-cabrillo-beach",
+    "name": "Cabrillo Beach",
+    "countryCode": "US",
+    "region": "Los Angeles",
+    "lat": 33.711,
+    "lng": -118.284,
+    "categories": [
+      "beaches"
+    ],
+    "rank": 32,
+    "blurb": "public beach in San Pedro, Los Angeles, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Cabrillo1947.jpg?width=640",
+    "imageAttribution": "Los Angeles Times · Wikimedia Commons · CC BY 4.0",
+    "suggestedHours": 3
+  },
+  {
+    "id": "us-carter-caves-state-resort-park",
+    "name": "Carter Caves State Resort Park",
+    "countryCode": "US",
+    "region": "Carter County",
+    "lat": 38.374,
+    "lng": -83.1221,
+    "categories": [
+      "nature"
+    ],
+    "rank": 32,
+    "blurb": "state park in Kentucky, USA",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Carter%20Caves%20Visitor%20Center.JPG?width=640",
+    "imageAttribution": "C. Bedford Crenshaw · Wikimedia Commons · Attribution",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-chumash-painted-cave-state-historic-park",
+    "name": "Chumash Painted Cave State Historic Park",
+    "countryCode": "US",
+    "region": "Santa Barbara County",
+    "lat": 34.50417,
+    "lng": -119.78694,
+    "categories": [
+      "nature"
+    ],
+    "rank": 32,
+    "blurb": "State park in California",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/PaintedCaveArtCA.jpg?width=640",
+    "imageAttribution": "John Wiley User:Jw4nvc - Santa Barbara, California · Wikimedia Commons · CC BY 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-corkscrew-swamp-sanctuary",
+    "name": "Corkscrew Swamp Sanctuary",
+    "countryCode": "US",
+    "region": "Collier County",
+    "lat": 26.37556,
+    "lng": -81.60417,
+    "categories": [
+      "nature"
+    ],
+    "rank": 32,
+    "blurb": "nature reserve in southwest Florida, U.S.A.",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Corkscrew%20Swamp%20Sanctuary%20-%20Trail.jpg?width=640",
+    "imageAttribution": "P. Hughes · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-daisy-geyser",
+    "name": "Daisy Geyser",
+    "countryCode": "US",
+    "region": "Teton County",
+    "lat": 44.47018,
+    "lng": -110.84419,
+    "categories": [
+      "nature"
+    ],
+    "rank": 32,
+    "blurb": "geyser in Teton County, Wyoming, United States of America",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Daisy%20Geyser%20erupting%20in%20Yellowstone%20National%20Park%20edit.jpg?width=640",
+    "imageAttribution": "Brocken Inaglory · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-don-edwards-san-francisco-bay-national-wildlife-",
+    "name": "Don Edwards San Francisco Bay National Wildlife Refuge",
+    "countryCode": "US",
+    "region": "San Mateo County",
+    "lat": 37.5,
+    "lng": -122.11667,
+    "categories": [
+      "nature"
+    ],
+    "rank": 32,
+    "blurb": "United States National Wildlife Refuge",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/San%20Francisco%20Bay%20National%20Wildlife%20Refuge.jpg?width=640",
+    "imageAttribution": "Hollingsworth, John and Karen · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-doublet-pool",
+    "name": "Doublet Pool",
+    "countryCode": "US",
+    "region": "Teton County",
+    "lat": 44.46432,
+    "lng": -110.82972,
+    "categories": [
+      "nature"
+    ],
+    "rank": 32,
+    "blurb": "hot spring in Teton County, Wyoming, United States of America",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Doublet%20Pool%20%28mid-afternoon%2C%208%20August%202013%29%202.jpg?width=640",
+    "imageAttribution": "James St. John · Wikimedia Commons · CC BY 2.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-eaton-canyon",
+    "name": "Eaton Canyon",
+    "countryCode": "US",
+    "region": null,
+    "lat": 34.205,
+    "lng": -118.088,
+    "categories": [
+      "nature"
+    ],
+    "rank": 32,
+    "blurb": "canyon in the San Gabriel Mountains in Los Angeles County, California, USA",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Eaton%20canyon%20from%20the%20air.jpg?width=640",
+    "imageAttribution": "Bruce Perry · Wikimedia Commons · CC BY-SA 2.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-excelsior-geyser",
+    "name": "Excelsior Geyser",
+    "countryCode": "US",
+    "region": "Wyoming",
+    "lat": 44.52636,
+    "lng": -110.83653,
+    "categories": [
+      "nature"
+    ],
+    "rank": 32,
+    "blurb": "geyser in Yellowstone National Park",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Excelsion%20geyser%20in%201890.jpg?width=640",
+    "imageAttribution": "Unknown (1888 image credited to F. J. Haynes in above reference) · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-florida-panther-national-wildlife-refuge",
+    "name": "Florida Panther National Wildlife Refuge",
+    "countryCode": "US",
+    "region": "Florida",
+    "lat": 26.1722,
+    "lng": -81.3772,
+    "categories": [
+      "nature"
+    ],
+    "rank": 32,
+    "blurb": "United States National Wildlife Refuge in Florida",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Fl%20panther.jpg?width=640",
+    "imageAttribution": "US Fish and Wildlife Service · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-fort-rock-cave",
+    "name": "Fort Rock Cave",
+    "countryCode": "US",
+    "region": "Lake County",
+    "lat": 43.37853,
+    "lng": -121.10156,
+    "categories": [
+      "nature"
+    ],
+    "rank": 32,
+    "blurb": "cave and archaeological site in Oregon, USA",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/University%20of%20Oregon%20archaeological%20excavations%20at%20Fort%20Rock%20Cave%2C%20Oregon%20%28USA%29%2C%201966.jpg?width=640",
+    "imageAttribution": "John Atherton · Wikimedia Commons · CC BY-SA 2.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-goat-rock-beach",
+    "name": "Goat Rock Beach",
+    "countryCode": "US",
+    "region": "California",
+    "lat": 38.44667,
+    "lng": -123.12639,
+    "categories": [
+      "beaches"
+    ],
+    "rank": 32,
+    "blurb": "beach in Sonoma County, California",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Goat%20Rock%20Beach%20%2810908575024%29.jpg?width=640",
+    "imageAttribution": "John Uhrig from Davis, CA, United States · Wikimedia Commons · CC BY 2.0",
+    "suggestedHours": 3
+  },
+  {
+    "id": "us-great-fountain-geyser",
+    "name": "Great Fountain Geyser",
+    "countryCode": "US",
+    "region": "Wyoming",
+    "lat": 44.53657,
+    "lng": -110.80005,
+    "categories": [
+      "nature"
+    ],
+    "rank": 32,
+    "blurb": "geyser in Yellowstone National Park",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Great%20Fountain%20Geyser%20Sunset.jpg?width=640",
+    "imageAttribution": "user:Flicka · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-grotto-geyser",
+    "name": "Grotto Geyser",
+    "countryCode": "US",
+    "region": "Wyoming",
+    "lat": 44.4718,
+    "lng": -110.84179,
+    "categories": [
+      "nature"
+    ],
+    "rank": 32,
+    "blurb": "geyser in Teton County, Wyoming, United States of America",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Grotto%20Geyser%20%286%20June%202016%29%201%20%2831370974932%29.jpg?width=640",
+    "imageAttribution": "James St. John · Wikimedia Commons · CC BY 2.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-land-between-the-lakes-national-recreation-area",
+    "name": "Land Between the Lakes National Recreation Area",
+    "countryCode": "US",
+    "region": "Trigg County",
+    "lat": 36.8569,
+    "lng": -88.0747,
+    "categories": [
+      "nature"
+    ],
+    "rank": 32,
+    "blurb": "recreation area and former biosphere reserve (1991-2017) in the United States of America",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Land%20between%20the%20lakes.jpg?width=640",
+    "imageAttribution": "http://www.terraprints.com · Wikimedia Commons · CC BY 2.5",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-lion-geyser",
+    "name": "Lion Geyser",
+    "countryCode": "US",
+    "region": "Teton County",
+    "lat": 44.46406,
+    "lng": -110.83096,
+    "categories": [
+      "nature"
+    ],
+    "rank": 32,
+    "blurb": "geyser in Yellowstone National Park",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/LionGeyser-Jones1987.jpg?width=640",
+    "imageAttribution": "Herb Jones · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-madera-canyon",
+    "name": "Madera Canyon",
+    "countryCode": "US",
+    "region": "Pima County",
+    "lat": 31.74064,
+    "lng": -110.94176,
+    "categories": [
+      "nature"
+    ],
+    "rank": 32,
+    "blurb": "canyon in the northwestern face of the Santa Rita Mountains in Pima and Santa Cruz counties in Arizona, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Madera%20Canyon%20Arizona%202012.jpg?width=640",
+    "imageAttribution": "$1LENCE D00600D · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-monterey-bay-national-marine-sanctuary",
+    "name": "Monterey Bay National Marine Sanctuary",
+    "countryCode": "US",
+    "region": "territorial waters of the United States",
+    "lat": 36.8,
+    "lng": -122.5,
+    "categories": [
+      "nature"
+    ],
+    "rank": 32,
+    "blurb": "marine protected area in California, USA",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Sanc0815%20-%20Flickr%20-%20NOAA%20Photo%20Library.jpg?width=640",
+    "imageAttribution": "Robert Schwemmer, CINMS, NOAA. · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-olympic-coast-national-marine-sanctuary",
+    "name": "Olympic Coast National Marine Sanctuary",
+    "countryCode": "US",
+    "region": "Exclusive economic zone of the United States",
+    "lat": 48,
+    "lng": -124.8,
+    "categories": [
+      "nature"
+    ],
+    "rank": 32,
+    "blurb": "marine protected area in Washington state, USA",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Olympic%20Coast%20National%20Marine%20Sanctuary%202009%20Allocentrotus%20fragilis%20and%20Strongylocentrotus%20pallidus.jpg?width=640",
+    "imageAttribution": "Ed Bowlby, NOAA/Olympic Coast NMS; NOAA/OAR/Office of Ocean Exploration. · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-pelican-island-national-wildlife-refuge",
+    "name": "Pelican Island National Wildlife Refuge",
+    "countryCode": "US",
+    "region": "Indian River County",
+    "lat": 27.81,
+    "lng": -80.44111,
+    "categories": [
+      "nature"
+    ],
+    "rank": 32,
+    "blurb": "United States National Wildlife Refuge in Florida",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/PelicanIslandNWR.jpg?width=640",
+    "imageAttribution": "Gentry, George (U.S. Fish and Wildlife Service) · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-rachel-carson-national-wildlife-refuge",
+    "name": "Rachel Carson National Wildlife Refuge",
+    "countryCode": "US",
+    "region": "Maine",
+    "lat": 43.3501,
+    "lng": -70.5411,
+    "categories": [
+      "nature"
+    ],
+    "rank": 32,
+    "blurb": "nature reserve in Kennebunk, Maine, US",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Rcnwr-6.jpg?width=640",
+    "imageAttribution": "Captain-tucker · Wikimedia Commons · CC BY 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-revere-beach",
+    "name": "Revere Beach",
+    "countryCode": "US",
+    "region": "Revere",
+    "lat": 42.40784,
+    "lng": -70.99084,
+    "categories": [
+      "beaches"
+    ],
+    "rank": 32,
+    "blurb": "First public beach in United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Sunset-after-rain-revere-beach-causevic.jpg?width=640",
+    "imageAttribution": "Reveah-patriot at English Wikipedia · Wikimedia Commons · Public domain",
+    "suggestedHours": 3
+  },
+  {
+    "id": "us-rickwood-caverns-state-park",
+    "name": "Rickwood Caverns State Park",
+    "countryCode": "US",
+    "region": "Blount County",
+    "lat": 33.87954,
+    "lng": -86.84486,
+    "categories": [
+      "nature"
+    ],
+    "rank": 32,
+    "blurb": "State park in Blount County, Alabama, United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Warrior%20Caves.jpg?width=640",
+    "imageAttribution": "Matthew Gordon · Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-riverside-geyser",
+    "name": "Riverside Geyser",
+    "countryCode": "US",
+    "region": "Wyoming",
+    "lat": 44.47347,
+    "lng": -110.84092,
+    "categories": [
+      "nature"
+    ],
+    "rank": 32,
+    "blurb": "geyser in Teton County, Wyoming, United States of America",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Riverside%20geyser%20%2818842701186%29.jpg?width=640",
+    "imageAttribution": "Yellowstone National Park from Yellowstone NP, USA · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-royal-gorge",
+    "name": "Royal Gorge",
+    "countryCode": "US",
+    "region": "Colorado",
+    "lat": 38.43111,
+    "lng": -105.26889,
+    "categories": [
+      "nature"
+    ],
+    "rank": 32,
+    "blurb": "Fremont, CO",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Royal%20Gorge%201.jpg?width=640",
+    "imageAttribution": "Wikimedia Commons · CC BY-SA 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-ruby-beach",
+    "name": "Ruby Beach",
+    "countryCode": "US",
+    "region": "Jefferson County",
+    "lat": 47.71083,
+    "lng": -124.41556,
+    "categories": [
+      "beaches"
+    ],
+    "rank": 32,
+    "blurb": "beach in Washington, USA",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Rubybeach.jpg?width=640",
+    "imageAttribution": "Daniel Welch · Wikimedia Commons · CC BY-SA 2.5",
+    "suggestedHours": 3
+  },
+  {
+    "id": "us-sonny-bono-salton-sea-national-wildlife-refuge",
+    "name": "Sonny Bono Salton Sea National Wildlife Refuge",
+    "countryCode": "US",
+    "region": "Imperial County",
+    "lat": 33.15,
+    "lng": -115.733,
+    "categories": [
+      "nature"
+    ],
+    "rank": 32,
+    "blurb": "protected area southern end of the Salton Sea in the Imperial Valley, California",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Saltonsea%20at%20sonny%20bono%20salton%20sea%20nwr.jpg?width=640",
+    "imageAttribution": "U.S. Fish and Wildlife Service · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-white-dome-geyser",
+    "name": "White Dome Geyser",
+    "countryCode": "US",
+    "region": "Teton County",
+    "lat": 44.5393,
+    "lng": -110.803,
+    "categories": [
+      "nature"
+    ],
+    "rank": 32,
+    "blurb": "geyser located in the Lower Geyser Basin in Yellowstone National Park in the United States",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/White-dome-geyser.jpg?width=640",
+    "imageAttribution": "Eeekster · Wikimedia Commons · CC BY 3.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-clepsydra-geyser",
+    "name": "Clepsydra Geyser",
+    "countryCode": "US",
+    "region": "Teton County",
+    "lat": 44.55114,
+    "lng": -110.80894,
+    "categories": [
+      "nature"
+    ],
+    "rank": 29,
+    "blurb": "geyser in Teton County, Wyoming, United States of America",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Yellowstone%20National%20Park%20%28WY%2C%20USA%29%2C%20Clepsydra%20Geyser%20--%202022%20--%202421.jpg?width=640",
+    "imageAttribution": "Dietmar Rabich · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-golden-gate-canyon",
+    "name": "Golden Gate Canyon",
+    "countryCode": "US",
+    "region": "Wyoming",
+    "lat": 44.9367,
+    "lng": -110.723,
+    "categories": [
+      "nature"
+    ],
+    "rank": 29,
+    "blurb": "canyon in Yellowstone National Park",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Golden%20Gate%20YNP1.jpg?width=640",
+    "imageAttribution": "Acroterion · Wikimedia Commons · CC BY-SA 4.0",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-solitary-geyser",
+    "name": "Solitary Geyser",
+    "countryCode": "US",
+    "region": "Wyoming",
+    "lat": 44.46859,
+    "lng": -110.82931,
+    "categories": [
+      "nature"
+    ],
+    "rank": 29,
+    "blurb": "geyser in Yellowstone National Park",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/SolitaryGeyser-Keller1964.jpg?width=640",
+    "imageAttribution": "NPS/William Keller · Wikimedia Commons · Public domain",
+    "suggestedHours": 2
+  },
+  {
+    "id": "us-fort-stevens",
+    "name": "Fort Stevens",
+    "countryCode": "US",
+    "region": "Washington, D.C.",
+    "lat": 38.96444,
+    "lng": -77.02889,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 25,
+    "blurb": "historic fort in Washington, D.C.",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Fort%20Stevens.jpg?width=640",
+    "imageAttribution": "D Monack at English Wikipedia · Wikimedia Commons · Public domain",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-battery-kemble-park",
+    "name": "Battery Kemble Park",
+    "countryCode": "US",
+    "region": "Washington, D.C.",
+    "lat": 38.93028,
+    "lng": -77.09556,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 20,
+    "blurb": "park in Washington, D.C.",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Battery%20Kemble%20Park%20%283924580696%29.jpg?width=640",
+    "imageAttribution": "Geoff Livingston from DC, USA · Wikimedia Commons · CC BY-SA 2.0",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-fort-dupont-park",
+    "name": "Fort Dupont Park",
+    "countryCode": "US",
+    "region": "Washington, D.C.",
+    "lat": 38.87731,
+    "lng": -76.94956,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 20,
+    "blurb": "park in Washington, D.C.",
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Fort%20Dupont%20Park%20December%202017.jpg?width=640",
+    "imageAttribution": "Eric T. Gunther · Wikimedia Commons · CC BY 3.0",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-national-vigilance-park",
+    "name": "National Vigilance Park",
+    "countryCode": "US",
+    "region": "Maryland",
+    "lat": 39.1119,
+    "lng": -76.7748,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 20,
+    "blurb": null,
+    "imageUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/C130%20National%20Vigilance%20Park.jpg?width=640",
+    "imageAttribution": "US government employee · Wikimedia Commons · Public domain",
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-north-cascades-national-park-complex",
+    "name": "North Cascades National Park Complex",
+    "countryCode": "US",
+    "region": "Washington",
+    "lat": 48.3333,
+    "lng": -121,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 20,
+    "blurb": "contiguous American park system",
+    "imageUrl": null,
+    "imageAttribution": null,
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-great-sand-dunes-national-park",
+    "name": "Great Sand Dunes National Park",
+    "countryCode": "US",
+    "region": "Saguache County",
+    "lat": 37.77654,
+    "lng": -105.62886,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 13,
+    "blurb": "park in Saguache County, Colorado, United States of America",
+    "imageUrl": null,
+    "imageAttribution": null,
+    "suggestedHours": 5
+  },
+  {
+    "id": "us-fort-slocum-park",
+    "name": "Fort Slocum Park",
+    "countryCode": "US",
+    "region": "Washington, D.C.",
+    "lat": 38.96028,
+    "lng": -77.01389,
+    "categories": [
+      "national_parks"
+    ],
+    "rank": 1,
+    "blurb": "park in Washington, D.C.",
+    "imageUrl": null,
+    "imageAttribution": null,
+    "suggestedHours": 5
   }
 ]
 
 /** Countries with curated coverage, so the UI can tell "nothing in this category" from "not mapped yet". */
-export const DISCOVER_SEEDED_COUNTRIES: readonly string[] = ["ES","FR","GR","IT","JP","NO","PT","TR"]
+export const DISCOVER_SEEDED_COUNTRIES: readonly string[] = ["ES","FR","GR","IT","JP","NO","PT","TR","US"]

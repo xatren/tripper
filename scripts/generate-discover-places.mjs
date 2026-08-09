@@ -18,6 +18,8 @@ const CURATION_PATH = resolve(ROOT, 'scripts/discover-curation.json')
 const CACHE_DIR = resolve(ROOT, 'scripts/.discover-cache')
 
 const ENDPOINT = 'https://query.wikidata.org/sparql'
+const COMMONS_ENDPOINT = 'https://commons.wikimedia.org/w/api.php'
+const COMMONS_ATTRIBUTION_CACHE_PATH = resolve(CACHE_DIR, 'commons-attribution.json')
 // Wikidata blocks anonymous clients; a contactable UA is required by their policy.
 const USER_AGENT = 'TripperDiscoverSeeder/1.0 (https://github.com/xatren/tripper)'
 
@@ -51,6 +53,46 @@ const CATEGORY_QUERIES = [
   // endpoint out. Cities are typed directly as Q515 often enough not to need it.
   { category: 'cities', classes: ['Q515'], minSitelinks: 40, perClass: 25, hours: null, mustVisit: 5, direct: true },
 ]
+
+/**
+ * Geographic clip applied after coordinates are parsed, per country. The US
+ * override keeps this to the contiguous states — Alaska and Hawaii are
+ * politically part of the US but not on the same landmass/road network the
+ * rest of Discover's stop-planning assumes, and the user asked for them
+ * excluded explicitly.
+ */
+const COUNTRY_BOUNDS = {
+  US: { minLat: 24.5, maxLat: 49.4, minLng: -125, maxLng: -66.9 },
+}
+
+/**
+ * Per-country tuning on top of CATEGORY_QUERIES. The US override widens
+ * national_parks and nature: `minSitelinks` dropped so lesser-known (but still
+ * officially designated) parks aren't filtered out purely for having a thin
+ * Wikipedia footprint, and `perClass`/`mustVisit` raised so the West — where
+ * the contiguous US's national parks and dense nature clusters actually are —
+ * isn't cut off by a per-country-agnostic cap tuned for smaller countries.
+ */
+const COUNTRY_CATEGORY_OVERRIDES = {
+  US: {
+    national_parks: { minSitelinks: 1, perClass: 70, mustVisit: 10 },
+    nature: { minSitelinks: 3, perClass: 24, mustVisit: 8 },
+    viewpoints: { perClass: 14, mustVisit: 4 },
+    landmarks: { perClass: 14, mustVisit: 6 },
+  },
+}
+
+function categoryGroupFor(code, group) {
+  const override = COUNTRY_CATEGORY_OVERRIDES[code]?.[group.category]
+  return override ? { ...group, ...override } : group
+}
+
+function withinCountryBounds(code, coord) {
+  const bounds = COUNTRY_BOUNDS[code]
+  if (!bounds) return true
+  return coord.lat >= bounds.minLat && coord.lat <= bounds.maxLat
+    && coord.lng >= bounds.minLng && coord.lng <= bounds.maxLng
+}
 
 /**
  * One class per query rather than a VALUES block over the whole category: a
@@ -149,8 +191,76 @@ function commonsImage(raw) {
   if (!raw) return null
   const url = raw.replace(/^http:/, 'https:')
   const file = decodeURIComponent(url.split('/').pop() ?? '')
-  // The Special:FilePath thumbnailer keeps cards off multi-megabyte originals.
+  // The Special:FilePath thumbnailer keeps cards off multi-megabyte originals. This
+  // placeholder attribution (source label only) is upgraded to a real per-file
+  // license/author credit by fetchCommonsAttribution() before the dataset is
+  // written — see the enrichment pass below (§18 risk #3).
   return { imageUrl: `${url}?width=640`, imageAttribution: `Wikimedia Commons · ${file}` }
+}
+
+function filenameFromImageUrl(imageUrl) {
+  if (!imageUrl) return null
+  const withoutQuery = imageUrl.split('?')[0]
+  return decodeURIComponent(withoutQuery.split('/').pop() ?? '')
+}
+
+function stripHtml(value) {
+  return value ? value.replace(/<[^>]+>/g, '').trim() : ''
+}
+
+async function loadCommonsCache() {
+  try {
+    return JSON.parse(await readFile(COMMONS_ATTRIBUTION_CACHE_PATH, 'utf8'))
+  } catch {
+    return {}
+  }
+}
+
+/**
+ * Commons' extmetadata carries the real per-file license and author, which the
+ * bare P18 filename doesn't. Most Commons images are CC-BY-SA, which legally
+ * requires author credit, not just a source label, so `commonsImage`'s
+ * placeholder attribution isn't sufficient on its own (§18 risk #3). Batched at
+ * 50 titles/request (the API's non-bot ceiling) and cached by filename so a
+ * re-run only fetches files new to the dataset.
+ */
+async function fetchCommonsAttribution(filenames) {
+  const cache = await loadCommonsCache()
+  const missing = filenames.filter((name) => !(name in cache))
+  for (let i = 0; i < missing.length; i += 50) {
+    const batch = missing.slice(i, i + 50)
+    const titles = batch.map((name) => `File:${name}`).join('|')
+    const url = `${COMMONS_ENDPOINT}?action=query&format=json&prop=imageinfo&iiprop=extmetadata&titles=${encodeURIComponent(titles)}`
+    try {
+      const response = await fetch(url, { headers: { 'User-Agent': USER_AGENT } })
+      if (!response.ok) throw new Error(`Commons ${response.status}`)
+      const body = await response.json()
+      const pages = body.query?.pages ?? {}
+      for (const page of Object.values(pages)) {
+        const title = page.title?.replace(/^File:/, '')
+        if (!title) continue
+        const meta = page.imageinfo?.[0]?.extmetadata
+        cache[title] = {
+          license: stripHtml(meta?.LicenseShortName?.value) || null,
+          artist: stripHtml(meta?.Artist?.value) || null,
+        }
+      }
+    } catch (error) {
+      console.warn(`  ! Commons attribution batch failed: ${error.message}`)
+    }
+    for (const name of batch) if (!(name in cache)) cache[name] = { license: null, artist: null }
+    await sleep(500)
+  }
+  if (missing.length > 0) await writeFile(COMMONS_ATTRIBUTION_CACHE_PATH, JSON.stringify(cache), 'utf8')
+  return cache
+}
+
+function formatCommonsAttribution(meta) {
+  const parts = []
+  if (meta?.artist) parts.push(meta.artist)
+  parts.push('Wikimedia Commons')
+  if (meta?.license) parts.push(meta.license)
+  return parts.join(' · ')
 }
 
 /**
@@ -187,7 +297,8 @@ async function cachedCountry(code) {
 async function collectCountry(code, qid) {
   const byQid = new Map()
 
-  for (const group of CATEGORY_QUERIES) {
+  for (const baseGroup of CATEGORY_QUERIES) {
+    const group = categoryGroupFor(code, baseGroup)
     let kept = 0
     for (const classQid of group.classes) {
       let rows
@@ -207,6 +318,9 @@ async function collectCountry(code, qid) {
         const name = row.itemLabel?.value
         // A label that is still the Q-id means Wikidata has no English name for it.
         if (!coord || !name || /^Q\d+$/.test(name)) continue
+        // Contiguous-US clip (§ user request): drops Alaska/Hawaii results before
+        // they ever reach byQid, rather than filtering the generated dataset later.
+        if (!withinCountryBounds(code, coord)) continue
 
         const existing = byQid.get(itemQid)
         if (existing) {
@@ -320,14 +434,29 @@ const places = all
   })
   .map((place) => ({ ...place, ...(curation.overrides[place.id] ?? {}) }))
 
+// Upgrade each place's placeholder `Wikimedia Commons · <filename>` attribution
+// to a real per-file license/author credit (§18 risk #3). Runs on every
+// invocation, cache-hit countries included, since it's keyed by filename rather
+// than by country.
+const commonsFilenames = [...new Set(places.map((place) => filenameFromImageUrl(place.imageUrl)).filter(Boolean))]
+if (commonsFilenames.length > 0) {
+  console.log(`\nFetching Commons attribution for ${commonsFilenames.length} images...`)
+  const commonsMeta = await fetchCommonsAttribution(commonsFilenames)
+  for (const place of places) {
+    const file = filenameFromImageUrl(place.imageUrl)
+    if (file) place.imageAttribution = formatCommonsAttribution(commonsMeta[file])
+  }
+}
+
 const banner = `// Generated by scripts/generate-discover-places.mjs from Wikidata (CC0) plus the
 // curation overlay in scripts/discover-curation.json. Do not edit by hand — edit
 // the overlay and re-run the script.
 //
 // Countries seeded: ${codes.join(', ')}
 // Places: ${places.length}
-// Images are Wikimedia Commons files, each under its own licence, so
-// \`imageAttribution\` must be surfaced wherever the image is shown.
+// Images are Wikimedia Commons files, each under its own licence (author/license
+// fetched from the Commons API), so \`imageAttribution\` must be surfaced
+// wherever the image is shown.
 
 import type { DiscoverCategoryId } from './categories.ts'
 

@@ -41,6 +41,7 @@ test('hero route context follows the current ordered stops', () => {
   assert.equal(routeContextLabel([{ name: 'Seattle' }, { name: 'Vancouver' }]), 'Seattle → Vancouver')
   assert.equal(routeContextLabel([{ name: 'Seattle' }, { name: 'Seattle' }]), 'Seattle')
   assert.equal(routeContextLabel([{ name: 'A' }, { name: 'B' }, { name: 'C' }, { name: 'D' }]), 'A → D')
+  assert.equal(routeContextLabel([{ name: 'Seattle' }, { name: 'Page', state: 'AZ' }]), 'Seattle → Page, AZ')
 })
 
 test('stops have deterministic ordering and useful date labels', () => {
@@ -50,7 +51,9 @@ test('stops have deterministic ordering and useful date labels', () => {
     { id: 'a', order_index: 1 },
   ])
   assert.deepEqual(stops.map((stop) => stop.id), ['a', 'b', 'c'])
-  assert.equal(stopDateLabel({ arrival: '2026-07-10', departure: '2026-07-13' }), 'Jul 10 – Jul 13')
+  assert.equal(stopDateLabel({ arrival: '2026-07-10', departure: '2026-07-13' }), 'Jul 10–13')
+  assert.equal(stopDateLabel({ arrival: '2026-07-31', departure: '2026-08-02' }), 'Jul 31 – Aug 2')
+  assert.equal(stopDateLabel({ arrival: '2026-07-10', departure: '2026-07-10' }), 'Jul 10')
   assert.equal(stopDateLabel({ arrival: null, departure: null }), 'Dates not set')
 })
 

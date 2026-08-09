@@ -1,0 +1,49 @@
+.button {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 0;
+  border-radius: var(--radius-12);
+  background: var(--gradient-accent-cta);
+  color: var(--color-text-on-accent);
+  box-shadow: var(--shadow-accent-cta);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 750;
+  cursor: pointer;
+}
+.button:disabled { cursor: default; }
+.button[aria-busy='true'] { opacity: 0.75; }
+
+.added {
+  background: var(--color-success-wash);
+  color: var(--color-success-wash-text);
+  box-shadow: none;
+}
+
+.tripList { display: flex; flex-direction: column; gap: 6px; }
+.tripOption {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--glass-standard-border);
+  border-radius: var(--radius-12);
+  background: var(--glass-standard-fill);
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+.tripOption:hover { border-color: var(--color-accent-border-hover); }
+
+@media (forced-colors: active) {
+  .button, .tripOption { border: 1px solid CanvasText; }
+}

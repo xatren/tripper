@@ -120,6 +120,23 @@ test('static security contract keeps the server key and provider payload out of 
   assert.equal(migration.includes('itinerary_items_trip_external_place_idx'), true)
 })
 
+test('Discover live-layer search (Phase 5) builds params validateSearchParams already accepts', () => {
+  // Mirrors the exact param shape DiscoverClient.searchThisArea sends for a
+  // single placesCategory of a live layer (food/museums/stays) — no new
+  // validation surface, no new endpoint.
+  const valid = validateSearchParams(new URLSearchParams({ category: 'restaurants', limit: '12', radius: '50000', lat: '41', lng: '29' }))
+  assert.equal(valid.category, 'restaurants')
+  assert.deepEqual(valid.location, { lat: 41, lng: 29 })
+  assert.equal(valid.radiusMeters, 50_000)
+  assert.equal(valid.limit, 12)
+})
+
+test('the second map SDK (GoogleExploreMap) is fully removed per Phase 5', () => {
+  assert.throws(() => readFileSync(new URL('../components/explore/GoogleExploreMap.tsx', import.meta.url), 'utf8'))
+  const client = readFileSync(new URL('../components/explore/GooglePlacesExplorer.tsx', import.meta.url), 'utf8')
+  assert.equal(client.includes('GoogleExploreMap'), false)
+})
+
 test('every Places proxy route requires Supabase auth and returns no server credential', () => {
   const routes = [
     '../app/api/places/search/route.ts',

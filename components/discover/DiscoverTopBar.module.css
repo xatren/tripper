@@ -11,14 +11,19 @@
   gap: 8px;
 }
 
+/* Floating top-bar chrome (header, per Usage rules) — border/blur match
+   --glass-elevated-*. fill/box-shadow stay bespoke: elevated's fill is tuned
+   near-opaque for a full sheet, too heavy at this pill's small scale; the
+   shadow direction differs for the same reason as Discover.module.css's
+   .sheet (not edge-pinned). */
 .countryPill,
 .searchButton {
   min-height: 52px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 18px;
+  border: 1px solid var(--glass-elevated-border);
+  border-radius: var(--radius-16);
   background: rgba(9, 9, 28, 0.76);
-  -webkit-backdrop-filter: blur(18px);
-  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(var(--glass-elevated-blur));
+  backdrop-filter: blur(var(--glass-elevated-blur));
   box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
   color: var(--color-text-primary);
   font: inherit;
@@ -46,7 +51,7 @@
 }
 
 .searchButton { display: grid; place-items: center; }
-.searchButton:hover, .countryPill:hover { border-color: rgba(245, 166, 35, 0.34); }
+.searchButton:hover, .countryPill:hover { border-color: var(--color-accent-border-hover); }
 .searchButton > svg { color: var(--color-accent); }
 
 .countryPill:focus-visible, .searchButton:focus-visible {

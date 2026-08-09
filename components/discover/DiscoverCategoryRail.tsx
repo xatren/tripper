@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { curatedCategories, type DiscoverCategory, type DiscoverCategoryId } from '@/lib/discover/categories'
+import { categoryAvailableAtZoom, curatedCategories, type DiscoverCategory, type DiscoverCategoryId } from '@/lib/discover/categories'
 import styles from './DiscoverCategoryRail.module.css'
 
 export interface DiscoverCategoryRailProps {
@@ -10,11 +10,17 @@ export interface DiscoverCategoryRailProps {
   /** Result count per category for the framed country. A zero still renders — the empty state explains itself. */
   counts?: Partial<Record<DiscoverCategoryId, number>>
   /**
-   * Defaults to the curated layers. Live (Places) layers join the rail in Phase 5,
-   * when they are actually wired — a chip that can only render an empty state is
-   * worse than no chip.
+   * Defaults to the curated layers. Pass both curated and live categories once
+   * Phase 5's live layers are wired to make them selectable.
    */
   categories?: DiscoverCategory[]
+  /**
+   * The map's current zoom (§14 — read imperatively, mirrored here only for
+   * the gate). A live (Places) chip is disabled below its `minZoom`, since a
+   * 50 km circle is meaningless at country scale (§7.1) — undefined (map not
+   * loaded yet) is treated as "not zoomed in enough" rather than assumed ok.
+   */
+  zoom?: number
 }
 
 /**
@@ -23,7 +29,7 @@ export interface DiscoverCategoryRailProps {
  * and simply swaps its source. Mirrors the trips filter contract in
  * `tests/accessibility-contracts.test.mts`.
  */
-export function DiscoverCategoryRail({ active, onChange, counts, categories }: DiscoverCategoryRailProps) {
+export function DiscoverCategoryRail({ active, onChange, counts, categories, zoom }: DiscoverCategoryRailProps) {
   const list = categories ?? curatedCategories()
   const railRef = useRef<HTMLDivElement | null>(null)
 
@@ -45,13 +51,17 @@ export function DiscoverCategoryRail({ active, onChange, counts, categories }: D
       {list.map((category) => {
         const count = counts?.[category.id]
         const isActive = category.id === active
+        const zoomGated = category.source === 'places' && !categoryAvailableAtZoom(category, zoom ?? -Infinity)
         return (
           <button
             key={category.id}
             type="button"
-            className={`${styles.chip} ${isActive ? styles.chipActive : ''}`}
+            className={`${styles.chip} ${isActive ? styles.chipActive : ''} ${zoomGated ? styles.chipDisabled : ''}`}
             aria-pressed={isActive}
-            onClick={() => onChange(category.id)}
+            aria-disabled={zoomGated}
+            disabled={zoomGated}
+            title={zoomGated ? 'Zoom in on the map to search here' : undefined}
+            onClick={() => { if (!zoomGated) onChange(category.id) }}
             style={isActive ? { borderColor: category.markerColor } : undefined}
           >
             <span className={styles.dot} style={{ background: category.markerColor }} aria-hidden="true" />

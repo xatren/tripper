@@ -19,9 +19,9 @@
   gap: 7px;
   min-height: 44px;
   padding: 0 14px;
-  border: 1px solid rgba(255, 255, 255, 0.13);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid var(--glass-standard-border);
+  border-radius: var(--radius-full);
+  background: var(--glass-standard-fill);
   color: var(--color-text-secondary);
   font: inherit;
   font-size: 12.5px;
@@ -29,12 +29,21 @@
   white-space: nowrap;
   cursor: pointer;
 }
-.chip:hover { border-color: rgba(255, 255, 255, 0.26); }
+.chip:hover { border-color: var(--overlay-border-hover); }
 
+/* No dedicated "0.13 white fill" token exists; --glass-standard-border already
+   carries that exact value, reused here as a background rather than adding a
+   near-duplicate token. */
 .chipActive {
-  background: rgba(255, 255, 255, 0.13);
+  background: var(--glass-standard-border);
   color: var(--color-text-primary);
 }
+
+.chipDisabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+.chipDisabled:hover { border-color: var(--glass-standard-border); }
 
 .dot {
   width: 8px;
@@ -42,9 +51,14 @@
   border-radius: 50%;
 }
 
+/* Left as a literal black wash, not a token: the count badge sits on top of
+   both the default translucent-white chip and the brighter active chip, so it
+   needs a neutral dark scrim rather than any of the app's white-based glass
+   fills; --glass-elevated-fill is the closest token but is a near-opaque navy
+   tuned for full-screen sheets, not a small in-chip badge. */
 .count {
   padding: 1px 6px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   background: rgba(0, 0, 0, 0.28);
   color: var(--color-text-muted);
   font-size: 10.5px;

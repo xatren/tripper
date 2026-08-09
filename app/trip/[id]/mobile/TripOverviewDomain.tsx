@@ -256,13 +256,13 @@ function Hero({ trip, lifecycle, dateRange, scope, routeLabel, dayNumber, totalD
           <span>{dateRange || 'Dates not set'}</span>
           {scope && <><span aria-hidden="true">·</span><span>{scope}</span></>}
         </div>
-        <div className={styles.heroMessage}>{copy.message}</div>
+        {copy.message && <div className={styles.heroMessage}>{copy.message}</div>}
       </div>
     </section>
   )
 }
 
-function StopCarousel({ stops, schedule, canEdit, onOpenPlan }: { stops: Stop[]; schedule: StopSchedule[]; canEdit: boolean; onOpenPlan: () => void }) {
+function StopCarousel({ stops, schedule, canEdit, currentStopId, onOpenPlan }: { stops: Stop[]; schedule: StopSchedule[]; canEdit: boolean; currentStopId: string | null; onOpenPlan: () => void }) {
   if (stops.length === 0) {
     return (
       <section aria-label="Trip destinations" className={`${styles.card} ${styles.stopsEmpty}`}>
@@ -281,22 +281,26 @@ function StopCarousel({ stops, schedule, canEdit, onOpenPlan }: { stops: Stop[];
   return (
     <section aria-label="Trip destinations" className={styles.carousel}>
       <div role="list" tabIndex={0} aria-label="Trip stops, scroll horizontally" className={styles.carouselTrack}>
-        {stops.map((stop, index) => (
-          <button
-            key={stop.id}
-            type="button"
-            role="listitem"
-            aria-label={`${stop.name}, ${stopDateLabel(schedule[index])}. Open in Plan`}
-            onClick={onOpenPlan}
-            className={styles.stopCard}
-          >
-            <span aria-hidden="true" className={styles.stopAvatar} style={{ background: fallbackGradient(`${stop.stop_type}${stop.name}`) }}>{stop.name.trim().charAt(0).toUpperCase() || '·'}</span>
-            <span className={styles.stopCopy}>
-              <span className={styles.stopName}>{stop.name}</span>
-              <span className={styles.stopDate}>{stopDateLabel(schedule[index])}</span>
-            </span>
-          </button>
-        ))}
+        {stops.map((stop, index) => {
+          const selected = stop.id === currentStopId
+          return (
+            <button
+              key={stop.id}
+              type="button"
+              role="listitem"
+              aria-current={selected ? 'true' : undefined}
+              aria-label={`${stop.name}, ${stopDateLabel(schedule[index])}${selected ? ', current stop' : ''}. Open in Plan`}
+              onClick={onOpenPlan}
+              className={`${styles.stopCard} ${selected ? styles.stopCardSelected : ''}`}
+            >
+              <span aria-hidden="true" className={styles.stopAvatar} style={{ background: fallbackGradient(`${stop.stop_type}${stop.name}`) }}>{stop.name.trim().charAt(0).toUpperCase() || '·'}</span>
+              <span className={styles.stopCopy}>
+                <span className={styles.stopName}>{stop.name}</span>
+                <span className={styles.stopDate}>{stopDateLabel(schedule[index])}</span>
+              </span>
+            </button>
+          )
+        })}
         <div aria-hidden="true" className={styles.carouselTail} />
       </div>
     </section>
@@ -326,22 +330,26 @@ function FocusCard({ lifecycle, canEdit, hasStops, currentStop, nextStop, packin
 
   if (lifecycle === 'upcoming') {
     eyebrow = "TODAY'S PREPARATION"
-    action = 'Review checklist'
-    onAction = onPacking
     icon = <CheckSquare size={21} />
     if (packing.status === 'error') {
       title = 'Preparation details unavailable'
       detail = 'Your checklist could not be loaded. Retry below or open it directly.'
+      action = 'Review checklist'
+      onAction = onPacking
     } else {
+      const total = packing.rows.length
+      const checked = packing.rows.filter((item) => item.checked).length
       const unchecked = packing.rows.filter((item) => !item.checked)
       const documents = unchecked.filter((item) => item.category === 'documents').length
+      action = total === 0 || checked === 0 ? 'Start checklist' : checked < total ? 'Continue checklist' : 'Review checklist'
+      onAction = onPacking
       if (documents > 0) {
         title = `Pack ${documents} travel ${documents === 1 ? 'document' : 'documents'}`
         detail = 'Keep passports, bookings and insurance within reach.'
       } else if (unchecked.length > 0) {
         title = `${unchecked.length} packing ${unchecked.length === 1 ? 'item' : 'items'} left`
         detail = 'Finish the next items on your trip checklist.'
-      } else if (packing.rows.length > 0) {
+      } else if (total > 0) {
         title = 'Your packing list is complete'
         detail = 'Review the checklist once more before departure.'
       } else {
@@ -387,6 +395,7 @@ function FocusCard({ lifecycle, canEdit, hasStops, currentStop, nextStop, packin
         <button type="button" onClick={onAction} className={styles.focusAction}>
           {action}<ChevronRight size={17} aria-hidden="true" />
         </button>
+        {lifecycle === 'upcoming' && <ProgressBlock section={packing} />}
       </div>
     </section>
   )
@@ -396,7 +405,7 @@ function ProgressBlock({ section }: { section: OverviewSection<OverviewPackingIt
   const checked = section.rows.filter((item) => item.checked).length
   const progress = preparationProgress(section.status, section.rows.length, checked)
   return (
-    <section aria-label="Preparation progress" className={styles.progress}>
+    <section aria-label="Preparation progress" className={styles.progressEmbedded}>
       <div className={styles.progressRow}>
         <span className={styles.progressLabel}>Preparation progress</span>
         <span className={`${styles.progressValue} ${progress.status === 'error' ? styles.progressValueMuted : ''}`}>{progress.label}</span>
@@ -575,9 +584,8 @@ export function TripOverviewDomain({ trip, stops, members, capabilities, initial
     <div className={styles.screen}>
       <Hero trip={trip} lifecycle={lifecycle} dateRange={formatDateRange(trip.start_date, trip.end_date)} scope={scope} routeLabel={routeLabel} dayNumber={dayNumber} totalDays={totalDays} currentStop={currentStop} featuredStop={photoStop} onBack={onBack} onOpenMore={onOpenMore} />
       <div className={styles.content}>
-        <StopCarousel stops={orderedStops} schedule={schedule} canEdit={capabilities.canEdit} onOpenPlan={() => onSelectSection('plan')} />
+        <StopCarousel stops={orderedStops} schedule={schedule} canEdit={capabilities.canEdit} currentStopId={currentStop?.id ?? null} onOpenPlan={() => onSelectSection('plan')} />
         <FocusCard lifecycle={lifecycle} canEdit={capabilities.canEdit} hasStops={orderedStops.length > 0} currentStop={currentStop} nextStop={nextStop} packing={packingData.section} journal={journalData.section} journalPhotos={journalPhotos} onAddDates={() => setDatesSheetOpen(true)} onPlan={() => onSelectSection('plan')} onPacking={() => onOpenDestination('packing')} onJournal={() => onOpenDestination('journal')} />
-        {lifecycle === 'upcoming' && <ProgressBlock section={packingData.section} />}
 
         <div className={styles.errorStack}>
           {expensesData.section.status === 'error' && <InlineError onRetry={expensesData.retrying ? undefined : expensesData.retry}>{expensesData.retrying ? 'Retrying expenses…' : "Couldn't load expenses."}</InlineError>}

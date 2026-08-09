@@ -1,9 +1,13 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { tokens } from '@/components/mobile'
-import { ACCENT, type Section } from '../domain-ui'
+import { motion } from 'framer-motion'
+import { type Section } from '../domain-ui'
 import { DUSK } from '@/components/design/tokens'
+
+// Same floating-pill language as AppBottomNav (Dashboard/Trips/Explore/Profile)
+// so the bottom nav reads as one system across the app.
+const TAP = { type: 'spring' as const, stiffness: 420, damping: 22 }
 
 export type PrimaryNavSection = Exclude<Section, 'more'>
 
@@ -25,7 +29,7 @@ const ITEMS: { key: Section; label: string; icon: (color: string) => ReactNode }
   },
   {
     key: 'explore', label: 'Explore',
-    icon: (color) => (<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M15 9l-2 6-6 2 2-6 6-2z" /></svg>),
+    icon: (color) => (<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><polygon points="15.5 8.5 13.2 13.2 8.5 15.5 10.8 10.8 15.5 8.5" strokeLinejoin="round" /></svg>),
   },
   {
     key: 'bookings', label: 'Bookings',
@@ -37,18 +41,23 @@ const ITEMS: { key: Section; label: string; icon: (color: string) => ReactNode }
   },
 ]
 
-/** Trip workspace's primary nav bar — Plan / Explore / Bookings / More. */
+/** Trip workspace's primary nav bar — Overview / Plan / Explore / Bookings / More. */
 export function TripPrimaryNav({ active, onSelect, onOpenMore, onPrefetch }: TripPrimaryNavProps) {
   return (
-    // Tighter gap and side padding than the other bars: five 12px labels have to
-    // fit a 320px viewport without shrinking the type back below the legible floor.
     <nav
       aria-label="Trip sections"
-      style={{ display: 'flex', gap: 3, borderTop: `1px solid ${tokens.glassStandardBorder}`, background: tokens.glassSubtleFill, backdropFilter: 'blur(var(--glass-standard-blur))', WebkitBackdropFilter: 'blur(var(--glass-standard-blur))', padding: '10px 8px 12px', paddingBottom: 'max(12px, env(safe-area-inset-bottom))', flex: 'none' }}
+      style={{
+        display: 'flex', alignItems: 'stretch',
+        margin: '0 16px max(10px, env(safe-area-inset-bottom))',
+        background: 'rgba(8,8,25,0.90)', border: '1px solid rgba(255,255,255,0.14)', borderRadius: 20,
+        boxShadow: '0 12px 34px rgba(0,0,0,.42)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+        padding: '3px 6px', flex: 'none',
+        fontFamily: "var(--font-inter),'Inter',system-ui,-apple-system,sans-serif",
+      }}
     >
       {ITEMS.map((item) => {
         const isActive = item.key === active
-        const color = isActive ? ACCENT : DUSK.textMuted
+        const color = isActive ? DUSK.amber : 'rgba(222,220,240,.58)'
         const handleActivate = () => {
           if (item.key === 'more') onOpenMore()
           else onSelect(item.key)
@@ -57,7 +66,7 @@ export function TripPrimaryNav({ active, onSelect, onOpenMore, onPrefetch }: Tri
           if (item.key !== 'more') onPrefetch?.(item.key)
         }
         return (
-          <button
+          <motion.button
             key={item.key}
             type="button"
             onClick={handleActivate}
@@ -65,14 +74,15 @@ export function TripPrimaryNav({ active, onSelect, onOpenMore, onPrefetch }: Tri
             onFocus={handlePrefetch}
             aria-current={isActive ? 'page' : undefined}
             style={{
-              flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4,
-              minHeight: 48, padding: '7px 0 6px', borderRadius: 14, border: 'none', cursor: 'pointer', fontFamily: 'inherit',
-              background: isActive ? 'rgba(245,166,35,.12)' : 'transparent',
+              flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3,
+              minHeight: 54, padding: '6px 4px 5px', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', position: 'relative',
             }}
+            whileTap={{ scale: 0.88 }}
+            transition={TAP}
           >
             {item.icon(color)}
-            <span style={{ color, fontWeight: 600, fontSize: 12, whiteSpace: 'nowrap' }}>{item.label}</span>
-          </button>
+            <span style={{ color, fontWeight: 600, fontSize: 11.5, whiteSpace: 'nowrap' }}>{item.label}</span>
+          </motion.button>
         )
       })}
     </nav>

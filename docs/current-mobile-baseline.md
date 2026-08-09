@@ -52,12 +52,14 @@ Roles referenced below (`owner`/`editor`/`viewer`) come from `trip_members.role`
   - `components/trips/new-trip/` exists as a directory but is currently empty; the wizard has not actually been split into step components despite the path existing.
   - RPC failure surfaces via toast only, not a boundary — a reasonable but inconsistent pattern versus the rest of the app.
 
-## 5. Explore
+## 5. Discover
 
-- **Route**: `/explore`
-- **Components**: [app/explore/page.tsx](app/explore/page.tsx), [app/explore/ExploreClient.tsx](app/explore/ExploreClient.tsx), [app/explore/error.tsx](app/explore/error.tsx), [app/explore/loading.tsx](app/explore/loading.tsx), [components/explore/ExploreMapbox.tsx](components/explore/ExploreMapbox.tsx)
-- **Supabase**: route discovery is Mapbox-driven, not Supabase-backed for the search itself; creating a trip from a discovered route ultimately calls the same `create_trip_with_stops` RPC as the wizard
-- **Known risks**: not deep-audited this pass — flag for a follow-up pass focused specifically on Mapbox call volume/debouncing here, since `PlanRouteDomain.tsx` shows a pattern of unguarded route-fetch effects worth checking for reuse.
+- **Route**: `/explore` (nav label is "Discover"; the URL is unchanged per `docs/discover-explore-map-plan.md` §3.1)
+- **Components**: [app/explore/page.tsx](app/explore/page.tsx) (server: country resolution, active-trip stops), [app/explore/DiscoverClient.tsx](app/explore/DiscoverClient.tsx), [app/explore/error.tsx](app/explore/error.tsx), [app/explore/loading.tsx](app/explore/loading.tsx), [components/discover/](components/discover/) (`DiscoverMap`, `DiscoverMapLayers`, `DiscoverCategoryRail`, `DiscoverResultsList`, `DiscoverPlaceCard`, `DiscoverPlaceSheet`, `AddToRouteButton`, `CountryPickerSheet`, `DiscoverTopBar`), [components/mobile/DraggableSheet.tsx](components/mobile/DraggableSheet.tsx)
+- **Supabase**: `stops` insert for "Add to Route" (curated places only — see the plan's §9.2/§18.1 provider-geography decision), `itinerary_items` insert via the reused `AddPlaceToTripSheet` for live (Google Places) results, `create_trip_with_stops` RPC for "Start a trip here"; curated place data (`lib/discover/discover-places.generated.ts`) is a static build-time module, not a DB read
+- **Map**: `DiscoverMap` — GeoJSON source + native Mapbox clustering (not React markers), country-boundary tint, zoom-gated live layers
+- **Old surface retired**: the globe/`ROUTES`-template experience (`ExploreClient.tsx`, `ExploreMapbox.tsx`, `CountryCard.tsx`, `EmptyCountries.tsx`, `StarField.tsx`, `explore-ui.tsx`, `DiscoverCard.tsx`, `explore-routes-data.ts`) is deleted as of Phase 6 (2026-08-08). The "visited countries / trips / nights" stat block moved to `/profile` (§7 below).
+- **Known risks**: not deep-audited this pass beyond the discover-explore-map-plan phases — flag for a follow-up pass focused specifically on live-layer (Google Places) call volume/debouncing under rapid category switching.
 
 ## 6. Invite / join
 
@@ -79,7 +81,7 @@ Roles referenced below (`owner`/`editor`/`viewer`) come from `trip_members.role`
 - **Empty**: n/a — always renders the shell with `?? ""` fallbacks
 - **Known risks**:
   - Account deletion (`ProfileClient.tsx`) calls `POST /api/account/delete` with a custom `x-tripper-confirm: delete-account` header as the confirmation gate. The route itself is server-only and re-validates the session — the header is a UX confirmation signal, not the authorization boundary, but worth keeping in mind if the endpoint is ever touched.
-  - `getCountryCount` parses country names out of a free-text `description` field via a `Countries:\s*([^\n]+)/` regex — fragile, couples a display stat to a text convention instead of structured data.
+  - `getCountryCount` (as of Phase 6, which relocated the "Countries" stat here from the old `/explore` globe view — see §5) prefers the structured `trips.countries` jsonb column, falling back to the legacy `Countries:\s*([^\n]+)/` regex over `description` only for trips that predate that column. The regex fallback is still fragile for those old rows, but new trips no longer depend on it.
   - The Settings screen currently only persists `distanceUnit` (and similar local-only prefs) to `localStorage` via `lib/settings.ts`; nothing else in the codebase reads most of the settings fields back out. If Settings is expanded, verify each new field is actually consumed somewhere before shipping it.
 
 ## 8. Root / onboarding

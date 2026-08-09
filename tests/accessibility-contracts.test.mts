@@ -266,6 +266,8 @@ test('the discover category rail is a segmented group, not a tablist, and its re
   const rail = read('components/discover/DiscoverCategoryRail.tsx')
   const railCss = read('components/discover/DiscoverCategoryRail.module.css')
   const client = read('app/explore/DiscoverClient.tsx')
+  const card = read('components/discover/DiscoverPlaceCard.tsx')
+  const cardCss = read('components/discover/DiscoverPlaceCard.module.css')
 
   // Switching layers swaps a map source; there is no tab/panel pair to model.
   assert.match(rail, /role="group"/)
@@ -282,13 +284,36 @@ test('the discover category rail is a segmented group, not a tablist, and its re
 
   // The count changes on every layer switch and must not be a silent swap.
   assert.match(client, /aria-live="polite"/)
-  // The row is the selection control; its thumbnail stays decorative.
-  assert.match(client, /aria-pressed=\{isSelected\}/)
-  assert.match(client, /className=\{styles\.thumb\} src=\{image\} alt=""/)
+  // The row is the selection control; its thumbnail stays decorative. Moved
+  // into DiscoverPlaceCard when DiscoverResultsList was extracted (Phase 3).
+  assert.match(card, /aria-pressed=\{isSelected\}/)
+  assert.match(card, /className=\{styles\.thumb\} src=\{image\} alt=""/)
 
-  const row = read('app/explore/Discover.module.css').match(/\.row \{[\s\S]*?\n\}/)?.[0] ?? ''
-  const rowMinHeight = Number(row.match(/min-height: (\d+)px/)?.[1] ?? 0)
-  assert.ok(rowMinHeight >= 44, `expected .row min-height >= 44px, got ${rowMinHeight}`)
+  const rowMain = cardCss.match(/\.rowMain \{[\s\S]*?\n\}/)?.[0] ?? ''
+  const rowMinHeight = Number(rowMain.match(/min-height: (\d+)px/)?.[1] ?? 0)
+  assert.ok(rowMinHeight >= 44, `expected .rowMain min-height >= 44px, got ${rowMinHeight}`)
+})
+
+test('the draggable sheet handle is an operable, labelled control shared by Map Home and Discover', () => {
+  const sheet = read('components/mobile/DraggableSheet.tsx')
+  const sheetCss = read('components/mobile/DraggableSheet.module.css')
+
+  // Pointer drag, tap, and keyboard activation all go through one <button>.
+  assert.match(sheet, /aria-expanded=\{level !== 'collapsed'\}/)
+  assert.match(sheet, /aria-label=\{level === 'expanded' \? `Collapse \$\{label\}` : `Expand \$\{label\}`\}/)
+  // A drag must not also fire the tap-to-cycle behavior.
+  assert.match(sheet, /if \(dragged\.current\) \{ dragged\.current = false; return \}/)
+
+  const handle = sheetCss.match(/\.handle \{[\s\S]*?\n\}/)?.[0] ?? ''
+  const handleMinHeight = Number(handle.match(/min-height: (\d+)px/)?.[1] ?? 0)
+  assert.ok(handleMinHeight >= 44, `expected .handle min-height >= 44px, got ${handleMinHeight}`)
+
+  // Both Map Home and Discover render the shared component rather than a
+  // second hand-rolled sheet.
+  const dashboard = read('app/dashboard/DashboardClient.tsx')
+  const discover = read('app/explore/DiscoverClient.tsx')
+  assert.match(dashboard, /<DraggableSheet/)
+  assert.match(discover, /<DraggableSheet/)
 })
 
 test('the offline flow renders one owned sheet instead of a stacked pair', () => {

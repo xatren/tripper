@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   ArrowLeft, ArrowRight, CalendarDays, LocateFixed,
@@ -17,12 +17,12 @@ import { buildRouteMapPins, tripDayCountFromDates } from '@/lib/map-pins'
 // the same day numbers so a pin means the same thing on both screens.
 import { projectStopSchedule } from '@/app/trip/[id]/mobile/itinerary-projection'
 import { AppBottomNav } from '@/components/ui/AppBottomNav'
+import { DraggableSheet, type SheetLevel } from '@/components/mobile'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import styles from './MapHome.module.css'
 
-type SheetLevel = 'collapsed' | 'half' | 'expanded'
 type RouteState = 'idle' | 'loading' | 'ready' | 'unavailable'
 
 interface DashboardClientProps {
@@ -33,7 +33,6 @@ interface DashboardClientProps {
 }
 
 const ROUTE_REQUESTS = new LatestRouteRequestController()
-const SHEET_ORDER: SheetLevel[] = ['collapsed', 'half', 'expanded']
 
 function calendarDays(fromISO: string, toISO: string): number {
   return Math.round((new Date(`${toISO}T00:00:00`).getTime() - new Date(`${fromISO}T00:00:00`).getTime()) / 86_400_000)
@@ -95,6 +94,12 @@ function currentStopIndex(trip: Trip, stops: Stop[]): number {
   return next === -1 ? stops.length - 1 : next
 }
 
+function sheetHeightFor(level: SheetLevel, viewportHeight: number): number {
+  if (level === 'collapsed') return 132
+  if (level === 'half') return Math.round(viewportHeight * 0.47)
+  return Math.max(390, viewportHeight - 190)
+}
+
 function MapFallback({ message }: { message: string }) {
   return (
     <div className={styles.mapFallback} role="status">
@@ -123,9 +128,6 @@ export function DashboardClient({ profile, featuredTrip, featuredStops, capabili
   const [joinCode, setJoinCode] = useState('')
   const [joinError, setJoinError] = useState<string | null>(null)
   const [viewportHeight, setViewportHeight] = useState(800)
-  const [dragOffset, setDragOffset] = useState(0)
-  const drag = useRef<{ y: number; pointerId: number } | null>(null)
-  const dragged = useRef(false)
 
   const validStops = useMemo(
     () => featuredStops.filter((stop) => Number.isFinite(stop.lat) && Number.isFinite(stop.lng)),
@@ -211,12 +213,6 @@ export function DashboardClient({ profile, featuredTrip, featuredStops, capabili
     return () => ROUTE_REQUESTS.cancel(controller)
   }, [pointKey, routeAttempt]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => {
-    const onPopState = () => setSheetLevel((level) => level === 'collapsed' ? level : 'collapsed')
-    window.addEventListener('popstate', onPopState)
-    return () => window.removeEventListener('popstate', onPopState)
-  }, [])
-
   useEffect(() => { setFitNonce((value) => value + 1) }, [sheetLevel])
 
   const openSheet = useCallback((level: Exclude<SheetLevel, 'collapsed'> = 'half') => {
@@ -230,38 +226,6 @@ export function DashboardClient({ profile, featuredTrip, featuredStops, capabili
     if (window.history.state?.mapHomeRoutePreview) window.history.back()
     else setSheetLevel('collapsed')
   }, [])
-
-  const setLevelFromGesture = useCallback((delta: number) => {
-    const index = SHEET_ORDER.indexOf(sheetLevel)
-    if (delta < -45 && index < SHEET_ORDER.length - 1) {
-      const next = SHEET_ORDER[index + 1]
-      if (sheetLevel === 'collapsed') openSheet(next as 'half' | 'expanded')
-      else setSheetLevel(next)
-    } else if (delta > 45 && index > 0) {
-      const next = SHEET_ORDER[index - 1]
-      if (next === 'collapsed') collapseSheet()
-      else setSheetLevel(next)
-    }
-  }, [collapseSheet, openSheet, sheetLevel])
-
-  const handlePointerDown = (event: React.PointerEvent<HTMLButtonElement>) => {
-    drag.current = { y: event.clientY, pointerId: event.pointerId }
-    dragged.current = false
-    event.currentTarget.setPointerCapture(event.pointerId)
-  }
-  const handlePointerMove = (event: React.PointerEvent<HTMLButtonElement>) => {
-    if (!drag.current) return
-    const delta = event.clientY - drag.current.y
-    if (Math.abs(delta) > 5) dragged.current = true
-    setDragOffset(Math.max(-110, Math.min(110, delta)))
-  }
-  const handlePointerUp = (event: React.PointerEvent<HTMLButtonElement>) => {
-    if (!drag.current) return
-    const delta = event.clientY - drag.current.y
-    setLevelFromGesture(delta)
-    drag.current = null
-    setDragOffset(0)
-  }
 
   const requestLocation = useCallback(() => {
     if (locationState === 'loading') return
@@ -291,7 +255,7 @@ export function DashboardClient({ profile, featuredTrip, featuredStops, capabili
     ? 'Map unavailable · your trip is still ready'
     : !online ? 'You are offline · your saved trip is still here' : 'The map could not load · your itinerary is still available'
   const navClearance = 92
-  const sheetHeight = sheetLevel === 'collapsed' ? 132 : sheetLevel === 'half' ? Math.round(viewportHeight * 0.47) : Math.max(390, viewportHeight - 190)
+  const sheetHeight = sheetHeightFor(sheetLevel, viewportHeight)
   const fitPadding = {
     top: 104,
     right: 56,
@@ -356,38 +320,13 @@ export function DashboardClient({ profile, featuredTrip, featuredStops, capabili
       )}
 
       {featuredTrip ? (
-        <section
-          className={`${styles.routeSheet} ${styles[sheetLevel]}`}
-          style={{ transform: dragOffset ? `translateY(${dragOffset}px)` : undefined }}
-          aria-label={`${featuredTrip.title} route preview`}
-        >
-          <button
-            type="button"
-            className={styles.sheetHandle}
-            aria-expanded={sheetLevel !== 'collapsed'}
-            aria-label={sheetLevel === 'expanded' ? 'Collapse route preview' : 'Expand route preview'}
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={handlePointerUp}
-            onPointerCancel={() => { drag.current = null; setDragOffset(0) }}
-            onClick={() => {
-              if (dragged.current) { dragged.current = false; return }
-              if (sheetLevel === 'collapsed') openSheet('half')
-              else if (sheetLevel === 'half') setSheetLevel('expanded')
-              else setSheetLevel('half')
-            }}
-          ><span /></button>
-
-          {sheetLevel === 'collapsed' ? (
-            <div className={styles.collapsedCard}>
-              <button type="button" className={styles.cardMain} onClick={() => openSheet('half')} aria-label={`Open ${featuredTrip.title} route preview`}>
-                <div className={styles.cardTitleRow}><strong>{featuredTrip.title}</strong><span data-status={status}>{status?.toUpperCase()}</span></div>
-                <div className={styles.cardMeta}>{validStops.length} stop{validStops.length === 1 ? '' : 's'} <i>·</i> {tripDateCopy(featuredTrip)}</div>
-                <p>{summary}</p>
-              </button>
-              <button type="button" className={styles.openTripButton} onClick={() => router.push(`/trip/${featuredTrip.id}/mobile?section=overview`)} aria-label={`Open trip ${featuredTrip.title}`}><ArrowRight size={19} /></button>
-            </div>
-          ) : (
+        <DraggableSheet
+          level={sheetLevel}
+          onLevelChange={setSheetLevel}
+          heightFor={sheetHeightFor}
+          label={`${featuredTrip.title} route preview`}
+          className={styles.routeSheet}
+          header={sheetLevel !== 'collapsed' ? (
             <>
               <div className={styles.sheetHeading}>
                 <div><span>Your Route</span><strong>{featuredTrip.title}</strong></div>
@@ -400,7 +339,20 @@ export function DashboardClient({ profile, featuredTrip, featuredStops, capabili
                 {routeState === 'unavailable' && <><span>Route unavailable · itinerary still available</span><button type="button" onClick={() => setRouteAttempt((value) => value + 1)}><RotateCcw size={13} /> Retry</button></>}
                 {routeState === 'idle' && <span>{validStops.length === 0 ? 'No stops yet' : 'Route starts here'}</span>}
               </div>
-
+            </>
+          ) : undefined}
+        >
+          {sheetLevel === 'collapsed' ? (
+            <div className={styles.collapsedCard}>
+              <button type="button" className={styles.cardMain} onClick={() => openSheet('half')} aria-label={`Open ${featuredTrip.title} route preview`}>
+                <div className={styles.cardTitleRow}><strong>{featuredTrip.title}</strong><span data-status={status}>{status?.toUpperCase()}</span></div>
+                <div className={styles.cardMeta}>{validStops.length} stop{validStops.length === 1 ? '' : 's'} <i>·</i> {tripDateCopy(featuredTrip)}</div>
+                <p>{summary}</p>
+              </button>
+              <button type="button" className={styles.openTripButton} onClick={() => router.push(`/trip/${featuredTrip.id}/mobile?section=overview`)} aria-label={`Open trip ${featuredTrip.title}`}><ArrowRight size={19} /></button>
+            </div>
+          ) : (
+            <div className={styles.expandedBody}>
               <div className={styles.stopList} role="list" aria-label="Trip stops">
                 {validStops.length === 0 ? (
                   <div className={styles.noStops}><MapPinned size={24} /><strong>No stops yet</strong><span>Open Plan to shape this route.</span></div>
@@ -436,9 +388,9 @@ export function DashboardClient({ profile, featuredTrip, featuredStops, capabili
                 <button type="button" onClick={() => router.push(`/trip/${featuredTrip.id}/mobile?section=overview`)}>Open trip</button>
                 {capabilities?.canEdit && <button type="button" className={styles.primaryAction} onClick={() => router.push(`/trip/${featuredTrip.id}/mobile?section=plan`)}><Plus size={16} /> Edit route</button>}
               </div>
-            </>
+            </div>
           )}
-        </section>
+        </DraggableSheet>
       ) : (
         <section className={`${styles.routeSheet} ${styles.emptyCard}`} aria-label="Create your first trip">
           <div>

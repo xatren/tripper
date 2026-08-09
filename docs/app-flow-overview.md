@@ -33,7 +33,7 @@ app/
   api/places/{search,autocomplete,details,photo}/ — Google Places proxy (server-side key)
   dashboard/, trips/, trips/new/      — trip list + creation wizard
   trip/[id]/mobile/                   — the actual app: one big mobile client shell + per-feature "Domain" components
-  explore/                            — standalone place-discovery surface (separate from the in-trip Explore tab)
+  explore/                            — Discover: the map-first "Discover" nav tab (`DiscoverClient.tsx`), a full-bleed Mapbox canvas over a curated + live-Places dataset (`lib/discover/`), country-scoped, with a draggable results sheet. The old globe/`ROUTES`-template surface (`ExploreClient.tsx`) is retired (see `docs/discover-explore-map-plan.md`, Phases 1-6 shipped). The in-trip Explore tab (`ExploreDomain.tsx`, `GooglePlacesExplorer.tsx`) is a separate, trip-scoped surface — see §6 item 6 and §7.
   join/[code]/                        — invite-code join flow
   profile/, settings/                 — account pages
 lib/

@@ -116,7 +116,7 @@ export function MobileBottomSheet({ open, onClose, title, titleId, children }: M
     <div
       onClick={onClose}
       style={{
-        position: 'fixed', inset: 0, zIndex: 40,
+        position: 'fixed', inset: 0, zIndex: 60, // above AppBottomNav's z-index: 50, so a modal sheet's bottom content is never clipped by the floating nav
         display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
         background: 'rgba(0,0,0,.55)',
         opacity: entered ? 1 : 0, transition: reduced ? 'none' : 'opacity var(--motion-normal) var(--ease-out)',

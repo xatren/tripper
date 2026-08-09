@@ -4,9 +4,9 @@
   width: 100%;
   min-height: 46px;
   padding: 0 14px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--glass-standard-border);
   border-radius: var(--radius-16);
-  background: rgba(255, 255, 255, 0.055);
+  background: var(--glass-standard-fill);
   color: var(--color-text-primary);
   font: inherit;
   font-size: 14px;
@@ -30,17 +30,17 @@
   align-items: center;
   gap: 7px;
   padding: 0 13px;
-  border: 1px solid rgba(255, 255, 255, 0.13);
+  border: 1px solid var(--glass-standard-border);
   border-radius: var(--radius-full);
-  background: rgba(255, 255, 255, 0.055);
+  background: var(--glass-standard-fill);
   color: var(--color-text-primary);
   font-size: 13px;
   font-weight: 650;
   cursor: pointer;
 }
 .suggestion[aria-pressed='true'] {
-  border-color: rgba(245, 166, 35, 0.42);
-  background: rgba(245, 166, 35, 0.12);
+  border-color: var(--color-accent-border-selected);
+  background: var(--color-accent-wash);
   color: var(--color-accent-light);
 }
 
@@ -62,8 +62,8 @@
   text-align: left;
   cursor: pointer;
 }
-.option:hover { background: rgba(255, 255, 255, 0.05); }
-.optionSelected { border-color: rgba(245, 166, 35, 0.4); background: rgba(245, 166, 35, 0.1); }
+.option:hover { background: var(--overlay-hover-fill); }
+.optionSelected { border-color: var(--color-accent-border-selected); background: var(--color-accent-wash); }
 .flag { font-size: 21px; }
 .name { min-width: 0; overflow: hidden; font-size: 14px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
 .code { color: var(--color-text-muted); font-size: 11px; font-weight: 700; }

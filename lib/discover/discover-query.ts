@@ -7,6 +7,7 @@
 
 import type { DiscoverCategoryId } from './categories.ts'
 import type { DiscoverPlace } from './discover-places.generated.ts'
+import type { DiscoverRoute } from './discover-routes.generated.ts'
 
 /** West/east are normalised to [-180, 180); `west > east` means the box crosses the antimeridian. */
 export interface DiscoverBounds {
@@ -75,11 +76,22 @@ export function sliceByPage(places: readonly DiscoverPlace[], page: number, page
 }
 
 /**
- * A bounding box over the given places, dateline-safe: for a set straddling the
+ * The minimal shape `boundsForPlaces`/`shouldRefitCamera` need. `DiscoverPlace`
+ * satisfies this structurally, and so does a route waypoint (`DiscoverRouteWaypoint`)
+ * — widened in Phase 7 so route-bounds fitting (§5 line layer) reuses this instead
+ * of a second copy of the same dateline-safe math.
+ */
+export interface LatLng {
+  lat: number
+  lng: number
+}
+
+/**
+ * A bounding box over the given points, dateline-safe: for a set straddling the
  * antimeridian the naive min/max spans almost the whole globe, so the wrapped
  * span is computed too and the narrower of the two wins.
  */
-export function boundsForPlaces(places: readonly DiscoverPlace[]): DiscoverBounds | null {
+export function boundsForPlaces(places: readonly LatLng[]): DiscoverBounds | null {
   if (places.length === 0) return null
 
   let south = Infinity
@@ -113,7 +125,7 @@ export function boundsForPlaces(places: readonly DiscoverPlace[]): DiscoverBound
  * zoomed into one region, which reads as the map undoing their navigation.
  */
 export function shouldRefitCamera(
-  places: readonly DiscoverPlace[],
+  places: readonly LatLng[],
   viewport: DiscoverBounds | null,
   visibleThreshold = 0.6,
 ): boolean {
@@ -167,4 +179,53 @@ export function placesToFeatureCollection(
 export function hasCuratedCoverage(countryCode: string | null | undefined, seeded: readonly string[]): boolean {
   if (!countryCode) return false
   return seeded.includes(countryCode.trim().toUpperCase())
+}
+
+/**
+ * The `routes` category's country filter (§7.1 Phase 7). Simpler than
+ * `filterDiscoverPlaces`: a route has one country and no sub-category to match,
+ * so this is a straight `countryCode` scope, alphabetised so the list order is
+ * stable across renders (routes have no `rank` field to sort by).
+ */
+export function filterDiscoverRoutes(routes: readonly DiscoverRoute[], countryCode?: string | null): DiscoverRoute[] {
+  const code = countryCode?.trim().toUpperCase() || null
+  return routes
+    .filter((route) => !code || route.countryCode === code)
+    .sort((a, b) => a.name.localeCompare(b.name))
+}
+
+export interface DiscoverRouteFeatureProperties {
+  id: string
+  name: string
+}
+
+export interface DiscoverRouteLineFeatureCollection {
+  type: 'FeatureCollection'
+  features: {
+    type: 'Feature'
+    id: number
+    geometry: { type: 'LineString'; coordinates: [number, number][] }
+    properties: DiscoverRouteFeatureProperties
+  }[]
+}
+
+/**
+ * The map's source of truth for route polylines (§5 line layer, Phase 7) — one
+ * `LineString` feature per route, its waypoints in order. Mirrors
+ * `placesToFeatureCollection`'s numeric-`id`-plus-slug-in-`properties` shape so
+ * selection and hit-testing work the same way for both layers.
+ */
+export function routesToLineFeatureCollection(routes: readonly DiscoverRoute[]): DiscoverRouteLineFeatureCollection {
+  return {
+    type: 'FeatureCollection',
+    features: routes.map((route, index) => ({
+      type: 'Feature',
+      id: index,
+      geometry: {
+        type: 'LineString',
+        coordinates: route.waypoints.map((waypoint) => [waypoint.lng, waypoint.lat] as [number, number]),
+      },
+      properties: { id: route.id, name: route.name },
+    })),
+  }
 }

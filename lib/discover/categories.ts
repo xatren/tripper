@@ -17,6 +17,7 @@ export type DiscoverCategoryId =
   | 'landmarks'
   | 'cities'
   | 'beaches'
+  | 'routes'
   | 'food'
   | 'museums'
   | 'stays'
@@ -42,6 +43,15 @@ export interface DiscoverCategory {
    * overnights that create a trip day; a viewpoint is somewhere you drive through.
    * See `20260808120000_stop_overnight_semantics.sql` — a wrong default silently
    * lengthens the trip.
+   *
+   * `routes` is the one category where this field goes unread: a route is not
+   * itself a place that becomes a single stop — its `waypoints` become several
+   * (§9 Phase 7). Each waypoint gets `nights: 1`, mirroring the retired
+   * `ExploreClient.handleUseRoute`'s `create_trip_with_stops` call, which sent no
+   * `nights` key at all and let the RPC's own default (one night per omitted
+   * stop) apply uniformly — see `lib/discover/add-to-route.ts`. Kept at `1`
+   * here anyway so the field stays truthful for any future single-waypoint use,
+   * rather than a value that would silently mislead if it were ever read.
    */
   defaultStopNights: 0 | 1
   /** Literal hex: Mapbox paint expressions are evaluated off the document and cannot read CSS custom properties. */
@@ -59,6 +69,7 @@ export const DISCOVER_CATEGORIES: readonly DiscoverCategory[] = [
   { id: 'landmarks', label: 'Landmarks', source: 'curated', defaultStopNights: 0, markerColor: '#e0784a' },
   { id: 'cities', label: 'Cities & Towns', source: 'curated', defaultStopNights: 1, markerColor: '#ff9f6b' },
   { id: 'beaches', label: 'Beaches', source: 'curated', defaultStopNights: 0, markerColor: '#f2d06b' },
+  { id: 'routes', label: 'Road Trips', source: 'curated', defaultStopNights: 1, markerColor: '#8b96ad' },
   {
     id: 'food',
     label: 'Food',
@@ -118,8 +129,13 @@ export function categoryAvailableAtZoom(category: DiscoverCategory, zoom: number
   return category.minZoom === undefined || zoom >= category.minZoom
 }
 
-// Deferred, deliberately absent from DISCOVER_CATEGORIES until they have data:
+// Deferred, deliberately absent from DISCOVER_CATEGORIES until it has data:
 //   `hidden_gems` — a cross-cutting curation flag, needs a human pass per country.
-//   `routes`      — Tier C; lands when `explore-routes-data.ts` moves to
-//                   `lib/discover/discover-routes.generated.ts`.
 // A chip that can only ever render an empty state is worse than no chip.
+//
+// `routes` (Tier C) shipped in Phase 7: `lib/discover/discover-routes.generated.ts`'s
+// DISCOVER_ROUTES render as a line layer (DiscoverMapLayers) plus route cards
+// (DiscoverRouteCard/DiscoverRouteResultsList/DiscoverRouteSheet) — a parallel
+// component set rather than a union type threaded through the place-shaped ones,
+// since a route's data (a polyline of waypoints) and its primary action (clone or
+// append several stops at once) don't fit the single-`DiscoverPlace` shape.

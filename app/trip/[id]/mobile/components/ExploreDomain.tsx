@@ -17,7 +17,6 @@ export interface ExploreDomainProps {
 export function ExploreDomain({ trip, stops, items, setItems, itineraryEnabled, currentUserId, capabilities, onSelectSection }: ExploreDomainProps) {
   return (
     <GooglePlacesExplorer
-      mode="trip"
       trips={[{ id: trip.id, title: trip.title, startDate: trip.start_date ?? null, endDate: trip.end_date ?? null, role: capabilities.role }]}
       activeTrip={trip}
       activeStops={stops}

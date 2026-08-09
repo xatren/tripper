@@ -12,7 +12,7 @@ export default async function ProfilePage() {
 
   const [profileResult, tripsResult] = await Promise.all([
     supabase.from('profiles').select('*').eq('id', user.id).maybeSingle(),
-    supabase.from('trips').select('start_date, end_date, description'),
+    supabase.from('trips').select('start_date, end_date, description, countries'),
   ]);
 
   const profile = requiredQueryData({ route: '/profile', operation: 'profiles.select' }, profileResult);

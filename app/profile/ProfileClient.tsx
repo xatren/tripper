@@ -10,7 +10,7 @@ import { getInitials } from "@/lib/utils";
 import { clearTripperCaches } from "@/components/pwa/RegisterSW";
 import { clearPrivateOfflineData } from "@/lib/offline/db";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import type { Profile } from "@/types";
+import type { Profile, TripCountry } from "@/types";
 import { Home, Briefcase, Compass, FileText } from "lucide-react";
 import { DUSK, FONT_INTER, glassCard, SUNSET_GRADIENT } from "@/components/design/tokens";
 
@@ -31,10 +31,14 @@ function getTotalNights(trips: TripStat[]): number {
 function getCountryCount(trips: TripStat[]): number {
   const all = new Set<string>();
   for (const t of trips) {
+    if (t.countries?.length) {
+      for (const c of t.countries) { const s = (c.code ?? c.name).trim().toLowerCase(); if (s) all.add(s); }
+      continue;
+    }
     if (!t.description) continue;
     const match = t.description.match(/Countries:\s*([^\n]+)/);
     if (!match) continue;
-    match[1].split(",").forEach((c) => { const s = c.trim(); if (s) all.add(s.toLowerCase()); });
+    match[1].split(",").forEach((c) => { const s = c.trim().toLowerCase(); if (s) all.add(s); });
   }
   return all.size;
 }
@@ -57,7 +61,7 @@ function orb(p: {
 }
 
 // ── Types ─────────────────────────────────────────────────────────────────────
-interface TripStat { start_date?: string | null; end_date?: string | null; description?: string | null; }
+interface TripStat { start_date?: string | null; end_date?: string | null; description?: string | null; countries?: TripCountry[] | null; }
 interface Props { profile: Profile | null; trips: TripStat[]; }
 
 const NAV_ITEMS = [

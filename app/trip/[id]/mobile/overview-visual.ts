@@ -24,6 +24,15 @@ function formatShortDate(date: string) {
   return new Date(`${date}T00:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
+/** Same-month ranges drop the repeated month ("Sep 23–25"); cross-month ranges spell both ("Sep 30 – Oct 2"). */
+function formatCompactRange(startISO: string, endISO: string): string {
+  const start = new Date(`${startISO}T00:00:00`)
+  const end = new Date(`${endISO}T00:00:00`)
+  const sameMonth = start.getFullYear() === end.getFullYear() && start.getMonth() === end.getMonth()
+  if (sameMonth) return `${start.toLocaleDateString('en-US', { month: 'short' })} ${start.getDate()}–${end.getDate()}`
+  return `${formatShortDate(startISO)} – ${formatShortDate(endISO)}`
+}
+
 /** Re-exported so existing Overview call sites and tests keep one import path. */
 export { safeCoverImageUrl } from '../../../../lib/media-url.ts'
 
@@ -34,7 +43,8 @@ export function orderStops<T extends OrderedStop>(stops: T[]): T[] {
 export function stopDateLabel(schedule: ScheduledStop | undefined): string {
   if (!schedule) return 'Dates not set'
   if (schedule.arrival && schedule.departure) {
-    return `${formatShortDate(schedule.arrival)} – ${formatShortDate(schedule.departure)}`
+    if (schedule.arrival === schedule.departure) return formatShortDate(schedule.arrival)
+    return formatCompactRange(schedule.arrival, schedule.departure)
   }
   if (schedule.arrival) return `Arrive ${formatShortDate(schedule.arrival)}`
   if (schedule.departure) return `Leave ${formatShortDate(schedule.departure)}`
@@ -48,13 +58,20 @@ export function tripScopeLabel(members: Array<{ user_id: string }>): string | nu
   return `${count} travelers`
 }
 
-export function routeContextLabel(stops: Array<{ name: string }>): string | null {
-  const names = stops
-    .map((stop) => stop.name.trim())
-    .filter((name, index, all) => name.length > 0 && all.indexOf(name) === index)
-  if (names.length === 0) return null
-  if (names.length <= 3) return names.join(' → ')
-  return `${names[0]} → ${names.at(-1)}`
+export function routeContextLabel(stops: Array<{ name: string; state?: string | null }>): string | null {
+  const seen = new Set<string>()
+  const unique = stops.filter((stop) => {
+    const name = stop.name.trim()
+    if (name.length === 0 || seen.has(name)) return false
+    seen.add(name)
+    return true
+  })
+  if (unique.length === 0) return null
+  if (unique.length === 1) return unique[0].name.trim()
+  const last = unique.at(-1)!
+  const lastLabel = last.state?.trim() ? `${last.name.trim()}, ${last.state.trim()}` : last.name.trim()
+  if (unique.length <= 3) return [...unique.slice(0, -1).map((stop) => stop.name.trim()), lastLabel].join(' → ')
+  return `${unique[0].name.trim()} → ${lastLabel}`
 }
 
 export function heroCopy(
