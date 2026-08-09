@@ -211,7 +211,7 @@ test('the trip primary nav marks its active section with aria-current', () => {
   assert.match(nav, /aria-current=\{isActive \? 'page' : undefined\}/)
   assert.match(nav, /aria-label="Trip sections"/)
   // Tab bar entries stay at or above the 44px touch floor.
-  assert.match(nav, /minHeight: 48/)
+  assert.match(nav, /minHeight: 54/)
 })
 
 test('active Overview gives Travel Mode the only lifecycle-controlled accent', () => {
