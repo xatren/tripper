@@ -182,11 +182,15 @@ end $$;
 --    child activity rows for the parent that is being removed.
 do $$
 declare
-  disposable_trip_id uuid;
+  -- Pre-generated rather than captured via RETURNING: RETURNING re-checks
+  -- the row against the SELECT policy (is_trip_member) immediately after
+  -- the insert, which runs before the AFTER INSERT trigger has added the
+  -- owner's trip_members row for it — so a same-statement RETURNING would
+  -- spuriously fail RLS even though the insert itself is legitimate.
+  disposable_trip_id uuid := gen_random_uuid();
 begin
-  insert into public.trips (owner_id, title)
-  values (tests.user_id('owner'), 'Cascade deletion probe')
-  returning id into disposable_trip_id;
+  insert into public.trips (id, owner_id, title)
+  values (disposable_trip_id, tests.user_id('owner'), 'Cascade deletion probe');
 
   delete from public.trips where id = disposable_trip_id;
 
